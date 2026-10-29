@@ -1,0 +1,34 @@
+[
+  {
+    "full_name": "Admin Kasule",
+    "phone": "+256700111000",
+    "pin": "246810",
+    "role": "ADMIN",
+    "motorcycle_plate": null,
+    "is_active": true
+  },
+  {
+    "full_name": "Chef Musa",
+    "phone": "+256700111001",
+    "pin": "135790",
+    "role": "KITCHEN",
+    "motorcycle_plate": null,
+    "is_active": true
+  },
+  {
+    "full_name": "Rider Juma",
+    "phone": "+256700111002",
+    "pin": "112233",
+    "role": "RIDER",
+    "motorcycle_plate": "UFD 342B",
+    "is_active": true
+  },
+  {
+    "full_name": "Rider David",
+    "phone": "+256700111003",
+    "pin": "445566",
+    "role": "RIDER",
+    "motorcycle_plate": "UEX 119A",
+    "is_active": true
+  }
+]

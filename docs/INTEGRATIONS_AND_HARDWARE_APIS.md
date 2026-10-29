@@ -1,5 +1,7 @@
 # INTEGRATIONS_AND_HARDWARE_APIS.md
 
+> **v1.1 normative amendment:** Payment signatures, OTP provider, map tiles, printing, and deep links are superseded by [`DECISIONS.md`](DECISIONS.md) ADR-002/003/004/007 and [`API_CONTRACTS.md`](API_CONTRACTS.md) §3.
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved Technical Integration Specification

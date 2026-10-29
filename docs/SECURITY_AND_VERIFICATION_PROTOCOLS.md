@@ -1,5 +1,7 @@
 # SECURITY_AND_VERIFICATION_PROTOCOLS.md
 
+> **v1.1 normative amendment:** Custom staff sessions, plaintext PINs, in-memory lockout, and COD OTP storage are superseded by [`DECISIONS.md`](DECISIONS.md) ADR-001/003/013 and the migration. Staff use Supabase Auth; handover-PIN state is durable.
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved Security Specification

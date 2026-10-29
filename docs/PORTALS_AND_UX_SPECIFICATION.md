@@ -1,5 +1,7 @@
 # PORTALS_AND_UX_SPECIFICATION.md
 
+> **v1.1 normative amendment:** Auth screens, store-closed behavior, dine-in completion, and rider GPS claims are superseded by [`SPEC_AMENDMENTS.md`](SPEC_AMENDMENTS.md), [`API_CONTRACTS.md`](API_CONTRACTS.md), and [`OPERATIONS_RUNBOOK.md`](OPERATIONS_RUNBOOK.md).
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved User Experience & Interface Specification

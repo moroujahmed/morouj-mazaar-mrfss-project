@@ -1,5 +1,7 @@
 # TESTING_PERSONAS_AND_E2E_SCENARIOS.md
 
+> **v1.1 normative amendment:** Seed UUIDs, staff auth, distances, totals, and the Playwright blueprint are superseded by [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md), [`TEST_PLAN.md`](TEST_PLAN.md), [`../supabase/seed.sql`](../supabase/seed.sql), and [`../scripts/seed-staff.mjs`](../scripts/seed-staff.mjs).
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved QA & Testing Specification

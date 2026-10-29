@@ -1,5 +1,7 @@
 # DATABASE_SCHEMA_AND_RLS.md
 
+> **v1.1 normative amendment:** The schema, RLS, triggers, and seed in this document are superseded by [`../supabase/migrations/20261029000000_initial_schema.sql`](../supabase/migrations/20261029000000_initial_schema.sql), [`../supabase/seed.sql`](../supabase/seed.sql), and [`ERD.md`](ERD.md). Do not apply the SQL in this file.
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Production-Ready Database Specification

@@ -3,27 +3,65 @@
 | Field | Value |
 | :--- | :--- |
 | **Audit date** | 2026-10-29 |
+| **Remediation date** | 2026-10-29 |
 | **Repository** | `morouj-mazaar-mrfss-project` |
-| **Scope** | All 10 files in `/docs` plus repository state |
+| **Scope** | v1.0 audit of the original 10 documents, followed by the v1.1 remediation and local database validation |
 | **Auditor** | Big Pickle (OpenCode coding agent) |
-| **Document status** | Audit complete — findings are blocking until resolved |
-| **Code present** | None. Repository contains documentation only. |
+| **Document status** | v1.1 — P0/P1 specification remediation complete; launch gated by founder inputs in §12 |
+| **Code present** | No application code. Schema, migrations, seed, config, scripts, and docs are present. |
+
+> **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1.1; the authoritative founder action register is §12; every file created or changed is in §13.
 
 ---
 
 ## 1. Executive Verdict
 
-The documentation set is **well above average** in product thinking, UX detail, business-rule clarity, and security intent. The fee model, order lifecycle, rider handover PIN, cash ledger, KDS audio, and offline/low-bandwidth concerns are all identified correctly.
+### 1.1 v1.1 remediation verdict (current)
 
-However, the project is **not build-ready** in its current state. There are three blocking classes:
+The v1.0 documentation was **well above average** in product thinking, UX detail, business-rule clarity, and security intent. It was nevertheless **not build-ready**: it contained 10 P0 blockers and 50 P1 findings, including contradictions between authentication and RLS, unsafe public order access, a non-durable handover-PIN gate, a cash ledger that could not close, incorrect payment contracts, wrong distance/total fixtures, invalid seed UUIDs, and a false accessibility claim.
 
-1. **Internal contradictions** that make several requirements mutually exclusive (authentication vs. RLS, token-based reads vs. Realtime, "PIN never sent to rider" vs. row-level RLS, discount in the pricing formula vs. no discount model).
-2. **Unsafe or unimplementable implementation details** (public order inserts, over-broad rider/staff RLS updates, non-durable PIN attempt counters, missing settlement linkage, incomplete payment lifecycle).
-3. **Missing inputs** (no application code, no config, no database migration files, no assets, no credentials, no verified menu/staff data, no legal copy).
+The v1.1 baseline now:
 
-### Readiness scorecard
+- Resolves **9 of the 10 P0 findings** fully in the specification/schema and **contracts P0-10** (operations, legal, compliance) with a runbook, compliance checklist, and founder register.
+- Addresses **all 50 P1 findings** — 34 resolved in the specification/schema, 12 contracted to a named implementation phase, and 4 gated on founder accounts or hosting.
+- Adds a validated PostgreSQL schema, storage migration, deterministic seed, local Supabase config, staff-provisioning script, canonical fixtures, API contracts, ERD, test plan, accessibility baseline, operations runbook, and Uganda compliance checklist.
+- Removes the contradictions that would force rework in Phases 1–6.
 
-| Area | Score | Assessment |
+**Build-readiness score: 9/10 — conditional.**
+
+The score is conditional because the remaining gap is no longer specification ambiguity. It is **implementation plus founder inputs**: there is no Next.js application yet, no production credentials, no on-site verified coordinates, no approved menu/staff data, and no completed legal review. A competent team can start Phase 1 immediately without re-deciding the architecture, but checkout, payments, and launch cannot go live until §12 is closed.
+
+#### Current scorecard
+
+| Area | v1.0 | v1.1 | Evidence |
+| :--- | :---: | :---: | :--- |
+| Product vision & scope | 9/10 | 9/10 | `SYSTEM_OVERVIEW.md` + `DECISIONS.md`; scope is explicit and bounded. |
+| UX & visual specification | 8/10 | 9/10 | `PORTALS_AND_UX_SPECIFICATION.md` + `ACCESSIBILITY.md`; false AAA claim removed. |
+| Business rules & FSM | 7/10 | 9/10 | `ERD.md` §4, `CANONICAL_EXAMPLES.md`, migration triggers/RPCs. |
+| Data model | 4/10 | 9/10 | `ERD.md` + validated migration + seed; all promised entities modeled. |
+| Security design | 3/10 | 9/10 | Deny-by-default RLS, token-scoped RPCs, durable PIN state, audit tables. |
+| Integration specifications | 4/10 | 9/10 | `API_CONTRACTS.md` + `DECISIONS.md` ADR-002/003/004/005/007. |
+| Test specification | 3/10 | 9/10 | `TEST_PLAN.md`; corrected fixtures, RLS matrix, Playwright blueprint. |
+| Documentation traceability | 5/10 | 9/10 | `SPEC_AMENDMENTS.md`, amendment banners, §13 change log. |
+| Operations & compliance | 2/10 | 8/10 | `OPERATIONS_RUNBOOK.md` + `COMPLIANCE_AND_LEGAL.md`; legal review open. |
+| **Specification / build readiness** | **2/10** | **9/10 (conditional)** | **Build can start; founder gates remain.** |
+| **Launch readiness** | n/a | **4/10** | Credentials, verified data, legal review, and live provider certification outstanding. |
+
+#### Why 9/10 and not 10/10
+
+1. No application code exists yet; Phase 1 scaffolding is the next engineering task.
+2. Production credentials and merchant accounts are not provisioned.
+3. Restaurant coordinates, menu, modifiers, combos, staff roster, printer, and assets are not founder-verified.
+4. The legal/tax/privacy documents are skeletons pending Ugandan counsel and accountant review.
+5. Payment, SMS, OSRM, MapTiler, and Upstash integrations have not been certified against live/sandbox accounts.
+
+None of these is a specification contradiction. They are execution and business-input gates, tracked in §12.
+
+### 1.2 Historical v1.0 scorecard (superseded)
+
+The original verdict was: **not build-ready**, because of internal contradictions, unsafe or unimplementable details, and missing inputs. The original scorecard is retained for traceability.
+
+| Area | Score | Original assessment |
 | :--- | :---: | :--- |
 | Product vision & scope | 9/10 | Clear, specific, commercially grounded. |
 | UX & visual specification | 8/10 | Strong and distinctive; accessibility claims are not met. |
@@ -33,25 +71,29 @@ However, the project is **not build-ready** in its current state. There are thre
 | Integration specifications | 4/10 | Good direction; payment/OTP/print contracts incomplete or wrong. |
 | Test specification | 3/10 | Excellent scenario thinking; fixtures and expected numbers are wrong. |
 | Documentation traceability | 5/10 | Cross-references use filenames that do not exist; manifests drift. |
-| **Build readiness** | **2/10** | **Not ready to build "seamlessly/perfectly" without the inputs in §9.** |
+| **Build readiness** | **2/10** | **Not ready to build without the inputs in §9.** |
 
-### Short answer to "is there anything else we need to provide?"
+### 1.3 Short answer to "is there anything else we need to provide?"
 
-**Yes.** Before a clean build, we need:
+**Yes — but the list is now finite, deduplicated, and tracked in §12.** Phase 1 can start now. Payments, checkout go-live, and public launch cannot start until the founder gates are closed.
 
-- **Decisions** on 8 architectural forks (auth model, payment provider, OTP provider, map tiles, rate-limit store, printing, Next.js version, COD policy).
-- **Credentials/accounts** for Supabase, payments, SMS, hosting, and the domain — shared securely, never committed.
-- **Verified business data**: restaurant coordinates, confirmed fee constants, menu, modifiers, combos, staff/rider roster, table numbers.
-- **Assets**: dish images, logo, PWA icons, favicon, social image.
-- **Legal/compliance copy**: privacy, terms, refunds, tax/EFRIS position, data-retention policy.
-- **Corrected fixtures**: the current 3.8 km / 7.4 km examples do not match real routing (see §6.4).
-- **New internal docs**: API contracts, ERD, decision log (ADRs), runbook, and a single canonical worked example.
+The remaining founder inputs fall into seven groups:
 
-Full checklist in **§9**.
+- **Legal identity, tax, and regulatory** — entity, TIN, licences, VAT/EFRIS, PDPO registration, privacy/terms/refund policies.
+- **Commercial rules** — final fee constants, COD policy, delivery zones, opening hours, refund authority.
+- **Menu and content** — final menu, modifiers, combos, prices, allergens, photos, brand assets.
+- **Staff and riders** — roster, PINs, contracts, plates, pay/float model, devices.
+- **Accounts and infrastructure** — Supabase, Vercel, Flutterwave, Africa's Talking, MapTiler, Upstash, OSRM host, domain, monitoring.
+- **Operations** — printer, kitchen tablet, rider phones, cash denominations, on-call rota.
+- **Launch sign-off** — pilot orders, legal review, accessibility/UX sign-off, go/no-go authority.
+
+The complete register, including the 15 decisions already recorded in `DECISIONS.md`, is **§12**. There are no remaining open engineering decisions that block Phase 1.
 
 ---
 
 ## 2. Scope and Method
+
+> **Historical record (v1.0).** This section describes the repository and method as they were before remediation. Current repository state and every file created or changed are in §13. The findings in §§3–8 are retained as the evidentiary basis for the remediation, not as current status.
 
 ### 2.1 Files reviewed
 
@@ -789,7 +831,7 @@ Replace the ledger example with orders generated from the canonical fixtures. Fo
 
 ## 9. What We Need From You
 
-> Share secrets through a password manager or `.env.local`/secret manager — **never in chat or Git**.
+> **Historical v1.0 request list.** This section is retained for traceability. The authoritative, deduplicated register — including status and blocking phase — is **§12**. Share secrets through a password manager or secret manager — **never in chat or Git**.
 
 ### 9.1 Decisions (blocking)
 
@@ -939,6 +981,8 @@ table_number,label,is_active
 
 ## 10. Recommended Path to Unblock
 
+> **Historical v1.0 plan.** Gates 0–2 are complete at specification level in v1.1. The remaining gates are the founder actions in §12 and Phase 1–12 implementation. This section is retained to show how the remediation was scoped.
+
 ### Gate 0 — Resolve the specification (1–3 days)
 
 1. Answer D1–D12.
@@ -983,6 +1027,290 @@ To be clear, these are strengths, not things to rewrite:
 - The **zero-trust pricing pipeline** (server recalculates everything) is correct.
 - The **scenario-based testing** (A–G) is exactly the right approach; it needs corrected fixtures.
 - The **low-bandwidth/offline** concerns are appropriate for Kampala.
+
+---
+
+## 12. Founders-Only Actions
+
+> **Authoritative register.** This is the complete list of things only the founders can provide or decide. It supersedes the v1.0 request list in §9 and the short table in `DECISIONS.md`. Engineering decisions already resolved in `DECISIONS.md` are not founder actions; they only need acknowledgment (F-87).
+>
+> **Status legend:** `Open` = not yet provided; `In progress` = being collected; `Confirmed` = decision recorded, evidence linked; `Provided` = credential/data delivered securely; `N/A` = explicitly not applicable.
+>
+> **Security:** never send secrets in chat or Git. Use a password manager or the hosting provider's secret manager. Founders should invite the engineering team to accounts with least privilege rather than sharing owner passwords.
+
+### 12.1 Decisions already recorded (F-01–F-15)
+
+These 15 items are the first tranche recorded in `DECISIONS.md`. The decision is made; the founder input or acknowledgment is still required.
+
+| ID | Founder action | Acceptance / evidence | Blocks | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| F-01 | Confirm restaurant GPS on site | Exact latitude/longitude read at the physical bazaar; update `app_settings` and `CANONICAL_EXAMPLES.md` | Phase 2 | Open |
+| F-02 | Confirm fee/MOV/COD constants | Signed-off values for free radius, rate, max radius, MOV, packaging, max cart, max quantity | Phase 2 | Open |
+| F-03 | Provide menu/modifier/combo data | Final items, prices, descriptions, prep times, modifier groups/options, combo steps/options | Phase 2 | Open |
+| F-04 | Provide staff/rider roster and PINs | Names, roles, E.164 phones, 6-digit PINs, plates; provision via `scripts/seed-staff.mjs` | Phase 2 | Open |
+| F-05 | Provide Flutterwave merchant credentials | Merchant account, public/secret keys, webhook hash, settlement bank | Phase 6 | Open |
+| F-06 | Provide Africa's Talking credentials | Account, API key, username, approved sender ID | Phase 6 | Open |
+| F-07 | Provide MapTiler key | Account and domain-restricted production key | Phase 5 | Open |
+| F-08 | Provide Upstash credentials | REST URL and token; chosen region | Phase 5 | Open |
+| F-09 | Provide printer model/paper width | Make/model, 58 mm or 80 mm, connection type, fallback plan | Phase 3 | Open |
+| F-10 | Provide legal/compliance copy | Reviewed privacy, terms, refund, delivery, retention, consent, tax/EFRIS text | Phase 10 / launch | Open |
+| F-11 | Confirm VAT/EFRIS position | Registration status, VAT number, EFRIS onboarding, receipt fields | Phase 6 | Open |
+| F-12 | Provide brand/dish assets | Logo SVG/PNG, PWA 192/512 icons, favicon, OG image, dish photos, font licences | Phase 3 | Open |
+| F-13 | Confirm domain/hosting accounts | Domain/DNS, Vercel/hosting team, billing owner, TLS | Phase 12 | Open |
+| F-14 | Confirm COD max radius and change policy | Max COD radius, OTP policy, accepted change denominations, blacklist rules | Phase 2 | Open |
+| F-15 | Confirm notification templates/sender ID | SMS templates, sender ID approval, support WhatsApp, opt-out wording | Phase 9 | Open |
+
+### 12.2 Legal identity, tax, and regulatory (F-16–F-35)
+
+| ID | Founder action | Acceptance / evidence | Blocks | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| F-16 | Confirm legal entity and TIN | Registered name, trading name, registration number, TIN | Launch | Open |
+| F-17 | Confirm registered and physical address | Address, landmark, support address; link to F-01 coordinates | Phase 2 / launch | Open |
+| F-18 | Confirm licences and permits | Trade licence, food hygiene/health permit, fire certificate, liquor licence if alcohol | Launch | Open |
+| F-19 | Confirm insurance | Public liability, product liability, rider/motorcycle cover | Launch | Open |
+| F-20 | Confirm VAT registration | Registered/not registered; VAT number | Phase 6 | Open |
+| F-21 | Confirm EFRIS onboarding | EFRIS status, invoice fields, credit-note process | Phase 6 | Open |
+| F-22 | Confirm tax treatment | VAT-inclusive/exclusive pricing, service fees, withholding, digital services | Phase 6 | Open |
+| F-23 | Confirm record-retention period | Statutory period and storage location | Phase 6 | Open |
+| F-24 | Confirm PDPO registration and DPO | Registration reference, DPO name/contact, DPIA position | Launch | Open |
+| F-25 | Approve privacy policy | Counsel-reviewed policy; link and version | Launch | Open |
+| F-26 | Approve terms of service | Counsel-reviewed terms; link and version | Launch | Open |
+| F-27 | Approve refund/cancellation policy | Counsel-reviewed policy; refund authority and timelines | Launch | Open |
+| F-28 | Approve delivery policy | Zones, fees, COD limits, failed-delivery rules | Launch | Open |
+| F-29 | Approve data-retention schedule | Category-level periods and deletion method | Launch | Open |
+| F-30 | Confirm cross-border transfer position | Vendor regions, DPAs, safeguards, privacy-policy wording | Launch | Open |
+| F-31 | Approve breach-notification procedure | Contacts, decision tree, PDPO/data-subject notice templates | Launch | Open |
+| F-32 | Approve AML/cash policy | Cash limits, thresholds, reporting, record keeping | Launch | Open |
+| F-33 | Confirm PCI/SAQ A position | Written confirmation from Flutterwave/acquirer; no card data in app | Phase 6 | Open |
+| F-34 | Approve chargeback/refund limits | Amount thresholds and approvers | Phase 6 | Open |
+| F-35 | Confirm complaint escalation | Support channels, response targets, regulator contact | Launch | Open |
+
+### 12.3 Commercial rules and customer policy (F-36–F-48)
+
+| ID | Founder action | Acceptance / evidence | Blocks | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| F-36 | Approve final fee constants | 5.0 km free, USh 1,500/km, 15 km max, MOV 20,000, packaging 1,000, max cart 200,000, max qty 20 — or corrections | Phase 2 | Open |
+| F-37 | Approve COD policy | 8 km max, OTP for first-time COD, change policy, blacklist rules | Phase 2 | Open |
+| F-38 | Confirm delivery zones | Included/excluded areas and any zone-specific rules | Phase 2 | Open |
+| F-39 | Confirm opening hours and holidays | Regular hours, holiday calendar, Ramadan/Eid hours | Phase 2 | Open |
+| F-40 | Confirm store-closed behavior | Hard block, admin override authority, customer copy | Phase 2 | Open |
+| F-41 | Approve refund methods/timelines | Original method, cash refund process, approval limits | Phase 6 | Open |
+| F-42 | Approve failed-delivery policy | Waiting time, redelivery fee, refund/return rules | Launch | Open |
+| F-43 | Confirm support channels and hours | WhatsApp, phone, email, response targets | Phase 9 | Open |
+| F-44 | Approve SMS templates and sender ID | Exact copy, sender ID, opt-out wording | Phase 9 | Open |
+| F-45 | Approve marketing consent | Opt-in wording, withdrawal, record keeping | Launch | Open |
+| F-46 | Decide cookies/analytics | Essential-only MVP or consent-gated analytics | Phase 10 | Open |
+| F-47 | Confirm v1 exclusions | No promotions, batching, pre-orders, customer accounts, loyalty | Phase 2 | Open |
+| F-48 | Confirm accessibility target | WCAG 2.2 AA accepted; any additional requirements | Phase 3 | Open |
+
+### 12.4 Menu, catalog, and content (F-49–F-57)
+
+| ID | Founder action | Acceptance / evidence | Blocks | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| F-49 | Provide final menu | Categories, items, prices, descriptions, prep times, availability | Phase 2 | Open |
+| F-50 | Provide modifiers | Groups, selection rules, options, price deltas, applicability | Phase 2 | Open |
+| F-51 | Provide combos | Steps, options, price deltas, defaults, availability | Phase 2 | Open |
+| F-52 | Provide allergen/dietary data | Allergen matrix, dietary tags, cross-contamination disclaimer | Phase 2 | Open |
+| F-53 | Provide dish photos and rights | WebP images, photographer/usage rights, alt text | Phase 3 | Open |
+| F-54 | Provide brand assets and font licences | Logo, PWA icons, favicon, OG image, font files/licences | Phase 3 | Open |
+| F-55 | Confirm tables and QR placement | Table numbers, labels, layout, QR placement | Phase 2 | Open |
+| F-56 | Approve receipt content | Header/footer, legal footer, VAT/EFRIS fields | Phase 6 | Open |
+| F-57 | Confirm 86/availability SOP | Who toggles, how often, customer copy | Phase 3 | Open |
+
+### 12.5 Staff, riders, and operations (F-58–F-68)
+
+| ID | Founder action | Acceptance / evidence | Blocks | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| F-58 | Provide staff roster | Names, roles, phones, 6-digit PINs, start dates | Phase 2 | Open |
+| F-59 | Provide rider roster | Names, phones, plates, licences, insurance, contracts | Phase 2 | Open |
+| F-60 | Confirm rider engagement model | Employee/contractor, pay, float, shift schedule, settlement cadence | Phase 2 / launch | Open |
+| F-61 | Approve monitoring notices | GPS while on delivery, CCTV areas, confidentiality, acceptable use | Launch | Open |
+| F-62 | Confirm kitchen device | Tablet/PC model, browser/OS, network and power backup | Phase 3 | Open |
+| F-63 | Confirm rider devices | Phone models, browser/OS, data plan, mount/power | Phase 3 | Open |
+| F-64 | Confirm printer and fallback | Model, paper width, connection, handwritten docket fallback | Phase 3 | Open |
+| F-65 | Provide volume forecast and pilot date | Orders/day, peak hour, rider capacity, pilot window | Phase 12 | Open |
+| F-66 | Assign opening/closing SOP owner | Named person and daily checklist | Launch | Open |
+| F-67 | Confirm cash denominations/float | Accepted notes, change reserve, float per rider | Phase 2 | Open |
+| F-68 | Publish on-call/escalation rota | Names, phones, severity contacts | Launch | Open |
+
+### 12.6 Accounts, infrastructure, and security (F-69–F-81)
+
+| ID | Founder action | Acceptance / evidence | Blocks | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| F-69 | Confirm Supabase ownership | Organisation/project, billing owner, region, team invites | Phase 1 | Open |
+| F-70 | Confirm hosting ownership | Vercel/team, billing owner, domains, preview policy | Phase 1 | Open |
+| F-71 | Confirm GitHub ownership | Org/repo, branch protection, 2FA, deploy keys | Phase 1 | Open |
+| F-72 | Provide Flutterwave account | Merchant onboarding, keys, webhook hash, settlement bank | Phase 6 | Open |
+| F-73 | Provide Africa's Talking account | API key, username, sender ID, sandbox/live split | Phase 6 | Open |
+| F-74 | Provide MapTiler account | Plan, restricted key, attribution | Phase 5 | Open |
+| F-75 | Provide Upstash account | Plan, region, REST URL/token | Phase 5 | Open |
+| F-76 | Provide OSRM host | VPS/container host or approved paid routing contract | Phase 5 | Open |
+| F-77 | Confirm domain/DNS/TLS | Registrar, DNS access, TLS, renewal owner | Phase 12 | Open |
+| F-78 | Provide monitoring account | Error tracking, uptime, alert channel, on-call recipient | Phase 12 | Open |
+| F-79 | Confirm backup ownership | Owner, retention, restore-drill schedule | Launch | Open |
+| F-80 | Publish security contact | Vulnerability disclosure channel and response owner | Launch | Open |
+| F-81 | Provide vendor contracts/DPAs | Signed terms, renewal dates, exit plan | Launch | Open |
+
+### 12.7 Brand, launch, and sign-off (F-82–F-97)
+
+| ID | Founder action | Acceptance / evidence | Blocks | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| F-82 | Confirm domain/social ownership | Domain, DNS, social handles owned by the business | Phase 12 | Open |
+| F-83 | Confirm trademark/brand ownership | Trademark search/filing, logo assignment, photo/font licences | Launch | Open |
+| F-84 | Provide pilot customers/test orders | Named pilot users, test phones, acceptance window | Phase 12 | Open |
+| F-85 | Set launch date and go/no-go authority | Date, decision-maker, rollback authority | Launch | Open |
+| F-86 | Approve provider budget | Supabase, Vercel, Flutterwave, AT, MapTiler, Upstash, OSRM, domain, monitoring | Phase 1 | Open |
+| F-87 | Accept ADR-001–ADR-016 | Written acknowledgment of `DECISIONS.md` | Phase 1 | Open |
+| F-88 | Accept canonical fixtures | Acknowledge `CANONICAL_EXAMPLES.md` and retired numbers | Phase 2 | Open |
+| F-89 | Accept Phase 1 start | Acknowledge no application code exists yet | Phase 1 | Open |
+| F-90 | Complete legal review sign-off | Counsel/accountant sign-off recorded | Launch | Open |
+| F-91 | Complete accessibility/UX sign-off | WCAG 2.2 AA verification accepted | Phase 12 | Open |
+| F-92 | Complete operational readiness sign-off | Runbook, backup, rollback, on-call tested | Launch | Open |
+| F-93 | Confirm existing data migration | Whether old orders/customers/menu must be migrated; source access | Phase 1 | Open |
+| F-94 | Approve staff training plan/date | Training materials, attendance, sign-off | Launch | Open |
+| F-95 | Assign post-launch support/maintenance | Owner, hours, escalation, budget | Launch | Open |
+| F-96 | Accept known limitations | No promotions, batching, pre-orders, accounts, background GPS, WhatsApp automation, ESC/POS, multi-branch | Phase 1 | Open |
+| F-97 | Final launch sign-off | Written go-live approval | Launch | Open |
+
+### 12.8 What is *not* a founder action
+
+These are already resolved and should not be reopened without an ADR:
+
+- Staff authentication model (Supabase Auth; 6-digit PIN as password).
+- Payment provider contract (Flutterwave hosted checkout + verification).
+- SMS/OTP provider (Africa's Talking).
+- Map tiles (MapTiler production; OSM development).
+- Routing (self-hosted OSRM production; mock/public development; no Haversine fallback for final fee).
+- Rate-limit store (Upstash Redis).
+- Printing (browser print for MVP).
+- Framework versions (Next.js 15.x, React 19, Tailwind 3.4.x).
+- Promotions, batching, pre-orders, customer accounts, loyalty (deferred).
+- Store-closed hard block, one active order per rider, 4-digit handover PIN, 6-digit staff PIN.
+- Realtime strategy (Broadcast + polling; no raw `postgres_changes` on PII tables).
+- Money/time representation (integer UGX; `Africa/Kampala` business dates).
+- Accessibility target (WCAG 2.2 AA; `#B83817` action colour).
+- Schema, RLS, API contracts, test plan, runbook, and compliance skeletons (already written and validated where possible).
+
+Founders do **not** need to write code, design the database, choose library versions, or provide card data. They need to make the business decisions and provide the accounts, verified data, and legal sign-off above.
+
+### 12.9 Critical path
+
+1. **Before Phase 1:** F-69–F-71 (accounts/ownership), F-85/F-86 (date/budget), F-87–F-89 (accept baseline), F-93 (migration), F-96 (limitations).
+2. **Before Phase 2:** F-01, F-02, F-14, F-36–F-40 (business rules), F-03, F-49–F-52, F-55, F-57 (menu/data), F-04, F-58–F-60, F-67 (staff/rider/cash).
+3. **Before Phase 3:** F-09, F-12, F-48, F-53, F-54, F-62–F-64 (devices/assets/accessibility).
+4. **Before Phase 5:** F-07, F-08, F-74–F-76 (maps/routing/rate limits).
+5. **Before Phase 6:** F-05, F-06, F-11, F-20–F-23, F-33, F-34, F-41, F-56, F-72, F-73 (payments/SMS/tax/receipts).
+6. **Before Phase 9:** F-15, F-43, F-44 (notifications/support).
+7. **Before launch:** F-10, F-16–F-35, F-42, F-45–F-47, F-61, F-65, F-66, F-68, F-77–F-84, F-90–F-92, F-94, F-95, F-97.
+
+---
+
+## 13. Change Log
+
+> **Tracked record.** This section records every file created or modified during the v1.1 remediation. The last commit before the remediation was `4b98245`.
+
+### 13.1 Commits
+
+| Commit | Date | Contents |
+| :--- | :--- | :--- |
+| `4b98245` | 2026-10-29 | Added `docs/CANONICAL_EXAMPLES.md` and `docs/DECISIONS.md`. |
+| `this commit` | 2026-10-29 | v1.1 build baseline: schema, storage, seed, config, staff script, contracts, ERD, amendments, tests, accessibility, operations, compliance, audit update, and amendment banners. |
+
+### 13.2 Files created
+
+| Path | Purpose | Validation |
+| :--- | :--- | :--- |
+| `docs/DECISIONS.md` | ADR log for every architectural fork (ADR-001–ADR-016) and the first 15 founder inputs. | Reviewed; committed in `4b98245`; cross-referenced to §12. |
+| `docs/CANONICAL_EXAMPLES.md` | Single source of truth for distances, fees, totals, status copy, and fixtures. | Live OSRM snapshot; totals recomputed; committed in `4b98245`. |
+| `docs/API_CONTRACTS.md` | Server actions, route handlers, RPCs, auth matrix, Realtime, rate limits, env vars. | Cross-checked against the migration and seed. |
+| `docs/ERD.md` | v1.1 entity model, data dictionary, FSM, indexes, deferred models. | Cross-checked against the migration. |
+| `docs/SPEC_AMENDMENTS.md` | Normative mapping of every P0/P1 to its resolution and artifact. | 10 P0 + 50 P1 accounted for. |
+| `docs/TEST_PLAN.md` | Corrected unit/DB/RLS/E2E/accessibility/performance plan. | Fixtures match `CANONICAL_EXAMPLES.md`. |
+| `docs/ACCESSIBILITY.md` | WCAG 2.2 AA palette, measured contrast, component rules, verification plan. | Contrast ratios recomputed. |
+| `docs/OPERATIONS_RUNBOOK.md` | Deploy, backup/restore, incidents, rider/kitchen SOP, cash reconciliation, KPIs, secret rotation, go-live. | Cross-checked against the schema/RPCs. |
+| `docs/COMPLIANCE_AND_LEGAL.md` | Uganda DPPA/consumer/tax/PCI checklist and policy skeletons. | Clearly marked “not legal advice”; founder review required. |
+| `supabase/migrations/20261029000000_initial_schema.sql` | Enums, settings, profiles, menu/modifiers/combos, tables, orders, payments, settlements, audit, triggers, RPCs, RLS, grants. | Applied to PostgreSQL 18.4; smoke tests passed. |
+| `supabase/migrations/20261029000001_storage.sql` | `menu-images` bucket and public-read policy. | Applied after the schema; bucket inserted. |
+| `supabase/seed.sql` | Deterministic settings, 5 categories, 12 menu items, modifiers, combos, 8 tables. | Applied successfully; valid hex UUIDs. |
+| `supabase/config.toml` | Local Supabase project configuration and seed path. | Syntax reviewed; CLI not installed in this environment. |
+| `scripts/seed-staff.mjs` | Provisions Supabase Auth staff users and profiles. | `node --check` passed. |
+| `scripts/staff.example.json` | Example roster with 6-digit PINs. | JSON parsed; 4 roles. |
+| `public/images/placeholder-dish.svg` | Accessible dish placeholder. | SVG reviewed. |
+| `public/icons/icon.svg` | Accessible placeholder icon. | SVG reviewed. |
+| `.env.example` | Environment template for all providers. | No real secrets. |
+| `.gitignore` | Ignores env files, local staff file, build output, test artifacts. | Reviewed. |
+| `README.md` | Repository overview, quick start, security rules, canonical fixtures, founder pointer. | Cross-checked against the docs. |
+
+### 13.3 Files modified
+
+| Path | Change |
+| :--- | :--- |
+| `docs/AUDIT_REPORT.md` | Replaced the v1.0 verdict with the v1.1 conditional 9/10 scorecard; preserved the v1.0 scorecard; added remediation summary, §12 founder register, §13 change log, and historical notes. |
+| `docs/SYSTEM_OVERVIEW.md` | Added v1.1 amendment banner. |
+| `docs/TECH_STACK_AND_CONVENTIONS.md` | Added v1.1 amendment banner. |
+| `docs/DATABASE_SCHEMA_AND_RLS.md` | Added v1.1 amendment banner pointing to the migration/seed/ERD. |
+| `docs/DESIGN_SYSTEM_AND_UI_SPEC.md` | Added v1.1 amendment banner pointing to `ACCESSIBILITY.md`. |
+| `docs/PORTALS_AND_UX_SPECIFICATION.md` | Added v1.1 amendment banner. |
+| `docs/STATE_MACHINES_AND_BUSINESS_RULES.md` | Added v1.1 amendment banner. |
+| `docs/INTEGRATIONS_AND_HARDWARE_APIS.md` | Added v1.1 amendment banner. |
+| `docs/SECURITY_AND_VERIFICATION_PROTOCOLS.md` | Added v1.1 amendment banner. |
+| `docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md` | Added v1.1 amendment banner. |
+| `docs/TESTING_PERSONAS_AND_E2E_SCENARIOS.md` | Added v1.1 amendment banner. |
+| `docs/DECISIONS.md` | Pointed the open-decisions table at the authoritative §12 register. |
+
+### 13.4 Validation evidence
+
+| Check | Result |
+| :--- | :--- |
+| PostgreSQL version | 18.4 temporary cluster on port `55432`, database `mrfss_test`. |
+| Initial migration | Applied with `ON_ERROR_STOP=1`; all enums, tables, indexes, triggers, RPCs, policies, and grants created. |
+| Storage migration | Applied; `menu-images` bucket and public-read policy created. |
+| Seed | Applied; 1 settings row, 5 categories, 12 menu items, 4 modifier groups, 11 options, 17 item-group links, 2 combo steps, 4 combo options, 8 tables. |
+| Smoke test 1 | Canonical totals (35,000 / 38,000), phone normalization, public tracker, rider claim/start, wrong PIN, correct PIN, kitchen authorization denial — passed. |
+| Smoke test 2 | Kitchen accept/bump, COD claim/start/PIN, COD change due 12,000, settlement expected 38,000, zero variance, order-settlement linkage, analytics — passed. |
+| RLS checks | `anon` denied direct `orders` select; `authenticated` denied direct `orders` select; `anon` token RPC returned a payload; `authenticated` read 12 menu items and 1 safe settings row. |
+| Staff script | `node --check scripts/seed-staff.mjs` passed. |
+| Staff JSON | Parsed successfully; 4 records (ADMIN, KITCHEN, RIDER, RIDER). |
+| Contrast | `ACCESSIBILITY.md` ratios recomputed with the WCAG relative-luminance formula. |
+| UUIDs | Seed uses valid hexadecimal UUIDs; retired `m1111111`/`k1000000`/`r1000000` prefixes are absent from the new seed. |
+| Application build | Not run; there is no `package.json` or Next.js scaffold yet. This is the Phase 1 task. |
+
+### 13.5 Retired values and guardrails
+
+These values and patterns must not reappear in new tests, UI copy, or implementation:
+
+- Distances: `3.8 km`, `7.4 km` (use 1.562 km and 8.093 km).
+- Fees: `4,500` (use 0 or 6,000 for the canonical fixtures).
+- Totals: `35,600`, `36,500`, `34,000` as a final total, `37,000`, `38,000` as Sarah's total.
+- Invalid UUID prefixes: `m1111111`, `k1000000`, `r1000000`, `r2000000`, `r3000000`.
+- `postgres_changes` on orders, telemetry, payments, or profiles.
+- Public `INSERT` into `orders`.
+- Plaintext staff PINs in `profiles`.
+- Haversine fallback for a final delivery fee.
+- Custom staff session cookies instead of Supabase Auth.
+- WCAG AAA claim.
+- `#D84A26` as a primary CTA background with white text.
+- `h-13` (use `h-[52px]`).
+- “Zero ongoing third-party SaaS cost.”
+
+Historical audit/spec text may quote these as findings. That is not normative. `CANONICAL_EXAMPLES.md` and `ACCESSIBILITY.md` win.
+
+### 13.6 Current status and next actions
+
+- **Specification/build readiness:** 9/10 conditional.
+- **Launch readiness:** 4/10; gated by §12.
+- **Phase 1:** may start now (Next.js scaffold, env wiring, Supabase local project, CI skeleton).
+- **Phase 2:** blocked on F-01/F-02/F-14/F-36–F-40 and the menu/staff data.
+- **Phase 6:** blocked on Flutterwave/Africa's Talking credentials and VAT/EFRIS.
+- **Launch:** blocked on legal review, verified data, live provider certification, and go-live sign-off.
+- **Git:** v1.1 baseline committed locally; no push has been performed.
+
+### 13.7 Revision history
+
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.0.0 | 2026-10-29 | Original audit report (P0/P1/P2 findings). |
+| 1.1.0 | 2026-10-29 | Remediation verdict, 9/10 conditional scorecard, founder register, change log, amendment banners. |
 
 ---
 
@@ -1032,6 +1360,8 @@ The seed script will fail at the first invalid literal.
 
 ## Appendix B — File Inventory and Status
 
+> **Historical v1.0 inventory.** The current inventory, including new schema/seed/scripts/config and the modified original specs, is in §13.
+
 | Path | Status | Notes |
 | :--- | :--- | :--- |
 | `docs/SYSTEM_OVERVIEW.md` | Present, untracked | Strong vision; route/tree drift. |
@@ -1070,6 +1400,8 @@ The seed script will fail at the first invalid literal.
 ---
 
 ## Appendix D — One-Page Build Gate Checklist
+
+> **Historical v1.0 gate.** Most specification items are now complete; the current founder-only gate is §12. Use both: §12 for business inputs, and this checklist for the original traceability record.
 
 Use this as the sign-off before Phase 1.
 

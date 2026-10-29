@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Dish image placeholder</title>
+  <desc id="desc">Warm linen background with a terracotta plate and the words Bazaar Flame and Grill.</desc>
+  <rect width="800" height="600" fill="#F9F8F6"/>
+  <circle cx="400" cy="270" r="150" fill="#EFECE6" stroke="#B83817" stroke-width="8"/>
+  <circle cx="400" cy="270" r="112" fill="none" stroke="#D84A26" stroke-width="4" stroke-dasharray="10 12"/>
+  <path d="M330 270c30-48 110-48 140 0-30 48-110 48-140 0Z" fill="#D84A26" opacity="0.18"/>
+  <text x="400" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#1A1918">Bazaar Flame &amp; Grill</text>
+  <text x="400" y="512" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#6B6763">Dish photo coming soon</text>
+</svg>

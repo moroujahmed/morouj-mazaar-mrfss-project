@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Bazaar Flame and Grill placeholder icon</title>
+  <desc id="desc">A terracotta flame mark on a warm linen square.</desc>
+  <rect width="512" height="512" rx="96" fill="#F9F8F6"/>
+  <path d="M256 88c34 62 92 92 92 166 0 60-41 106-92 106s-92-46-92-106c0-42 24-72 46-100 12 30 28 44 46 54-8-44-8-78 0-120Z" fill="#B83817"/>
+  <path d="M256 232c18 26 38 40 38 68 0 30-17 52-38 52s-38-22-38-52c0-20 12-34 22-48 4 14 10 20 16 24-4-18-4-30 0-44Z" fill="#F9F8F6"/>
+</svg>

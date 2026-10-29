@@ -1,5 +1,7 @@
 # STATE_MACHINES_AND_BUSINESS_RULES.md
 
+> **v1.1 normative amendment:** FSM transitions, fee formula, claim RPC, PIN logic, and settlement linkage are superseded by [`ERD.md`](ERD.md) §4, [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md), and the migration. Use integer metres and `Africa/Kampala`.
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved Core Engine Specification

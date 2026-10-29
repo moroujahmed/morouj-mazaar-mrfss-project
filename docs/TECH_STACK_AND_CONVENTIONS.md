@@ -1,5 +1,7 @@
 # TECH_STACK_AND_CONVENTIONS.md
 
+> **v1.1 normative amendment:** The version matrix, Realtime strategy, tiles, directory manifest, and environment variables are superseded by [`SPEC_AMENDMENTS.md`](SPEC_AMENDMENTS.md) §4 and [`API_CONTRACTS.md`](API_CONTRACTS.md) §7. Pin Next.js 15.x, React 19, and Tailwind 3.4.x; do not use `postgres_changes`.
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved Technical Architecture

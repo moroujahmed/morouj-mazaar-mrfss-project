@@ -301,7 +301,7 @@ Supabase Realtime `postgres_changes` cannot do column redaction and cannot authe
 
 ## Open founder decisions
 
-These are recorded here so they are not lost. They are tracked in `AUDIT_REPORT.md` §Founder Actions.
+These are recorded here so they are not lost. **The authoritative, complete register — including F-16 onward, status, and blocking phase — is `AUDIT_REPORT.md` §12.** This table is the first tranche of that register.
 
 | ID | Decision | Needed by |
 | :--- | :--- | :--- |

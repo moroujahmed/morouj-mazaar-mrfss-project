@@ -1,5 +1,7 @@
 # DESIGN_SYSTEM_AND_UI_SPEC.md
 
+> **v1.1 normative amendment:** The AAA claim, contrast values, and primary CTA palette are superseded by [`ACCESSIBILITY.md`](ACCESSIBILITY.md). Use WCAG 2.2 AA, `#B83817` for actions, and `#D84A26` for decoration only.
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved Design Specification

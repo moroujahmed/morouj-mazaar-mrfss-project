@@ -1,5 +1,7 @@
 # SYSTEM_OVERVIEW.md
 
+> **v1.1 normative amendment (2026-10-29):** This v1.0 document is retained for product context. Pricing, routing, cost, and topology statements are superseded by [`SPEC_AMENDMENTS.md`](SPEC_AMENDMENTS.md), [`DECISIONS.md`](DECISIONS.md), and [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md).
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Approved Architecture Draft

@@ -1,5 +1,7 @@
 # STEP_BY_STEP_IMPLEMENTATION_PLAN.md
 
+> **v1.1 normative amendment:** File paths, phase gates, and provider references are superseded by [`../README.md`](../README.md), [`TEST_PLAN.md`](TEST_PLAN.md), and [`DECISIONS.md`](DECISIONS.md). Acknowledge the founder gates in [`AUDIT_REPORT.md`](AUDIT_REPORT.md) §12 before Phase 1.
+
 ## Document Control & Metadata
 * **Document Version:** 1.0.0
 * **Status:** Master Execution Blueprint
