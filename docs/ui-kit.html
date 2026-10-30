@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morouj Mazaar | Food Delivery App UI/UX Case Study & Design System</title>
+  <meta name="description" content="Modern, appetizing Food Delivery App UI Kit, Visual Identity, and Design System for Morouj Mazaar (Bazaar Flame & Grill) - Kampala, Uganda.">
+
+  <!-- Google Fonts: Plus Jakarta Sans / Outfit for Headings & Inter for Body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS for Live Tracking Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM CSS TOKENS (Modern Consumer Food Delivery Palette)
+       ========================================================================== */
+    :root {
+      /* Brand Primary Orange Palette */
+      --brand-primary: #FF5A26;       /* Energetic, appetizing flame orange */
+      --brand-primary-hover: #E44816; /* Hover / Pressed CTA */
+      --brand-primary-light: #FFF0EB; /* Soft orange container tint */
+      --brand-primary-glow: rgba(255, 90, 38, 0.28);
+
+      /* Neutrals & Surfaces */
+      --bg-page: #FAF7F2;            /* Warm off-white / light cream canvas */
+      --bg-card: #FFFFFF;            /* Pure white cards */
+      --bg-inset: #F4EFEB;           /* Pill filters, search backgrounds, steppers */
+      --bg-dark-card: #1E1B18;       /* Deep charcoal accent containers */
+
+      /* Inks & Typography */
+      --text-primary: #1A1918;       /* Smoked Charcoal ink */
+      --text-secondary: #716B64;     /* Refined warm gray */
+      --text-muted: #9C958D;         /* Muted annotations */
+      --text-white: #FFFFFF;
+
+      /* Semantic Colors */
+      --status-success: #10B981;     /* Ratings, Delivered, In-stock */
+      --status-success-bg: #ECFDF5;
+      --status-amber: #F59E0B;       /* Prep time, Warnings */
+      --status-amber-bg: #FEF3C7;
+      --status-danger: #EF4444;      /* Omissions, COD, Urgency */
+      --status-danger-bg: #FEE2E2;
+
+      /* Borders & Shadows */
+      --border-subtle: #EDE7E1;
+      --border-card: #E8E2DA;
+      --shadow-sm: 0 2px 6px -1px rgba(26, 25, 24, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(26, 25, 24, 0.07), 0 4px 10px -2px rgba(26, 25, 24, 0.04);
+      --shadow-orange: 0 8px 20px -3px var(--brand-primary-glow);
+      --shadow-phone: 0 24px 50px -12px rgba(26, 25, 24, 0.2), 0 8px 16px -4px rgba(26, 25, 24, 0.08);
+
+      /* Radii */
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-pill: 9999px;
+
+      /* Motion */
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration: 200ms;
+    }
+
+    /* Global Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .font-mono, .tabular-nums {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' 1;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; transition: all var(--duration) var(--ease-smooth); }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ==========================================================================
+       TOP MASTHEAD & CONTROLS
+       ========================================================================== */
+    .top-navbar {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 72px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .brand-logo-unit {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-cube-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand-primary) 0%, #FF7844 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px var(--brand-primary-glow);
+    }
+
+    .brand-text-wrap h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.1;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .brand-text-wrap h1 span {
+      color: var(--brand-primary);
+    }
+
+    .brand-text-wrap p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--brand-primary);
+      background: var(--brand-primary-light);
+    }
+
+    .nav-btn-pill {
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      padding: 0.55rem 1.25rem;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      font-size: 0.875rem;
+      box-shadow: var(--shadow-orange);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-btn-pill:hover {
+      background: var(--brand-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       SECTION: HERO CASE STUDY & INTERACTIVE PHONE DEMONSTRATION
+       ========================================================================== */
+    .case-study-hero {
+      padding: 3.5rem 0 2rem;
+      position: relative;
+    }
+
+    .hero-case-grid {
+      display: grid;
+      grid-template-columns: 360px 400px 400px;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 1200px) {
+      .hero-case-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+    }
+
+    /* Left Intro Column */
+    .case-info-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .pill-case-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--brand-primary-light);
+      color: var(--brand-primary);
+      font-weight: 800;
+      font-size: 0.8125rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-pill);
+      width: fit-content;
+    }
+
+    .case-main-title {
+      font-size: 2.75rem;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .case-main-title span {
+      color: var(--brand-primary);
+    }
+
+    .case-intro-p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .case-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .case-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .case-feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--brand-primary-light);
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .case-feature-text h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+
+    .case-feature-text p {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .figma-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #FFFFFF;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 1rem;
+      box-shadow: var(--shadow-sm);
+      width: fit-content;
+    }
+
+    .figma-badge-text div:first-child {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .figma-badge-text div:last-child {
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    /* Screen Selector Segmented Bar */
+    .screen-switcher-bar {
+      display: flex;
+      background: #EAE4DC;
+      padding: 0.35rem;
+      border-radius: var(--radius-pill);
+      gap: 0.25rem;
+      margin: 1.5rem auto 2.5rem;
+      width: fit-content;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .btn-screen-tab {
+      padding: 0.55rem 1.25rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-screen-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .btn-screen-tab.active {
+      background: #FFFFFF;
+      color: var(--brand-primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* ==========================================================================
+       IPHONE 15 PRO DEVICE MOCKUP FRAME
+       ========================================================================== */
+    .phone-mockup-frame {
+      width: 390px;
+      height: 780px;
+      background: #FFFFFF;
+      border-radius: 48px;
+      border: 10px solid #1E1B18;
+      box-shadow: var(--shadow-phone);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Dynamic Island */
+    .phone-dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 28px;
+      background: #1E1B18;
+      border-radius: var(--radius-pill);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+    }
+
+    .island-lens {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #0D0C0B;
+      border: 1px solid #2B2825;
+    }
+
+    /* Status Bar */
+    .phone-status-bar {
+      height: 44px;
+      padding: 12px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      z-index: 50;
+      background: transparent;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+    }
+
+    /* Scrollable Phone Viewport */
+    .phone-viewport-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      padding-bottom: 70px; /* Space for bottom nav */
+    }
+
+    .phone-viewport-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ==========================================================================
+       SCREEN 1: HOME / DISCOVERY SCREEN
+       ========================================================================== */
+    .phone-home-view {
+      padding: 0 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .home-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.25rem;
+    }
+
+    .user-greeting-wrap p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .user-greeting-wrap h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .user-avatar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #EAE5DC;
+      overflow: hidden;
+      position: relative;
+      border: 2px solid #FFFFFF;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .user-avatar-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Search Input Pill */
+    .phone-search-bar {
+      background: var(--bg-inset);
+      border-radius: var(--radius-pill);
+      height: 46px;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      transition: all var(--duration);
+    }
+
+    .phone-search-bar input {
+      border: none;
+      background: none;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      color: var(--text-primary);
+    }
+
+    /* Promo Offer Banner */
+    .phone-promo-card {
+      background: linear-gradient(135deg, #FFF1EA 0%, #FFE4D6 100%);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 14px rgba(255, 90, 38, 0.08);
+    }
+
+    .promo-text-side {
+      max-width: 65%;
+      z-index: 2;
+    }
+
+    .promo-headline {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .promo-btn-order {
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 700;
+      box-shadow: 0 2px 8px var(--brand-primary-glow);
+    }
+
+    .promo-btn-order:hover {
+      background: var(--brand-primary-hover);
+    }
+
+    .promo-dish-img {
+      position: absolute;
+      right: -8px;
+      bottom: -10px;
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 3px solid #FFFFFF;
+    }
+
+    /* Category Pills Row */
+    .phone-categories-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      margin: 0 -1rem;
+      padding: 0 1rem;
+    }
+
+    .phone-categories-scroll::-webkit-scrollbar { display: none; }
+
+    .cat-pill {
+      background: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      padding: 0.45rem 0.95rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .cat-pill.active {
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px var(--brand-primary-glow);
+    }
+
+    /* 2-Column Dish Grid (Direct from FoodZo Inspiration!) */
+    .dishes-2col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    .dish-card-compact {
+      background: #FFFFFF;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+      transition: transform var(--duration) var(--ease-smooth), box-shadow var(--duration);
+    }
+
+    .dish-card-compact:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: #E2DBD2;
+    }
+
+    .dish-card-thumb-wrap {
+      position: relative;
+      width: 100%;
+      height: 115px;
+      background: #EAE6DF;
+      overflow: hidden;
+    }
+
+    .dish-card-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .dish-card-compact:hover .dish-card-thumb-wrap img {
+      transform: scale(1.05);
+    }
+
+    .dish-card-rating {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(4px);
+      border-radius: var(--radius-pill);
+      padding: 0.15rem 0.45rem;
+      font-size: 0.6875rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .dish-card-rating span {
+      color: #F59E0B;
+    }
+
+    .dish-card-body {
+      padding: 0.65rem 0.75rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .dish-card-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+
+    .dish-card-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dish-card-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .dish-card-btn-plus {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      box-shadow: 0 2px 6px var(--brand-primary-glow);
+    }
+
+    .dish-card-btn-plus:hover {
+      transform: scale(1.1);
+      background: var(--brand-primary-hover);
+    }
+
+    /* Floating Bottom Navigation Bar */
+    .phone-bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 1rem;
+      z-index: 80;
+    }
+
+    .nav-tab-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 1.35rem;
+      cursor: pointer;
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-pill);
+      transition: all var(--duration);
+    }
+
+    .nav-tab-item.active {
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      box-shadow: 0 3px 10px var(--brand-primary-glow);
+    }
+
+    .nav-cart-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      font-size: 0.625rem;
+      font-weight: 800;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #FFFFFF;
+    }
+
+    /* ==========================================================================
+       SCREEN 2: DISH DETAILS & CUSTOMIZATION (Matching FoodZo Right Phone)
+       ========================================================================== */
+    .phone-detail-view {
+      display: flex;
+      flex-direction: column;
+      background: #FFFFFF;
+    }
+
+    .detail-hero-box {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      background: #000;
+    }
+
+    .detail-hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .detail-nav-overlay {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .btn-circle-action {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: var(--text-primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .detail-info-sheet {
+      padding: 1.25rem 1.25rem 5rem;
+      background: #FFFFFF;
+      border-radius: 24px 24px 0 0;
+      margin-top: -20px;
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .detail-tags-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-pill);
+      background: var(--bg-inset);
+      color: var(--text-primary);
+    }
+
+    .tag-badge.star {
+      background: #FEF3C7;
+      color: #B45309;
+    }
+
+    .detail-title-stepper-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .detail-main-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    /* Quantity Stepper Capsule (- 1 +) */
+    .capsule-stepper {
+      display: flex;
+      align-items: center;
+      background: var(--bg-inset);
+      border-radius: var(--radius-pill);
+      padding: 0.25rem 0.5rem;
+      gap: 0.65rem;
+    }
+
+    .btn-step {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      font-size: 0.875rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 0.95rem;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    .detail-desc-p {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .detail-desc-p span {
+      color: var(--brand-primary);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Cooking Preferences & Add-ons */
+    .detail-section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      margin-bottom: 0.45rem;
+    }
+
+    .chips-select-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pill-select-chip {
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-pill);
+      background: var(--bg-inset);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .pill-select-chip.active {
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      border-color: var(--brand-primary);
+      box-shadow: 0 2px 6px var(--brand-primary-glow);
+    }
+
+    .pill-select-chip.active-omission {
+      background: var(--text-primary);
+      color: #FFFFFF;
+    }
+
+    /* Sticky Bottom Add to Cart Bar */
+    .detail-bottom-sticky-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 76px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-subtle);
+      padding: 0.85rem 1.25rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 70;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+    }
+
+    .sticky-price-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sticky-price-lbl {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .sticky-price-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .btn-add-to-cart-hero {
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      height: 50px;
+      padding: 0 1.75rem;
+      border-radius: var(--radius-pill);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-orange);
+    }
+
+    .btn-add-to-cart-hero:hover {
+      background: var(--brand-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       SCREEN 3: LIVE TRACKING & COURIER MAP
+       ========================================================================== */
+    .phone-tracking-view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+
+    .tracking-map-container {
+      width: 100%;
+      height: 380px;
+      background: #E8E4DA;
+      position: relative;
+    }
+
+    .map-top-bar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tracking-eta-pill {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(6px);
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .tracking-bottom-sheet {
+      background: #FFFFFF;
+      border-radius: 24px 24px 0 0;
+      padding: 1.25rem;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 600;
+      margin-top: -24px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .courier-profile-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.85rem;
+    }
+
+    .courier-avatar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .courier-pic {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #FF5A26;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .courier-info h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .courier-info p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .courier-contact-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-contact-action {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg-inset);
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    /* Handover Security PIN Box */
+    .tracking-pin-card {
+      background: #FFF8F5;
+      border: 1px dashed var(--brand-primary);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pin-label-group div:first-child {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--brand-primary);
+      letter-spacing: 0.05em;
+    }
+
+    .pin-label-group div:last-child {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .pin-digits-big {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.45rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      color: var(--text-primary);
+      background: #FFFFFF;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* ==========================================================================
+       SECTION: VISUAL IDENTITY & UI KIT SPECIFICATION LIBRARY
+       ========================================================================== */
+    .ui-library-section {
+      padding: 4rem 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .section-title-wrap {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title-wrap h2 {
+      font-size: 2.25rem;
+      font-weight: 800;
+    }
+
+    .section-title-wrap p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      margin-top: 0.35rem;
+    }
+
+    .spec-grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.75rem;
+    }
+
+    .spec-panel {
+      background: #FFFFFF;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .spec-panel h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Color Swatch Card */
+    .color-swatches-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .swatch-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-page);
+    }
+
+    .swatch-color-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .swatch-info-text {
+      flex: 1;
+      padding-left: 0.75rem;
+    }
+
+    .swatch-info-text strong {
+      display: block;
+      font-size: 0.875rem;
+    }
+
+    .swatch-info-text span {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .swatch-hex-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      background: #FFFFFF;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Interactive Toast */
+    .demo-toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--text-primary);
+      color: #FFFFFF;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      font-size: 0.875rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.25s var(--ease-smooth);
+      pointer-events: none;
+    }
+
+    .demo-toast.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       MASTHEAD NAVBAR
+       ========================================================================== */
+  -->
+  <header class="top-navbar">
+    <div class="container nav-inner">
+      <div class="brand-logo-unit">
+        <div class="brand-cube-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text-wrap">
+          <h1>Morouj <span>Mazaar</span></h1>
+          <p>Bazaar Flame &amp; Grill • Kampala, Uganda</p>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#case-study" class="active">Interactive Mockup</a></li>
+          <li><a href="#screens">All 5 Screens</a></li>
+          <li><a href="#design-system">UI Kit &amp; Tokens</a></li>
+          <li><a href="#accessibility">Accessibility (WCAG AA)</a></li>
+        </ul>
+      </nav>
+
+      <button class="nav-btn-pill" onclick="triggerOrderDemo()">
+        <span>Explore Live App</span>
+        <span>➔</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==========================================================================
+         HERO CASE STUDY SHOWCASE (Inspired Directly by FoodZo Reference)
+         ========================================================================== -->
+    <section class="case-study-hero" id="case-study">
+      <div class="container">
+
+        <!-- Top Screen Mode Switcher -->
+        <div class="screen-switcher-bar">
+          <button class="btn-screen-tab active" id="tabHome" onclick="switchPhoneScreen('home')">
+            <span>🏠 Home &amp; Discovery</span>
+          </button>
+          <button class="btn-screen-tab" id="tabDetail" onclick="switchPhoneScreen('detail')">
+            <span>🍽️ Item Detail &amp; Stepper</span>
+          </button>
+          <button class="btn-screen-tab" id="tabTracking" onclick="switchPhoneScreen('tracking')">
+            <span>🛵 Live Courier Map &amp; PIN</span>
+          </button>
+          <button class="btn-screen-tab" id="tabCart" onclick="switchPhoneScreen('cart')">
+            <span>🛒 Instant Cart (3)</span>
+          </button>
+        </div>
+
+        <div class="hero-case-grid">
+
+          <!-- Left Info Column -->
+          <div class="case-info-col">
+            <div class="pill-case-tag">
+              <span>★ UI/UX Design System</span>
+            </div>
+
+            <h2 class="case-main-title">
+              Food Delivery App <span>UI/UX Case Study</span>
+            </h2>
+
+            <p class="case-intro-p">
+              A bespoke, user-friendly food delivery interface crafted for Kampala's food lovers. Pairing warm culinary terracotta tones with seamless bottom-thumb navigation, zero-jitter tabular pricing, and instant order customization.
+            </p>
+
+            <div class="case-features-list">
+              <div class="case-feature-item">
+                <div class="case-feature-icon">🔍</div>
+                <div class="case-feature-text">
+                  <h4>Easy Discovery</h4>
+                  <p>Find your favorite grilled fish, chicken, and local combos quickly with smart search, pill categories, and instant filters.</p>
+                </div>
+              </div>
+
+              <div class="case-feature-item">
+                <div class="case-feature-icon">🛍️</div>
+                <div class="case-feature-text">
+                  <h4>Delightful Experience</h4>
+                  <p>Tactile dish customizer, interactive quantity steppers, and smooth animations engineered for high-velocity ordering.</p>
+                </div>
+              </div>
+
+              <div class="case-feature-item">
+                <div class="case-feature-icon">💳</div>
+                <div class="case-feature-text">
+                  <h4>Secure Checkout &amp; PIN</h4>
+                  <p>Instant MTN Mobile Money &amp; Airtel checkout with a 4-digit package seal safety verification code.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="figma-badge">
+              <svg width="24" height="24" viewBox="0 0 38 57" fill="none">
+                <path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="#1ABCFE"/>
+                <path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="#0ACF83"/>
+                <path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="#FF7262"/>
+                <path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="#F24E1E"/>
+                <path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="#A259FF"/>
+              </svg>
+              <div class="figma-badge-text">
+                <div>Visual Identity Spec</div>
+                <div>Morouj Mazaar v1.1</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center Interactive Phone: HOME SCREEN -->
+          <div class="phone-mockup-frame" id="phonePrimary">
+            <!-- Dynamic Island -->
+            <div class="phone-dynamic-island">
+              <div class="island-lens"></div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="status-icons">
+                <span>📶</span>
+                <span>5G</span>
+                <span>🔋 98%</span>
+              </div>
+            </div>
+
+            <!-- Scrollable Viewport Content -->
+            <div class="phone-viewport-scroll" id="phoneViewport">
+
+              <!-- VIEW 1: HOME VIEW -->
+              <div class="phone-home-view" id="viewHome">
+                <!-- Greeting & Location Header -->
+                <div class="home-header-row">
+                  <div class="user-greeting-wrap">
+                    <p>Hi Sarah! 👋</p>
+                    <h3>What are you craving?</h3>
+                  </div>
+                  <div class="user-avatar-btn">
+                    <img src="assets/grilled_chicken.jpg" alt="User Avatar">
+                  </div>
+                </div>
+
+                <!-- Search Input Pill -->
+                <div class="phone-search-bar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" placeholder="Search tilapia, grills, juice..." id="dishSearchInput" onkeyup="filterDishes(this.value)">
+                </div>
+
+                <!-- Promotional Hero Banner (Direct FoodZo match!) -->
+                <div class="phone-promo-card">
+                  <div class="promo-text-side">
+                    <div class="promo-headline">
+                      35% OFF on Flame Grilled Burger!
+                    </div>
+                    <button class="promo-btn-order" onclick="openDishDetail('Bazaar Flame Burger', 18000, 'assets/flame_burger.jpg', '4.8', '520 kcal')">
+                      Order now
+                    </button>
+                  </div>
+                  <img src="assets/flame_burger.jpg" alt="Promo Burger" class="promo-dish-img">
+                </div>
+
+                <!-- Category Navigation Pills -->
+                <div class="phone-categories-scroll">
+                  <button class="cat-pill active" onclick="filterCategory('All', this)">🔥 Combos</button>
+                  <button class="cat-pill" onclick="filterCategory('Tilapia', this)">🐟 Tilapia</button>
+                  <button class="cat-pill" onclick="filterCategory('Grills', this)">🍗 Grills</button>
+                  <button class="cat-pill" onclick="filterCategory('Burger', this)">🍔 Burgers</button>
+                  <button class="cat-pill" onclick="filterCategory('Drinks', this)">🥤 Juices</button>
+                </div>
+
+                <!-- 2-Column Popular Dishes Grid -->
+                <div class="dishes-2col-grid" id="dishesGrid">
+
+                  <!-- Dish 1: Tilapia Combo -->
+                  <div class="dish-card-compact" onclick="openDishDetail('Whole Grilled Tilapia Combo', 32000, 'assets/grilled_tilapia.jpg', '4.9', '480 kcal')">
+                    <div class="dish-card-thumb-wrap">
+                      <img src="assets/grilled_tilapia.jpg" alt="Whole Grilled Tilapia Combo">
+                      <div class="dish-card-rating"><span>★</span> 4.9</div>
+                    </div>
+                    <div class="dish-card-body">
+                      <div class="dish-card-title">Whole Tilapia Flame Combo</div>
+                      <div class="dish-card-bottom-row">
+                        <span class="dish-card-price">USh 32,000</span>
+                        <div class="dish-card-btn-plus" onclick="event.stopPropagation(); quickAddToCart('Tilapia Combo', 32000)">+</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Dish 2: Quarter Chicken -->
+                  <div class="dish-card-compact" onclick="openDishDetail('Quarter Charcoal Chicken', 22000, 'assets/grilled_chicken.jpg', '4.7', '410 kcal')">
+                    <div class="dish-card-thumb-wrap">
+                      <img src="assets/grilled_chicken.jpg" alt="Quarter Charcoal Chicken">
+                      <div class="dish-card-rating"><span>★</span> 4.7</div>
+                    </div>
+                    <div class="dish-card-body">
+                      <div class="dish-card-title">Quarter Charcoal Chicken</div>
+                      <div class="dish-card-bottom-row">
+                        <span class="dish-card-price">USh 22,000</span>
+                        <div class="dish-card-btn-plus" onclick="event.stopPropagation(); quickAddToCart('Charcoal Chicken', 22000)">+</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Dish 3: Flame Burger -->
+                  <div class="dish-card-compact" onclick="openDishDetail('Bazaar Flame Burger', 18000, 'assets/flame_burger.jpg', '4.8', '520 kcal')">
+                    <div class="dish-card-thumb-wrap">
+                      <img src="assets/flame_burger.jpg" alt="Bazaar Flame Burger">
+                      <div class="dish-card-rating"><span>★</span> 4.8</div>
+                    </div>
+                    <div class="dish-card-body">
+                      <div class="dish-card-title">Classic Flame Burger</div>
+                      <div class="dish-card-bottom-row">
+                        <span class="dish-card-price">USh 18,000</span>
+                        <div class="dish-card-btn-plus" onclick="event.stopPropagation(); quickAddToCart('Flame Burger', 18000)">+</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Dish 4: Passion Juice & Rolex -->
+                  <div class="dish-card-compact" onclick="openDishDetail('Special Rolex & Passion Juice', 12000, 'assets/passion_juice_rolex.jpg', '4.9', '310 kcal')">
+                    <div class="dish-card-thumb-wrap">
+                      <img src="assets/passion_juice_rolex.jpg" alt="Special Rolex & Passion Juice">
+                      <div class="dish-card-rating"><span>★</span> 4.9</div>
+                    </div>
+                    <div class="dish-card-body">
+                      <div class="dish-card-title">Rolex &amp; Passion Juice</div>
+                      <div class="dish-card-bottom-row">
+                        <span class="dish-card-price">USh 12,000</span>
+                        <div class="dish-card-btn-plus" onclick="event.stopPropagation(); quickAddToCart('Rolex Combo', 12000)">+</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- VIEW 2: DISH DETAIL VIEW -->
+              <div class="phone-detail-view" id="viewDetail" style="display: none;">
+                <div class="detail-hero-box">
+                  <img src="assets/grilled_tilapia.jpg" alt="Detail Food" class="detail-hero-img" id="detailHeroImg">
+                  <div class="detail-nav-overlay">
+                    <button class="btn-circle-action" onclick="switchPhoneScreen('home')">‹</button>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button class="btn-circle-action" onclick="showToast('Shared with friends!')">↗</button>
+                      <button class="btn-circle-action" style="color: var(--brand-primary);" onclick="showToast('Added to Favorites ❤️')">♥</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-info-sheet">
+                  <div class="detail-tags-row">
+                    <div class="tag-badge star" id="detailStarBadge">★ 4.8 (1.2k)</div>
+                    <div class="tag-badge" id="detailCalBadge">🔥 450 kcal</div>
+                    <div class="tag-badge">⏱ 20-25 mins</div>
+                  </div>
+
+                  <div class="detail-title-stepper-row">
+                    <h3 class="detail-main-name" id="detailDishName">Whole Tilapia Flame Combo</h3>
+                    <!-- Capsule Stepper (- 1 +) -->
+                    <div class="capsule-stepper">
+                      <button class="btn-step" onclick="adjustDetailQty(-1)">−</button>
+                      <span class="step-val" id="detailQtyVal">1</span>
+                      <button class="btn-step" onclick="adjustDetailQty(1)">+</button>
+                    </div>
+                  </div>
+
+                  <p class="detail-desc-p">
+                    Enjoy a freshly caught Lake Victoria whole tilapia, flame-grilled over natural charcoal, coated in signature spiced glaze, served with seasoned chips, grilled lime wedges, and house garlic dip. <span>Read more...</span>
+                  </p>
+
+                  <!-- Cooking Preferences -->
+                  <div>
+                    <div class="detail-section-title">Cooking Style</div>
+                    <div class="chips-select-row">
+                      <button class="pill-select-chip active" onclick="toggleOptionChip(this)">Mild Spice</button>
+                      <button class="pill-select-chip" onclick="toggleOptionChip(this)">Flame Hot Chili 🔥</button>
+                      <button class="pill-select-chip" onclick="toggleOptionChip(this)">Garlic Glaze</button>
+                    </div>
+                  </div>
+
+                  <!-- Kitchen Omissions -->
+                  <div>
+                    <div class="detail-section-title">Free Kitchen Omissions</div>
+                    <div class="chips-select-row">
+                      <button class="pill-select-chip active-omission" onclick="this.classList.toggle('active-omission')">✓ No Onions</button>
+                      <button class="pill-select-chip" onclick="this.classList.toggle('active-omission')">No Salt</button>
+                      <button class="pill-select-chip" onclick="this.classList.toggle('active-omission')">No Chili</button>
+                    </div>
+                  </div>
+
+                  <!-- Paid Upgrades -->
+                  <div>
+                    <div class="detail-section-title">Paid Add-Ons</div>
+                    <div class="chips-select-row">
+                      <button class="pill-select-chip active" data-price="2000" onclick="toggleUpgradeChip(this)">✓ Extra Garlic Dip (+2k)</button>
+                      <button class="pill-select-chip" data-price="3500" onclick="toggleUpgradeChip(this)">+ Extra Gonja (+3.5k)</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sticky Bottom Cart Button -->
+                <div class="detail-bottom-sticky-bar">
+                  <div class="sticky-price-wrap">
+                    <span class="sticky-price-lbl">Total Price</span>
+                    <span class="sticky-price-val" id="detailTotalSticky">USh 34,000</span>
+                  </div>
+                  <button class="btn-add-to-cart-hero" onclick="addCurrentDetailToCart()">
+                    <span>Add to cart</span>
+                    <span>➔</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- VIEW 3: LIVE TRACKING VIEW -->
+              <div class="phone-tracking-view" id="viewTracking" style="display: none;">
+                <div class="tracking-map-container" id="trackingMap">
+                  <div class="map-top-bar">
+                    <button class="btn-circle-action" onclick="switchPhoneScreen('home')">‹</button>
+                    <div class="tracking-eta-pill">
+                      <span>⏱ Estimated: 18 mins</span>
+                    </div>
+                    <button class="btn-circle-action" onclick="centerMapRider()">📍</button>
+                  </div>
+                </div>
+
+                <div class="tracking-bottom-sheet">
+                  <div class="courier-profile-row">
+                    <div class="courier-avatar-wrap">
+                      <div class="courier-pic">🛵</div>
+                      <div class="courier-info">
+                        <h4>Rider Juma (UFD 342B)</h4>
+                        <p>★ 4.9 • 1.2 km away from Nakasero</p>
+                      </div>
+                    </div>
+                    <div class="courier-contact-btns">
+                      <button class="btn-contact-action" onclick="showToast('Calling Rider Juma...')">📞</button>
+                      <button class="btn-contact-action" onclick="showToast('Opening WhatsApp Concierge...')">💬</button>
+                    </div>
+                  </div>
+
+                  <div class="tracking-pin-card">
+                    <div class="pin-label-group">
+                      <div>Handover Security PIN</div>
+                      <div>Share only after verifying seal</div>
+                    </div>
+                    <div class="pin-digits-big">4 8 2 1</div>
+                  </div>
+
+                  <div style="font-size: 0.8125rem; color: var(--text-secondary); text-align: center;">
+                    Order #1042 • Paid via MTN Mobile Money
+                  </div>
+                </div>
+              </div>
+
+              <!-- VIEW 4: CART & CHECKOUT -->
+              <div class="phone-home-view" id="viewCart" style="display: none;">
+                <div class="home-header-row" style="margin-bottom: 0.5rem;">
+                  <button class="btn-circle-action" onclick="switchPhoneScreen('home')">‹</button>
+                  <h3>My Cart (3 Items)</h3>
+                  <div style="width: 36px;"></div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <div style="display: flex; gap: 0.75rem; background: #FFFFFF; border: 1px solid var(--border-card); border-radius: 12px; padding: 0.75rem; align-items: center;">
+                    <img src="assets/grilled_tilapia.jpg" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover;">
+                    <div style="flex: 1;">
+                      <h4 style="font-size: 0.875rem;">Whole Tilapia Flame Combo</h4>
+                      <div style="font-size: 0.75rem; color: var(--text-secondary);">No Onions • Extra Garlic Dip</div>
+                      <div style="font-family: 'JetBrains Mono'; font-weight: 800; font-size: 0.875rem; margin-top: 0.2rem;">USh 34,000</div>
+                    </div>
+                    <div class="capsule-stepper">
+                      <span style="font-size: 0.8125rem; font-weight: 800;">1x</span>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 0.75rem; background: #FFFFFF; border: 1px solid var(--border-card); border-radius: 12px; padding: 0.75rem; align-items: center;">
+                    <img src="assets/passion_juice_rolex.jpg" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover;">
+                    <div style="flex: 1;">
+                      <h4 style="font-size: 0.875rem;">Rolex &amp; Passion Juice</h4>
+                      <div style="font-size: 0.75rem; color: var(--text-secondary);">Chilled natural passion pulp</div>
+                      <div style="font-family: 'JetBrains Mono'; font-weight: 800; font-size: 0.875rem; margin-top: 0.2rem;">USh 12,000</div>
+                    </div>
+                    <div class="capsule-stepper">
+                      <span style="font-size: 0.8125rem; font-weight: 800;">1x</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="background: #FFFFFF; border: 1px solid var(--border-card); border-radius: 12px; padding: 1rem; margin-top: 0.5rem;">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.35rem;">
+                    <span>Delivery Address</span>
+                    <strong style="color: var(--brand-primary);">Nakasero (3.8 km)</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.35rem;">
+                    <span>Delivery Fee</span>
+                    <strong style="color: var(--status-success);">USh 0 (Free 5km Zone)</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 800; border-top: 1px dashed var(--border-subtle); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <span>Total Amount</span>
+                    <span style="font-family: 'JetBrains Mono'; color: var(--brand-primary);">USh 46,000</span>
+                  </div>
+                </div>
+
+                <button class="btn-add-to-cart-hero" style="width: 100%; justify-content: center; margin-top: 1rem;" onclick="switchPhoneScreen('tracking'); showToast('Order #1042 Placed via MTN MoMo!')">
+                  <span>Pay USh 46,000 via MTN MoMo ➔</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Floating Bottom Nav Bar -->
+            <div class="phone-bottom-nav">
+              <div class="nav-tab-item active" id="btnNavHome" onclick="switchPhoneScreen('home')">🏠</div>
+              <div class="nav-tab-item" id="btnNavOrders" onclick="switchPhoneScreen('tracking')">🛵</div>
+              <div class="nav-tab-item" id="btnNavCart" onclick="switchPhoneScreen('cart')">
+                🛒
+                <span class="nav-cart-badge" id="cartCountBadge">3</span>
+              </div>
+              <div class="nav-tab-item" onclick="showToast('Profile & Dine-In Table 4')">👤</div>
+            </div>
+          </div>
+
+          <!-- Right Phone Mockup: ITEM DETAIL SCREEN (Matching FoodZo Right Phone!) -->
+          <div class="phone-mockup-frame" id="phoneSecondary">
+            <!-- Dynamic Island -->
+            <div class="phone-dynamic-island">
+              <div class="island-lens"></div>
+            </div>
+
+            <div class="phone-status-bar">
+              <span>9:41</span>
+              <div class="status-icons">
+                <span>📶</span>
+                <span>5G</span>
+                <span>🔋 98%</span>
+              </div>
+            </div>
+
+            <div class="phone-viewport-scroll" style="padding-bottom: 0;">
+              <div class="detail-hero-box">
+                <img src="assets/grilled_tilapia.jpg" alt="Whole Grilled Tilapia Combo" class="detail-hero-img">
+                <div class="detail-nav-overlay">
+                  <button class="btn-circle-action">‹ Back</button>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn-circle-action">↗</button>
+                    <button class="btn-circle-action" style="color: var(--brand-primary);">♥</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-info-sheet">
+                <div class="detail-tags-row">
+                  <div class="tag-badge star">★ 4.9 (1.4k)</div>
+                  <div class="tag-badge">🔥 480 kcal</div>
+                  <div class="tag-badge">⏱ 20 mins</div>
+                </div>
+
+                <div class="detail-title-stepper-row">
+                  <h3 class="detail-main-name">Whole Tilapia Combo</h3>
+                  <div class="capsule-stepper">
+                    <button class="btn-step">−</button>
+                    <span class="step-val">1</span>
+                    <button class="btn-step">+</button>
+                  </div>
+                </div>
+
+                <p class="detail-desc-p">
+                  Enjoy perfectly crisp flame-grilled Lake Victoria tilapia with spiced golden chips, caramelized onions, garden greens, and rich garlic basting sauce. <span>Read more...</span>
+                </p>
+
+                <div>
+                  <div class="detail-section-title">Cooking Preference</div>
+                  <div class="chips-select-row">
+                    <button class="pill-select-chip active">Flame Grilled</button>
+                    <button class="pill-select-chip">Deep Fried</button>
+                    <button class="pill-select-chip">Extra Chili 🔥</button>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="detail-section-title">Free Kitchen Omissions</div>
+                  <div class="chips-select-row">
+                    <button class="pill-select-chip active-omission">✓ No Onions</button>
+                    <button class="pill-select-chip">No Salt</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sticky Action -->
+              <div class="detail-bottom-sticky-bar">
+                <div class="sticky-price-wrap">
+                  <span class="sticky-price-lbl">Total</span>
+                  <span class="sticky-price-val">USh 32,000</span>
+                </div>
+                <button class="btn-add-to-cart-hero" onclick="showToast('Whole Tilapia added to Cart! 🛒')">
+                  <span>Add to cart</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION: COMPLETE VISUAL IDENTITY & DESIGN SYSTEM LIBRARY
+         ========================================================================== -->
+    <section class="ui-library-section" id="design-system">
+      <div class="container">
+        <div class="section-title-wrap">
+          <h2>Visual Identity &amp; UI Kit Foundations</h2>
+          <p>Extracted design system tokens, components, and interaction patterns conforming to WCAG 2.2 AA and Kampala consumer ergonomics.</p>
+        </div>
+
+        <div class="spec-grid-layout">
+
+          <!-- 1. Master Color Palette -->
+          <div class="spec-panel">
+            <h3>🎨 Color Palette</h3>
+            <div class="color-swatches-list">
+              <div class="swatch-item-row">
+                <div class="swatch-color-box" style="background: #FF5A26;"></div>
+                <div class="swatch-info-text">
+                  <strong>Brand Flame Orange</strong>
+                  <span>Primary CTA, active states, badges</span>
+                </div>
+                <span class="swatch-hex-pill">#FF5A26</span>
+              </div>
+
+              <div class="swatch-item-row">
+                <div class="swatch-color-box" style="background: #1A1918;"></div>
+                <div class="swatch-info-text">
+                  <strong>Smoked Charcoal</strong>
+                  <span>Headlines, high-contrast text, icons</span>
+                </div>
+                <span class="swatch-hex-pill">#1A1918</span>
+              </div>
+
+              <div class="swatch-item-row">
+                <div class="swatch-color-box" style="background: #FAF7F2;"></div>
+                <div class="swatch-info-text">
+                  <strong>Warm Linen Ground</strong>
+                  <span>Application background canvas</span>
+                </div>
+                <span class="swatch-hex-pill">#FAF7F2</span>
+              </div>
+
+              <div class="swatch-item-row">
+                <div class="swatch-color-box" style="background: #10B981;"></div>
+                <div class="swatch-info-text">
+                  <strong>Forest Success Mint</strong>
+                  <span>Ratings, Delivered, Free 5km zone</span>
+                </div>
+                <span class="swatch-hex-pill">#10B981</span>
+              </div>
+
+              <div class="swatch-item-row">
+                <div class="swatch-color-box" style="background: #F59E0B;"></div>
+                <div class="swatch-info-text">
+                  <strong>Warm Amber Rating</strong>
+                  <span>Star ratings, prep time</span>
+                </div>
+                <span class="swatch-hex-pill">#F59E0B</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Typography Scale -->
+          <div class="spec-panel">
+            <h3>🔤 Typography System</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div>
+                <div style="font-family: 'Outfit'; font-size: 1.6rem; font-weight: 800; line-height: 1.1;">
+                  Whole Tilapia Combo
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Heading Display • Outfit Bold (32px / -0.02em)
+                </div>
+              </div>
+
+              <div>
+                <div style="font-family: 'Plus Jakarta Sans'; font-size: 1.15rem; font-weight: 700;">
+                  Bazaar Flame Burger &amp; Chips
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Card Title • Plus Jakarta Sans Bold (18px)
+                </div>
+              </div>
+
+              <div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+                  Flame-grilled with seasoned chips, garlic glaze, and caramelized sweet roasted plantains.
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Body Regular • Inter (15px / 1.5)
+                </div>
+              </div>
+
+              <div>
+                <div class="font-mono tabular-nums" style="font-size: 1.25rem; font-weight: 800; color: var(--brand-primary);">
+                  USh 32,000 • PIN: 4821
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Monospace &amp; Financials • JetBrains Mono Tabular
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Buttons & Interactive Controls -->
+          <div class="spec-panel">
+            <h3>🔘 Controls &amp; Steppers</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Primary Action CTA:</span>
+                <button class="btn-add-to-cart-hero" style="width: 100%; justify-content: center;">
+                  <span>Add to cart • USh 32,000</span>
+                </button>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; align-items: center; justify-content: space-between;">
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Quantity Stepper:</span>
+                  <div class="capsule-stepper">
+                    <button class="btn-step">−</button>
+                    <span class="step-val">2</span>
+                    <button class="btn-step">+</button>
+                  </div>
+                </div>
+
+                <div>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Circular Plus:</span>
+                  <div class="dish-card-btn-plus" style="width: 36px; height: 36px; font-size: 1.3rem;">+</div>
+                </div>
+              </div>
+
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Modifier Chips:</span>
+                <div class="chips-select-row">
+                  <button class="pill-select-chip active">✓ Flame Grilled</button>
+                  <button class="pill-select-chip active-omission">✓ No Onions</button>
+                  <button class="pill-select-chip">+ Extra Sauce (+2k)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Interactive Feedback Toast -->
+  <div class="demo-toast" id="demoToast">Item added to cart!</div>
+
+  <!-- Leaflet JS for Real Interactive Kampala Map -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // 1. Toast Notification
+    function showToast(msg) {
+      const toast = document.getElementById('demoToast');
+      toast.textContent = msg;
+      toast.classList.add('active');
+      setTimeout(() => toast.classList.remove('active'), 2200);
+      triggerHaptic([15]);
+    }
+
+    // 2. Haptic Vibration Trigger
+    function triggerHaptic(pattern) {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(pattern);
+      }
+    }
+
+    // 3. Screen Switcher
+    function switchPhoneScreen(screen) {
+      // Hide all views in primary phone
+      document.getElementById('viewHome').style.display = 'none';
+      document.getElementById('viewDetail').style.display = 'none';
+      document.getElementById('viewTracking').style.display = 'none';
+      document.getElementById('viewCart').style.display = 'none';
+
+      // Reset Tab Bar
+      document.querySelectorAll('.btn-screen-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-item').forEach(b => b.classList.remove('active'));
+
+      if (screen === 'home') {
+        document.getElementById('viewHome').style.display = 'flex';
+        document.getElementById('tabHome').classList.add('active');
+        document.getElementById('btnNavHome').classList.add('active');
+      } else if (screen === 'detail') {
+        document.getElementById('viewDetail').style.display = 'flex';
+        document.getElementById('tabDetail').classList.add('active');
+      } else if (screen === 'tracking') {
+        document.getElementById('viewTracking').style.display = 'flex';
+        document.getElementById('tabTracking').classList.add('active');
+        document.getElementById('btnNavOrders').classList.add('active');
+        initTrackingMap();
+      } else if (screen === 'cart') {
+        document.getElementById('viewCart').style.display = 'flex';
+        document.getElementById('tabCart').classList.add('active');
+        document.getElementById('btnNavCart').classList.add('active');
+      }
+
+      // Scroll to top of phone
+      document.getElementById('phoneViewport').scrollTop = 0;
+    }
+
+    // 4. Open Specific Dish Detail
+    let currentDishBasePrice = 32000;
+    function openDishDetail(name, price, img, rating, kcal) {
+      currentDishBasePrice = price;
+      document.getElementById('detailDishName').textContent = name;
+      document.getElementById('detailHeroImg').src = img;
+      document.getElementById('detailStarBadge').textContent = `★ ${rating} (1.2k)`;
+      document.getElementById('detailCalBadge').textContent = `🔥 ${kcal}`;
+      document.getElementById('detailQtyVal').textContent = '1';
+      updateDetailTotal();
+      switchPhoneScreen('detail');
+    }
+
+    // 5. Quantity Stepper
+    function adjustDetailQty(delta) {
+      let qty = parseInt(document.getElementById('detailQtyVal').textContent, 10);
+      qty = Math.max(1, qty + delta);
+      document.getElementById('detailQtyVal').textContent = qty;
+      updateDetailTotal();
+      triggerHaptic([10]);
+    }
+
+    function updateDetailTotal() {
+      let qty = parseInt(document.getElementById('detailQtyVal').textContent, 10);
+      let addOns = 0;
+      document.querySelectorAll('#viewDetail .pill-select-chip.active[data-price]').forEach(chip => {
+        addOns += parseInt(chip.getAttribute('data-price') || '0', 10);
+      });
+      let grand = (currentDishBasePrice + addOns) * qty;
+      document.getElementById('detailTotalSticky').textContent = `USh ${grand.toLocaleString()}`;
+    }
+
+    function toggleUpgradeChip(chip) {
+      chip.classList.toggle('active');
+      updateDetailTotal();
+      triggerHaptic([10]);
+    }
+
+    function toggleOptionChip(chip) {
+      chip.parentElement.querySelectorAll('.pill-select-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      triggerHaptic([10]);
+    }
+
+    // 6. Quick Add to Cart
+    let cartCount = 3;
+    function quickAddToCart(name, price) {
+      cartCount++;
+      document.getElementById('cartCountBadge').textContent = cartCount;
+      showToast(`Added ${name} (USh ${price.toLocaleString()}) to cart! 🛒`);
+      triggerHaptic([20, 50, 20]);
+    }
+
+    function addCurrentDetailToCart() {
+      const name = document.getElementById('detailDishName').textContent;
+      const total = document.getElementById('detailTotalSticky').textContent;
+      cartCount++;
+      document.getElementById('cartCountBadge').textContent = cartCount;
+      showToast(`Added ${name} (${total}) to Cart! 🛒`);
+      triggerHaptic([20, 50, 20]);
+      setTimeout(() => switchPhoneScreen('cart'), 400);
+    }
+
+    // 7. Search & Filter
+    function filterDishes(val) {
+      const query = val.toLowerCase();
+      document.querySelectorAll('.dish-card-compact').forEach(card => {
+        const title = card.querySelector('.dish-card-title').textContent.toLowerCase();
+        card.style.display = title.includes(query) ? 'flex' : 'none';
+      });
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      showToast(`Filtered by ${cat}`);
+    }
+
+    // 8. Live Interactive Leaflet Map for Kampala
+    let mapInstance = null;
+    let riderMarker = null;
+
+    function initTrackingMap() {
+      if (mapInstance) {
+        setTimeout(() => mapInstance.invalidateSize(), 150);
+        return;
+      }
+
+      // Kampala coordinates: Nakasero approx 0.324° N, 32.581° E
+      const kampalaCoords = [0.3255, 32.5815];
+      mapInstance = L.map('trackingMap', { zoomControl: false }).setView(kampalaCoords, 14);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(mapInstance);
+
+      // Custom Motorcycle Rider Marker
+      const riderHtml = `
+        <div style="position:relative; width:44px; height:44px; display:flex; align-items:center; justify-content:center;">
+          <div style="position:absolute; width:100%; height:100%; border-radius:50%; background:rgba(255,90,38,0.3); animation: pulse 1.5s infinite;"></div>
+          <div style="width:34px; height:34px; border-radius:50%; background:#FF5A26; border:2.5px solid #FFFFFF; color:#FFF; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(0,0,0,0.3); font-size:16px;">
+            🛵
+          </div>
+        </div>
+      `;
+      const riderIcon = L.divIcon({
+        html: riderHtml,
+        className: 'custom-rider-icon',
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
+      });
+
+      riderMarker = L.marker(kampalaCoords, { icon: riderIcon }).addTo(mapInstance);
+
+      // Destination Marker
+      const destHtml = `<div style="font-size:24px;">📍</div>`;
+      const destIcon = L.divIcon({ html: destHtml, className: 'dest-icon', iconSize: [24, 24], iconAnchor: [12, 24] });
+      L.marker([0.3340, 32.5850], { icon: destIcon }).addTo(mapInstance);
+
+      // Route Polyline
+      const routePoints = [
+        [0.3255, 32.5815],
+        [0.3280, 32.5825],
+        [0.3310, 32.5840],
+        [0.3340, 32.5850]
+      ];
+      L.polyline(routePoints, { color: '#FF5A26', weight: 4, dashArray: '6, 8' }).addTo(mapInstance);
+
+      setTimeout(() => mapInstance.invalidateSize(), 200);
+    }
+
+    function centerMapRider() {
+      if (mapInstance && riderMarker) {
+        mapInstance.setView(riderMarker.getLatLng(), 15);
+        showToast('Centered on Rider Juma 🛵');
+      }
+    }
+
+    function triggerOrderDemo() {
+      switchPhoneScreen('detail');
+      showToast('Explore the interactive dish details and steppers!');
+    }
+  </script>
+</body>
+</html>
