@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Design system | Morouj Mazaar</title>
+  <meta name="description" content="The Morouj Mazaar design system: palette, contrast rules, typography, actions, forms, status language, surfaces and accessibility guidance.">
+  <meta name="theme-color" content="#173F35">
+  <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/portal.css">
+</head>
+<body class="portal-body">
+  <a class="skip-link" href="#dsContent">Skip to design system</a>
+
+  <header class="portal-header">
+    <div class="container">
+      <a class="brand" href="index.html" aria-label="Morouj Mazaar portal home">
+        <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+        <span class="brand-text">
+          <strong>Morouj Mazaar</strong>
+          <span>Design system v2</span>
+        </span>
+      </a>
+
+      <nav class="portal-nav" aria-label="Prototype pages">
+        <a href="customer.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-utensils"></use></svg>Customer</a>
+        <a href="admin.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-grid"></use></svg>Admin</a>
+        <a href="rider.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-bike"></use></svg>Rider</a>
+        <a class="is-current" href="design-system.html" aria-current="page"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-settings"></use></svg>Design system</a>
+      </nav>
+
+      <div class="portal-header-actions">
+        <a class="btn btn-secondary btn-sm" href="index.html">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Portal
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="ds-hero">
+      <div class="container">
+        <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-leaf"></use></svg>Shared foundation</span>
+        <h1>One system. Three levels of density.</h1>
+        <p>
+          The palette, typography and components are shared. The customer app breathes, the dashboard packs information
+          tightly, and the rider app enlarges every target. Status always carries an icon and a word, never colour alone.
+        </p>
+        <div class="ds-meta">
+          <span class="badge badge-success badge-lg"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>WCAG 2.2 AA</span>
+          <span class="badge badge-neutral badge-lg"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>48px targets · 56px rider</span>
+          <span class="badge badge-neutral badge-lg"><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg>Offline-safe patterns</span>
+          <span class="badge badge-neutral badge-lg"><svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg>Zero build step</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="container ds-layout">
+      <nav class="ds-nav" aria-label="Design system sections">
+        <a href="#colour">Colour &amp; contrast</a>
+        <a href="#type">Typography</a>
+        <a href="#actions">Buttons &amp; actions</a>
+        <a href="#status">Badges &amp; status</a>
+        <a href="#forms">Forms</a>
+        <a href="#feedback">Feedback</a>
+        <a href="#surfaces">Surfaces &amp; tokens</a>
+        <a href="#icons">Icons</a>
+        <a href="#accessibility">Accessibility</a>
+      </nav>
+
+      <div class="ds-content" id="dsContent">
+        <!-- Colour ------------------------------------------------------ -->
+        <section class="ds-section" id="colour" aria-labelledby="colourTitle">
+          <h2 id="colourTitle">Colour &amp; contrast</h2>
+          <p>
+            Deep green carries structure and trust. Flame orange marks the next action. Red is reserved for errors and
+            destructive choices. The darker orange token exists so orange can still be used as text on white.
+          </p>
+
+          <h3 class="ds-subhead">Brand</h3>
+          <div class="ds-swatch-grid">
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#173F35;color:#ffffff">#173F35</div>
+              <div class="ds-swatch-body"><strong>green-800</strong><span>Primary · white 11.67:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#102E27;color:#ffffff">#102E27</div>
+              <div class="ds-swatch-body"><strong>green-900</strong><span>Deep surfaces · white 14.4:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#1D4F42;color:#ffffff">#1D4F42</div>
+              <div class="ds-swatch-body"><strong>green-700</strong><span>Hover on dark · white 9.6:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#F2F7F5;color:#0f241f">#F2F7F5</div>
+              <div class="ds-swatch-body"><strong>green-50</strong><span>Tinted surface · ink 13.8:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#F28C28;color:#102e27">#F28C28</div>
+              <div class="ds-swatch-body"><strong>orange-500</strong><span>Action fill · green 4.76:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#A65A0F;color:#ffffff">#A65A0F</div>
+              <div class="ds-swatch-body"><strong>orange-700</strong><span>Orange text on white · 5.13:1</span></div>
+            </div>
+          </div>
+
+          <h3 class="ds-subhead">Neutral &amp; semantic</h3>
+          <div class="ds-swatch-grid">
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#0F241F;color:#ffffff">#0F241F</div>
+              <div class="ds-swatch-body"><strong>ink</strong><span>Primary text · white 16.25:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#52635D;color:#ffffff">#52635D</div>
+              <div class="ds-swatch-body"><strong>gray-600</strong><span>Muted text · white 6.36:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#F2F4F3;color:#0f241f">#F2F4F3</div>
+              <div class="ds-swatch-body"><strong>gray-100</strong><span>Page wash · ink 15.2:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#C62828;color:#ffffff">#C62828</div>
+              <div class="ds-swatch-body"><strong>red-600</strong><span>Critical · white 5.62:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#17603F;color:#ffffff">#17603F</div>
+              <div class="ds-swatch-body"><strong>success-700</strong><span>Confirmed · white 7.2:1</span></div>
+            </div>
+            <div class="ds-swatch">
+              <div class="ds-swatch-color" style="background:#8A4B00;color:#ffffff">#8A4B00</div>
+              <div class="ds-swatch-body"><strong>warning-700</strong><span>Attention · white 7.4:1</span></div>
+            </div>
+          </div>
+
+          <h3 class="ds-subhead">Contrast decisions</h3>
+          <table class="ds-token-table">
+            <thead>
+              <tr><th>Pair</th><th>Ratio</th><th>Decision</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>White on green-800</td><td class="mono">11.67:1</td><td>Passes AA and AAA for normal text.</td></tr>
+              <tr><td>green-900 on orange-500</td><td class="mono">4.76:1</td><td>Use for primary action labels. Do not use white.</td></tr>
+              <tr><td>orange-700 on white</td><td class="mono">5.13:1</td><td>Safe when orange must be text.</td></tr>
+              <tr><td>gray-600 on white</td><td class="mono">6.36:1</td><td>Muted copy, hints and metadata.</td></tr>
+              <tr><td>red-600 on white</td><td class="mono">5.62:1</td><td>Errors and critical alerts.</td></tr>
+              <tr><td>White on orange-500</td><td class="mono">2.32:1</td><td><strong>Prohibited</strong> for text. Use green-900 instead.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="ds-note">
+            <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+            <span>Orange is never used as body text on white. For links and small orange labels, use <code>--orange-700</code>.</span>
+          </div>
+        </section>
+
+        <!-- Typography -------------------------------------------------- -->
+        <section class="ds-section" id="type" aria-labelledby="typeTitle">
+          <h2 id="typeTitle">Typography</h2>
+          <p>Plus Jakarta Sans carries headings, Inter carries UI copy, and JetBrains Mono is used for money, IDs, PINs and times.</p>
+
+          <div class="ds-type-row">
+            <div class="ds-type-display" style="font-size:clamp(2.6rem,6vw,3.75rem)">Real charcoal. Real fast.</div>
+            <code>display · 60 / 1.05</code>
+          </div>
+          <div class="ds-type-row">
+            <div class="ds-type-display" style="font-size:2.25rem">Grilled fresh, packed hot.</div>
+            <code>h1 · 36 / 1.15</code>
+          </div>
+          <div class="ds-type-row">
+            <div class="ds-type-display" style="font-size:1.5rem">Today's menu</div>
+            <code>h2 · 24 / 1.2</code>
+          </div>
+          <div class="ds-type-row">
+            <div class="ds-type-display" style="font-size:1.125rem">Delivery complete</div>
+            <code>h3 · 18 / 1.25</code>
+          </div>
+          <div class="ds-type-row">
+            <div class="ds-type-body">Order updates are saved on this phone and verified when you reconnect.</div>
+            <code>body · 16 / 1.55</code>
+          </div>
+          <div class="ds-type-row">
+            <div class="ds-type-body small">Muted supporting copy uses gray-600 at 14px.</div>
+            <code>small · 14 / 1.55</code>
+          </div>
+          <div class="ds-type-row">
+            <div class="ds-type-body tiny">Eyebrow labels and helper text use 12px with strong weight.</div>
+            <code>tiny · 12 / 1.5</code>
+          </div>
+          <div class="ds-type-row">
+            <div class="mono" style="font-size:1.25rem">USh 38,000 · #1043 · 7310</div>
+            <code>mono · tabular numerals</code>
+          </div>
+        </section>
+
+        <!-- Actions ----------------------------------------------------- -->
+        <section class="ds-section" id="actions" aria-labelledby="actionsTitle">
+          <h2 id="actionsTitle">Buttons &amp; actions</h2>
+          <p>One primary action per view. Orange means “do this next”; green means navigation or confirmation; red only appears for destructive work.</p>
+
+          <h3 class="ds-subhead">Variants</h3>
+          <div class="ds-example">
+            <button class="btn btn-primary" type="button">Primary action</button>
+            <button class="btn btn-dark" type="button">Dark action</button>
+            <button class="btn btn-secondary" type="button">Secondary</button>
+            <button class="btn btn-ghost" type="button">Ghost</button>
+            <button class="btn btn-soft" type="button">Soft</button>
+            <button class="btn btn-danger" type="button">Destructive</button>
+            <button class="btn btn-primary" type="button" disabled>Disabled</button>
+          </div>
+
+          <h3 class="ds-subhead">Sizes &amp; icon buttons</h3>
+          <div class="ds-example">
+            <button class="btn btn-primary btn-sm" type="button">Small</button>
+            <button class="btn btn-primary" type="button">Default</button>
+            <button class="btn btn-primary btn-lg" type="button">Large</button>
+            <button class="btn btn-primary btn-xl" type="button">Extra large</button>
+            <button class="icon-btn" type="button" aria-label="Notification">
+              <svg class="icon" aria-hidden="true"><use href="#i-bell"></use></svg>
+            </button>
+            <button class="icon-btn icon-btn-dark" type="button" aria-label="More options">
+              <svg class="icon" aria-hidden="true"><use href="#i-more"></use></svg>
+            </button>
+          </div>
+
+          <div class="ds-note">
+            <svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>
+            <span>Customer targets are at least 48px. Rider actions are 56–66px so they remain reachable with one hand and gloves.</span>
+          </div>
+        </section>
+
+        <!-- Status ------------------------------------------------------ -->
+        <section class="ds-section" id="status" aria-labelledby="statusTitle">
+          <h2 id="statusTitle">Badges &amp; status</h2>
+          <p>Every state pairs colour with an icon and a word. Colour is a reinforcement, not the message.</p>
+
+          <h3 class="ds-subhead">Badges</h3>
+          <div class="ds-example">
+            <span class="badge badge-success"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Paid</span>
+            <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>Waiting</span>
+            <span class="badge badge-danger"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>Failed</span>
+            <span class="badge badge-info"><svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>New</span>
+            <span class="badge badge-orange"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>Ready</span>
+            <span class="badge badge-neutral"><svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>Draft</span>
+            <span class="badge badge-dark"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>Staff</span>
+            <span class="badge badge-solid-orange"><svg class="icon" aria-hidden="true"><use href="#i-banknote"></use></svg>COD</span>
+          </div>
+
+          <h3 class="ds-subhead">Connection status</h3>
+          <div class="ds-status-grid">
+            <div class="ds-status"><span class="connection-dot" aria-hidden="true"></span><span>Online</span><span>Syncs immediately</span></div>
+            <div class="ds-status"><span class="connection-dot is-weak" aria-hidden="true"></span><span>Weak signal</span><span>May take longer</span></div>
+            <div class="ds-status"><span class="connection-dot is-offline" aria-hidden="true"></span><span>Offline</span><span>Queues on device</span></div>
+          </div>
+
+          <h3 class="ds-subhead">Order lifecycle</h3>
+          <div class="ds-example">
+            <span class="badge badge-info"><svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>New</span>
+            <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-flame"></use></svg>Cooking</span>
+            <span class="badge badge-orange"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Ready</span>
+            <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>On the way</span>
+            <span class="badge badge-success"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>Delivered</span>
+            <span class="badge badge-danger"><svg class="icon" aria-hidden="true"><use href="#i-x-circle"></use></svg>Cancelled</span>
+          </div>
+        </section>
+
+        <!-- Forms ------------------------------------------------------- -->
+        <section class="ds-section" id="forms" aria-labelledby="formsTitle">
+          <h2 id="formsTitle">Forms</h2>
+          <p>Labels stay visible, hints explain the expected input, and errors appear next to the field with an icon and text.</p>
+
+          <div class="grid grid-2">
+            <div class="field">
+              <label class="field-label" for="dsName">Full name <span class="optional">Required</span></label>
+              <input class="input" id="dsName" type="text" value="Brian Kato" autocomplete="name">
+              <span class="field-hint">Used on the rider's handover screen.</span>
+            </div>
+            <div class="field">
+              <label class="field-label" for="dsPhone">Phone number</label>
+              <input class="input" id="dsPhone" type="tel" value="+256 701 234 567" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label class="field-label" for="dsArea">Delivery area</label>
+              <select class="select" id="dsArea">
+                <option>Nakasero · free delivery</option>
+                <option selected>Ntinda · USh 6,000</option>
+                <option>Kololo · free delivery</option>
+                <option>Bugolobi · free delivery</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="dsNote">Order note <span class="optional">Optional</span></label>
+              <textarea class="textarea" id="dsNote" rows="3">Call when at the gate. Gate code 1234.</textarea>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:16px">
+            <label class="field-label" for="dsError">Phone number</label>
+            <input class="input" id="dsError" type="tel" value="0701" aria-invalid="true" aria-describedby="dsErrorText">
+            <span class="field-error" id="dsErrorText">
+              <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+              Enter a complete Ugandan phone number, for example +256 701 234 567.
+            </span>
+          </div>
+
+          <h3 class="ds-subhead">Choice &amp; switch</h3>
+          <div class="grid grid-2">
+            <div class="choice-grid">
+              <label class="choice">
+                <input type="radio" name="dsPayment" checked>
+                <span class="choice-mark" aria-hidden="true"></span>
+                <span class="choice-body"><span class="choice-title">MTN Mobile Money</span><span class="choice-sub">Approve on your phone</span></span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="dsPayment">
+                <span class="choice-mark" aria-hidden="true"></span>
+                <span class="choice-body"><span class="choice-title">Cash on delivery</span><span class="choice-sub">Pay the rider at handover</span></span>
+              </label>
+            </div>
+            <div class="stack stack-3">
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="small"><strong>Available today</strong><br><span class="muted">Customers can order it immediately.</span></span>
+              </label>
+              <label class="switch">
+                <input type="checkbox">
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="small"><strong>Send low-stock alerts</strong><br><span class="muted">Notify the manager below par level.</span></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Feedback ---------------------------------------------------- -->
+        <section class="ds-section" id="feedback" aria-labelledby="feedbackTitle">
+          <h2 id="feedbackTitle">Feedback</h2>
+          <p>System messages say what happened, what it means and what to do next. Critical messages use red plus an alert icon and direct wording.</p>
+
+          <div class="stack stack-3">
+            <div class="alert alert-success">
+              <svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>
+              <div><strong>Payment confirmed</strong>Your order is with the kitchen. We will update the tracker as each step is completed.</div>
+            </div>
+            <div class="alert alert-warning">
+              <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+              <div><strong>Weak connection</strong>Keep this screen open until the delivery confirmation appears.</div>
+            </div>
+            <div class="alert alert-danger">
+              <svg class="icon" aria-hidden="true"><use href="#i-x-circle"></use></svg>
+              <div><strong>Handover could not be verified</strong>Ask the customer to read the 4-digit PIN again, or call dispatch.</div>
+            </div>
+            <div class="alert alert-info">
+              <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+              <div><strong>Free delivery within 5 km</strong>Nakasero, Kololo and Nakawa are inside the free zone.</div>
+            </div>
+          </div>
+
+          <h3 class="ds-subhead">Progress</h3>
+          <div class="stack stack-3">
+            <div class="progress" role="progressbar" aria-label="Order progress" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"><span style="width:68%"></span></div>
+            <div class="progress progress-orange" role="progressbar" aria-label="Stock level" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100"><span style="width:42%"></span></div>
+            <div class="progress progress-red" role="progressbar" aria-label="Stock warning" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"><span style="width:15%"></span></div>
+          </div>
+
+          <div class="ds-note">
+            <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+            <span>Toasts are announced politely; error toasts use <code>role="alert"</code>. Nothing disappears before a person can read it.</span>
+          </div>
+        </section>
+
+        <!-- Surfaces ---------------------------------------------------- -->
+        <section class="ds-section" id="surfaces" aria-labelledby="surfacesTitle">
+          <h2 id="surfacesTitle">Surfaces &amp; tokens</h2>
+          <p>Cards use a single-pixel border and a low shadow. Elevation increases only when a surface becomes interactive or floats above the page.</p>
+
+          <div class="grid grid-3">
+            <div class="card card-pad">
+              <span class="card-kicker"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-banknote"></use></svg>Revenue today</span>
+              <div class="card-value" style="margin-top:8px">USh 1,284,000</div>
+              <span class="stat-trend trend-up" style="margin-top:6px">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-trend-up"></use></svg>+16.9% vs yesterday
+              </span>
+            </div>
+            <div class="card card-pad card-dark">
+              <span class="card-kicker" style="color:#b9cdc7"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-bike"></use></svg>Active delivery</span>
+              <div class="card-value" style="margin-top:8px;color:#fff">#1043</div>
+              <span class="small" style="color:#d6e5e0;margin-top:6px">Ntinda · 8.093 km · 18 min</span>
+            </div>
+            <div class="surface-muted" style="padding:20px">
+              <span class="card-kicker"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-box"></use></svg>Restock</span>
+              <div class="card-value" style="margin-top:8px;font-size:1.5rem">6 kg beef</div>
+              <span class="small muted" style="display:block;margin-top:6px">Below par level of 30 kg.</span>
+            </div>
+          </div>
+
+          <h3 class="ds-subhead">Spacing, radius &amp; elevation</h3>
+          <table class="ds-token-table">
+            <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td><code>--space-3</code></td><td class="mono">12px</td><td>Inside compact controls</td></tr>
+              <tr><td><code>--space-4</code></td><td class="mono">16px</td><td>Default component gap</td></tr>
+              <tr><td><code>--space-6</code></td><td class="mono">24px</td><td>Card padding and section rhythm</td></tr>
+              <tr><td><code>--radius-md</code></td><td class="mono">12px</td><td>Buttons, inputs, banners</td></tr>
+              <tr><td><code>--radius-xl</code></td><td class="mono">20px</td><td>Large cards, panels, rider order</td></tr>
+              <tr><td><code>--shadow-sm</code></td><td class="mono">2px 6px</td><td>Resting cards</td></tr>
+              <tr><td><code>--shadow-lg</code></td><td class="mono">24px 48px</td><td>Sheets and floating elements</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Icons ------------------------------------------------------- -->
+        <section class="ds-section" id="icons" aria-labelledby="iconsTitle">
+          <h2 id="iconsTitle">Icons</h2>
+          <p>A single 24px stroke family keeps the interfaces consistent. Icons are decorative unless they carry an accessible label.</p>
+          <div class="ds-icon-grid">
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-flame"></use></svg><span>flame</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-utensils"></use></svg><span>utensils</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg><span>cart</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg><span>bike</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-navigation"></use></svg><span>navigation</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg><span>phone</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg><span>pin</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span>clock</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg><span>shield</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-banknote"></use></svg><span>banknote</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg><span>wifi</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-wifi-off"></use></svg><span>wifi-off</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg><span>sync</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg><span>receipt</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg><span>box</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg><span>chart</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg><span>users</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span>alert</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg><span>check-circle</span></div>
+            <div class="ds-icon"><svg class="icon" aria-hidden="true"><use href="#i-x-circle"></use></svg><span>x-circle</span></div>
+          </div>
+        </section>
+
+        <!-- Accessibility ----------------------------------------------- -->
+        <section class="ds-section" id="accessibility" aria-labelledby="accessibilityTitle">
+          <h2 id="accessibilityTitle">Accessibility rules</h2>
+          <p>These are build requirements, not suggestions. A page that breaks one of them is not ready to ship.</p>
+          <div class="stack stack-3" style="margin-top:16px">
+            <div class="alert alert-success"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg><div><strong>Contrast</strong>Body and UI text meet WCAG 2.2 AA. White is never placed on orange.</div></div>
+            <div class="alert alert-info"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg><div><strong>Focus</strong>A 3px green focus ring is always visible; dark surfaces switch to orange.</div></div>
+            <div class="alert alert-info"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg><div><strong>Targets</strong>48px minimum on customer and admin screens; 56px minimum on rider screens.</div></div>
+            <div class="alert alert-warning"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><div><strong>Never colour-only</strong>Status, errors and connection state always include an icon and text.</div></div>
+            <div class="alert alert-info"><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg><div><strong>Reduced motion</strong>Animations collapse to near-zero when the operating system asks for less motion.</div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="portal-footer on-dark">
+    <div class="container">
+      <div>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+          <span class="brand-text">
+            <strong>Morouj Mazaar</strong>
+            <span>Design system v2 · November 2026</span>
+          </span>
+        </div>
+        <p>Static token and component reference. Open any portal to see the system under real interface pressure.</p>
+      </div>
+      <nav class="portal-footer-links" aria-label="Prototype links">
+        <a href="index.html">Portal</a>
+        <a href="customer.html">Customer</a>
+        <a href="admin.html">Admin</a>
+        <a href="rider.html">Rider</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="assets/js/ui.js"></script>
+</body>
+</html>

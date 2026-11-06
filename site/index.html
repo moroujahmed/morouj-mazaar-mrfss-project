@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Morouj Mazaar · Design prototype portal</title>
+  <meta name="description" content="Morouj Mazaar interface prototype: customer ordering, operations dashboard, rider delivery app and the shared design system.">
+  <meta name="theme-color" content="#173F35">
+  <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/portal.css">
+</head>
+<body class="portal-body">
+  <a class="skip-link" href="#main">Skip to portals</a>
+
+  <header class="portal-header">
+    <div class="container">
+      <a class="brand" href="index.html" aria-label="Morouj Mazaar portal home">
+        <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+        <span class="brand-text">
+          <strong>Morouj Mazaar</strong>
+          <span>Bazaar Flame &amp; Grill</span>
+        </span>
+      </a>
+
+      <nav class="portal-nav" aria-label="Prototype pages">
+        <a href="customer.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-utensils"></use></svg>Customer</a>
+        <a href="admin.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-grid"></use></svg>Admin</a>
+        <a href="rider.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-bike"></use></svg>Rider</a>
+        <a href="design-system.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-settings"></use></svg>Design system</a>
+      </nav>
+
+      <div class="portal-header-actions">
+        <a class="btn btn-primary btn-sm" href="customer.html">
+          Order food
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ==================================================================
+         HERO
+         ================================================================== -->
+    <section class="portal-hero on-dark" aria-labelledby="portalTitle">
+      <div class="container portal-hero-grid">
+        <div>
+          <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-flame"></use></svg>Interface prototype · November 2026</span>
+          <h1 id="portalTitle">One kitchen.<br><em>Three focused experiences.</em></h1>
+          <p class="lead">
+            A charcoal-fired Kampala kitchen needs a calm customer menu, a fast operations console and a rider app
+            that still works when the signal drops. This prototype applies one green-and-flame system to all three.
+          </p>
+          <div class="portal-hero-actions">
+            <a class="btn btn-primary btn-lg" href="customer.html">
+              <svg class="icon" aria-hidden="true"><use href="#i-utensils"></use></svg>
+              Browse the menu
+            </a>
+            <a class="btn btn-secondary btn-lg" href="admin.html">
+              <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>
+              Open dashboard
+            </a>
+            <a class="btn btn-secondary btn-lg" href="rider.html">
+              <svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>
+              Rider app
+            </a>
+          </div>
+          <div class="portal-hero-meta">
+            <div><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>WCAG 2.2 AA contrast</div>
+            <div><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Mobile-first layouts</div>
+            <div><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg>Offline-safe rider flow</div>
+          </div>
+        </div>
+
+        <div class="portal-hero-media" aria-hidden="true">
+          <div class="portal-hero-frame">
+            <img src="assets/images/grilled_tilapia.jpg" alt="" width="800" height="880" fetchpriority="high">
+            <div class="portal-hero-caption">
+              <span class="icon-tile"><svg class="icon"><use href="#i-flame"></use></svg></span>
+              <div>
+                <strong>Whole Tilapia Flame Combo</strong>
+                <span>Charcoal grilled · USh 32,000 · 25 min prep</span>
+              </div>
+            </div>
+          </div>
+          <div class="portal-hero-badge">
+            <span class="connection-dot" aria-hidden="true"></span>
+            Demo data · no live services
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         PORTALS
+         ================================================================== -->
+    <section class="portal-section" aria-labelledby="portalsTitle">
+      <div class="container">
+        <div class="portal-section-head">
+          <div>
+            <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Three portals</span>
+            <h2 id="portalsTitle">Built around the person holding the screen.</h2>
+            <p>
+              Every interface shares the same tokens and components, but each one changes density, type size and
+              action priority to match its job. Nothing is colour-only, and no critical action depends on hover.
+            </p>
+          </div>
+          <a class="btn btn-secondary" href="design-system.html">
+            View the shared system
+            <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </a>
+        </div>
+
+        <div class="portal-grid">
+          <article class="portal-card">
+            <div class="portal-card-top">
+              <span class="icon-tile icon-tile-dark"><svg class="icon" aria-hidden="true"><use href="#i-utensils"></use></svg></span>
+              <span class="portal-card-tag"><span class="connection-dot" aria-hidden="true"></span>Customer</span>
+            </div>
+            <h3>Order without friction.</h3>
+            <p>A warm menu, clear modifiers and a checkout that keeps the total visible from basket to handover.</p>
+            <ul>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Search, category filters and dish modifiers</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Delivery, dine-in and mobile-money flows</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Live timeline, rider contact and handover PIN</li>
+            </ul>
+            <div class="portal-card-foot">
+              <a class="btn btn-dark" href="customer.html">
+                Open customer app
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </a>
+            </div>
+          </article>
+
+          <article class="portal-card">
+            <div class="portal-card-top">
+              <span class="icon-tile icon-tile-orange"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg></span>
+              <span class="portal-card-tag"><span class="connection-dot" aria-hidden="true"></span>Operations</span>
+            </div>
+            <h3>Run the whole floor.</h3>
+            <p>Dense but readable analytics, a live order pipeline, stock alerts and a reconciliation ledger.</p>
+            <ul>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Revenue, prep-time and pipeline overview</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Order drawer with safe status transitions</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Menu, inventory, dispatch and CSV reports</li>
+            </ul>
+            <div class="portal-card-foot">
+              <a class="btn btn-dark" href="admin.html">
+                Open dashboard
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </a>
+            </div>
+          </article>
+
+          <article class="portal-card">
+            <div class="portal-card-top">
+              <span class="icon-tile icon-tile-success"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg></span>
+              <span class="portal-card-tag"><span class="connection-dot" aria-hidden="true"></span>Rider</span>
+            </div>
+            <h3>Finish the drop, even offline.</h3>
+            <p>Large targets, high contrast and one clear next action — with queued completion instead of a fake success.</p>
+            <ul>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Cash due, change and customer notes up front</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Call, message and navigation within thumb reach</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Weak/offline states and PIN-verified handover</li>
+            </ul>
+            <div class="portal-card-foot">
+              <a class="btn btn-dark" href="rider.html">
+                Open rider app
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </a>
+            </div>
+          </article>
+        </div>
+
+        <div class="portal-principles">
+          <div class="portal-principle">
+            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg></span>
+            <strong>Palette with a job</strong>
+            <span>Green anchors, orange acts, red only warns.</span>
+          </div>
+          <div class="portal-principle">
+            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></span>
+            <strong>Status never colour-only</strong>
+            <span>Every state pairs an icon and a word.</span>
+          </div>
+          <div class="portal-principle">
+            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg></span>
+            <strong>Thumb-first</strong>
+            <span>Primary actions stay in the lower third.</span>
+          </div>
+          <div class="portal-principle">
+            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg></span>
+            <strong>Safe by default</strong>
+            <span>Failed sync is surfaced and retryable.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         PALETTE
+         ================================================================== -->
+    <section class="portal-section portal-section-subtle" aria-labelledby="paletteTitle">
+      <div class="container">
+        <div class="portal-section-head">
+          <div>
+            <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-leaf"></use></svg>Shared palette</span>
+            <h2 id="paletteTitle">Deep green, flame orange, honest neutrals.</h2>
+            <p>
+              White text on the primary green measures 11.67:1. Green text on the orange action fill measures 4.76:1.
+              Orange is never used as body text on white; the darker orange token is used when orange must be text.
+            </p>
+          </div>
+          <a class="btn btn-secondary" href="design-system.html#colour">
+            Full colour rules
+            <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </a>
+        </div>
+
+        <div class="palette-strip">
+          <div class="palette-chip">
+            <div class="palette-chip-color" style="background:#173F35;color:#ffffff">#173F35</div>
+            <div class="palette-chip-body"><strong>Primary green</strong><span>Navigation, headers, trust</span></div>
+          </div>
+          <div class="palette-chip">
+            <div class="palette-chip-color" style="background:#F28C28;color:#102e27">#F28C28</div>
+            <div class="palette-chip-body"><strong>Flame orange</strong><span>Primary actions, highlights</span></div>
+          </div>
+          <div class="palette-chip">
+            <div class="palette-chip-color" style="background:#ffffff;color:#0f241f;border-bottom:1px solid #dfe6e3">#FFFFFF</div>
+            <div class="palette-chip-body"><strong>White</strong><span>Cards, sheets, reading surfaces</span></div>
+          </div>
+          <div class="palette-chip">
+            <div class="palette-chip-color" style="background:#F2F4F3;color:#0f241f">#F2F4F3</div>
+            <div class="palette-chip-body"><strong>Light gray</strong><span>Secondary page background</span></div>
+          </div>
+          <div class="palette-chip">
+            <div class="palette-chip-color" style="background:#C62828;color:#ffffff">#C62828</div>
+            <div class="palette-chip-body"><strong>Alert red</strong><span>Errors, destructive actions</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="portal-footer on-dark">
+    <div class="container">
+      <div>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+          <span class="brand-text">
+            <strong>Morouj Mazaar</strong>
+            <span>Bazaar Flame &amp; Grill · Kampala</span>
+          </span>
+        </div>
+        <p>Static, dependency-free prototype. All orders, stock levels, riders and payments are demo data.</p>
+      </div>
+      <nav class="portal-footer-links" aria-label="Prototype links">
+        <a href="customer.html">Customer</a>
+        <a href="admin.html">Admin</a>
+        <a href="rider.html">Rider</a>
+        <a href="design-system.html">Design system</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="assets/js/ui.js"></script>
+</body>
+</html>

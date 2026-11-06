@@ -4,10 +4,11 @@ Direct-to-consumer ordering, kitchen display, rider dispatch, and cash reconcili
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.1 — build-ready, pending founder inputs |
+| **Status** | Specification baseline v1.1 + static interface prototype |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | UGX, whole integers |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
+| **Prototype** | [`site/index.html`](site/index.html) — customer, admin and rider interfaces |
 | **Audit** | [`docs/AUDIT_REPORT.md`](docs/AUDIT_REPORT.md) |
 | **Decisions** | [`docs/DECISIONS.md`](docs/DECISIONS.md) |
 | **Canonical numbers** | [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) |
@@ -16,11 +17,12 @@ Direct-to-consumer ordering, kitchen display, rider dispatch, and cash reconcili
 
 ## What is in this repository
 
-The repository currently contains the **specification, database baseline, seed data, and operational contracts**. The Next.js application scaffold starts at Phase 1 of the implementation plan.
+The repository currently contains the **specification, database baseline, seed data, and operational contracts**, plus a static interface prototype in `site/`. The Next.js application scaffold starts at Phase 1 of the implementation plan.
 
 ```
 .
 ├── docs/                       # 10 original specs + v1.1 build artifacts
+├── site/                       # static customer, admin, rider and design-system prototype
 ├── supabase/
 │   ├── migrations/             # schema + storage migrations
 │   ├── seed.sql                # menu, settings, tables
@@ -45,6 +47,28 @@ The repository currently contains the **specification, database baseline, seed d
 8. [`docs/OPERATIONS_RUNBOOK.md`](docs/OPERATIONS_RUNBOOK.md) — deploy, backup, incident, and go-live procedures.
 9. [`docs/COMPLIANCE_AND_LEGAL.md`](docs/COMPLIANCE_AND_LEGAL.md) — Uganda compliance checklist and policy skeletons.
 10. [`docs/ACCESSIBILITY.md`](docs/ACCESSIBILITY.md) — WCAG 2.2 AA palette and verification rules.
+11. [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) — the static prototype's palette, components, portal behaviour and accessibility checklist.
+
+---
+
+## Interface prototype
+
+The [`site/`](site/) folder contains a dependency-free, multi-page prototype of the customer, admin and rider experiences. Open [`site/index.html`](site/index.html) directly, or serve it locally:
+
+```bash
+cd site
+python -m http.server 8000
+```
+
+| Page | Purpose |
+| :--- | :--- |
+| [`site/index.html`](site/index.html) | Portal launcher and palette overview |
+| [`site/customer.html`](site/customer.html) | Menu, basket, checkout, payment and tracking |
+| [`site/admin.html`](site/admin.html) | Analytics, orders, inventory, menu, delivery and reports |
+| [`site/rider.html`](site/rider.html) | Active delivery, PIN handover and offline-safe sync |
+| [`site/design-system.html`](site/design-system.html) | Tokens, components, status language and contrast rules |
+
+The prototype reuses the canonical totals and distances from [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md), with the `#1047` fixture exception noted in the design-system doc. It is a design reference, not the production app; see [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) for scope and limitations.
 
 ---
 

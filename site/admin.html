@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Admin dashboard | Morouj Mazaar</title>
+  <meta name="description" content="Morouj Mazaar operations dashboard: live analytics, order management, inventory, menu, delivery fleet and end-of-day reports.">
+  <meta name="theme-color" content="#173F35">
+  <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="admin-body">
+  <a class="skip-link" href="#adminMain">Skip to dashboard</a>
+  <div class="admin-scrim" id="adminScrim" hidden></div>
+
+  <div class="admin-shell">
+    <!-- ==================================================================
+         SIDEBAR
+         ================================================================== -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+      <a class="brand" href="index.html" aria-label="Morouj Mazaar portal home">
+        <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+        <span class="brand-text">
+          <strong>Morouj Mazaar</strong>
+          <span>Operations console</span>
+        </span>
+      </a>
+
+      <nav class="admin-nav" aria-label="Dashboard sections">
+        <div class="admin-nav-label">Workspace</div>
+        <button type="button" data-admin-view="overview" aria-current="page">
+          <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Overview
+        </button>
+        <button type="button" data-admin-view="orders">
+          <svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>Orders
+          <span class="admin-nav-badge" id="navOrderCount">6</span>
+        </button>
+        <button type="button" data-admin-view="inventory">
+          <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>Inventory
+          <span class="admin-nav-badge" id="navLowCount">3</span>
+        </button>
+        <button type="button" data-admin-view="menu">
+          <svg class="icon" aria-hidden="true"><use href="#i-utensils"></use></svg>Menu
+        </button>
+        <button type="button" data-admin-view="delivery">
+          <svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>Delivery
+        </button>
+        <button type="button" data-admin-view="reports">
+          <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>Reports
+        </button>
+      </nav>
+
+      <div class="admin-sidebar-foot">
+        <div class="store-status">
+          <span class="connection-dot" aria-hidden="true"></span>
+          <div><strong>Store open</strong><span>Closes 22:00 EAT</span></div>
+        </div>
+        <div class="admin-user">
+          <span class="avatar" aria-hidden="true">AN</span>
+          <div><strong>Amina Nakato</strong><span>General manager</span></div>
+        </div>
+        <a class="admin-back" href="index.html">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Back to portal
+        </a>
+      </div>
+    </aside>
+
+    <!-- ==================================================================
+         MAIN
+         ================================================================== -->
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="icon-btn admin-menu-btn" type="button" id="adminMenuBtn" aria-controls="adminSidebar" aria-expanded="false" aria-label="Open admin menu">
+          <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+        </button>
+        <div class="admin-topbar-title">
+          <h1 id="adminPageTitle">Overview</h1>
+          <p id="adminPageSub">Sunday, 1 November 2026 · Kampala, EAT</p>
+        </div>
+        <div class="admin-topbar-actions">
+          <span class="admin-date"><svg class="icon" aria-hidden="true"><use href="#i-calendar"></use></svg>Today · 1 Nov</span>
+          <button class="icon-btn admin-notify" type="button" id="adminNotify" aria-label="Notifications, 3 unread">
+            <svg class="icon" aria-hidden="true"><use href="#i-bell"></use></svg>
+          </button>
+          <span class="avatar avatar-dark" aria-hidden="true">AN</span>
+        </div>
+      </header>
+
+      <main class="admin-content" id="adminMain">
+        <!-- ==============================================================
+             OVERVIEW
+             ============================================================== -->
+        <section class="admin-panel is-active" id="panel-overview" aria-labelledby="overviewTitle">
+          <div class="admin-heading">
+            <div>
+              <h2 id="overviewTitle">Good morning, Amina.</h2>
+              <p>Here is how the Bazaar is performing today.</p>
+            </div>
+            <div class="cluster">
+              <button class="btn btn-secondary btn-sm" type="button" data-export="overview">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-download"></use></svg>Export
+              </button>
+              <button class="btn btn-primary btn-sm" type="button" data-admin-view="orders">
+                Open live orders
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="overviewKpis"></div>
+
+          <div class="dashboard-grid">
+            <div class="dashboard-stack">
+              <section class="panel-card" aria-labelledby="revenueChartTitle">
+                <div class="panel-card-head">
+                  <div>
+                    <h3 id="revenueChartTitle">Revenue this week</h3>
+                    <p>Gross sales including delivery and packaging · UGX</p>
+                  </div>
+                  <span class="badge badge-success"><svg class="icon" aria-hidden="true"><use href="#i-trend-up"></use></svg>+12.4%</span>
+                </div>
+                <div class="bar-chart" id="revenueChart" role="img" aria-label="Bar chart of revenue from Monday to Sunday. Sunday is today and is the highest day."></div>
+                <div class="chart-legend">
+                  <span><i></i>Previous days</span>
+                  <span><i class="now"></i>Today</span>
+                  <span class="mono" style="margin-left:auto">Week total: USh 8,640,000</span>
+                </div>
+              </section>
+
+              <section class="panel-card admin-table-card" aria-labelledby="recentOrdersTitle">
+                <div class="admin-table-head">
+                  <div><h3 id="recentOrdersTitle">Recent orders</h3><p>Live from the kitchen and rider pool.</p></div>
+                  <button class="btn btn-ghost btn-sm" type="button" data-admin-view="orders">View all<svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></button>
+                </div>
+                <div class="table-wrap table-wrap-flat">
+                  <table class="table" style="min-width:620px">
+                    <caption class="sr-only">Most recent orders</caption>
+                    <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col" class="num">Total</th><th scope="col">Status</th></tr></thead>
+                    <tbody id="recentOrdersBody"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+
+            <div class="dashboard-stack">
+              <section class="panel-card" aria-labelledby="pipelineTitle">
+                <div class="panel-card-head">
+                  <div><h3 id="pipelineTitle">Kitchen pipeline</h3><p>Orders by preparation stage.</p></div>
+                  <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-flame"></use></svg>Busy</span>
+                </div>
+                <div class="pipeline-grid" id="pipelineGrid"></div>
+              </section>
+
+              <section class="panel-card" aria-labelledby="lowStockTitle">
+                <div class="panel-card-head">
+                  <div><h3 id="lowStockTitle">Stock alerts</h3><p>Items that need a restock today.</p></div>
+                  <span class="badge badge-danger"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>3 low</span>
+                </div>
+                <div class="low-stock-list" id="lowStockList"></div>
+                <button class="btn btn-secondary btn-sm btn-block" type="button" data-admin-view="inventory" style="margin-top:12px">Open inventory</button>
+              </section>
+
+              <section class="panel-card" aria-labelledby="fleetSnapshotTitle">
+                <div class="panel-card-head">
+                  <div><h3 id="fleetSnapshotTitle">Riders on shift</h3><p>4 of 5 riders available.</p></div>
+                  <span class="badge badge-success"><svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>4 active</span>
+                </div>
+                <div class="cluster" id="fleetSnapshot"></div>
+                <button class="btn btn-secondary btn-sm btn-block" type="button" data-admin-view="delivery" style="margin-top:12px">Open delivery board</button>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==============================================================
+             ORDERS
+             ============================================================== -->
+        <section class="admin-panel" id="panel-orders" aria-labelledby="ordersTitle" hidden>
+          <div class="admin-heading">
+            <div>
+              <h2 id="ordersTitle">Order management</h2>
+              <p>Track every order, fix customer typos and keep the kitchen moving.</p>
+            </div>
+            <div class="cluster">
+              <button class="btn btn-secondary btn-sm" type="button" data-export="orders">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-download"></use></svg>Export CSV
+              </button>
+              <button class="btn btn-primary btn-sm" type="button" id="refreshOrders">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-refresh"></use></svg>Refresh
+              </button>
+            </div>
+          </div>
+
+          <section class="panel-card" aria-label="Orders list">
+            <div class="admin-toolbar">
+              <div class="filter-tabs" id="orderFilters" role="group" aria-label="Filter orders by status">
+                <button type="button" data-order-filter="all" aria-pressed="true">All</button>
+                <button type="button" data-order-filter="New" aria-pressed="false">New</button>
+                <button type="button" data-order-filter="Cooking" aria-pressed="false">Cooking</button>
+                <button type="button" data-order-filter="Ready" aria-pressed="false">Ready</button>
+                <button type="button" data-order-filter="On the way" aria-pressed="false">On the way</button>
+                <button type="button" data-order-filter="Delivered" aria-pressed="false">Delivered</button>
+              </div>
+              <label class="admin-search" for="orderSearch">
+                <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                <span class="sr-only">Search orders</span>
+                <input id="orderSearch" type="search" placeholder="Search order, name or area…" autocomplete="off">
+              </label>
+            </div>
+
+            <div class="table-wrap" style="margin-top:16px">
+              <table class="table" style="min-width:980px">
+                <caption class="sr-only">All orders with customer, area, payment, status and actions</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Area</th>
+                    <th scope="col" class="num">Total</th>
+                    <th scope="col">Payment</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+              </table>
+            </div>
+            <div class="spread" style="margin-top:12px">
+              <p class="small muted" id="ordersCount" aria-live="polite">Showing 6 orders</p>
+              <span class="badge badge-neutral"><svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg>Updates every 30 seconds</span>
+            </div>
+          </section>
+        </section>
+
+        <!-- ==============================================================
+             INVENTORY
+             ============================================================== -->
+        <section class="admin-panel" id="panel-inventory" aria-labelledby="inventoryTitle" hidden>
+          <div class="admin-heading">
+            <div>
+              <h2 id="inventoryTitle">Inventory</h2>
+              <p>Stock levels for the kitchen and bar. Low stock is calculated against each par level.</p>
+            </div>
+            <div class="cluster">
+              <button class="btn btn-secondary btn-sm" type="button" id="inventoryExport">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-download"></use></svg>Export stock
+              </button>
+              <button class="btn btn-primary btn-sm" type="button" id="restockAll">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-plus"></use></svg>Restock low items
+              </button>
+            </div>
+          </div>
+
+          <div class="inv-summary" id="inventoryKpis"></div>
+
+          <section class="panel-card" aria-label="Inventory levels">
+            <div class="panel-card-head">
+              <div><h3>Kitchen &amp; bar stock</h3><p>Adjust counts as deliveries arrive or the kitchen uses stock.</p></div>
+              <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>3 need attention</span>
+            </div>
+            <div class="table-wrap">
+              <table class="table" style="min-width:900px">
+                <caption class="sr-only">Inventory stock levels and adjustments</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Stock level</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Updated</th>
+                    <th scope="col"><span class="sr-only">Adjust stock</span></th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <!-- ==============================================================
+             MENU
+             ============================================================== -->
+        <section class="admin-panel" id="panel-menu" aria-labelledby="menuAdminTitle" hidden>
+          <div class="admin-heading">
+            <div>
+              <h2 id="menuAdminTitle">Menu management</h2>
+              <p>Prices, availability and dish details shown on the customer storefront.</p>
+            </div>
+            <div class="cluster">
+              <button class="btn btn-secondary btn-sm" type="button" id="previewMenu">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-eye"></use></svg>Preview storefront
+              </button>
+              <button class="btn btn-primary btn-sm" type="button" id="addMenuItem">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-plus"></use></svg>Add dish
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-menu-grid" id="menuAdminGrid"></div>
+        </section>
+
+        <!-- ==============================================================
+             DELIVERY
+             ============================================================== -->
+        <section class="admin-panel" id="panel-delivery" aria-labelledby="deliveryTitle" hidden>
+          <div class="admin-heading">
+            <div>
+              <h2 id="deliveryTitle">Delivery management</h2>
+              <p>Dispatch unassigned orders, monitor riders and reconcile cash.</p>
+            </div>
+            <div class="cluster">
+              <span class="badge badge-success badge-lg"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>4 riders online</span>
+              <button class="btn btn-secondary btn-sm" type="button" data-admin-view="reports">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-banknote"></use></svg>Cash ledger
+              </button>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="deliveryKpis"></div>
+
+          <div class="dashboard-grid">
+            <section class="panel-card" aria-labelledby="fleetMapTitle">
+              <div class="panel-card-head">
+                <div><h3 id="fleetMapTitle">Live fleet map</h3><p>Rider positions around Kampala · updated 20 seconds ago.</p></div>
+                <span class="badge badge-success"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg>Live</span>
+              </div>
+              <div class="fleet-map" role="img" aria-label="Stylised map showing four riders across Nakasero, Ntinda, Kololo and Nakawa">
+                <svg viewBox="0 0 640 240" width="640" height="240" aria-hidden="true">
+                  <rect width="640" height="240" fill="#e8efec"/>
+                  <g fill="#dbe6e1">
+                    <rect x="20" y="18" width="110" height="52" rx="6"/>
+                    <rect x="168" y="30" width="86" height="40" rx="6"/>
+                    <rect x="300" y="16" width="120" height="62" rx="6"/>
+                    <rect x="470" y="30" width="86" height="46" rx="6"/>
+                    <rect x="30" y="164" width="96" height="58" rx="6"/>
+                    <rect x="170" y="152" width="90" height="70" rx="6"/>
+                    <rect x="330" y="160" width="110" height="62" rx="6"/>
+                    <rect x="490" y="152" width="80" height="70" rx="6"/>
+                  </g>
+                  <g stroke="#d2dfd9" stroke-width="20">
+                    <path d="M-10 96h660M-10 138h660M146-10v260M280-10v260M430-10v260M556-10v260"/>
+                  </g>
+                  <g stroke="#ffffff" stroke-width="2"><path d="M-10 96h660M-10 138h660M146-10v260M280-10v260M430-10v260M556-10v260"/></g>
+                  <path d="M80 200 146 200 146 138 280 138 280 96 430 96 430 60 556 60" fill="none" stroke="#f28c28" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 8"/>
+                  <circle cx="80" cy="200" r="8" fill="#173f35" stroke="#fff" stroke-width="3"/>
+                  <text x="96" y="220" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#3c4c46">Bazaar kitchen</text>
+                </svg>
+                <span class="fleet-pin is-active" style="left:35%;top:54%">1<span>Juma</span></span>
+                <span class="fleet-pin" style="left:64%;top:30%">2<span>Brian</span></span>
+                <span class="fleet-pin" style="left:20%;top:72%">3<span>David</span></span>
+                <span class="fleet-pin" style="left:79%;top:60%">4<span>Alex</span></span>
+              </div>
+            </section>
+
+            <section class="panel-card" aria-labelledby="dispatchTitle">
+              <div class="panel-card-head">
+                <div><h3 id="dispatchTitle">Ready for dispatch</h3><p>Assign a rider to these paid orders.</p></div>
+                <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>2 waiting</span>
+              </div>
+              <div class="dispatch-list" id="dispatchList"></div>
+            </section>
+          </div>
+
+          <section class="panel-card" aria-labelledby="fleetTitle">
+            <div class="panel-card-head">
+              <div><h3 id="fleetTitle">Rider fleet</h3><p>Cash liabilities are settled at the end of each shift.</p></div>
+              <span class="badge badge-neutral"><svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>5 riders</span>
+            </div>
+            <div class="fleet-grid" id="fleetGrid"></div>
+          </section>
+        </section>
+
+        <!-- ==============================================================
+             REPORTS
+             ============================================================== -->
+        <section class="admin-panel" id="panel-reports" aria-labelledby="reportsTitle" hidden>
+          <div class="admin-heading">
+            <div>
+              <h2 id="reportsTitle">Reports &amp; cash reconciliation</h2>
+              <p>Daily performance, payment mix and the end-of-day rider cash ledger.</p>
+            </div>
+            <div class="cluster">
+              <label class="sr-only" for="reportRange">Report period</label>
+              <select class="select" id="reportRange" style="min-height:40px;width:auto;font-size:.875rem">
+                <option value="today">Today · 1 Nov</option>
+                <option value="week" selected>This week</option>
+                <option value="month">This month</option>
+              </select>
+              <button class="btn btn-primary btn-sm" type="button" data-export="reports">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-download"></use></svg>Export report
+              </button>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="reportKpis"></div>
+
+          <div class="report-grid">
+            <div class="report-stack">
+              <section class="panel-card" aria-labelledby="reportChartTitle">
+                <div class="panel-card-head">
+                  <div><h3 id="reportChartTitle">Sales performance</h3><p>Revenue and order count by day.</p></div>
+                  <span class="badge badge-success"><svg class="icon" aria-hidden="true"><use href="#i-trend-up"></use></svg>+12.4% vs last week</span>
+                </div>
+                <div class="bar-chart" id="reportChart" role="img" aria-label="Bar chart of sales performance across the selected period"></div>
+                <div class="chart-legend">
+                  <span><i class="now"></i>Gross sales</span>
+                  <span class="mono" style="margin-left:auto">USh 8,640,000 · 186 orders</span>
+                </div>
+              </section>
+
+              <section class="panel-card admin-table-card" aria-labelledby="ledgerTitle">
+                <div class="admin-table-head">
+                  <div><h3 id="ledgerTitle">End-of-day cash ledger</h3><p>Physical cash collected by riders. Reconcile after counting the drawer.</p></div>
+                  <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-banknote"></use></svg>USh 239,600 due</span>
+                </div>
+                <div class="table-wrap table-wrap-flat">
+                  <table class="table" style="min-width:720px">
+                    <caption class="sr-only">Rider cash reconciliation ledger</caption>
+                    <thead>
+                      <tr><th scope="col">Rider</th><th scope="col">Boda plate</th><th scope="col" class="num">Deliveries</th><th scope="col" class="num">Cash collected</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Action</span></th></tr>
+                    </thead>
+                    <tbody id="ledgerBody"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+
+            <div class="report-stack">
+              <section class="panel-card" aria-labelledby="topItemsTitle">
+                <div class="panel-card-head"><div><h3 id="topItemsTitle">Top dishes</h3><p>By revenue this week.</p></div></div>
+                <div id="topItems"></div>
+              </section>
+
+              <section class="panel-card" aria-labelledby="paymentMixTitle">
+                <div class="panel-card-head"><div><h3 id="paymentMixTitle">Payment mix</h3><p>Share of completed orders.</p></div></div>
+                <div id="paymentMix"></div>
+              </section>
+
+              <section class="panel-card" aria-labelledby="deliveryPerfTitle">
+                <div class="panel-card-head"><div><h3 id="deliveryPerfTitle">Delivery performance</h3><p>Last 7 days.</p></div></div>
+                <div class="stack stack-3">
+                  <div class="kv"><dt>On-time deliveries</dt><dd>92%</dd></div>
+                  <div class="progress"><span style="width:92%"></span></div>
+                  <div class="kv" style="margin-top:6px"><dt>Average delivery time</dt><dd class="mono">24 min</dd></div>
+                  <div class="kv"><dt>Average prep time</dt><dd class="mono">18 min</dd></div>
+                  <div class="kv"><dt>Failed handovers</dt><dd><span class="badge badge-danger"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>1</span></dd></div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       ORDER DRAWER
+       ==================================================================== -->
+  <dialog class="sheet sheet-right order-drawer" id="orderDrawer" aria-labelledby="orderDrawerTitle">
+    <div class="sheet-inner">
+      <div class="sheet-head">
+        <div>
+          <h2 id="orderDrawerTitle">Order details</h2>
+          <p id="orderDrawerSub">Order #1042</p>
+        </div>
+        <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close order details">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="sheet-body" id="orderDrawerBody"></div>
+    </div>
+  </dialog>
+
+  <!-- ====================================================================
+       MENU ITEM SHEET
+       ==================================================================== -->
+  <dialog class="sheet" id="menuItemSheet" aria-labelledby="menuItemSheetTitle">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <h2 id="menuItemSheetTitle">Add a dish</h2>
+          <p id="menuItemSheetSub">New items appear on the storefront immediately.</p>
+        </div>
+        <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close dish form">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <form class="sheet-body stack stack-4" id="menuItemForm" novalidate>
+        <input type="hidden" id="menuItemId">
+        <div class="field">
+          <label class="field-label" for="menuItemName">Dish name <span class="optional">Required</span></label>
+          <input class="input" id="menuItemName" name="name" type="text" required placeholder="e.g. Grilled Goat Choma">
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label" for="menuItemCategory">Category</label>
+            <select class="select" id="menuItemCategory" name="category">
+              <option value="combos">Combos &amp; deals</option>
+              <option value="grills">Flame grills</option>
+              <option value="luwombo">Luwombo</option>
+              <option value="sides">Sides</option>
+              <option value="beverages">Juices &amp; drinks</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="menuItemPrice">Price (UGX) <span class="optional">Required</span></label>
+            <input class="input" id="menuItemPrice" name="price" type="number" min="500" step="500" required placeholder="18000">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="menuItemDesc">Description <span class="optional">Optional</span></label>
+          <textarea class="textarea" id="menuItemDesc" name="desc" rows="3" placeholder="What makes this dish special?"></textarea>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="menuItemAvailable" checked>
+          <span class="switch-track" aria-hidden="true"></span>
+          <span class="small"><strong>Available today</strong><br><span class="muted">Customers can order it immediately.</span></span>
+        </label>
+        <p class="field-error" id="menuItemError" role="alert" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span>Enter a dish name and a price of at least USh 500.</span>
+        </p>
+      </form>
+      <div class="sheet-foot">
+        <button class="btn btn-secondary" type="button" data-close-sheet>Cancel</button>
+        <button class="btn btn-primary" type="submit" form="menuItemForm" id="saveMenuItem">Save dish</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

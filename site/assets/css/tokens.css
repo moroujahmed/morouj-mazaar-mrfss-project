@@ -1,0 +1,150 @@
+/* ==========================================================================
+   MOROUJ MAZAAR — DESIGN TOKENS
+   Palette: deep green / flame orange / white / light gray / alert red
+   All body-text pairs meet WCAG 2.2 AA (>= 4.5:1).
+   ========================================================================== */
+
+:root {
+  /* Brand green ---------------------------------------------------------- */
+  --green-950: #0b241e;
+  --green-900: #102e27;
+  --green-800: #173f35; /* primary */
+  --green-700: #1d4f42;
+  --green-600: #276354;
+  --green-200: #c7d8d2;
+  --green-100: #e4edea;
+  --green-50: #f2f7f5;
+
+  /* Flame orange --------------------------------------------------------- */
+  --orange-700: #a65a0f; /* orange as text on light surfaces: 5.13:1 */
+  --orange-600: #c96f12;
+  --orange-500: #f28c28; /* accent fills; use green text (4.76:1) */
+  --orange-400: #f5a04a;
+  --orange-200: #fbd6ad;
+  --orange-100: #fdebd7;
+  --orange-50: #fef6ec;
+
+  /* Neutrals ------------------------------------------------------------- */
+  --white: #ffffff;
+  --gray-50: #f8faf9;
+  --gray-100: #f2f4f3; /* secondary background */
+  --gray-200: #e5eae8;
+  --gray-300: #d2dad7;
+  --gray-400: #a8b5b0;
+  --gray-500: #6b7b75; /* decorative only — 4.45:1 on white */
+  --gray-600: #52635d; /* muted text — 6.36:1 on white */
+  --gray-700: #3c4c46;
+  --ink: #0f241f; /* primary text — 16.25:1 on white */
+
+  /* Semantic ------------------------------------------------------------- */
+  --red-700: #a51f1f;
+  --red-600: #c62828; /* errors / critical */
+  --red-100: #fad7d7;
+  --red-50: #fdecec;
+
+  --success-700: #17603f;
+  --success-600: #1e6b4b;
+  --success-50: #e7f4ee;
+
+  --warning-700: #8a4b00;
+  --warning-50: #fff3e0;
+
+  --info-700: #1d4e89;
+  --info-50: #eaf2fb;
+
+  /* Surfaces & lines ----------------------------------------------------- */
+  --surface-page: var(--white);
+  --surface-subtle: var(--gray-100);
+  --surface-card: var(--white);
+  --surface-dark: var(--green-800);
+  --border: #dfe6e3;
+  --border-strong: var(--green-200);
+  --border-dark: rgba(255, 255, 255, 0.16);
+
+  /* Type ----------------------------------------------------------------- */
+  --font-heading: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", "Consolas", monospace;
+
+  --text-xs: 0.75rem;   /* 12 */
+  --text-sm: 0.875rem;  /* 14 */
+  --text-base: 1rem;    /* 16 */
+  --text-lg: 1.125rem;  /* 18 */
+  --text-xl: 1.25rem;   /* 20 */
+  --text-2xl: 1.5rem;   /* 24 */
+  --text-3xl: 1.875rem; /* 30 */
+  --text-4xl: 2.25rem;  /* 36 */
+  --text-5xl: 3rem;     /* 48 */
+  --text-6xl: 3.75rem;  /* 60 */
+
+  /* Space ---------------------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Radii ---------------------------------------------------------------- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+
+  /* Elevation ------------------------------------------------------------ */
+  --shadow-xs: 0 1px 2px rgba(15, 36, 31, 0.06);
+  --shadow-sm: 0 2px 6px rgba(15, 36, 31, 0.06), 0 1px 2px rgba(15, 36, 31, 0.04);
+  --shadow-md: 0 10px 24px -12px rgba(15, 36, 31, 0.22), 0 2px 6px rgba(15, 36, 31, 0.05);
+  --shadow-lg: 0 24px 48px -20px rgba(15, 36, 31, 0.28), 0 8px 18px -12px rgba(15, 36, 31, 0.14);
+  --shadow-orange: 0 10px 22px -10px rgba(242, 140, 40, 0.55);
+
+  /* Layout --------------------------------------------------------------- */
+  --container: 1240px;
+  --container-narrow: 920px;
+  --header-height: 72px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Motion --------------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 140ms;
+  --duration: 200ms;
+  --duration-slow: 320ms;
+
+  /* Focus ---------------------------------------------------------------- */
+  --focus-color: var(--green-800);
+  --focus-width: 3px;
+  --focus-offset: 3px;
+
+  color-scheme: light;
+}
+
+/* Optional dark surfaces keep the same semantic tokens. */
+.on-dark {
+  --surface-page: var(--green-900);
+  --surface-card: var(--green-800);
+  --surface-subtle: var(--green-700);
+  --border: var(--border-dark);
+  --border-strong: rgba(255, 255, 255, 0.28);
+  --ink: var(--white);
+  --gray-600: #cfded9;
+  --gray-700: #e4edea;
+  --focus-color: var(--orange-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration: 0ms;
+    --duration-slow: 0ms;
+  }
+}

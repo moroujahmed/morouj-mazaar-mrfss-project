@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Order food | Morouj Mazaar — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Order charcoal-grilled tilapia, chicken, luwombo and fresh juices from Morouj Mazaar in Kampala. Live tracking, secure handover PIN and MTN MoMo checkout.">
+  <meta name="theme-color" content="#173F35">
+  <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
+</head>
+<body class="customer-body">
+  <a class="skip-link" href="#main">Skip to menu</a>
+
+  <header class="customer-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Morouj Mazaar home">
+        <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+        <span class="brand-text">
+          <strong>Morouj Mazaar</strong>
+          <span>Bazaar Flame &amp; Grill</span>
+        </span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="#menu" data-scroll-menu><svg class="icon icon-sm" aria-hidden="true"><use href="#i-utensils"></use></svg>Menu</a>
+        <a href="#track-preview"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-bike"></use></svg>Track order</a>
+        <button type="button" data-open-sheet="dineInSheet"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-table"></use></svg>Dine-in</button>
+        <a href="admin.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-grid"></use></svg>Staff</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn cart-trigger" type="button" data-open-sheet="cartSheet" aria-label="Open cart, 0 items">
+          <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+          <span class="cart-count" id="cartCount" data-empty="true">0</span>
+        </button>
+        <button class="btn btn-primary btn-sm" type="button" data-scroll-menu>
+          <span>Order now</span>
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ==================================================================
+         BROWSE VIEW
+         ================================================================== -->
+    <div class="app-view is-active" id="browseView">
+      <section class="customer-hero" aria-labelledby="heroTitle">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-flame"></use></svg>Kampala's charcoal kitchen</span>
+            <h1 class="hero-title" id="heroTitle">Real charcoal.<br><em>Real fast.</em></h1>
+            <p class="lead">Lake Victoria tilapia, herb-marinated chicken and slow-steamed luwombo — grilled to order and at your door in about 30 minutes.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-lg" type="button" data-scroll-menu>
+                Browse the menu
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </button>
+              <button class="btn btn-secondary btn-lg" type="button" data-show-view="track">
+                <svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>
+                Track my order
+              </button>
+            </div>
+            <ul class="hero-points">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>Free delivery within 5 km</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>Secure handover PIN</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>30-minute average</li>
+            </ul>
+          </div>
+
+          <div class="hero-media" aria-hidden="true">
+            <div class="hero-deco"></div>
+            <div class="hero-media-main">
+              <img src="assets/images/grilled_tilapia.jpg" alt="" width="800" height="860" fetchpriority="high">
+              <div class="hero-media-caption">
+                <strong>Whole Tilapia Flame Combo</strong>
+                <span>Charcoal grilled · Served with chips &amp; garlic dip</span>
+              </div>
+            </div>
+            <div class="hero-float hero-float-rating">
+              <span class="icon-tile icon-tile-orange"><svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg></span>
+              <span><strong>4.9 / 5</strong><span>1,240+ happy orders</span></span>
+            </div>
+            <div class="hero-float hero-float-delivery">
+              <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg></span>
+              <span><strong>Arrives hot</strong><span>Live rider tracking</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="service-strip" aria-label="Service highlights">
+        <div class="container service-strip-inner">
+          <div class="service-item">
+            <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg></span>
+            <div><strong>Free delivery under 5 km</strong><span>Nakasero, Kololo, Nakawa and more</span></div>
+          </div>
+          <div class="service-item">
+            <span class="icon-tile icon-tile-orange"><svg class="icon" aria-hidden="true"><use href="#i-navigation"></use></svg></span>
+            <div><strong>Follow every turn</strong><span>Live map, rider contact and ETA</span></div>
+          </div>
+          <div class="service-item">
+            <span class="icon-tile icon-tile-success"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg></span>
+            <div><strong>Sealed and protected</strong><span>Share your 4-digit PIN only at handover</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="menu-section container" id="menu" aria-labelledby="menuTitle">
+        <div class="menu-toolbar">
+          <div>
+            <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-leaf"></use></svg>Today's menu</span>
+            <h2 id="menuTitle">Grilled fresh, packed hot.</h2>
+          </div>
+          <label class="search-field" for="menuSearch">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <span class="sr-only">Search the menu</span>
+            <input id="menuSearch" type="search" placeholder="Search tilapia, chicken, juice…" autocomplete="off">
+            <button class="search-clear" type="button" id="clearSearch" aria-label="Clear search" hidden>
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#i-x"></use></svg>
+            </button>
+          </label>
+        </div>
+
+        <div class="category-row" role="group" aria-label="Filter menu by category">
+          <button class="chip chip-orange" type="button" data-category="all" aria-pressed="true">
+            <svg class="icon" aria-hidden="true"><use href="#i-flame"></use></svg>All dishes
+          </button>
+          <button class="chip" type="button" data-category="combos" aria-pressed="false">Combos &amp; deals</button>
+          <button class="chip" type="button" data-category="grills" aria-pressed="false">Flame grills</button>
+          <button class="chip" type="button" data-category="luwombo" aria-pressed="false">Luwombo</button>
+          <button class="chip" type="button" data-category="sides" aria-pressed="false">Sides</button>
+          <button class="chip" type="button" data-category="beverages" aria-pressed="false">Juices &amp; drinks</button>
+        </div>
+
+        <div class="dish-grid" id="dishGrid"></div>
+        <div class="menu-empty" id="menuEmpty" hidden>
+          <h3>No dishes match that search.</h3>
+          <p class="small muted">Try “tilapia”, “chicken” or clear the filters.</p>
+          <button class="btn btn-secondary btn-sm" type="button" id="resetSearch">Clear filters</button>
+        </div>
+        <p class="sr-only" id="menuStatus" aria-live="polite"></p>
+        <noscript><p class="small muted" style="margin-top:20px">Enable JavaScript to browse and order. You can call the kitchen on +256 772 000 111.</p></noscript>
+      </section>
+
+      <section class="steps-band" aria-labelledby="howTitle">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-route"></use></svg>From grill to gate</span>
+              <h2 id="howTitle">Three steps. No guesswork.</h2>
+              <p>Everything you need is on one screen — including the rider's name, live position and your handover PIN.</p>
+            </div>
+          </div>
+          <div class="steps-grid">
+            <div class="step-card">
+              <span class="step-num">1</span>
+              <h3>Build your order</h3>
+              <p>Pick a dish, choose your spice level and add free kitchen omissions. Prices update instantly.</p>
+            </div>
+            <div class="step-card">
+              <span class="step-num">2</span>
+              <h3>Pay your way</h3>
+              <p>MTN MoMo, Airtel Money, card or cash on delivery. The delivery fee is shown before you pay.</p>
+            </div>
+            <div class="step-card">
+              <span class="step-num">3</span>
+              <h3>Track to your gate</h3>
+              <p>Follow the rider live, call or message them, then share your PIN after checking the seal.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section container" id="track-preview" aria-labelledby="trackPreviewTitle">
+        <div class="track-preview-grid">
+          <div class="track-preview-copy">
+            <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-navigation"></use></svg>Live order tracking</span>
+            <h2 id="trackPreviewTitle">Know exactly where dinner is.</h2>
+            <p class="lead">No vague “on the way” messages. See the rider move, the minutes count down, and the exact handover step — even on a weak connection.</p>
+            <div class="hero-actions">
+              <button class="btn btn-dark" type="button" data-show-view="track">
+                Open live tracker
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </button>
+              <button class="btn btn-secondary" type="button" data-open-sheet="cartSheet">Review basket</button>
+            </div>
+          </div>
+
+          <div class="track-preview-card" aria-label="Preview of order tracking">
+            <div class="spread" style="margin-bottom:12px">
+              <div>
+                <span class="tiny muted" style="font-weight:800;letter-spacing:.08em;text-transform:uppercase">Order #1042</span>
+                <h3 style="font-size:1.15rem">On the way to Nakasero</h3>
+              </div>
+              <span class="badge badge-warning"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>On the way</span>
+            </div>
+            <div class="mini-map" role="img" aria-label="Stylised map showing rider Juma 1.2 kilometres from the delivery address">
+              <svg viewBox="0 0 520 210" width="520" height="210" aria-hidden="true">
+                <rect width="520" height="210" fill="#e8efec"/>
+                <g stroke="#d6e1dc" stroke-width="18"><path d="M-10 54h540M-10 152h540M86-10v230M254-10v230M410-10v230"/></g>
+                <g stroke="#ffffff" stroke-width="2"><path d="M-10 54h540M-10 152h540M86-10v230M254-10v230M410-10v230"/></g>
+                <path d="M86 152 150 152 150 54 254 54 254 110 340 110 340 54 410 54" fill="none" stroke="#f28c28" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 9"/>
+                <circle cx="86" cy="152" r="8" fill="#173f35" stroke="#fff" stroke-width="3"/>
+                <circle cx="410" cy="54" r="9" fill="#f28c28" stroke="#fff" stroke-width="3"/>
+                <text x="98" y="144" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#3c4c46">Bazaar kitchen</text>
+                <text x="318" y="42" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#3c4c46">Nakasero</text>
+              </svg>
+            </div>
+            <div class="milestones" style="margin-top:12px;padding:12px;border:0">
+              <div class="milestone is-done"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span><span>Received</span></div>
+              <div class="milestone is-done"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span><span>Confirmed</span></div>
+              <div class="milestone is-done"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span><span>Cooking</span></div>
+              <div class="milestone is-current"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg></span><span>On the way</span></div>
+              <div class="milestone"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg></span><span>Delivered</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================================================================
+         CHECKOUT VIEW
+         ================================================================== -->
+    <div class="app-view checkout-view" id="checkoutView">
+      <div class="container">
+        <div class="checkout-top">
+          <div>
+            <button class="btn btn-ghost btn-sm" type="button" data-show-view="browse" style="margin-left:-14px">
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Back to menu
+            </button>
+            <h1>Checkout</h1>
+            <p class="muted small">Delivery details, payment and a final review.</p>
+          </div>
+          <div class="checkout-progress" aria-label="Checkout progress">
+            <span class="is-active"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-check"></use></svg>Cart</span>
+            <span class="is-active"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-check"></use></svg>Details</span>
+            <span><span class="label-long">Payment</span></span>
+          </div>
+        </div>
+
+        <div class="checkout-grid">
+          <form class="checkout-main" id="checkoutForm" novalidate>
+            <div class="alert alert-danger" id="checkoutErrors" role="alert" tabindex="-1" hidden>
+              <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+              <div><strong>Please check your details.</strong><span id="checkoutErrorsText">Some required fields need attention.</span></div>
+            </div>
+
+            <section class="checkout-card" aria-labelledby="deliveryTitle">
+              <div class="checkout-card-head">
+                <span class="step-badge">1</span>
+                <div>
+                  <h2 id="deliveryTitle">Where should we bring it?</h2>
+                  <p>Delivery fee is calculated from the Bazaar kitchen on Lumumba Avenue.</p>
+                </div>
+              </div>
+
+              <fieldset style="border:0;padding:0;margin:0 0 16px">
+                <legend class="field-label" style="margin-bottom:8px">Delivery area</legend>
+                <div class="area-options">
+                  <label class="area-option">
+                    <input type="radio" name="area" value="nakasero" checked>
+                    <span class="area-check" aria-hidden="true"></span>
+                    <strong>Nakasero</strong>
+                    <span>1.562 km · free delivery</span>
+                  </label>
+                  <label class="area-option">
+                    <input type="radio" name="area" value="ntinda">
+                    <span class="area-check" aria-hidden="true"></span>
+                    <strong>Ntinda</strong>
+                    <span>8.093 km · USh 6,000</span>
+                  </label>
+                  <label class="area-option">
+                    <input type="radio" name="area" value="table4">
+                    <span class="area-check" aria-hidden="true"></span>
+                    <strong>Dine-in · Table 4</strong>
+                    <span>No delivery fee</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="form-grid">
+                <div class="field col-span-2">
+                  <label class="field-label" for="customerName">Full name <span class="optional">Required</span></label>
+                  <input class="input" id="customerName" name="name" type="text" autocomplete="name" placeholder="e.g. Sarah Namukasa" required aria-describedby="nameError">
+                  <p class="field-error" id="nameError" hidden><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span>Enter the name the rider should ask for.</span></p>
+                </div>
+
+                <div class="field">
+                  <label class="field-label" for="customerPhone">Phone number <span class="optional">Required</span></label>
+                  <input class="input" id="customerPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+256 772 000 111" required aria-describedby="phoneError phoneHint">
+                  <p class="field-hint" id="phoneHint">Used by the rider and for payment confirmation.</p>
+                  <p class="field-error" id="phoneError" hidden><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span>Enter a valid Ugandan mobile number.</span></p>
+                </div>
+
+                <div class="field" id="addressField">
+                  <label class="field-label" for="customerAddress">Delivery address <span class="optional">Required</span></label>
+                  <input class="input" id="customerAddress" name="address" type="text" autocomplete="street-address" placeholder="Plot 14 Lumumba Avenue" required aria-describedby="addressError">
+                  <p class="field-error" id="addressError" hidden><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span>Add a building, plot or landmark.</span></p>
+                </div>
+
+                <div class="field col-span-2">
+                  <label class="field-label" for="customerNotes">Gate code or notes <span class="optional">Optional</span></label>
+                  <textarea class="textarea" id="customerNotes" name="notes" rows="2" placeholder="Gate code 1234 · Call when at the gate"></textarea>
+                </div>
+              </div>
+            </section>
+
+            <section class="checkout-card" aria-labelledby="paymentTitle">
+              <div class="checkout-card-head">
+                <span class="step-badge">2</span>
+                <div>
+                  <h2 id="paymentTitle">How would you like to pay?</h2>
+                  <p>All payments are confirmed before the kitchen starts cooking.</p>
+                </div>
+              </div>
+
+              <fieldset style="border:0;padding:0;margin:0">
+                <legend class="sr-only">Payment method</legend>
+                <div class="pay-methods">
+                  <label class="pay-method">
+                    <input type="radio" name="payment" value="mtn" checked>
+                    <span class="icon-tile icon-tile-orange"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg></span>
+                    <span><strong>MTN Mobile Money</strong><span>Approve on your phone</span></span>
+                  </label>
+                  <label class="pay-method">
+                    <input type="radio" name="payment" value="airtel">
+                    <span class="icon-tile icon-tile-red"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg></span>
+                    <span><strong>Airtel Money</strong><span>Approve on your phone</span></span>
+                  </label>
+                  <label class="pay-method">
+                    <input type="radio" name="payment" value="cod">
+                    <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-banknote"></use></svg></span>
+                    <span><strong>Cash on delivery</strong><span>Pay the rider at handover</span></span>
+                  </label>
+                  <label class="pay-method">
+                    <input type="radio" name="payment" value="card">
+                    <span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#i-credit-card"></use></svg></span>
+                    <span><strong>Visa / Mastercard</strong><span>Secure card checkout</span></span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div id="cashChangeWrap" hidden style="margin-top:14px">
+                <div class="field" style="max-width:320px">
+                  <label class="field-label" for="cashChange">Do you need change?</label>
+                  <select class="select" id="cashChange">
+                    <option value="exact">Exact cash</option>
+                    <option value="50000" selected>Change for USh 50,000</option>
+                    <option value="100000">Change for USh 100,000</option>
+                  </select>
+                </div>
+              </div>
+
+              <p class="summary-note" style="margin-top:16px">
+                <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+                This is a design prototype. No real payment is taken and no order is sent to a kitchen.
+              </p>
+            </section>
+
+            <section class="checkout-card" aria-labelledby="reviewTitle">
+              <div class="checkout-card-head">
+                <span class="step-badge">3</span>
+                <div>
+                  <h2 id="reviewTitle">Review your order</h2>
+                  <p>You can change quantities from the basket before paying.</p>
+                </div>
+              </div>
+              <div class="cart-lines" id="checkoutLines"></div>
+              <button class="btn btn-ghost btn-sm" type="button" data-open-sheet="cartSheet" style="margin-top:12px">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-edit"></use></svg>Edit basket
+              </button>
+            </section>
+          </form>
+
+          <aside class="summary-card" aria-labelledby="summaryTitle">
+            <h2 id="summaryTitle">Order summary</h2>
+            <div class="summary-lines">
+              <div class="summary-item"><span>Items (<span id="summaryCount">0</span>)</span><span class="mono" id="summaryItems">USh 0</span></div>
+              <div class="summary-item"><span>Packaging</span><span class="mono" id="summaryPackaging">USh 1,000</span></div>
+              <div class="summary-item"><span>Delivery · <span id="summaryDistance">1.562 km</span></span><span class="mono" id="summaryDelivery">Free</span></div>
+            </div>
+            <div class="summary-total">
+              <span>Total</span>
+              <span id="summaryTotal" aria-live="polite">USh 0</span>
+            </div>
+            <button class="btn btn-primary btn-lg btn-block" type="submit" form="checkoutForm" id="placeOrderBtn">
+              <span id="placeOrderLabel">Pay with MTN MoMo</span>
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </button>
+            <p class="summary-note">
+              <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+              By ordering you agree to share your name, phone and address with the kitchen and your rider.
+            </p>
+            <div class="alert alert-orange" style="margin-top:14px" id="dineInNote" hidden>
+              <svg class="icon" aria-hidden="true"><use href="#i-table"></use></svg>
+              <div><strong>Dine-in order</strong><span>Your food will be served at Table 4. No delivery fee.</span></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================================================================
+         TRACKING VIEW
+         ================================================================== -->
+    <div class="app-view tracking-view" id="trackView">
+      <div class="container">
+        <div class="tracking-head">
+          <div>
+            <button class="btn btn-ghost btn-sm" type="button" data-show-view="browse" style="margin-left:-14px">
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-left"></use></svg>Back to menu
+            </button>
+            <h1 id="trackTitle">Order #1042</h1>
+            <p class="muted small" id="trackSubtitle">Placed today at 12:45 EAT · Paid via MTN MoMo</p>
+          </div>
+          <div class="cluster">
+            <span class="badge badge-success badge-lg" id="trackStatusBadge"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>On the way</span>
+            <button class="btn btn-secondary btn-sm" type="button" id="copyOrderLink">
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#i-copy"></use></svg>Copy link
+            </button>
+          </div>
+        </div>
+
+        <div class="tracking-grid">
+          <div class="tracking-main">
+            <div class="eta-band">
+              <div>
+                <div class="eta-label">Estimated arrival</div>
+                <div class="eta-value" id="etaValue">13:15 EAT</div>
+                <div class="eta-sub" id="etaSub">18 minutes remaining · 1.2 km away</div>
+              </div>
+              <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>On schedule</span>
+            </div>
+
+            <div class="milestones" id="trackMilestones" aria-label="Order progress">
+              <div class="milestone is-done"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span><span>Received</span></div>
+              <div class="milestone is-done"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span><span>Confirmed</span></div>
+              <div class="milestone is-done"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span><span>Cooking</span></div>
+              <div class="milestone is-current"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg></span><span>On the way</span></div>
+              <div class="milestone"><span class="milestone-dot"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg></span><span>Delivered</span></div>
+            </div>
+
+            <div class="map-card" id="trackMapCard">
+              <div class="map-canvas">
+                <svg viewBox="0 0 680 300" width="680" height="300" role="img" aria-label="Stylised map of Kampala showing the rider travelling from the Bazaar kitchen to Plot 14 Lumumba Avenue, Nakasero">
+                  <rect width="680" height="300" fill="#e8efec"/>
+                  <g fill="#dbe6e1">
+                    <rect x="28" y="24" width="120" height="64" rx="6"/>
+                    <rect x="190" y="38" width="88" height="50" rx="6"/>
+                    <rect x="310" y="20" width="110" height="78" rx="6"/>
+                    <rect x="470" y="40" width="86" height="54" rx="6"/>
+                    <rect x="588" y="22" width="66" height="70" rx="6"/>
+                    <rect x="40" y="196" width="104" height="76" rx="6"/>
+                    <rect x="188" y="184" width="94" height="86" rx="6"/>
+                    <rect x="330" y="198" width="120" height="70" rx="6"/>
+                    <rect x="492" y="184" width="84" height="84" rx="6"/>
+                    <rect x="600" y="196" width="58" height="70" rx="6"/>
+                  </g>
+                  <g stroke="#d2dfd9" stroke-width="22">
+                    <path d="M-10 118h700M-10 172h700M160-10v320M288-10v320M452-10v320M574-10v320"/>
+                  </g>
+                  <g stroke="#ffffff" stroke-width="2.5">
+                    <path d="M-10 118h700M-10 172h700M160-10v320M288-10v320M452-10v320M574-10v320"/>
+                  </g>
+                  <path d="M96 248 160 248 160 172 288 172 288 118 452 118 452 76 574 76 574 118 610 118" fill="none" stroke="#f28c28" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12 10"/>
+                  <circle cx="96" cy="248" r="10" fill="#173f35" stroke="#fff" stroke-width="3"/>
+                  <circle cx="610" cy="118" r="11" fill="#f28c28" stroke="#fff" stroke-width="3"/>
+                  <text x="112" y="270" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#3c4c46">Bazaar kitchen</text>
+                  <text x="510" y="104" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#3c4c46">Nakasero</text>
+                  <text x="470" y="142" font-family="Inter, sans-serif" font-size="11" fill="#52635d">Lumumba Ave</text>
+                  <text x="300" y="196" font-family="Inter, sans-serif" font-size="11" fill="#52635d">Kampala Rd</text>
+                </svg>
+                <div class="map-rider-marker pulse-ring" aria-hidden="true">
+                  <svg class="icon"><use href="#i-bike"></use></svg>
+                </div>
+                <div class="map-legend">
+                  <span><span class="dot"></span>Rider Juma</span>
+                  <span><span class="dot dot-green"></span>Your address</span>
+                </div>
+              </div>
+              <div class="map-caption">
+                <span><strong>1.2 km</strong> from your gate · Map data preview</span>
+                <span class="cluster">
+                  <button class="btn btn-ghost btn-sm" type="button" id="centerMap">
+                    <svg class="icon icon-sm" aria-hidden="true"><use href="#i-navigation"></use></svg>Centre
+                  </button>
+                </span>
+              </div>
+            </div>
+
+            <div class="rider-card" id="trackRiderCard">
+              <div class="rider-avatar">
+                <svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>
+                <span class="online-dot" aria-hidden="true"></span>
+              </div>
+              <div class="rider-info">
+                <h3>Rider Juma · UFD 342B</h3>
+                <p>4.9 rating · 1.2 km away · <span style="color:var(--success-700);font-weight:700">Online</span></p>
+              </div>
+              <div class="rider-actions">
+                <button class="icon-btn" type="button" id="callRider" aria-label="Call rider Juma">
+                  <svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>
+                </button>
+                <button class="icon-btn" type="button" id="messageRider" aria-label="Message rider Juma">
+                  <svg class="icon" aria-hidden="true"><use href="#i-message"></use></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="timeline" id="trackTimeline" aria-label="Order updates">
+              <div class="timeline-step is-done">
+                <span class="timeline-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>
+                <div><div class="timeline-title">Order received</div><div class="timeline-sub">12:45 EAT · Payment confirmed</div></div>
+              </div>
+              <div class="timeline-step is-done">
+                <span class="timeline-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>
+                <div><div class="timeline-title">Kitchen confirmed</div><div class="timeline-sub">12:47 EAT · Chef Moses started your grill</div></div>
+              </div>
+              <div class="timeline-step is-done">
+                <span class="timeline-dot"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>
+                <div><div class="timeline-title">Packed and sealed</div><div class="timeline-sub">13:02 EAT · Safety seal #A-4821 applied</div></div>
+              </div>
+              <div class="timeline-step is-current">
+                <span class="timeline-dot"><svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg></span>
+                <div><div class="timeline-title">On the way</div><div class="timeline-sub">13:05 EAT · Juma picked up your order</div></div>
+              </div>
+              <div class="timeline-step">
+                <span class="timeline-dot"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg></span>
+                <div><div class="timeline-title">Delivered</div><div class="timeline-sub">Share your PIN after checking the seal</div></div>
+              </div>
+            </div>
+
+            <details class="demo-toolbar">
+              <summary>Demo controls · advance the order</summary>
+              <div class="demo-body">
+                <button class="btn btn-secondary btn-sm" type="button" id="advanceStatus">Advance status</button>
+                <button class="btn btn-ghost btn-sm" type="button" id="resetStatus">Reset to “On the way”</button>
+              </div>
+            </details>
+          </div>
+
+          <aside class="tracking-main">
+            <div class="pin-card" id="trackPinCard">
+              <div class="pin-card-head">
+                <div>
+                  <h3>Handover PIN</h3>
+                  <p>Share only after checking the safety seal.</p>
+                </div>
+                <button class="icon-btn icon-btn-sm" type="button" id="copyPin" aria-label="Copy handover PIN">
+                  <svg class="icon icon-sm" aria-hidden="true"><use href="#i-copy"></use></svg>
+                </button>
+              </div>
+              <div class="pin-digits" aria-label="Handover PIN 4 8 2 1">
+                <span class="pin-digit">4</span>
+                <span class="pin-digit">8</span>
+                <span class="pin-digit">2</span>
+                <span class="pin-digit">1</span>
+              </div>
+              <p class="pin-warning">
+                <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+                If the seal is broken, do not share the PIN. Call the kitchen on +256 772 000 111.
+              </p>
+            </div>
+
+            <div class="docket" id="trackDocket">
+              <div class="docket-head">
+                <div>
+                  <strong>BAZAAR FLAME &amp; GRILL</strong><br>
+                  <span>Order #1042 · 29 Oct 2026</span>
+                </div>
+                <span>Delivery</span>
+              </div>
+              <div class="docket-lines" id="docketLines"></div>
+              <div class="docket-totals" id="docketTotals"></div>
+              <div class="docket-status"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Paid via MTN Mobile Money</div>
+            </div>
+
+            <div class="card card-pad">
+              <h3 style="font-size:1rem">Need help?</h3>
+              <p class="small muted" style="margin-top:4px">The kitchen is open until 22:00 EAT. We usually reply in under 2 minutes.</p>
+              <button class="btn btn-secondary btn-block" type="button" id="helpOrder" style="margin-top:12px">
+                <svg class="icon" aria-hidden="true"><use href="#i-message"></use></svg>Chat about this order
+              </button>
+            </div>
+
+            <div id="deliveredCard" hidden>
+              <div class="feedback-card">
+                <div class="pay-success-icon" style="margin:0 auto 10px">
+                  <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+                </div>
+                <h2>Meal delivered!</h2>
+                <p>How was your experience with Morouj Mazaar?</p>
+                <div class="feedback-options" role="group" aria-label="Rate your meal">
+                  <button class="feedback-option" type="button" data-rating="great" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>Great</button>
+                  <button class="feedback-option" type="button" data-rating="okay" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-utensils"></use></svg>Okay</button>
+                  <button class="feedback-option" type="button" data-rating="bad" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-x-circle"></use></svg>Not great</button>
+                </div>
+                <button class="btn btn-primary" type="button" id="submitFeedback" style="margin-top:16px">Submit feedback</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="customer-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+          <span class="brand-text"><strong style="color:#fff">Morouj Mazaar</strong><span style="color:#b9cdc7">Bazaar Flame &amp; Grill</span></span>
+        </a>
+        <p>Charcoal-grilled Ugandan favourites, cooked to order and delivered across Kampala.</p>
+      </div>
+      <div class="cluster cluster-4" style="align-items:flex-start">
+        <nav class="footer-links" aria-label="Customer links">
+          <a href="#menu">Menu</a>
+          <a href="#track-preview">Track order</a>
+          <a href="admin.html">Staff portal</a>
+          <a href="rider.html">Rider app</a>
+          <a href="design-system.html">Design system</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cart dock ---------------------------------------------------------- -->
+  <div class="cart-dock" id="cartDock" hidden>
+    <div class="cart-dock-info">
+      <span class="cart-dock-icon"><svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg></span>
+      <div class="cart-dock-text">
+        <strong id="dockCount">0 items</strong>
+        <span id="dockTotal">USh 0 · delivery calculated at checkout</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" type="button" data-show-view="checkout">
+      Checkout
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+    </button>
+  </div>
+
+  <!-- Cart sheet --------------------------------------------------------- -->
+  <dialog class="sheet sheet-right" id="cartSheet" aria-labelledby="cartTitle">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <h2 id="cartTitle">Your basket</h2>
+          <p id="cartSheetSub">0 items · ready when you are</p>
+        </div>
+        <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close basket">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="cart-lines" id="cartLines"></div>
+        <div class="empty-state" id="cartEmpty">
+          <span class="icon-tile icon-tile-orange"><svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg></span>
+          <h3>Your basket is empty</h3>
+          <p class="small">Add a dish from today's menu and it will appear here.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-close-sheet data-scroll-menu>Browse menu</button>
+        </div>
+        <div id="cartSummaryWrap" hidden>
+          <div class="cart-note" style="margin-top:16px">
+            <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+            Packaging is USh 1,000. Delivery is free within 5 km; Ntinda adds USh 6,000.
+          </div>
+          <div style="margin-top:16px">
+            <div class="kv"><dt>Subtotal</dt><dd class="mono" id="cartSubtotal">USh 0</dd></div>
+            <div class="kv" style="margin-top:8px"><dt>Packaging</dt><dd class="mono">USh 1,000</dd></div>
+            <div class="kv kv-total" style="margin-top:14px"><dt>Estimated total</dt><dd id="cartTotal">USh 0</dd></div>
+          </div>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary btn-lg" type="button" data-show-view="checkout" id="cartCheckoutBtn" disabled>
+          Checkout
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Dish sheet --------------------------------------------------------- -->
+  <dialog class="sheet" id="dishSheet" aria-labelledby="dishSheetTitle">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div id="dishSheetContent"></div>
+    </div>
+  </dialog>
+
+  <!-- Dine-in sheet ------------------------------------------------------ -->
+  <dialog class="sheet" id="dineInSheet" aria-labelledby="dineInTitle">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <h2 id="dineInTitle">Dine-in at the Bazaar</h2>
+          <p>Scan-to-order at your table. No delivery fee, no minimum order.</p>
+        </div>
+        <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close dine-in">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="sheet-body stack stack-4">
+        <div class="alert alert-info">
+          <svg class="icon" aria-hidden="true"><use href="#i-table"></use></svg>
+          <div><strong>Table service</strong><span>Your order is sent straight to the kitchen and served at your table.</span></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="tableNumber">Your table number</label>
+          <select class="select" id="tableNumber">
+            <option value="1">Table 1</option>
+            <option value="2">Table 2</option>
+            <option value="3">Table 3</option>
+            <option value="4" selected>Table 4</option>
+            <option value="5">Table 5</option>
+            <option value="6">Table 6</option>
+            <option value="7">Table 7</option>
+            <option value="8">Table 8</option>
+          </select>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary btn-lg" type="button" id="startDineIn">Start table order</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Payment sheet ------------------------------------------------------ -->
+  <dialog class="sheet" id="paymentSheet" aria-labelledby="paymentSheetTitle">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <h2 id="paymentSheetTitle">Confirm payment</h2>
+          <p id="paymentSheetSub">MTN Mobile Money · secure request</p>
+        </div>
+        <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close payment" id="paymentClose">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div id="paymentInitial">
+          <div class="pay-amount">
+            <span>Amount to pay</span>
+            <strong id="payAmount">USh 35,000</strong>
+          </div>
+          <div class="pay-steps">
+            <div class="pay-step is-done"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Order details validated</div>
+            <div class="pay-step is-active"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>Approve the request on your phone</div>
+            <div class="pay-step"><svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>Receive your receipt and live tracker</div>
+          </div>
+          <p class="summary-note" style="margin-top:18px">
+            <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+            A USh 500 mobile-money charge may apply. This prototype does not contact a payment provider.
+          </p>
+        </div>
+
+        <div id="paymentProcessing" hidden>
+          <div class="pay-amount" style="background:var(--gray-50);border-color:var(--border)">
+            <span>Processing</span>
+            <strong id="processingAmount">USh 35,000</strong>
+          </div>
+          <div class="pay-steps" style="margin-top:20px">
+            <div class="pay-step is-active"><span class="spinner" aria-hidden="true"></span>Sending request to MTN MoMo…</div>
+            <div class="pay-step"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>Waiting for approval</div>
+          </div>
+          <p class="small muted" style="margin-top:16px" role="status">Keep this screen open. We will confirm automatically.</p>
+        </div>
+
+        <div class="pay-success" id="paymentSuccess" hidden>
+          <div class="pay-success-icon"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></div>
+          <h3>Payment confirmed</h3>
+          <p>Your order is with the kitchen. We will update the tracker as each step is completed.</p>
+          <div class="badge badge-success badge-lg"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>Paid · <span id="paidAmount">USh 35,000</span></div>
+        </div>
+      </div>
+      <div class="sheet-foot" id="paymentFoot">
+        <button class="btn btn-secondary" type="button" data-close-sheet id="paymentCancel">Cancel</button>
+        <button class="btn btn-primary" type="button" id="confirmPayment">Pay <span id="confirmAmount">USh 35,000</span></button>
+      </div>
+      <div class="sheet-foot" id="paymentDoneFoot" hidden>
+        <button class="btn btn-primary btn-lg" type="button" id="trackPayment">Track my order<svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/customer.js"></script>
+</body>
+</html>

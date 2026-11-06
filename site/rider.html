@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Rider delivery | Morouj Mazaar</title>
+  <meta name="description" content="Morouj Mazaar rider app: active delivery details, customer contact, navigation, cash-on-delivery totals, handover PIN and offline-safe completion.">
+  <meta name="theme-color" content="#173F35">
+  <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/rider.css">
+</head>
+<body class="rider-body has-sticky">
+  <a class="skip-link" href="#riderMain">Skip to active delivery</a>
+
+  <!-- ====================================================================
+       HEADER
+       ==================================================================== -->
+  <header class="rider-header">
+    <div class="container">
+      <div class="rider-header-top">
+        <a class="brand" href="index.html" aria-label="Morouj Mazaar portal home">
+          <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+          <span class="brand-text">
+            <strong>Morouj Mazaar</strong>
+            <span>Rider delivery</span>
+          </span>
+        </a>
+
+        <button class="connection-chip" id="connectionChip" type="button" data-open-sheet="connectionSheet" data-state="online" aria-haspopup="dialog" aria-label="Connection status: online. Change connection status">
+          <svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg>
+          <span id="connectionLabel">Online</span>
+        </button>
+      </div>
+
+      <div class="rider-shift">
+        <div class="rider-id">
+          <span class="avatar" aria-hidden="true">JM</span>
+          <div>
+            <strong>Juma Mukasa</strong>
+            <span>UFD 342B · Shift ends 20:00 EAT</span>
+          </div>
+        </div>
+        <label class="shift-toggle">
+          <input type="checkbox" id="shiftToggle" role="switch" checked>
+          <span class="switch-track" aria-hidden="true"></span>
+          <span class="shift-label" id="shiftToggleLabel">On shift</span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="rider-main" id="riderMain">
+    <div class="rider-page-head">
+      <div>
+        <h1 id="riderPageTitle">Active delivery</h1>
+        <p id="riderPageSub">Order #1043 · Ntinda · 8.093 km</p>
+      </div>
+      <span class="badge badge-orange badge-lg" id="pageStatusBadge">
+        <svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>
+        <span id="pageStatusText">Ready for pickup</span>
+      </span>
+    </div>
+
+    <!-- Connection banners ------------------------------------------------ -->
+    <div class="rider-banners">
+      <div class="rider-banner rider-banner-offline" id="offlineBanner" role="alert" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-wifi-off"></use></svg>
+        <div>
+          <strong>You are offline</strong>
+          <p>Delivery updates are saved on this phone and verified when you reconnect. Never tell the customer the delivery is confirmed until it syncs.</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" type="button" id="offlineRetry">Retry</button>
+      </div>
+
+      <div class="rider-banner rider-banner-weak" id="weakBanner" role="status" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg>
+        <div>
+          <strong>Weak connection</strong>
+          <p>Actions may take longer. Keep this screen open until the confirmation appears.</p>
+        </div>
+      </div>
+
+      <div class="rider-banner rider-banner-pending" id="pendingBanner" role="status" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg>
+        <div>
+          <strong>Completion waiting for verification</strong>
+          <p id="pendingText">Your delivery is queued on this phone. Reconnect to verify it.</p>
+        </div>
+        <button class="btn btn-dark btn-sm" type="button" id="syncPending">Sync now</button>
+      </div>
+    </div>
+
+    <div class="rider-grid">
+      <div class="rider-col">
+        <!-- Active delivery ---------------------------------------------- -->
+        <section class="rider-order" id="activeOrderCard" aria-labelledby="activeOrderHeading">
+          <h2 class="sr-only" id="activeOrderHeading">Active delivery order</h2>
+          <div id="activeOrderBody"></div>
+        </section>
+
+        <!-- Delivered success -------------------------------------------- -->
+        <section class="delivered-panel" id="deliveredPanel" aria-labelledby="deliveredTitle" hidden></section>
+
+        <!-- Delivery pool ------------------------------------------------ -->
+        <section class="pool-section" aria-labelledby="poolTitle">
+          <div class="section-heading">
+            <div>
+              <h2 id="poolTitle">Available near you</h2>
+              <p id="poolSub">Ready for pickup · held for 10 minutes</p>
+            </div>
+            <span class="badge badge-neutral" id="poolCount">2 open</span>
+          </div>
+          <div class="pool-list" id="poolList"></div>
+          <p class="pool-note">
+            <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+            <span>Claim a delivery while you are on shift. You can queue one more job while finishing the current drop.</span>
+          </p>
+        </section>
+      </div>
+
+      <aside class="rider-col" aria-label="Shift summary and safety reminder">
+        <!-- Shift summary ------------------------------------------------ -->
+        <section class="shift-card" aria-labelledby="shiftTitle">
+          <h2 id="shiftTitle">Today's shift</h2>
+          <p class="shift-card-sub">UFD 342B · Ends 20:00 EAT</p>
+          <div class="shift-stats">
+            <div class="shift-stat">
+              <span>Delivered</span>
+              <strong id="shiftDeliveries">7</strong>
+            </div>
+            <div class="shift-stat">
+              <span id="shiftCashLabel">COD due</span>
+              <strong id="shiftCash">USh 38,000</strong>
+            </div>
+            <div class="shift-stat">
+              <span>Queue</span>
+              <strong id="shiftQueue">0</strong>
+            </div>
+          </div>
+          <p class="shift-note">
+            <svg class="icon" aria-hidden="true"><use href="#i-wallet"></use></svg>
+            <span id="shiftNote">Cash handover is due at the end of your shift.</span>
+          </p>
+        </section>
+
+        <!-- Safety ------------------------------------------------------- -->
+        <section class="safety-card" aria-labelledby="safetyTitle">
+          <h2 id="safetyTitle">Safe handover</h2>
+          <div class="safety-list">
+            <div class="safety-item">
+              <span class="safety-num" aria-hidden="true">1</span>
+              <span>Ask for the 4-digit PIN before handing over the food.</span>
+            </div>
+            <div class="safety-item">
+              <span class="safety-num" aria-hidden="true">2</span>
+              <span>Collect cash first, then confirm the change with the customer.</span>
+            </div>
+            <div class="safety-item">
+              <span class="safety-num" aria-hidden="true">3</span>
+              <span>Never mark a delivery complete while offline. Queue it and sync.</span>
+            </div>
+            <div class="safety-item">
+              <span class="safety-num" aria-hidden="true">4</span>
+              <span>Share your live location only while the delivery is active.</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Sticky mobile actions --------------------------------------------- -->
+  <div class="rider-sticky" id="riderSticky">
+    <button class="btn btn-secondary" type="button" data-navigate>
+      <svg class="icon" aria-hidden="true"><use href="#i-navigation"></use></svg>
+      Navigate
+    </button>
+    <button class="btn btn-primary" type="button" data-complete>
+      <svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>
+      Complete
+    </button>
+  </div>
+
+  <!-- ====================================================================
+       PIN SHEET
+       ==================================================================== -->
+  <dialog class="sheet" id="pinSheet" aria-labelledby="pinSheetTitle" aria-describedby="pinSheetSub">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <h2 id="pinSheetTitle">Confirm handover</h2>
+          <p id="pinSheetSub">Ask Brian for the 4-digit PIN before handing over the order.</p>
+        </div>
+        <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close handover confirmation">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="cash-banner" id="pinCashBanner">
+          <svg class="icon" aria-hidden="true"><use href="#i-banknote"></use></svg>
+          <div>
+            <strong>USh 38,000 cash due</strong>
+            <span>Give USh 12,000 change from USh 50,000.</span>
+          </div>
+        </div>
+
+        <p class="field-label" style="margin-top:18px">Customer handover PIN</p>
+        <div class="pin-display" id="pinDisplay" role="group" aria-label="Delivery PIN, 0 of 4 digits entered">
+          <span class="pin-slot" aria-hidden="true"></span>
+          <span class="pin-slot" aria-hidden="true"></span>
+          <span class="pin-slot" aria-hidden="true"></span>
+          <span class="pin-slot" aria-hidden="true"></span>
+        </div>
+        <p class="pin-error" id="pinError" role="alert" hidden></p>
+
+        <div class="keypad" id="keypad" aria-label="PIN keypad">
+          <button type="button" data-pin-digit="1" data-autofocus aria-label="1">1</button>
+          <button type="button" data-pin-digit="2" aria-label="2">2</button>
+          <button type="button" data-pin-digit="3" aria-label="3">3</button>
+          <button type="button" data-pin-digit="4" aria-label="4">4</button>
+          <button type="button" data-pin-digit="5" aria-label="5">5</button>
+          <button type="button" data-pin-digit="6" aria-label="6">6</button>
+          <button type="button" data-pin-digit="7" aria-label="7">7</button>
+          <button type="button" data-pin-digit="8" aria-label="8">8</button>
+          <button type="button" data-pin-digit="9" aria-label="9">9</button>
+          <button class="keypad-action" type="button" data-pin-action="clear" aria-label="Clear PIN">Clear</button>
+          <button type="button" data-pin-digit="0" aria-label="0">0</button>
+          <button class="keypad-action" type="button" data-pin-action="back" aria-label="Delete last digit">Delete</button>
+        </div>
+
+        <p class="pin-help">
+          <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+          <span>The customer sees this PIN on their tracking screen. Ask them to read it aloud — never take their phone.</span>
+        </p>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-ghost" type="button" data-close-sheet>Cancel</button>
+        <button class="btn btn-primary" type="button" id="pinVerify" disabled>Verify &amp; complete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ====================================================================
+       CONNECTION SHEET
+       ==================================================================== -->
+  <dialog class="sheet" id="connectionSheet" aria-labelledby="connectionSheetTitle">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <h2 id="connectionSheetTitle">Connection status</h2>
+          <p>Check how delivery updates will be sent.</p>
+        </div>
+        <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close connection settings">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="connection-options">
+          <label class="connection-option">
+            <input type="radio" name="riderConnection" value="online" checked>
+            <span class="icon-tile icon-tile-success"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg></span>
+            <span>
+              <strong>Online</strong>
+              <span>Updates sync immediately.</span>
+            </span>
+          </label>
+          <label class="connection-option">
+            <input type="radio" name="riderConnection" value="weak">
+            <span class="icon-tile icon-tile-orange"><svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg></span>
+            <span>
+              <strong>Weak connection</strong>
+              <span>Updates may take longer to confirm.</span>
+            </span>
+          </label>
+          <label class="connection-option">
+            <input type="radio" name="riderConnection" value="offline">
+            <span class="icon-tile icon-tile-red"><svg class="icon" aria-hidden="true"><use href="#i-wifi-off"></use></svg></span>
+            <span>
+              <strong>Offline</strong>
+              <span>Completions are queued on this phone.</span>
+            </span>
+          </label>
+        </div>
+        <p class="pin-help" id="connectionHint">
+          <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+          <span>Demo control: switch connection states to preview safe retry and queued completion behaviour.</span>
+        </p>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-secondary" type="button" data-close-sheet>Cancel</button>
+        <button class="btn btn-primary" type="button" id="applyConnection">Apply status</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/rider.js"></script>
+</body>
+</html>
