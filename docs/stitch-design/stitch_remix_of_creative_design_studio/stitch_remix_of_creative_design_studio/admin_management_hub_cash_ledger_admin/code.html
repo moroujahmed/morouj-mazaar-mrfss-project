@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-primary-fixed-variant": "#8d1515",
+          "secondary-fixed": "#ffdbc7",
+          "on-tertiary-container": "#f6fff3",
+          "primary-container": "#cd453d",
+          "background": "#fff8f6",
+          "primary": "#ab2d28",
+          "primary-warm": "#e8594f",
+          "on-primary-container": "#fffbff",
+          "secondary": "#974800",
+          "primary-fixed": "#ffdad6",
+          "tertiary-container": "#517f5b",
+          "surface-dim": "#e7d6d3",
+          "outline-variant": "#e0bfbb",
+          "surface-tint": "#ae2f2a",
+          "tertiary": "#396544",
+          "on-tertiary-fixed-variant": "#234f30",
+          "error": "#ba1a1a",
+          "surface-bright": "#fff8f6",
+          "inverse-surface": "#382e2c",
+          "error-container": "#ffdad6",
+          "surface-container-highest": "#f0dfdb",
+          "on-tertiary-fixed": "#00210c",
+          "surface": "#fff8f6",
+          "outline": "#8d706d",
+          "surface-container": "#fbeae7",
+          "on-secondary": "#ffffff",
+          "on-primary-fixed": "#410002",
+          "inverse-primary": "#ffb4ab",
+          "surface-container-low": "#fff0ed",
+          "on-tertiary": "#ffffff",
+          "on-error": "#ffffff",
+          "secondary-fixed-dim": "#ffb689",
+          "on-secondary-fixed-variant": "#733500",
+          "on-secondary-fixed": "#311300",
+          "on-background": "#221a18",
+          "primary-fixed-dim": "#ffb4ab",
+          "secondary-container": "#fd9348",
+          "inverse-on-surface": "#feede9",
+          "on-secondary-container": "#6b3100",
+          "tertiary-fixed": "#bdefc4",
+          "on-primary": "#ffffff",
+          "on-surface-variant": "#59413e",
+          "surface-container-lowest": "#ffffff",
+          "tertiary-fixed-dim": "#a2d2a9",
+          "on-error-container": "#93000a",
+          "surface-variant": "#f0dfdb",
+          "surface-container-high": "#f5e5e1",
+          "on-surface": "#221a18",
+          "gourmet-border": "#f5d5cf"
+        },
+        "borderRadius": {
+          "DEFAULT": "1rem",
+          "lg": "1.5rem",
+          "xl": "2rem",
+          "2xl": "2rem",
+          "3xl": "2.5rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin": "1.25rem",
+          "margin-mobile": "1rem",
+          "space-md": "1rem",
+          "space-2xs": "0.25rem",
+          "gutter-sm": "0.75rem",
+          "gutter-lg": "1.5rem",
+          "space-xs": "0.5rem",
+          "space-2xl": "3rem",
+          "space-sm": "0.75rem",
+          "gutter": "1rem",
+          "margin-desktop": "2.5rem",
+          "space-xl": "2rem",
+          "space-lg": "1.5rem"
+        },
+        "fontFamily": {
+          "headline-lg": ["Plus Jakarta Sans"],
+          "headline-sm": ["Plus Jakarta Sans"],
+          "body-md": ["Plus Jakarta Sans"],
+          "body-lg": ["Plus Jakarta Sans"],
+          "headline-xl": ["Plus Jakarta Sans"],
+          "headline-md": ["Plus Jakarta Sans"],
+          "label-lg": ["Plus Jakarta Sans"],
+          "body-sm": ["Plus Jakarta Sans"],
+          "label-md": ["Plus Jakarta Sans"],
+          "label-sm": ["Plus Jakarta Sans"]
+        }
+      }
+    }
+  }
+</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low border-r border-gourmet-border z-50 flex flex-col justify-between p-space-md shadow-sm"><div class="flex flex-col gap-space-lg"><div class="flex items-center gap-space-sm px-space-xs"><img alt="Bazaar D2C Logo" class="h-9 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnJpCSnpxsgjndr2ZVcZ2QXSNQF5rgNnDJcQ4EKcDyYY8jKKDVlB40gekUtJaCw3X1Vz1iGpCpQc7RSYo1ZFx2H_zFkJgIRpb5Tw46MHJL-FyxOEtoKlAn4c8iL_guWR883uXBXjrJQ07vHUKSUXYsT1U5oVeMnh-Hi5Va_GqN0h840EvhrbTvAFHtANeSPRk099g2kd8WnH1_Rb3uByZpE87apZRCAvQZfnag3reL"/><div class="flex flex-col"><span class="font-bold text-lg text-primary tracking-tight leading-none">Bazaar D2C</span><span class="text-xs text-on-surface-variant font-medium mt-0.5">Kampala Hub Console</span></div></div><div class="flex flex-col gap-space-xs bg-surface-container px-space-md py-space-sm rounded-2xl border border-gourmet-border"><div class="flex items-center justify-between"><span class="text-xs text-on-surface-variant font-semibold">Active Dispatch</span><span class="text-[11px] font-bold text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-full flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>LIVE</span></div><span class="text-base font-bold text-on-surface">5 Bodas in Field</span><span class="text-xs text-on-surface-variant">Kampala Central • Kololo • Ntinda</span></div><!-- Admin Management Hub Navigation (Section 6) --><div class="flex flex-col gap-space-xs"><span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider px-space-xs">Admin Management Hub</span><nav class="flex flex-col gap-1.5"><a aria-current="page" class="flex items-center px-space-md py-2.5 rounded-2xl font-bold text-sm bg-primary-warm text-white shadow-md shadow-primary-warm/20 transition-all" href="#live-rectifier"><span class="material-symbols-outlined mr-space-sm text-white text-lg">monitor_heart</span><div class="flex flex-col"><span class="leading-tight">/admin</span><span class="text-[11px] font-medium text-white/90">Live Monitor &amp; Typo Rectifier</span></div></a><a class="flex items-center px-space-md py-2.5 rounded-2xl font-semibold text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" href="#admin-menu"><span class="material-symbols-outlined mr-space-sm text-primary text-lg">restaurant_menu</span><div class="flex flex-col"><span class="leading-tight">/admin/menu</span><span class="text-[11px] font-normal text-on-surface-variant">Dish CRUD &amp; Modifiers</span></div></a><a class="flex items-center px-space-md py-2.5 rounded-2xl font-semibold text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" href="#settings-engine"><span class="material-symbols-outlined mr-space-sm text-primary text-lg">tune</span><div class="flex flex-col"><span class="leading-tight">/admin/settings</span><span class="text-[11px] font-normal text-on-surface-variant">5km Threshold &amp; MOV Sliders</span></div></a><a class="flex items-center px-space-md py-2.5 rounded-2xl font-semibold text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" href="#cash-ledger"><span class="material-symbols-outlined mr-space-sm text-primary text-lg">account_balance_wallet</span><div class="flex flex-col"><span class="leading-tight">/admin/ledger</span><span class="text-[11px] font-normal text-on-surface-variant">End-of-Day Rider Settlement</span></div></a></nav></div><div class="flex flex-col gap-space-xs pt-1 border-t border-gourmet-border"><span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider px-space-xs">Operational Pillars</span><nav class="flex flex-col gap-1"><a class="flex items-center px-space-md py-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface text-sm font-medium transition-all" href="#"><span class="material-symbols-outlined mr-space-sm text-base text-secondary">storefront</span>Storefront &amp; Tracker</a><a class="flex items-center px-space-md py-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface text-sm font-medium transition-all" href="#"><span class="material-symbols-outlined mr-space-sm text-base text-secondary">countertops</span>Kitchen KDS</a><a class="flex items-center px-space-md py-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface text-sm font-medium transition-all" href="#"><span class="material-symbols-outlined mr-space-sm text-base text-secondary">two_wheeler</span>Boda Courier</a></nav></div></div><div class="flex flex-col gap-space-sm pt-space-md bg-surface-container-lowest p-space-sm rounded-2xl border border-gourmet-border shadow-sm"><div class="flex items-center justify-between text-on-surface-variant text-xs"><span class="flex items-center gap-space-xs font-semibold"><span class="w-2 h-2 rounded-full bg-tertiary"></span>3G Low-Data</span><span class="font-bold text-primary">UGX / USh</span></div><div class="flex items-center gap-space-sm pt-space-xs"><img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6PT6HsfGgPmJJwlQhQjuztpJIDFNwGOfSzSz2MVT7j0VGmHQEVye-VDwJTHqw12f6tqdHRyqFxmPFOY3PKwl5Z0UMvyIjSdPF_QHpy9m_TQMkHsNzDeLT2LFNmUkQ6xN57I8UWqzrqSvkp0Kvd1cs3Z-vQmnahn80nmvKiVGYmc61y8aq-n4DRL6QYnFVicpKW7ZUXDg1HNuoMpCteAfmJpP3TQDcODnZ4tNeAD52"/><div class="flex flex-col overflow-hidden"><span class="font-bold text-sm text-on-surface truncate">Lead Expediter</span><span class="text-xs text-on-surface-variant truncate">Nakawa Depot (#DEPOT-KLA-1)</span></div></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/90 backdrop-blur-xl border-b border-gourmet-border z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md"><span class="text-xl text-on-surface font-extrabold tracking-tight">Admin Management Hub</span><span class="text-xs font-bold text-primary bg-primary-fixed px-2.5 py-0.5 rounded-full font-mono">/admin</span><div class="flex items-center gap-space-xs bg-surface-container px-space-sm py-1 rounded-full border border-gourmet-border"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Relay Online • Oct 29, 2026</span></div></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs bg-secondary-fixed text-on-secondary-fixed px-3 py-1.5 rounded-full font-semibold text-xs"><span class="material-symbols-outlined text-sm">bolt</span><span>MoMo Webhook Synced</span></div><div class="flex items-center gap-space-xs bg-surface-container-low border border-gourmet-border px-3 py-1.5 rounded-full"><span class="text-xs font-bold text-primary" id="header-cash-liability">USh 239,600 Active Liability</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-warm/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6PT6HsfGgPmJJwlQhQjuztpJIDFNwGOfSzSz2MVT7j0VGmHQEVye-VDwJTHqw12f6tqdHRyqFxmPFOY3PKwl5Z0UMvyIjSdPF_QHpy9m_TQMkHsNzDeLT2LFNmUkQ6xN57I8UWqzrqSvkp0Kvd1cs3Z-vQmnahn80nmvKiVGYmc61y8aq-n4DRL6QYnFVicpKW7ZUXDg1HNuoMpCteAfmJpP3TQDcODnZ4tNeAD52"/></div></header><main class="relative pt-16 bg-surface min-h-screen px-space-lg py-space-md"><div class="flex flex-col w-full gap-space-xl pb-space-2xl">
+<!-- Top Operations & Financial KPI Ribbon -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Card 1: Daily GMV -->
+<div class="relative overflow-hidden bg-surface-container-lowest p-space-lg rounded-2xl border border-gourmet-border shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+<div class="absolute -right-6 -bottom-6 w-28 h-28 bg-primary/5 rounded-full pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Daily GMV Captured</span>
+<div class="w-9 h-9 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">payments</span>
+</div>
+</div>
+<div class="mt-space-md">
+<div class="text-3xl font-extrabold text-on-surface tracking-tight">USh 1,840,000</div>
+<div class="flex items-center gap-space-xs mt-space-xs">
+<span class="text-xs font-bold text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span>+18.4%
+          </span>
+<span class="text-xs text-on-surface-variant font-medium">68 Orders Completed</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-gourmet-border/60 flex items-center justify-between text-on-surface-variant text-xs font-medium">
+<span>MoMo Pay: 74%</span>
+<span>Physical Cash: 26%</span>
+</div>
+</div>
+<!-- Card 2: Platform Commission Saved -->
+<div class="relative overflow-hidden bg-surface-container-lowest p-space-lg rounded-2xl border border-gourmet-border shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+<div class="absolute -right-6 -bottom-6 w-28 h-28 bg-tertiary-fixed-dim/20 rounded-full pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-tertiary">Aggregator Cut Kept</span>
+<div class="w-9 h-9 rounded-2xl bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-lg">shield_with_heart</span>
+</div>
+</div>
+<div class="mt-space-md">
+<div class="text-3xl font-extrabold text-tertiary tracking-tight">USh 460,000</div>
+<div class="flex items-center gap-space-xs mt-space-xs">
+<span class="text-xs font-bold text-on-surface bg-surface-container-high px-2 py-0.5 rounded-full">
+            ZERO 25% CUT
+          </span>
+<span class="text-xs text-on-surface-variant font-medium">D2C direct retention</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-gourmet-border/60 flex items-center justify-between text-on-surface-variant text-xs font-medium">
+<span>MoMo API fees: USh 9,200</span>
+<span class="text-tertiary font-bold">Net Margin 99.5%</span>
+</div>
+</div>
+<!-- Card 3: Active Fleet Status -->
+<div class="relative overflow-hidden bg-surface-container-lowest p-space-lg rounded-2xl border border-gourmet-border shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+<div class="absolute -right-6 -bottom-6 w-28 h-28 bg-secondary-container/20 rounded-full pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Active Fleet Grid</span>
+<div class="w-9 h-9 rounded-2xl bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-lg">two_wheeler</span>
+</div>
+</div>
+<div class="mt-space-md">
+<div class="flex items-baseline gap-space-xs">
+<span class="text-3xl font-extrabold text-on-surface tracking-tight">5/5 Bodas</span>
+<span class="text-xs font-bold text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping"></span> 100% On-Road
+          </span>
+</div>
+<div class="flex items-center gap-space-xs mt-space-xs">
+<span class="font-bold text-primary-warm text-sm">44 mins</span>
+<span class="text-xs text-on-surface-variant font-medium">Average Kampala Loop</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-gourmet-border/60 flex items-center justify-between text-on-surface-variant text-xs font-medium">
+<span>Fastest: 28m (Kololo)</span>
+<span>Peak: 52m (Ntinda)</span>
+</div>
+</div>
+<!-- Card 4: Physical Cash Due to Cash Drawer -->
+<div class="relative overflow-hidden bg-primary-warm p-space-lg rounded-2xl border border-primary-warm shadow-md hover:shadow-lg transition-all flex flex-col justify-between text-white">
+<div class="absolute right-0 top-0 translate-x-4 -translate-y-4 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-white/90">Cash in Field Float</span>
+<span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+</div>
+<div class="mt-space-md">
+<div class="text-3xl font-extrabold text-white tracking-tight" id="kpi-pending-cash">USh 239,600</div>
+<div class="flex items-center gap-space-xs mt-space-xs text-white/90">
+<span class="material-symbols-outlined text-sm">lock_clock</span>
+<span class="text-xs font-medium">4 Bodas Due • 1 MoMo Cleared</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-white/20 flex items-center justify-between text-white/90 text-xs">
+<span>Deposit Drawer: #KLA-VAULT-1</span>
+<span class="font-bold text-white">Shift: Oct 29, 2026</span>
+</div>
+</div>
+</section>
+<!-- Section 6.3: End-of-Day 5-Rider Cash Reconciliation Ledger (October 29, 2026) -->
+<section class="flex flex-col gap-space-md bg-surface-container-lowest p-space-lg rounded-3xl border border-gourmet-border shadow-sm" id="cash-ledger">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm flex-wrap">
+<h2 class="text-2xl font-extrabold text-on-surface tracking-tight">End-of-Day 5-Rider Cash Reconciliation Ledger</h2>
+<span class="text-xs font-bold px-3 py-1 rounded-full bg-surface-container text-on-surface-variant uppercase tracking-wider">
+            October 29, 2026 • Depot Nakawa
+          </span>
+</div>
+<p class="text-xs text-on-surface-variant font-medium mt-1">
+          Zero-discrepancy reconciliation. Reconciling a rider writes an immutable ledger entry to <code class="bg-surface-container px-1.5 py-0.5 rounded text-primary font-semibold text-xs">cash_settlements</code> and resets active cash liability.
+        </p>
+</div>
+<!-- Live Shift Reconciliation Summary Badge -->
+<div class="flex items-center gap-space-md bg-surface-container-low px-space-md py-space-sm rounded-2xl border border-gourmet-border">
+<div class="flex flex-col px-space-xs">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Settlement Progress</span>
+<span class="text-base font-extrabold text-primary-warm" id="settlement-count">1 / 5 Cleared</span>
+</div>
+<div class="h-8 w-px bg-gourmet-border"></div>
+<div class="flex flex-col px-space-xs">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Pending Cash Liability</span>
+<span class="text-base font-extrabold text-on-surface" id="global-pending-liability">USh 239,600</span>
+</div>
+</div>
+</div>
+<!-- Ledger Table (Exact Spec Data) -->
+<div class="overflow-x-auto mt-space-sm">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant text-[11px] font-bold uppercase tracking-wider border-b border-gourmet-border">
+<th class="py-3 px-space-md rounded-l-2xl">Courier &amp; Plate</th>
+<th class="py-3 px-space-md">Completed Runs</th>
+<th class="py-3 px-space-md">Payment Method</th>
+<th class="py-3 px-space-md">Cash Collected</th>
+<th class="py-3 px-space-md">Audit Status</th>
+<th class="py-3 px-space-md rounded-r-2xl text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gourmet-border/60" id="ledger-table-body">
+<!-- Rider 1: Juma Mukasa -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" id="row-juma">
+<td class="py-space-md px-space-md flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-extrabold text-sm ring-2 ring-primary-warm/20">
+            JM
+          </div>
+<div class="flex flex-col">
+<span class="font-bold text-sm text-on-surface">Juma Mukasa</span>
+<span class="text-xs text-on-surface-variant flex items-center gap-1 font-mono">
+<span class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary text-[10px] font-sans font-bold">BODA #01</span>
+            • UFD 342B (Bajaj Boxer)
+          </span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="font-bold text-on-surface text-sm">7</span>
+<span class="text-xs text-on-surface-variant ml-1 font-medium">Deliveries</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-[11px] bg-primary-fixed text-primary px-2.5 py-1 rounded-full font-bold">Physical Cash</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-sm text-on-surface font-extrabold">USh 64,000</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="audit-status text-[11px] px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-bold uppercase tracking-wider" id="status-juma">
+            UNSETTLED
+          </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<button class="reconcile-btn px-4 py-2 rounded-xl bg-primary-warm text-white font-bold text-xs hover:bg-primary transition-all active:scale-95 shadow-sm" onclick="reconcileRider('Juma Mukasa', 'UFD 342B', 64000, 'row-juma', 'status-juma', this)">
+            RECONCILE
+          </button>
+</td>
+</tr>
+<!-- Rider 2: David Ochieng -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" id="row-david">
+<td class="py-space-md px-space-md flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-extrabold text-sm ring-2 ring-secondary/20">
+            DO
+          </div>
+<div class="flex flex-col">
+<span class="font-bold text-sm text-on-surface">David Ochieng</span>
+<span class="text-xs text-on-surface-variant flex items-center gap-1 font-mono">
+<span class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary text-[10px] font-sans font-bold">BODA #02</span>
+            • UEX 119A (TVS Star)
+          </span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="font-bold text-on-surface text-sm">5</span>
+<span class="text-xs text-on-surface-variant ml-1 font-medium">Deliveries</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-[11px] bg-primary-fixed text-primary px-2.5 py-1 rounded-full font-bold">Physical Cash</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-sm text-on-surface font-extrabold">USh 35,600</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="audit-status text-[11px] px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-bold uppercase tracking-wider" id="status-david">
+            UNSETTLED
+          </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<button class="reconcile-btn px-4 py-2 rounded-xl bg-primary-warm text-white font-bold text-xs hover:bg-primary transition-all active:scale-95 shadow-sm" onclick="reconcileRider('David Ochieng', 'UEX 119A', 35600, 'row-david', 'status-david', this)">
+            RECONCILE
+          </button>
+</td>
+</tr>
+<!-- Rider 3: Brian Kato -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" id="row-brian">
+<td class="py-space-md px-space-md flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-extrabold text-sm ring-2 ring-primary-warm/20">
+            BK
+          </div>
+<div class="flex flex-col">
+<span class="font-bold text-sm text-on-surface">Brian Kato</span>
+<span class="text-xs text-on-surface-variant flex items-center gap-1 font-mono">
+<span class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary text-[10px] font-sans font-bold">BODA #03</span>
+            • UEE 902C (Bajaj Boxer)
+          </span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="font-bold text-on-surface text-sm">8</span>
+<span class="text-xs text-on-surface-variant ml-1 font-medium">Deliveries</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-[11px] bg-primary-fixed text-primary px-2.5 py-1 rounded-full font-bold">Physical Cash</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-sm text-on-surface font-extrabold">USh 112,000</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="audit-status text-[11px] px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-bold uppercase tracking-wider" id="status-brian">
+            UNSETTLED
+          </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<button class="reconcile-btn px-4 py-2 rounded-xl bg-primary-warm text-white font-bold text-xs hover:bg-primary transition-all active:scale-95 shadow-sm" onclick="reconcileRider('Brian Kato', 'UEE 902C', 112000, 'row-brian', 'status-brian', this)">
+            RECONCILE
+          </button>
+</td>
+</tr>
+<!-- Rider 4: Samuel Ssebo (All MoMo) -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group bg-surface-container-low/30" id="row-samuel">
+<td class="py-space-md px-space-md flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary font-extrabold text-sm ring-2 ring-tertiary/20">
+            SS
+          </div>
+<div class="flex flex-col">
+<span class="font-bold text-sm text-on-surface">Samuel Ssebo</span>
+<span class="text-xs text-on-surface-variant flex items-center gap-1 font-mono">
+<span class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary text-[10px] font-sans font-bold">BODA #04</span>
+            • UFA 450P (TVS HLX)
+          </span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="font-bold text-on-surface text-sm">6</span>
+<span class="text-xs text-on-surface-variant ml-1 font-medium">Deliveries</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-[11px] bg-tertiary-fixed text-tertiary px-2.5 py-1 rounded-full font-bold">MTN/Airtel MoMo</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-xs text-on-surface-variant font-semibold">USh 0 (All MoMo)</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-[11px] px-2.5 py-1 rounded-full bg-tertiary-fixed text-tertiary font-bold uppercase tracking-wider">
+            ZERO LIABILITY
+          </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<span class="inline-block px-4 py-2 rounded-xl bg-tertiary text-white font-bold text-xs uppercase cursor-default">
+            CLEARED
+          </span>
+</td>
+</tr>
+<!-- Rider 5: Alex Wandera -->
+<tr class="hover:bg-surface-container-low/60 transition-colors group" id="row-alex">
+<td class="py-space-md px-space-md flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-extrabold text-sm ring-2 ring-primary-warm/20">
+            AW
+          </div>
+<div class="flex flex-col">
+<span class="font-bold text-sm text-on-surface">Alex Wandera</span>
+<span class="text-xs text-on-surface-variant flex items-center gap-1 font-mono">
+<span class="bg-surface-container-high px-1.5 py-0.5 rounded text-primary text-[10px] font-sans font-bold">BODA #05</span>
+            • UFD 881M (Haojue 125)
+          </span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="font-bold text-on-surface text-sm">4</span>
+<span class="text-xs text-on-surface-variant ml-1 font-medium">Deliveries</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-[11px] bg-primary-fixed text-primary px-2.5 py-1 rounded-full font-bold">Physical Cash</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="text-sm text-on-surface font-extrabold">USh 28,000</span>
+</td>
+<td class="py-space-md px-space-md">
+<span class="audit-status text-[11px] px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-bold uppercase tracking-wider" id="status-alex">
+            UNSETTLED
+          </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<button class="reconcile-btn px-4 py-2 rounded-xl bg-primary-warm text-white font-bold text-xs hover:bg-primary transition-all active:scale-95 shadow-sm" onclick="reconcileRider('Alex Wandera', 'UFD 881M', 28000, 'row-alex', 'status-alex', this)">
+            RECONCILE
+          </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Summary Footer (Section 6.3 Exact Requirement) -->
+<div class="mt-space-md p-space-md bg-surface-container-low rounded-2xl flex flex-col md:flex-row items-center justify-between gap-space-md border border-gourmet-border">
+<div class="flex items-center gap-space-sm">
+<div class="w-11 h-11 rounded-2xl bg-primary-warm flex items-center justify-center text-white shadow-sm">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Audit Summary (October 29, 2026)</span>
+<div class="text-base text-primary font-extrabold tracking-tight" id="drawer-footer-text">TOTAL PHYSICAL CASH DUE TO CASH DRAWER: USh 239,600</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm w-full md:w-auto">
+<button class="flex-1 md:flex-initial flex items-center justify-center gap-space-xs px-space-md py-2.5 rounded-xl bg-surface-container-lowest text-on-surface font-bold text-xs border border-gourmet-border hover:bg-surface-container transition-colors shadow-sm" id="btn-export-audit">
+<span class="material-symbols-outlined text-sm">download</span> Export Slip
+</button>
+<button class="flex-1 md:flex-initial flex items-center justify-center gap-space-xs px-space-md py-2.5 rounded-xl bg-tertiary text-white font-bold text-xs hover:bg-tertiary-container transition-all shadow-md" id="btn-reconcile-all" onclick="reconcileAllRiders()">
+<span class="material-symbols-outlined text-sm">done_all</span> Reconcile All Riders
+</button>
+</div>
+</div>
+</section>
+<!-- Split Two-Column: Settings Configurator & Live Typo Rectifier -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Section 6.1: Dynamic Delivery Rule & Threshold Configurator (/admin/settings - 5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md bg-surface-container-lowest p-space-lg rounded-3xl border border-gourmet-border shadow-sm" id="settings-engine">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">tune</span>
+</div>
+<div class="flex flex-col">
+<h2 class="text-xl font-extrabold text-on-surface">Delivery Tier Engine</h2>
+<span class="font-mono text-[11px] text-primary-warm font-semibold">/admin/settings</span>
+</div>
+</div>
+<span class="text-xs font-bold bg-tertiary-fixed text-tertiary px-2.5 py-1 rounded-full">
+          AUTO-APPLIED
+        </span>
+</div>
+<p class="text-xs text-on-surface-variant font-medium">
+        Configure automated hyper-local dispatch boundaries, fee surcharges, and order minimums across Kampala sectors.
+      </p>
+<div class="flex flex-col gap-space-lg mt-space-sm">
+<!-- Setting 1: Tier 1 Free Zone Radius (5.0 km) -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="text-sm text-on-surface font-semibold flex items-center gap-1.5">
+              Tier 1 Free Zone Radius
+              <span class="text-[10px] font-bold text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-full">FREE</span>
+</label>
+<span class="text-base font-extrabold text-primary" id="radius-val">5.0 km</span>
+</div>
+<input class="w-full accent-primary-warm h-2 bg-surface-container rounded-lg cursor-pointer" id="slider-radius" max="10" min="1" step="0.5" type="range" value="5.0"/>
+<div class="flex justify-between text-on-surface-variant text-xs">
+<span>1.0 km (Hyperlocal)</span>
+<span class="font-bold text-primary">Spec Default: 5.0 km</span>
+<span>10.0 km (Suburbs)</span>
+</div>
+</div>
+<!-- Setting 2: Tier 2 Per-KM Surcharge (USh 1,500/km rounded up ceiling) -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="text-sm text-on-surface font-semibold">Tier 2 Per-km Surcharge</label>
+<span class="text-sm text-on-surface font-extrabold" id="surcharge-display">USh 1,500 / km</span>
+</div>
+<div class="grid grid-cols-3 gap-space-sm">
+<button class="tier-btn py-2 px-space-sm rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container font-bold text-xs border border-gourmet-border" onclick="setFee(1200, this)">USh 1,200</button>
+<button class="tier-btn py-2 px-space-sm rounded-xl bg-primary-warm text-white font-bold shadow-sm text-xs" onclick="setFee(1500, this)">USh 1,500</button>
+<button class="tier-btn py-2 px-space-sm rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container font-bold text-xs border border-gourmet-border" onclick="setFee(2000, this)">USh 2,000</button>
+</div>
+<span class="text-xs text-on-surface-variant">Rounded up ceiling for each extra kilometer beyond Tier 1 perimeter.</span>
+</div>
+<!-- Setting 3 & 4: Service Ceiling (15.0 km Hard Cutoff) & Minimum Order Value (USh 20,000) -->
+<div class="grid grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-md rounded-2xl border border-gourmet-border">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Service Ceiling</span>
+<div class="text-lg text-on-surface font-extrabold">15.0 km</div>
+<span class="text-xs text-error font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">block</span> Hard Cutoff
+            </span>
+</div>
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-md rounded-2xl border border-gourmet-border">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Global MOV</span>
+<div class="text-lg text-on-surface font-extrabold">USh 20,000</div>
+<span class="text-xs text-tertiary font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">check_circle</span> Dine-in USh 0
+            </span>
+</div>
+</div>
+<!-- Interactive Map Graphic with Coverage Indicator -->
+<div class="relative rounded-2xl overflow-hidden shadow-sm border border-gourmet-border">
+<div class="w-full h-40 bg-cover bg-center" data-location="Kampala Central, Uganda" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCA9iJYrn2NHFBYVG9BJNScLOFBaaXIfSLpiDfBKc1mGEg8Ruopz5hbjyyniS_ej49BObWjyW6MlV1KDn4kRRSkqbIpkvRwIIoaATS0mZkL0wSndjgb01mgO861to0lpFkJqVkKJ130mMp-Btm1NoBpZk0_yRXyUxHhh8JHLR7RN_QP7v_FGlxmGPRT6GFISvOjUEqUXXvZFJISIbP4ZMp0Vn6F6bjkSzRf9mm4prE8");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/85 via-inverse-surface/30 to-transparent flex items-end p-space-md">
+<div class="flex items-center justify-between w-full text-inverse-on-surface">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-tertiary-fixed font-bold">Active Geofence</span>
+<span class="text-xs font-bold text-white" id="map-label">5.0km Tier 1 (Central • Nakasero • Kololo)</span>
+</div>
+<span class="text-[10px] bg-surface-container-lowest/20 backdrop-blur-md px-2 py-0.5 rounded-full text-white font-mono">
+                PostGIS Matrix
+              </span>
+</div>
+</div>
+</div>
+<button class="w-full py-3 rounded-2xl bg-surface-container text-on-surface font-bold text-sm hover:bg-primary-warm hover:text-white transition-all shadow-sm border border-gourmet-border" id="save-tier-btn">
+          Push Config to Live Customer Apps
+        </button>
+</div>
+</div>
+<!-- Section 6.2: Live Order Typo Rectifier Modal / Panel for Active Order #1042 (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md bg-surface-container-lowest p-space-lg rounded-3xl border border-primary-warm/30 shadow-sm" id="live-rectifier">
+<div class="flex items-center justify-between flex-wrap gap-2">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">emergency_home</span>
+</div>
+<div>
+<h2 class="text-xl font-extrabold text-on-surface">Live Order Typo Rectifier Panel</h2>
+<span class="font-mono text-[11px] text-primary-warm font-semibold">/admin — Order #1042 Intervention</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-warm animate-ping"></span>
+<span class="text-xs bg-primary-fixed text-primary px-3 py-1 rounded-full font-bold">
+            IN-TRANSIT LIVE SYNC
+          </span>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant font-medium">
+        Correct inaccurate drop pins, contact numbers, and delivery instructions mid-transit. Changes push immediately to courier mobile screen over WebSockets.
+      </p>
+<!-- Form Container for Order #1042 (Spec Specified) -->
+<div class="bg-surface-container-low p-space-md rounded-2xl flex flex-col gap-space-md border border-gourmet-border">
+<!-- Order Info Header -->
+<div class="flex items-center justify-between border-b border-gourmet-border pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="text-lg text-on-surface font-extrabold">Order #1042</span>
+<span class="text-xs bg-tertiary-fixed text-tertiary px-2.5 py-0.5 rounded-full font-bold">Rider Assigned</span>
+<span class="text-sm text-primary font-bold">USh 32,500 (MoMo)</span>
+</div>
+<div class="text-right">
+<span class="text-xs text-on-surface-variant font-medium block">Assigned Courier:</span>
+<span class="text-xs text-primary-warm font-bold flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-sm">two_wheeler</span> Rider Juma Mukasa (UFD 342B)
+            </span>
+</div>
+</div>
+<form class="flex flex-col gap-space-md" id="rectifier-form" onsubmit="handleRectifierSubmit(event)">
+<!-- Field 1: Customer Name -->
+<div class="flex flex-col gap-1">
+<label class="text-xs font-bold text-on-surface flex items-center justify-between">
+<span>Customer Name</span>
+<span class="text-[10px] text-on-surface-variant font-semibold">Validated</span>
+</label>
+<input class="w-full bg-surface-container-lowest border border-gourmet-border rounded-xl px-space-md py-2.5 text-sm text-on-surface font-semibold focus:outline-none focus:ring-2 focus:ring-primary-warm shadow-sm" id="customer-name" name="customer-name" required="" type="text" value="Sarah Namukasa"/>
+</div>
+<!-- Field 2: Phone Number (Corrects digit typos) -->
+<div class="flex flex-col gap-1">
+<label class="text-xs font-bold text-on-surface flex items-center justify-between">
+<span>Phone Number (GSM / MoMo)</span>
+<span class="text-[10px] text-primary bg-primary-fixed px-2 py-0.5 rounded-full font-bold">Corrects Digit Typos</span>
+</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-base text-on-surface-variant">call</span>
+<input class="w-full pl-10 pr-space-md bg-surface-container-lowest border border-gourmet-border rounded-xl py-2.5 font-mono text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-warm shadow-sm font-bold" id="customer-phone" name="customer-phone" required="" type="text" value="+256 772 000 111"/>
+</div>
+<span class="text-[11px] text-on-surface-variant">Previous typo reported by rider: <span class="line-through">+256 772 000 11</span> (missing final digit).</span>
+</div>
+<!-- Field 3: Drop-Off Notes (Changed to: Gate 2 on Lumumba) -->
+<div class="flex flex-col gap-1">
+<label class="text-xs font-bold text-on-surface flex items-center justify-between">
+<span>Drop-Off Notes / Gate Instructions</span>
+<span class="text-[10px] text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-full font-bold">Auto-Broadcast</span>
+</label>
+<textarea class="w-full bg-surface-container-lowest border border-gourmet-border rounded-xl p-space-sm text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-warm shadow-sm resize-none" id="dropoff-notes" name="dropoff-notes" rows="2">Changed to: Gate 2 on Lumumba</textarea>
+</div>
+<!-- Field 4: Delivery Pin Adjustment -->
+<div class="flex flex-col gap-space-xs bg-surface-container-lowest p-space-sm rounded-xl border border-gourmet-border">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-warm text-base">pin_drop</span>
+<span class="text-xs font-bold text-on-surface">Delivery Pin Geolocation</span>
+</div>
+<span class="text-xs text-tertiary font-bold font-mono" id="pin-coords">0.3176° N, 32.5811° E (Nakasero)</span>
+</div>
+<div class="flex items-center gap-space-sm pt-1">
+<button class="flex-1 flex items-center justify-center gap-1 py-2 px-space-sm rounded-xl bg-surface-container text-on-surface font-bold text-xs hover:bg-surface-container-high transition-colors border border-gourmet-border" id="btn-adjust-pin" onclick="adjustMapPin()" type="button">
+<span class="material-symbols-outlined text-sm text-primary">edit_location</span>
+[ Adjust Pinned Location on Map ]
+</button>
+<button class="py-2 px-space-sm rounded-xl bg-surface-container text-on-surface font-bold text-xs hover:bg-surface-container-high transition-colors border border-gourmet-border" onclick="pingCustomerLocation()" title="Send WhatsApp Location Request" type="button">
+<span class="material-symbols-outlined text-sm text-tertiary">my_location</span>
+Request GPS SMS
+</button>
+</div>
+</div>
+<!-- CTA Button: SAVE & SYNC TO RIDER SCREEN -->
+<button class="w-full py-3.5 rounded-2xl bg-primary-warm text-white font-extrabold text-sm hover:bg-primary transition-all active:scale-95 shadow-md shadow-primary-warm/20 flex items-center justify-center gap-2" id="btn-sync-rider" type="submit">
+<span class="material-symbols-outlined text-base">sync</span>
+SAVE &amp; SYNC TO RIDER SCREEN
+</button>
+<p class="text-center text-[11px] text-on-surface-variant font-medium">
+Pushes real-time updates directly to Rider Juma Mukasa in transit via WebSockets.
+</p>
+</form>
+</div>
+<!-- Live Sync Toast Notification -->
+<div class="hidden bg-inverse-surface text-inverse-on-surface p-space-md rounded-2xl flex items-center justify-between shadow-xl border-l-4 border-tertiary-fixed" id="toast-rectifier">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary-fixed text-xl">check_circle</span>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-tertiary-fixed">Sync Dispatched Successfully</span>
+<span class="text-xs" id="toast-rectifier-text">Order #1042 updated: Phone +256 772 000 111 &amp; Gate 2 synced to Rider Juma Mukasa!</span>
+</div>
+</div>
+<button class="text-inverse-on-surface hover:text-white" onclick="document.getElementById('toast-rectifier').classList.add('hidden')">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sub-Route Showcase Anchor: /admin/menu preview -->
+<section class="bg-surface-container-lowest p-space-lg rounded-3xl border border-gourmet-border shadow-sm flex flex-col gap-space-sm" id="admin-menu">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-2xl bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-lg">restaurant_menu</span>
+</div>
+<div>
+<h3 class="text-xl font-extrabold text-on-surface">Dish CRUD &amp; Modifier Settings</h3>
+<span class="font-mono text-[11px] text-secondary font-semibold">/admin/menu — Sub-Route Management</span>
+</div>
+</div>
+<span class="text-xs bg-surface-container px-3 py-1 rounded-full text-on-surface-variant uppercase font-bold">
+18 Active Items • 6 Categories
+</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md mt-space-xs">
+<div class="bg-surface-container-low p-space-md rounded-2xl flex items-center justify-between border border-gourmet-border">
+<div>
+<span class="font-bold text-sm text-on-surface block">Rolex Royale (3 Eggs + Beef)</span>
+<span class="text-xs text-on-surface-variant font-medium">USh 14,000 • Modifiers: Extra Chili, Double Chapati</span>
+</div>
+<span class="text-[10px] bg-tertiary-fixed text-tertiary px-2 py-0.5 rounded-full font-bold">AVAILABLE</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-2xl flex items-center justify-between border border-gourmet-border">
+<div>
+<span class="font-bold text-sm text-on-surface block">Luwombo Chicken Stew</span>
+<span class="text-xs text-on-surface-variant font-medium">USh 28,000 • Modifiers: Steamed Matooke, Brown Rice</span>
+</div>
+<span class="text-[10px] bg-tertiary-fixed text-tertiary px-2 py-0.5 rounded-full font-bold">AVAILABLE</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-2xl flex items-center justify-between border border-gourmet-border">
+<div>
+<span class="font-bold text-sm text-on-surface block">Passion Fruit Fresh Carafe</span>
+<span class="text-xs text-on-surface-variant font-medium">USh 8,000 • Modifiers: Sugar Free, Mint Sprig</span>
+</div>
+<span class="text-[10px] bg-tertiary-fixed text-tertiary px-2 py-0.5 rounded-full font-bold">AVAILABLE</span>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // State for Section 6.3 End-of-Day Rider Cash Settlement
+  let riderLiabilities = {
+    'Juma Mukasa': 64000,
+    'David Ochieng': 35600,
+    'Brian Kato': 112000,
+    'Alex Wandera': 28000
+  };
+  let totalPendingCash = 239600;
+  let clearedCount = 1; // Samuel Ssebo already cleared
+
+  function updateCashDrawerSummary() {
+    const kpiPendingCash = document.getElementById('kpi-pending-cash');
+    const headerCashLiability = document.getElementById('header-cash-liability');
+    const globalPending = document.getElementById('global-pending-liability');
+    const drawerFooter = document.getElementById('drawer-footer-text');
+    const countBadge = document.getElementById('settlement-count');
+
+    if (kpiPendingCash) kpiPendingCash.textContent = 'USh ' + totalPendingCash.toLocaleString();
+    if (headerCashLiability) headerCashLiability.textContent = 'USh ' + totalPendingCash.toLocaleString() + ' Active Liability';
+    if (globalPending) globalPending.textContent = 'USh ' + totalPendingCash.toLocaleString();
+    if (drawerFooter) drawerFooter.textContent = 'TOTAL PHYSICAL CASH DUE TO CASH DRAWER: USh ' + totalPendingCash.toLocaleString();
+    if (countBadge) countBadge.textContent = clearedCount + ' / 5 Cleared';
+  }
+
+  function reconcileRider(riderName, plate, amount, rowId, statusId, btn) {
+    if (riderLiabilities[riderName] !== undefined && riderLiabilities[riderName] > 0) {
+      totalPendingCash -= riderLiabilities[riderName];
+      riderLiabilities[riderName] = 0;
+      clearedCount += 1;
+    }
+
+    const row = document.getElementById(rowId);
+    const status = document.getElementById(statusId);
+
+    if (status) {
+      status.textContent = 'SETTLED & LOGGED';
+      status.className = 'audit-status text-[11px] px-2.5 py-1 rounded-full bg-tertiary-fixed text-tertiary font-bold uppercase tracking-wider';
+    }
+
+    if (btn) {
+      btn.textContent = 'CLEARED';
+      btn.className = 'px-4 py-2 rounded-xl bg-tertiary text-white font-bold text-xs uppercase cursor-default';
+      btn.disabled = true;
+    }
+
+    if (row) {
+      row.classList.add('bg-tertiary-fixed/15');
+    }
+
+    updateCashDrawerSummary();
+
+    // Show temporary confirmation
+    const toast = document.getElementById('toast-rectifier');
+    const toastText = document.getElementById('toast-rectifier-text');
+    if (toast && toastText) {
+      toastText.textContent = 'Audit entry written to cash_settlements for ' + riderName + ' (' + plate + ') • Handed in USh ' + amount.toLocaleString() + ' • Liability reset to 0.';
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 4000);
+    }
+  }
+
+  function reconcileAllRiders() {
+    const riders = [
+      { name: 'Juma Mukasa', plate: 'UFD 342B', amount: 64000, row: 'row-juma', status: 'status-juma' },
+      { name: 'David Ochieng', plate: 'UEX 119A', amount: 35600, row: 'row-david', status: 'status-david' },
+      { name: 'Brian Kato', plate: 'UEE 902C', amount: 112000, row: 'row-brian', status: 'status-brian' },
+      { name: 'Alex Wandera', plate: 'UFD 881M', amount: 28000, row: 'row-alex', status: 'status-alex' }
+    ];
+
+    riders.forEach(r => {
+      const row = document.getElementById(r.row);
+      const btn = row ? row.querySelector('.reconcile-btn') : null;
+      if (btn && !btn.disabled) {
+        reconcileRider(r.name, r.plate, r.amount, r.row, r.status, btn);
+      }
+    });
+  }
+
+  // Section 6.2 Live Order Typo Rectifier Form Handling
+  function handleRectifierSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-sync-rider');
+    const name = document.getElementById('customer-name').value;
+    const phone = document.getElementById('customer-phone').value;
+    const notes = document.getElementById('dropoff-notes').value;
+
+    if (btn) {
+      btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> PUSHING VIA WEBSOCKET...';
+      btn.disabled = true;
+    }
+
+    setTimeout(() => {
+      if (btn) {
+        btn.innerHTML = '<span class="material-symbols-outlined text-base">check_circle</span> SYNCED TO RIDER JUMA MUKASA';
+        btn.className = 'w-full py-3.5 rounded-2xl bg-tertiary text-white font-extrabold text-sm transition-all shadow-md flex items-center justify-center gap-2';
+      }
+
+      const toast = document.getElementById('toast-rectifier');
+      const toastText = document.getElementById('toast-rectifier-text');
+      if (toast && toastText) {
+        toastText.textContent = 'Real-time sync verified! Updated ' + name + ' (' + phone + ') with notes "' + notes + '" on Rider Juma screen.';
+        toast.classList.remove('hidden');
+      }
+
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = '<span class="material-symbols-outlined text-base">sync</span> SAVE & SYNC TO RIDER SCREEN';
+          btn.className = 'w-full py-3.5 rounded-2xl bg-primary-warm text-white font-extrabold text-sm hover:bg-primary transition-all active:scale-95 shadow-md shadow-primary-warm/20 flex items-center justify-center gap-2';
+          btn.disabled = false;
+        }
+      }, 3500);
+    }, 700);
+  }
+
+  function adjustMapPin() {
+    const coords = document.getElementById('pin-coords');
+    const toast = document.getElementById('toast-rectifier');
+    const toastText = document.getElementById('toast-rectifier-text');
+    if (coords) {
+      coords.textContent = '0.3182° N, 32.5804° E (Lumumba Gate 2 Corrected)';
+      coords.className = 'text-xs text-primary font-bold font-mono animate-pulse';
+    }
+    if (toast && toastText) {
+      toastText.textContent = 'Pin coordinates snapped to Lumumba Avenue Gate 2. Ready to push to courier screen.';
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+    }
+  }
+
+  function pingCustomerLocation() {
+    alert('SMS link dispatched to +256 772 000 111: Customer prompted to drop exact WhatsApp / Web live pin.');
+  }
+
+  // Section 6.1 Slider & Surcharge logic
+  const slider = document.getElementById('slider-radius');
+  const radiusVal = document.getElementById('radius-val');
+  const mapLabel = document.getElementById('map-label');
+  if (slider && radiusVal) {
+    slider.addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value).toFixed(1);
+      radiusVal.textContent = v + ' km';
+      if (mapLabel) {
+        mapLabel.textContent = v + 'km Tier 1 (Central • Nakasero • Kololo)';
+      }
+    });
+  }
+
+  function setFee(val, el) {
+    document.querySelectorAll('.tier-btn').forEach(btn => {
+      btn.className = 'tier-btn py-2 px-space-sm rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container font-bold text-xs border border-gourmet-border';
+    });
+    el.className = 'tier-btn py-2 px-space-sm rounded-xl bg-primary-warm text-white font-bold shadow-sm text-xs';
+    const display = document.getElementById('surcharge-display');
+    if (display) {
+      display.textContent = 'USh ' + val.toLocaleString() + ' / km';
+    }
+  }
+
+  // Push Config button
+  const saveTierBtn = document.getElementById('save-tier-btn');
+  if (saveTierBtn) {
+    saveTierBtn.addEventListener('click', () => {
+      saveTierBtn.textContent = 'Settings Pushed to Live Customer & Rider Apps!';
+      saveTierBtn.className = 'w-full py-3 rounded-2xl bg-tertiary text-white font-bold text-sm transition-all';
+      setTimeout(() => {
+        saveTierBtn.textContent = 'Push Config to Live Customer Apps';
+        saveTierBtn.className = 'w-full py-3 rounded-2xl bg-surface-container text-on-surface font-bold text-sm hover:bg-primary-warm hover:text-white transition-all shadow-sm border border-gourmet-border';
+      }, 3000);
+    });
+  }
+
+  // Export audit slip button
+  const exportBtn = document.getElementById('btn-export-audit');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      alert('Generating signed settlement audit receipt (#DEPOT-KLA-AUDIT-20261029)... Download complete.');
+    });
+  }
+</script></main></div></body></html>

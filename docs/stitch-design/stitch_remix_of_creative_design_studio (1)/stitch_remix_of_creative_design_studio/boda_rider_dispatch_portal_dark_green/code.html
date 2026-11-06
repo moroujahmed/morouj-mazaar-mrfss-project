@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "primary-fixed-dim": "#ffb4ab",
+          "surface-tint": "#ae2f2a",
+          "on-secondary": "#ffffff",
+          "outline-variant": "#e0bfbb",
+          "surface-dim": "#e7d6d3",
+          "surface-container-highest": "#f0dfdb",
+          "secondary": "#974800",
+          "on-tertiary-fixed": "#00210c",
+          "on-surface-variant": "#59413e",
+          "on-tertiary": "#ffffff",
+          "tertiary-container": "#517f5b",
+          "on-secondary-fixed-variant": "#733500",
+          "on-surface": "#221a18",
+          "on-primary-fixed": "#410002",
+          "primary-container": "#cd453d",
+          "secondary-container": "#fd9348",
+          "surface-variant": "#f0dfdb",
+          "surface-container": "#fbeae7",
+          "on-error": "#ffffff",
+          "on-primary-fixed-variant": "#8d1515",
+          "on-background": "#221a18",
+          "surface-container-lowest": "#ffffff",
+          "secondary-fixed-dim": "#ffb689",
+          "surface-container-high": "#f5e5e1",
+          "on-tertiary-fixed-variant": "#234f30",
+          "outline": "#8d706d",
+          "primary-fixed": "#ffdad6",
+          "tertiary-fixed-dim": "#a2d2a9",
+          "on-secondary-fixed": "#311300",
+          "on-secondary-container": "#6b3100",
+          "error": "#ba1a1a",
+          "error-container": "#ffdad6",
+          "tertiary": "#396544",
+          "surface-bright": "#fff8f6",
+          "surface": "#fff8f6",
+          "primary": "#ab2d28",
+          "inverse-primary": "#ffb4ab",
+          "background": "#fff8f6",
+          "surface-container-low": "#fff0ed",
+          "inverse-on-surface": "#feede9",
+          "on-primary": "#ffffff",
+          "on-primary-container": "#fffbff",
+          "inverse-surface": "#382e2c",
+          "secondary-fixed": "#ffdbc7",
+          "on-tertiary-container": "#f6fff3",
+          "on-error-container": "#93000a",
+          "tertiary-fixed": "#bdefc4"
+        },
+        "borderRadius": {
+          "DEFAULT": "1rem",
+          "lg": "1.5rem",
+          "xl": "2rem",
+          "2xl": "2.25rem",
+          "3xl": "2.5rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "space-xl": "2rem",
+          "gutter-sm": "0.75rem",
+          "space-xs": "0.5rem",
+          "margin": "1.25rem",
+          "margin-desktop": "2.5rem",
+          "space-2xs": "0.25rem",
+          "gutter": "1rem",
+          "space-md": "1rem",
+          "gutter-lg": "1.5rem",
+          "margin-mobile": "1rem",
+          "space-2xl": "3rem",
+          "space-lg": "1.5rem",
+          "space-sm": "0.75rem"
+        },
+        "fontFamily": {
+          "sans": ["Plus Jakarta Sans", "sans-serif"],
+          "headline-md": ["Plus Jakarta Sans"],
+          "body-sm": ["Plus Jakarta Sans"],
+          "label-md": ["Plus Jakarta Sans"],
+          "label-sm": ["Plus Jakarta Sans"],
+          "label-lg": ["Plus Jakarta Sans"],
+          "headline-sm": ["Plus Jakarta Sans"],
+          "headline-xl": ["Plus Jakarta Sans"],
+          "headline-lg": ["Plus Jakarta Sans"],
+          "headline-lg-mobile": ["Plus Jakarta Sans"],
+          "body-md": ["Plus Jakarta Sans"],
+          "body-lg": ["Plus Jakarta Sans"],
+          "headline-xl-mobile": ["Plus Jakarta Sans"]
+        },
+        "fontSize": {
+          "headline-md": ["20px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+          "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "label-md": ["13px", {"lineHeight": "18px", "fontWeight": "600"}],
+          "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+          "label-lg": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+          "headline-sm": ["17px", {"lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800"}],
+          "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "headline-lg-mobile": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "headline-xl-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+        }
+      },
+    },
+  }
+</script></head><body class="bg-[#fff8f6] font-sans text-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 left-0 right-0 z-50 bg-[#fff8f6]/90 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_4px_24px_rgba(174,47,42,0.04)]"><div class="h-20 w-full max-w-[1280px] mx-auto px-margin md:px-margin-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-[#d9483b] flex items-center justify-center text-white shadow-md shadow-primary/20"><span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">local_fire_department</span></div><div class="flex flex-col"><div class="flex items-center gap-1.5"><span class="font-bold text-lg text-on-surface tracking-tight leading-none font-headline-sm">Bazaar</span><span class="font-extrabold text-lg text-primary tracking-tight leading-none font-headline-sm">Flame &amp; Grill</span></div><span class="font-body-sm text-[12px] text-on-surface-variant font-medium mt-0.5">Kampala Logistics Relay Grid</span></div><div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-[11px] uppercase tracking-wider font-bold text-emerald-800 font-label-sm">Fleet: 5 Bodas Live</span></div></div><nav class="hidden md:flex items-center gap-1 bg-[#fff0ed] p-1.5 rounded-2xl border border-outline-variant/30 shadow-inner"><a class="px-4 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-white/80 transition-all" data-path="storefront" href="#">Storefront</a><a class="px-4 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-white/80 transition-all" data-path="kitchen" href="#">Kitchen KDS</a><a aria-current="page" class="px-4 py-2 rounded-xl text-sm font-bold bg-primary text-white shadow-sm shadow-primary/25 transition-all" data-path="rider" href="#">Boda Rider</a><a class="px-4 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-white/80 transition-all" data-path="admin" href="#">Ops Ledger</a></nav><div class="flex items-center gap-2.5 shrink-0"><div class="hidden sm:flex items-center gap-2 bg-[#fff0ed] px-3 py-1.5 rounded-xl border border-outline-variant/30"><span class="text-xs font-bold text-primary tracking-wide">UGX</span><span class="text-xs text-on-surface-variant font-medium">Kampala Central</span></div><div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200/80 text-amber-900 px-2.5 py-1.5 rounded-xl"><span class="material-symbols-outlined text-sm leading-none text-amber-700">signal_cellular_alt</span><span class="text-[11px] font-bold tracking-wide hidden lg:inline">3G LITE</span></div><div class="relative"><img alt="Rider Profile" class="w-10 h-10 rounded-2xl object-cover ring-2 ring-primary/20 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6PT6HsfGgPmJJwlQhQjuztpJIDFNwGOfSzSz2MVT7j0VGmHQEVye-VDwJTHqw12f6tqdHRyqFxmPFOY3PKwl5Z0UMvyIjSdPF_QHpy9m_TQMkHsNzDeLT2LFNmUkQ6xN57I8UWqzrqSvkp0Kvd1cs3Z-vQmnahn80nmvKiVGYmc61y8aq-n4DRL6QYnFVicpKW7ZUXDg1HNuoMpCteAfmJpP3TQDcODnZ4tNeAD52"/><span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white"></span></div></div></div></header><main class="w-full pt-24 pb-16 bg-[#fff8f6] min-h-[calc(100vh-140px)]"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1280px] mx-auto px-margin md:px-margin-desktop py-space-md flex flex-col gap-6">
+<!-- Top Rider Bar: Glance-and-Go Diagnostics & Shift Vault -->
+<section class="w-full bg-[#2a1e1d] text-[#fff8f6] rounded-3xl p-5 md:p-6 shadow-xl border border-[#3e2f2d] flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5 relative overflow-hidden">
+<div class="absolute -right-16 -top-16 w-56 h-56 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Rider Identifier & Diagnostics -->
+<div class="flex flex-wrap items-center gap-4 relative z-10">
+<div class="flex items-center gap-3 bg-[#382a28] px-4 py-2.5 rounded-2xl border border-white/10 shadow-sm">
+<div class="w-10 h-10 rounded-xl bg-primary/20 text-[#ffb4ab] flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">two_wheeler</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-base text-[#ffdad6] font-bold tracking-tight">Rider: Juma</span>
+<span class="text-[11px] text-[#f0dfdb]/80 font-bold tracking-widest uppercase">PLATE: UFD 342B</span>
+</div>
+</div>
+<div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 shadow-sm"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span><span class="text-[11px] uppercase font-bold tracking-wider">Active Online</span></div>
+<div class="flex items-center gap-4 text-[#e0bfbb] text-xs"><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-emerald-400">network_check</span><span>3G Ping: <strong class="text-white font-semibold">12s</strong></span></span><span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-emerald-400">battery_5_bar</span><span>Battery: <strong class="text-white font-semibold">88%</strong></span></span></div>
+</div>
+<!-- Shift Snapshot & Physical Cash Liability Vault -->
+<div class="grid grid-cols-2 sm:flex sm:items-center gap-3 bg-[#382a28]/70 p-2 rounded-2xl border border-white/5 relative z-10">
+<div class="flex flex-col px-4 py-2">
+<span class="text-[11px] text-[#e0bfbb] font-bold uppercase tracking-wider">Completed Drops</span>
+<span class="text-xl font-bold text-white tracking-tight">7 Delivered</span>
+</div>
+<div class="flex flex-col px-4 py-2 bg-gradient-to-r from-primary to-[#d9483b] text-white rounded-xl shadow-md">
+<div class="flex items-center gap-1.5 text-white/90">
+<span class="material-symbols-outlined text-sm">payments</span>
+<span class="text-[10px] uppercase font-bold tracking-wider">Cash Liability</span>
+</div>
+<span class="text-lg font-extrabold tracking-wide text-white">USh 64,000</span>
+<span class="text-[11px] text-white/80 font-medium">Pending Handover Vault</span>
+</div>
+</div>
+</section>
+<!-- Main Viewport Grid: Active Drop Hero & Available Unclaimed Pool -->
+<div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- Left Column: Active Assigned Delivery (Hero Card) -->
+<div class="w-full lg:col-span-7 flex flex-col gap-4">
+<!-- Live Trip Header Tag -->
+<div class="flex items-center justify-between bg-primary text-white px-5 py-3 rounded-2xl shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined animate-spin text-lg">sync</span>
+<span class="font-bold text-sm uppercase tracking-wide">Active Assigned Delivery</span>
+</div>
+<span class="text-[11px] bg-[#2a1e1d] text-[#ffdad6] px-3 py-1 rounded-full font-bold uppercase tracking-wider">CRITICAL PRIORITY</span>
+</div>
+<!-- The Active Card -->
+<div class="w-full bg-white rounded-3xl p-6 md:p-7 shadow-[0_8px_30px_rgba(174,47,42,0.06)] border border-outline-variant/30 flex flex-col gap-6">
+<!-- Customer & Waypoint Details -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between gap-3">
+<span class="text-xs text-primary font-bold uppercase tracking-wider">Order #1039 • Destination Handover</span>
+<span class="text-xs px-3 py-1 rounded-full font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">TIER 1 • 2.4 KM</span>
+</div>
+<h1 class="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight mt-1">Sarah Namukasa</h1>
+<a class="text-secondary hover:text-primary transition-colors flex items-center gap-2 text-base font-bold w-fit" href="tel:+256772000111">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed/40 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-base">call</span>
+</div>
+<span>+256 772 000 111</span>
+</a>
+</div>
+<!-- Street Address & Gate Note Callout -->
+<div class="bg-[#fff0ed] p-4 md:p-5 rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-bold text-on-surface">Plot 14 Lumumba Ave, Nakasero</span>
+<span class="text-sm text-on-surface-variant font-medium mt-1 leading-relaxed">Dispatch Note: <strong class="text-on-surface">Gate 2 on Lumumba, call when at gate. Food pouch sealed with security tape.</strong></span>
+</div>
+</div>
+</div>
+<!-- High-Vis Warm Amber / Terracotta Cash Alert Banner -->
+<div class="bg-gradient-to-r from-amber-400 via-amber-400 to-[#fd9348] text-[#221a18] p-4 md:p-5 rounded-2xl shadow-md border border-amber-300 flex items-center justify-between gap-4">
+<div class="flex items-center gap-3.5">
+<div class="w-11 h-11 rounded-2xl bg-[#221a18] text-amber-300 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[11px] uppercase font-bold tracking-wider text-[#221a18]/75">Payment Requirement</span>
+<span class="text-base md:text-lg font-extrabold uppercase tracking-tight text-[#221a18]">Collect USh 35,600 Cash</span>
+</div>
+</div>
+<span class="text-xs bg-[#221a18] text-amber-300 px-3.5 py-1.5 rounded-xl font-bold uppercase whitespace-nowrap shadow-sm">Change for 50k</span>
+</div>
+<!-- Route Preview Map Snapshot -->
+<div class="relative w-full h-48 rounded-2xl overflow-hidden shadow-sm border border-outline-variant/30" data-location="Plot 14 Lumumba Ave, Nakasero, Kampala">
+<div class="w-full h-full bg-cover bg-center" data-alt="A top-down GPS navigation route map showing Kampala city grid roads between Nakasero hill and Lumumba Avenue with a glowing delivery trajectory and boda motorcycle pin in saffron orange and high-contrast charcoal tones." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDCafD55LNa5LH4diGa7iDEDkSZ93QTr-WoZLMeqAIsPXitz3ODCFrYddgKxTI8KPRTk3bWF3-2eBWMU2-cKYM82VyuvcsUttD21H0_fpYPXTViV4eWYB3KmLy3WqU1hbm7wUPwBWq1xTTz6N2giaMRmFotdD-zwN3Waeyy13BsJazIFB-vltmxptnoi9xlbRAy_eYjDElM4etU8-xJIB0hM--SpqRHlPIvnhjmPL6f')">
+<div class="absolute inset-0 bg-gradient-to-t from-[#221a18]/85 via-transparent to-transparent flex items-end p-4">
+<div class="flex items-center gap-2 text-white">
+<div class="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-base">near_me</span>
+</div>
+<span class="text-xs md:text-sm font-semibold text-white/95">ETA: 6 Minutes via Yusuf Lule Rd Bypass</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 56px Tall Direct Handlebar Action Buttons -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+<!-- Google Maps Launch -->
+<a class="h-14 min-h-[56px] w-full bg-[#2a1e1d] hover:bg-[#382a28] text-white px-5 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-[0.98]" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-xl text-[#ffdad6]" style="font-variation-settings: 'FILL' 1;">directions</span>
+<span class="font-bold text-sm tracking-tight text-center">Launch Maps Navigation</span>
+</a>
+<!-- Call Customer Direct -->
+<a class="h-14 min-h-[56px] w-full bg-[#fff0ed] hover:bg-[#fbeae7] text-secondary border border-outline-variant/40 px-5 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-sm active:scale-[0.98]" href="tel:+256772000111">
+<span class="material-symbols-outlined text-xl">phone_in_talk</span>
+<span class="font-bold text-sm tracking-tight text-center">Call Customer</span>
+</a>
+<!-- Proof of Delivery Handover PIN Trigger -->
+<button class="sm:col-span-2 h-14 min-h-[56px] w-full bg-primary hover:bg-[#962520] text-white px-5 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-primary/25 active:scale-[0.98]" id="open-pod-modal-btn" type="button">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">key</span>
+<span class="font-extrabold text-sm uppercase tracking-wide">Enter 4-Digit Customer PIN</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Right Column: Available Unclaimed Pool (2 Orders) & Live Logistics Feed -->
+<div class="w-full lg:col-span-5 flex flex-col gap-4">
+<!-- Pool Header Banner -->
+<div class="flex items-center justify-between bg-white px-5 py-3 rounded-2xl border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-2 text-on-surface">
+<div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">radar</span>
+</div>
+<span class="font-bold text-base">Unclaimed Order Pool</span>
+</div>
+<span class="text-xs px-3 py-1 rounded-full font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">2 AVAILABLE</span>
+</div>
+<!-- Pool Order Card 1: #1042 Nakasero (Prepaid MoMo) -->
+<div class="w-full bg-white rounded-3xl p-5 shadow-sm hover:shadow-md transition-shadow border border-outline-variant/30 flex flex-col gap-3 relative overflow-hidden" id="order-card-1042">
+<div class="flex items-center justify-between">
+<span class="text-base font-extrabold text-on-surface">ORDER #1042</span>
+<span class="text-xs px-3 py-1 rounded-full font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">PREPAID (MTN MoMo)</span>
+</div>
+<div class="flex items-baseline justify-between text-on-surface-variant text-sm">
+<span class="flex items-center gap-1.5 font-bold text-on-surface">
+<span class="material-symbols-outlined text-base text-primary">location_city</span>
+NAKASERO • 3.8 km
+</span>
+<span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold uppercase bg-emerald-100 text-emerald-900">READY IN KITCHEN</span>
+</div>
+<div class="bg-[#fff0ed] px-3.5 py-2.5 rounded-xl text-xs text-on-surface-variant border border-outline-variant/20">
+Items: <strong class="text-on-surface">1x Flame Grilled Tilapia Combo, 1x Passion Juice</strong>
+</div>
+<button class="h-14 min-h-[56px] w-full mt-1 bg-primary hover:bg-[#962520] text-white rounded-2xl flex items-center justify-center gap-2 text-sm font-bold tracking-tight shadow-md shadow-primary/20 active:scale-95 transition-all" onclick="claimOrder('1042', this)" type="button">
+<span class="material-symbols-outlined text-xl">two_wheeler</span>
+<span>Claim This Delivery</span>
+</button>
+</div>
+<!-- Pool Order Card 2: #1045 Kololo (Cash on Delivery) -->
+<div class="w-full bg-white rounded-3xl p-5 shadow-sm hover:shadow-md transition-shadow border border-outline-variant/30 flex flex-col gap-3 relative overflow-hidden" id="order-card-1045">
+<div class="flex items-center justify-between">
+<span class="text-base font-extrabold text-on-surface">ORDER #1045</span>
+<span class="text-xs px-3 py-1 rounded-full font-bold bg-[#ffdad6] text-primary border border-primary/20">COD (Collect USh 16,000)</span>
+</div>
+<div class="flex items-baseline justify-between text-on-surface-variant text-sm">
+<span class="flex items-center gap-1.5 font-bold text-on-surface">
+<span class="material-symbols-outlined text-base text-primary">location_city</span>
+KOLOLO • 4.2 km
+</span>
+<span class="text-[11px] font-bold text-secondary uppercase bg-amber-50 px-2 py-0.5 rounded">Kitchen Packaging</span>
+</div>
+<div class="bg-[#fff0ed] px-3.5 py-2.5 rounded-xl text-xs text-on-surface-variant border border-outline-variant/20">
+Items: <strong class="text-on-surface">2x Gourmet Rolex Royale (Double Chapati &amp; Eggs)</strong>
+</div>
+<button class="h-14 min-h-[56px] w-full mt-1 bg-primary hover:bg-[#962520] text-white rounded-2xl flex items-center justify-center gap-2 text-sm font-bold tracking-tight shadow-md shadow-primary/20 active:scale-95 transition-all" onclick="claimOrder('1045', this)" type="button">
+<span class="material-symbols-outlined text-xl">two_wheeler</span>
+<span>Claim This Delivery</span>
+</button>
+</div>
+<!-- Rider Hub Daily Performance Stats -->
+<div class="w-full bg-[#fff0ed] rounded-3xl p-5 border border-outline-variant/30 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant uppercase font-bold tracking-wider">Boda Hub Status Snapshot</span>
+<span class="text-[11px] font-semibold text-primary">Shift #418</span>
+</div>
+<div class="grid grid-cols-2 gap-3 text-center">
+<div class="bg-white p-3.5 rounded-2xl shadow-sm border border-outline-variant/20">
+<span class="text-xs text-on-surface-variant font-medium">Earned Net Today</span>
+<p class="text-lg font-extrabold text-emerald-800 mt-0.5">USh 52,500</p>
+</div>
+<div class="bg-white p-3.5 rounded-2xl shadow-sm border border-outline-variant/20">
+<span class="text-xs text-on-surface-variant font-medium">Avg Transit Time</span>
+<p class="text-lg font-extrabold text-on-surface mt-0.5">14.2 Mins</p>
+</div>
+</div>
+<div class="flex items-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-200/60 mt-1">
+<span class="material-symbols-outlined text-base">verified_user</span>
+<span>KCCA Stage Clearance: Wandegeya / Nakasero East</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Proof-of-Delivery PIN Modal -->
+<div class="fixed inset-0 z-50 bg-[#221a18]/70 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4" id="pod-modal">
+<div class="w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-6 md:p-7 shadow-2xl flex flex-col gap-5 max-h-[95vh] overflow-y-auto border border-outline-variant/30">
+<!-- Modal Header & Dismiss -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">verified</span>
+</div>
+<h2 class="text-xl text-on-surface font-extrabold">Proof of Delivery</h2>
+</div>
+<button class="w-9 h-9 rounded-full bg-[#fff0ed] hover:bg-[#fbeae7] flex items-center justify-center text-on-surface transition-colors" id="close-pod-modal-btn" type="button">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<!-- Security Micro-copy & Seal Verification Instruction -->
+<div class="bg-[#fff0ed] p-3.5 rounded-2xl flex items-start gap-3 border border-outline-variant/30">
+<span class="material-symbols-outlined text-primary text-xl mt-0.5">lock</span>
+<p class="text-xs text-on-surface-variant font-medium leading-relaxed">Verify tamper-evident sticker seal is intact with customer before entering PIN.</p>
+</div>
+<!-- PIN Entry Display: 4 Distinct Digit Boxes -->
+<div class="flex flex-col items-center gap-2">
+<span class="text-xs text-on-surface-variant uppercase font-bold tracking-wider">Enter Customer Handover PIN</span>
+<div class="flex items-center justify-center gap-3 mt-1">
+<div class="w-14 h-16 min-w-[56px] rounded-2xl bg-[#fff0ed] border border-outline-variant/40 flex items-center justify-center text-2xl text-on-surface font-black transition-all shadow-inner" id="pin-box-0">_</div>
+<div class="w-14 h-16 min-w-[56px] rounded-2xl bg-[#fff0ed] border border-outline-variant/40 flex items-center justify-center text-2xl text-on-surface font-black transition-all shadow-inner" id="pin-box-1">_</div>
+<div class="w-14 h-16 min-w-[56px] rounded-2xl bg-[#fff0ed] border border-outline-variant/40 flex items-center justify-center text-2xl text-on-surface font-black transition-all shadow-inner" id="pin-box-2">_</div>
+<div class="w-14 h-16 min-w-[56px] rounded-2xl bg-[#fff0ed] border border-outline-variant/40 flex items-center justify-center text-2xl text-on-surface font-black transition-all shadow-inner" id="pin-box-3">_</div>
+</div>
+<!-- Status / Feedback Banner -->
+<span class="text-xs text-secondary font-semibold h-5 mt-1 transition-all" id="pin-feedback-msg">Target Demo Code: 4-8-2-1</span>
+</div>
+<!-- Oversized Touch Numpad for Handlebar / Glove Operability -->
+<div class="grid grid-cols-3 gap-2.5 select-none">
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('1')" type="button">1</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('2')" type="button">2</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('3')" type="button">3</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('4')" type="button">4</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('5')" type="button">5</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('6')" type="button">6</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('7')" type="button">7</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('8')" type="button">8</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('9')" type="button">9</button>
+<button class="h-14 min-h-[56px] bg-red-50 text-red-700 hover:bg-red-100 text-lg rounded-2xl font-bold flex items-center justify-center shadow-sm border border-red-200" onclick="clearPinInput()" type="button">C</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] hover:bg-[#fbeae7] active:bg-[#ffdad6] text-on-surface text-xl rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="handlePinInput('0')" type="button">0</button>
+<button class="h-14 min-h-[56px] bg-[#fff0ed] text-on-surface hover:bg-[#fbeae7] text-lg rounded-2xl font-bold flex items-center justify-center shadow-sm border border-outline-variant/30" onclick="backspacePinInput()" type="button">
+<span class="material-symbols-outlined text-2xl">backspace</span>
+</button>
+</div>
+<!-- 56px CTA: Confirm & Complete Delivery -->
+<button class="h-14 min-h-[56px] w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl text-sm font-bold tracking-wide uppercase flex items-center justify-center gap-2 shadow-lg shadow-emerald-700/20 active:scale-[0.98] transition-all" id="confirm-pod-btn" onclick="submitPinVerification()" type="button">
+<span class="material-symbols-outlined text-2xl">check_circle</span>
+<span>Confirm &amp; Complete Delivery</span>
+</button>
+</div>
+</div>
+<!-- Interactive Logic & State Controller -->
+<script>
+    let enteredPin = "";
+    const correctPin = "4821";
+    const modal = document.getElementById("pod-modal");
+    const openModalBtn = document.getElementById("open-pod-modal-btn");
+    const closeModalBtn = document.getElementById("close-pod-modal-btn");
+    const feedbackMsg = document.getElementById("pin-feedback-msg");
+
+    if (openModalBtn) {
+      openModalBtn.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+        clearPinInput();
+      });
+    }
+
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener("click", () => {
+        modal.classList.add("hidden");
+      });
+    }
+
+    function updatePinDisplay() {
+      for (let i = 0; i < 4; i++) {
+        const box = document.getElementById(`pin-box-${i}`);
+        if (box) {
+          if (i < enteredPin.length) {
+            box.innerText = enteredPin[i];
+            box.className = "w-14 h-16 min-w-[56px] rounded-2xl bg-[#ffdad6] border-2 border-primary text-primary flex items-center justify-center text-2xl font-black scale-105 transition-all shadow-sm";
+          } else {
+            box.innerText = "_";
+            box.className = "w-14 h-16 min-w-[56px] rounded-2xl bg-[#fff0ed] border border-outline-variant/40 flex items-center justify-center text-2xl text-on-surface font-black transition-all shadow-inner";
+          }
+        }
+      }
+    }
+
+    function handlePinInput(digit) {
+      if (enteredPin.length < 4) {
+        enteredPin += digit;
+        updatePinDisplay();
+        if (enteredPin.length === 4) {
+          feedbackMsg.innerText = "PIN Complete. Tap Confirm Below.";
+          feedbackMsg.className = "text-xs text-primary font-bold h-5 mt-1";
+        }
+      }
+    }
+
+    function clearPinInput() {
+      enteredPin = "";
+      feedbackMsg.innerText = "Target Demo Code: 4-8-2-1";
+      feedbackMsg.className = "text-xs text-secondary font-semibold h-5 mt-1";
+      updatePinDisplay();
+    }
+
+    function backspacePinInput() {
+      if (enteredPin.length > 0) {
+        enteredPin = enteredPin.slice(0, -1);
+        updatePinDisplay();
+      }
+    }
+
+    function submitPinVerification() {
+      if (enteredPin === correctPin) {
+        if ("vibrate" in navigator) {
+          navigator.vibrate([20, 50, 20]);
+        }
+        feedbackMsg.innerText = "VERIFIED! Order Complete. Updating Ledger...";
+        feedbackMsg.className = "text-xs text-emerald-700 font-bold h-5 mt-1 animate-pulse";
+
+        for (let i = 0; i < 4; i++) {
+          const box = document.getElementById(`pin-box-${i}`);
+          box.className = "w-14 h-16 min-w-[56px] rounded-2xl bg-emerald-100 border-2 border-emerald-600 text-emerald-800 flex items-center justify-center text-2xl font-black transition-all";
+        }
+
+        setTimeout(() => {
+          modal.classList.add("hidden");
+          const heroBtn = document.getElementById("open-pod-modal-btn");
+          if (heroBtn) {
+            heroBtn.className = "sm:col-span-2 h-14 min-h-[56px] w-full bg-emerald-700 text-white px-5 rounded-2xl flex items-center justify-center gap-2 pointer-events-none shadow-md";
+            heroBtn.innerHTML = '<span class="material-symbols-outlined text-2xl">task_alt</span><span class="text-sm font-bold uppercase">Order #1039 Delivered & Closed</span>';
+          }
+        }, 1200);
+      } else {
+        feedbackMsg.innerText = "Invalid PIN. Re-verify sticker code with customer.";
+        feedbackMsg.className = "text-xs text-red-600 font-bold h-5 mt-1";
+
+        for (let i = 0; i < 4; i++) {
+          const box = document.getElementById(`pin-box-${i}`);
+          box.className = "w-14 h-16 min-w-[56px] rounded-2xl bg-red-100 border-2 border-red-500 text-red-700 flex items-center justify-center text-2xl font-black transition-all";
+        }
+        if ("vibrate" in navigator) {
+          navigator.vibrate(200);
+        }
+      }
+    }
+
+    function claimOrder(orderId, btnElement) {
+      btnElement.disabled = true;
+      btnElement.className = "h-14 min-h-[56px] w-full mt-1 bg-emerald-700 text-white rounded-2xl flex items-center justify-center gap-2 text-sm font-bold tracking-tight shadow-md cursor-default transition-all";
+      btnElement.innerHTML = '<span class="material-symbols-outlined text-xl animate-spin">refresh</span><span>Atomic Lock Confirmed</span>';
+      
+      setTimeout(() => {
+        btnElement.innerHTML = '<span class="material-symbols-outlined text-xl">check</span><span>ASSIGNED TO JUMA (UFD 342B)</span>';
+      }, 700);
+    }
+  </script>
+</div></main><footer class="w-full bg-[#fff0ed] border-t border-outline-variant/30 mt-12"><div class="w-full max-w-[1280px] mx-auto px-margin md:px-margin-desktop py-8 flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left"><span class="font-bold text-on-surface">Bazaar Flame &amp; Grill</span><span class="hidden sm:inline text-on-surface-variant">•</span><span class="text-xs text-on-surface-variant">Kampala Urban Hub © 2025</span><span class="bg-white border border-outline-variant/30 px-3 py-1 rounded-full text-[11px] font-bold text-emerald-800">MTN &amp; Airtel MoMo Integrated</span></div><div class="flex items-center gap-6 text-on-surface-variant text-xs"><span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Owino &amp; Nakasero Relay Active</span><span>Kampala Time: UTC+3</span></div></div></footer></body></html>

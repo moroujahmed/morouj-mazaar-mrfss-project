@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-secondary": "#ffffff",
+          "tertiary-fixed": "#bdefc4",
+          "error": "#ba1a1a",
+          "tertiary": "#396544",
+          "background": "#fff8f6",
+          "on-error": "#ffffff",
+          "surface-container-highest": "#f0dfdb",
+          "surface-tint": "#e8594f",
+          "on-secondary-fixed-variant": "#733500",
+          "on-primary-container": "#fffbff",
+          "secondary-fixed-dim": "#ffb689",
+          "on-tertiary": "#ffffff",
+          "on-secondary-fixed": "#311300",
+          "outline-variant": "#e0bfbb",
+          "on-tertiary-fixed-variant": "#234f30",
+          "surface-bright": "#fff8f6",
+          "secondary-container": "#fd9348",
+          "on-surface-variant": "#59413e",
+          "on-background": "#221a18",
+          "primary-fixed": "#ffdad6",
+          "on-primary": "#ffffff",
+          "error-container": "#ffdad6",
+          "primary-fixed-dim": "#ffb4ab",
+          "tertiary-container": "#396544",
+          "on-primary-fixed-variant": "#8d1515",
+          "on-secondary-container": "#6b3100",
+          "on-tertiary-container": "#f6fff3",
+          "inverse-primary": "#ffb4ab",
+          "surface-dim": "#e7d6d3",
+          "surface-container-high": "#f5e5e1",
+          "surface-container-lowest": "#ffffff",
+          "primary": "#e8594f",
+          "surface-variant": "#f0dfdb",
+          "secondary": "#974800",
+          "on-error-container": "#93000a",
+          "primary-container": "#cd453d",
+          "surface-container-low": "#fff0ed",
+          "secondary-fixed": "#ffdbc7",
+          "on-primary-fixed": "#410002",
+          "inverse-on-surface": "#feede9",
+          "surface": "#fff8f6",
+          "on-surface": "#221a18",
+          "outline": "#8d706d",
+          "on-tertiary-fixed": "#00210c",
+          "inverse-surface": "#2b2220",
+          "tertiary-fixed-dim": "#a2d2a9",
+          "surface-container": "#fbeae7"
+        },
+        "borderRadius": {
+          "DEFAULT": "1rem",
+          "lg": "1.25rem",
+          "xl": "1.5rem",
+          "2xl": "1.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "space-sm": "0.75rem",
+          "space-lg": "1.5rem",
+          "gutter-lg": "1.5rem",
+          "margin-desktop": "2.5rem",
+          "gutter": "1rem",
+          "space-xl": "2rem",
+          "margin-mobile": "1rem",
+          "space-xs": "0.5rem",
+          "margin": "1rem",
+          "space-md": "1rem",
+          "space-2xs": "0.25rem",
+          "space-2xl": "3rem",
+          "gutter-sm": "0.75rem"
+        },
+        "fontFamily": {
+          "body-md": ["Plus Jakarta Sans"],
+          "label-md": ["Plus Jakarta Sans"],
+          "headline-md": ["Plus Jakarta Sans"],
+          "label-lg": ["Plus Jakarta Sans"],
+          "headline-xl-mobile": ["Plus Jakarta Sans"],
+          "headline-lg": ["Plus Jakarta Sans"],
+          "headline-sm": ["Plus Jakarta Sans"],
+          "headline-xl": ["Plus Jakarta Sans"],
+          "label-sm": ["Plus Jakarta Sans"],
+          "body-lg": ["Plus Jakarta Sans"],
+          "body-sm": ["Plus Jakarta Sans"],
+          "headline-lg-mobile": ["Plus Jakarta Sans"]
+        },
+        "fontSize": {
+          "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+          "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "600" }],
+          "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+          "label-lg": ["15px", { "lineHeight": "20px", "fontWeight": "600" }],
+          "headline-xl-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+          "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "headline-sm": ["17px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+          "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+          "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }],
+          "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+          "headline-lg-mobile": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+        }
+      }
+    }
+  };
+</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head><body class="bg-background font-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-background/90 backdrop-blur-xl border-b border-surface-container-high pt-safe"><div class="h-14 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm flex-1 min-w-0"><button aria-label="Back" class="w-10 h-10 -ml-1 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high active:bg-surface-variant transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[22px]">arrow_back</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate">Mobile Checkout Cod Change Calculator</h1></div><div class="flex items-center gap-space-xs flex-shrink-0"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-14 pb-safe bg-background"><div class="flex flex-col w-full">
+<!-- Interactive & Lively COD Change Calculator Module -->
+<div class="px-margin pt-space-sm pb-space-2xl flex flex-col gap-space-md">
+<!-- Stepper Context Indicator -->
+<div class="flex items-center justify-between bg-surface-container px-space-md py-space-sm rounded-2xl border border-surface-container-high">
+<div class="flex items-center gap-space-sm">
+<span class="w-7 h-7 rounded-full bg-primary flex items-center justify-center font-label-sm text-label-sm font-bold text-on-primary shadow-sm">2</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">Checkout Flow</span>
+<span class="font-headline-sm text-[15px] font-bold text-on-surface">Step 2 of 2: Payment &amp; Change</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-surface-container-highest"></span>
+<span class="w-6 h-2 rounded-full bg-primary"></span>
+</div>
+</div>
+<!-- Order Total Summary Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md border border-surface-container-high/80 shadow-[0_2px_12px_rgba(34,26,24,0.04)] flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface-variant">Order Total Summary</span>
+<!-- Tier 1 Free Delivery Badge -->
+<span class="bg-[#eaf4ec] text-tertiary font-label-sm text-label-sm px-2.5 py-1 rounded-full uppercase flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+          TIER 1 • FREE (≤5 KM)
+        </span>
+</div>
+<div class="flex items-baseline justify-between pt-space-xs">
+<div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Subtotal USh 34,000 + Delivery USh 0</span>
+<div class="font-headline-xl-mobile text-headline-xl-mobile text-on-surface tracking-tight">USh 34,000</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container px-2 py-1 rounded-lg">
+<span class="material-symbols-outlined text-[16px] text-tertiary">moped</span>
+<span class="font-medium">Nakasero Kitchen Express</span>
+</div>
+</div>
+<!-- Quick Items Pill Preview with Food Imagery -->
+<div class="bg-surface-container-low p-space-sm rounded-xl border border-surface-container-high/60 flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-11 h-11 rounded-xl object-cover flex-shrink-0 shadow-sm" data-alt="Golden charcoal roasted Rolex wrap with fried eggs, shredded cabbage, red onions, sliced tomatoes, warm chapati crust, warm sunny daylight street food Kampala photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaMfNetwOrH0reBHNp2j_ww6SAVmdo0PI9fuvGkQ2dhZqF-guqBx5BDTRnzsVPxSgwo83Hc83Xx6JSYW1LC1xkgnsDmdAbFWJAyBp3Jjqh874QeRaYZ1CIu2JhBKAOrYQiaklDj9uwUIJFcaSolMXKU9TwkXyb7LgAkfCq9qaxxlb7DUAma8PATV_RmQMypLSb67r582m-NhAub1wkXNlvwsyVV3OLyVN9N2BLDSs7"/>
+<div class="min-w-0">
+<p class="font-headline-sm text-body-md truncate text-on-surface font-semibold">2x Special Kampala Rolex + Luwombo Gravy</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Dispatched with insulated thermal bag</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[22px]">receipt_long</span>
+</div>
+</div>
+<!-- Payment Method Selector (COD Highlighted) -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Payment Method</span>
+<!-- Radio Pills Container -->
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Inactive Momo Option -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-space-sm flex items-center gap-space-sm opacity-60">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">phone_android</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md font-bold truncate text-on-surface">MTN / Airtel</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Mobile Money</span>
+</div>
+</div>
+<!-- Active COD Option -->
+<div class="bg-surface-container-lowest border-2 border-primary rounded-2xl p-space-sm flex items-center justify-between shadow-[0_2px_10px_rgba(232,89,79,0.12)]">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md font-bold text-on-surface truncate">Cash on Delivery</span>
+<span class="font-body-sm text-body-sm text-primary font-medium truncate">Pay Boda Courier</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-[22px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Mandatory Denomination Selector -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md border border-surface-container-high/80 shadow-[0_2px_12px_rgba(34,26,24,0.04)] flex flex-col gap-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Do you need change for?</span>
+<span class="bg-error-container text-on-error-container font-label-sm text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wide">MANDATORY</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Select what cash note you will hand to the rider so they pack the exact change float beforehand.</p>
+</div>
+<!-- Segmented Radio Options -->
+<div class="flex flex-col gap-space-sm" id="denomination-options">
+<!-- Option 1: Exact Cash -->
+<label class="cursor-pointer bg-surface-container-low hover:bg-surface-container border border-surface-container-high/60 rounded-xl p-space-md flex items-center justify-between transition-all">
+<div class="flex items-center gap-space-md">
+<input class="sr-only" name="cod_denomination" onchange="updateChangeCalculation(34000, 0, 'No change needed')" type="radio" value="34000"/>
+<div class="radio-indicator w-5 h-5 rounded-full border-2 border-outline-variant flex items-center justify-center bg-surface-container-lowest">
+<div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">Exact Cash (USh 34,000)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">No change required from boda</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full font-semibold">0 Change</span>
+</label>
+<!-- Option 2: 40k -->
+<label class="cursor-pointer bg-surface-container-low hover:bg-surface-container border border-surface-container-high/60 rounded-xl p-space-md flex items-center justify-between transition-all">
+<div class="flex items-center gap-space-md">
+<input class="sr-only" name="cod_denomination" onchange="updateChangeCalculation(40000, 6000, '1x 5,000 note + 1x 1,000 coin')" type="radio" value="40000"/>
+<div class="radio-indicator w-5 h-5 rounded-full border-2 border-outline-variant flex items-center justify-center bg-surface-container-lowest">
+<div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">USh 40,000</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">2x 20,000 note bills</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-primary bg-primary-fixed/80 border border-primary/20 px-2.5 py-1 rounded-full font-bold">Change USh 6,000</span>
+</label>
+<!-- Option 3: 50k (Default Selected) -->
+<label class="cursor-pointer bg-surface-container-low border-2 border-primary rounded-xl p-space-md flex items-center justify-between transition-all shadow-[0_2px_8px_rgba(232,89,79,0.12)]">
+<div class="flex items-center gap-space-md">
+<input checked="" class="sr-only" name="cod_denomination" onchange="updateChangeCalculation(50000, 16000, '1x 10,000 note + 1x 5,000 note + 1x 1,000 coin')" type="radio" value="50000"/>
+<div class="radio-indicator w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-sm">
+<div class="w-2 h-2 rounded-full bg-on-primary"></div>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface font-bold flex items-center gap-2">
+                USh 50,000 Bill
+                <span class="bg-primary text-on-primary font-label-sm text-[10px] px-1.5 py-0.5 rounded-full font-bold">Selected</span>
+</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Single high-denomination note</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-primary bg-primary px-3 py-1.5 rounded-full shadow-sm font-bold">Change USh 16,000</span>
+</label>
+<!-- Option 4: Custom Note -->
+<label class="cursor-pointer bg-surface-container-low hover:bg-surface-container border border-surface-container-high/60 rounded-xl p-space-md flex items-center justify-between transition-all">
+<div class="flex items-center gap-space-md">
+<input class="sr-only" name="cod_denomination" onchange="toggleCustomInput()" type="radio" value="custom"/>
+<div class="radio-indicator w-5 h-5 rounded-full border-2 border-outline-variant flex items-center justify-center bg-surface-container-lowest">
+<div class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">Custom Note / Other</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">e.g. USh 100,000 note</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">edit_note</span>
+</label>
+</div>
+<!-- Custom Input (Hidden by default, shown via toggle) -->
+<div class="hidden flex-col gap-space-xs pt-space-xs" id="custom-tender-box">
+<label class="font-body-sm text-body-sm font-semibold text-on-surface" for="custom-input-field">Enter Exact Cash You Have (USh):</label>
+<div class="flex items-center bg-surface-container-low border border-surface-container-high rounded-xl px-space-md py-space-sm gap-space-sm focus-within:border-primary">
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">USh</span>
+<input class="bg-transparent w-full text-on-surface font-headline-sm text-headline-sm focus:outline-none" id="custom-input-field" min="34000" oninput="handleCustomTender(this.value)" placeholder="e.g. 100000" step="1000" type="number"/>
+</div>
+</div>
+</div>
+<!-- Dedicated Live Change Breakdown Box -->
+<div class="bg-inverse-surface text-inverse-on-surface rounded-2xl p-space-md shadow-md flex flex-col gap-space-md relative overflow-hidden">
+<!-- Ambient tactile graphic background -->
+<div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[130px] text-inverse-on-surface">point_of_sale</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[#ffb4ab] text-[22px]">calculate</span>
+<span class="font-headline-sm text-headline-sm text-inverse-on-surface font-bold">Live Change Calculator</span>
+</div>
+<span class="font-label-sm text-[10px] bg-white/15 text-inverse-on-surface px-2.5 py-0.5 rounded-full tracking-wider font-bold">REAL-TIME</span>
+</div>
+<!-- Row-by-Row Accounting -->
+<div class="flex flex-col gap-space-sm font-body-md text-body-md">
+<div class="flex justify-between items-center py-0.5">
+<span class="text-inverse-on-surface/75">Cash Tendered:</span>
+<span class="font-headline-sm text-[16px] text-inverse-on-surface font-bold" id="display-tendered">USh 50,000</span>
+</div>
+<div class="flex justify-between items-center py-0.5">
+<span class="text-inverse-on-surface/75">Order Due:</span>
+<span class="font-headline-sm text-[16px] text-inverse-on-surface font-bold">USh 34,000</span>
+</div>
+<div class="h-px bg-white/10 my-0.5"></div>
+<!-- Highlighted Change Badge -->
+<div class="bg-[#352523] border border-primary/40 rounded-xl p-space-md flex flex-col gap-space-xs shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-[15px] font-bold text-inverse-on-surface">Boda Rider Change to Bring:</span>
+<span class="font-headline-xl-mobile text-headline-xl-mobile text-primary font-extrabold" id="display-change">USh 16,000</span>
+</div>
+<div class="flex items-center gap-1.5 pt-1">
+<span class="material-symbols-outlined text-[18px] text-[#ffb4ab]">inventory_2</span>
+<span class="font-body-sm text-body-sm font-medium text-inverse-on-surface/90" id="display-breakdown">
+              Float pack: 1x 10,000 note + 1x 5,000 note + 1x 1,000 coin
+            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Anti-Fraud & Float Prep Notice Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md border border-surface-container-high/80 shadow-[0_2px_12px_rgba(34,26,24,0.04)] flex flex-col gap-space-sm">
+<div class="flex items-start gap-space-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container-high border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="Portrait of an experienced friendly Ugandan male boda-boda courier wearing an orange high-visibility delivery jacket and black certified motorcycle helmet, sunny Kampala street background, authentic warm documentary lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOL6D3TkOCzlhwy_Zc1xoFG-RG0Gxcbharkpwh6qlAplmPhVTZMERRSOyLjV9TprCVzVWRfsn4WBotvDsBCoSYwaXNZ-f9dPwR2wzyTOhK0R_MtBBovHkz0i-n21ja73yCuSxtuUQQdnK2zhi4v_nLrf70LTVuHYank0zb68hLUBwu-4C-d8B5elcTBn9I-31aJTwrJpxme-_E-2rJgOipP05aKlVI5KH0c5LpyM8-"/>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Boda Rider Juma</span>
+<span class="bg-[#eaf4ec] text-tertiary font-label-sm text-label-sm px-2.5 py-0.5 rounded-full flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+              VERIFIED
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span>Honda Ace 125 • UFF 418K</span>
+<span>•</span>
+<span class="text-primary font-bold">4.96 ★ (1,240 deliveries)</span>
+</span>
+</div>
+</div>
+<!-- Float Security Notice Text -->
+<div class="bg-surface-container-low border border-surface-container-high/60 rounded-xl p-space-sm flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0">security</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+<span class="font-bold text-on-surface">Float Guarantee:</span> Boda Rider Juma will carry the exact <span class="font-bold text-primary" id="security-notice-amt">USh 16,000</span> float. Please have your <span class="font-bold text-on-surface" id="security-tender-amt">USh 50,000</span> note ready before arrival. First-time COD verification complete.
+        </p>
+</div>
+<!-- Quick Delivery Timeline Tag -->
+<div class="flex items-center justify-between pt-space-xs font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">bolt</span>
+<span>Estimated arrival: <strong class="text-on-surface">22 - 28 mins</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">shield</span>
+<span>Zero-contact handover ready</span>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom CTA Dock -->
+<div class="pt-space-sm">
+<button class="w-full min-h-[54px] bg-primary active:bg-primary-container text-on-primary rounded-xl font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-sm shadow-[0_4px_14px_rgba(232,89,79,0.35)] transition-all" id="confirm-order-btn">
+<span class="material-symbols-outlined text-[22px]">lock</span>
+<span id="cta-label">CONFIRM ORDER • PREPARE USH 16,000 CHANGE</span>
+</button>
+<p class="text-center font-body-sm text-body-sm text-on-surface-variant mt-2">
+        Tap to notify kitchen to fire ticket and rider to reserve cash float
+      </p>
+</div>
+</div>
+<script>
+    const orderDue = 34000;
+
+    function formatUSh(num) {
+      return 'USh ' + num.toLocaleString();
+    }
+
+    function generateDenomBreakdown(change) {
+      if (change === 0) return 'No change needed (Exact payment)';
+      if (change < 0) return 'Cash tendered is less than order total!';
+      
+      let rem = change;
+      const parts = [];
+      
+      const note20k = Math.floor(rem / 20000);
+      if (note20k > 0) {
+        parts.push(note20k + 'x 20,000 note' + (note20k > 1 ? 's' : ''));
+        rem %= 20000;
+      }
+      
+      const note10k = Math.floor(rem / 10000);
+      if (note10k > 0) {
+        parts.push(note10k + 'x 10,000 note' + (note10k > 1 ? 's' : ''));
+        rem %= 10000;
+      }
+      
+      const note5k = Math.floor(rem / 5000);
+      if (note5k > 0) {
+        parts.push(note5k + 'x 5,000 note');
+        rem %= 5000;
+      }
+      
+      const note2k = Math.floor(rem / 2000);
+      if (note2k > 0) {
+        parts.push(note2k + 'x 2,000 note' + (note2k > 1 ? 's' : ''));
+        rem %= 2000;
+      }
+      
+      const coin1k = Math.floor(rem / 1000);
+      if (coin1k > 0) {
+        parts.push(coin1k + 'x 1,000 coin');
+        rem %= 1000;
+      }
+      
+      if (rem > 0) {
+        parts.push('USh ' + rem + ' small coins');
+      }
+
+      return 'Float pack: ' + parts.join(' + ');
+    }
+
+    function updateChangeCalculation(tendered, change, breakdownText) {
+      const customBox = document.getElementById('custom-tender-box');
+      if (customBox) customBox.classList.add('hidden');
+
+      document.getElementById('display-tendered').textContent = formatUSh(tendered);
+      document.getElementById('display-change').textContent = formatUSh(change);
+      document.getElementById('display-breakdown').textContent = breakdownText || generateDenomBreakdown(change);
+      
+      document.getElementById('security-tender-amt').textContent = formatUSh(tendered);
+      document.getElementById('security-notice-amt').textContent = formatUSh(change);
+      
+      const cta = document.getElementById('cta-label');
+      if (change === 0) {
+        cta.textContent = 'CONFIRM ORDER • EXACT CASH (NO CHANGE)';
+      } else {
+        cta.textContent = 'CONFIRM ORDER • PREPARE ' + formatUSh(change).toUpperCase() + ' CHANGE';
+      }
+    }
+
+    function toggleCustomInput() {
+      const customBox = document.getElementById('custom-tender-box');
+      if (customBox) {
+        customBox.classList.remove('hidden');
+        document.getElementById('custom-input-field').focus();
+      }
+    }
+
+    function handleCustomTender(val) {
+      const tenderNum = parseInt(val, 10);
+      if (isNaN(tenderNum) || tenderNum < orderDue) {
+        document.getElementById('display-tendered').textContent = isNaN(tenderNum) ? 'USh 0' : formatUSh(tenderNum);
+        document.getElementById('display-change').textContent = 'USh 0';
+        document.getElementById('display-breakdown').textContent = 'Please enter an amount of at least USh 34,000';
+        document.getElementById('cta-label').textContent = 'ENTER SUFFICIENT CASH AMOUNT';
+        return;
+      }
+
+      const changeAmt = tenderNum - orderDue;
+      const breakdown = generateDenomBreakdown(changeAmt);
+      
+      document.getElementById('display-tendered').textContent = formatUSh(tenderNum);
+      document.getElementById('display-change').textContent = formatUSh(changeAmt);
+      document.getElementById('display-breakdown').textContent = breakdown;
+      
+      document.getElementById('security-tender-amt').textContent = formatUSh(tenderNum);
+      document.getElementById('security-notice-amt').textContent = formatUSh(changeAmt);
+      
+      const cta = document.getElementById('cta-label');
+      if (changeAmt === 0) {
+        cta.textContent = 'CONFIRM ORDER • EXACT CASH (NO CHANGE)';
+      } else {
+        cta.textContent = 'CONFIRM ORDER • PREPARE ' + formatUSh(changeAmt).toUpperCase() + ' CHANGE';
+      }
+    }
+  </script>
+</div></main></body></html>

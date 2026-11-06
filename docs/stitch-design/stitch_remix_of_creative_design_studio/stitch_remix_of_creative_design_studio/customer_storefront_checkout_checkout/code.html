@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-primary-fixed-variant": "#8d1515",
+          "secondary-fixed": "#ffdbc7",
+          "on-tertiary-container": "#f6fff3",
+          "primary-container": "#cd453d",
+          "background": "#fff8f6",
+          "primary": "#ab2d28",
+          "on-primary-container": "#fffbff",
+          "secondary": "#974800",
+          "primary-fixed": "#ffdad6",
+          "tertiary-container": "#517f5b",
+          "surface-dim": "#e7d6d3",
+          "outline-variant": "#e0bfbb",
+          "surface-tint": "#ae2f2a",
+          "tertiary": "#396544",
+          "on-tertiary-fixed-variant": "#234f30",
+          "error": "#ba1a1a",
+          "surface-bright": "#fff8f6",
+          "inverse-surface": "#382e2c",
+          "error-container": "#ffdad6",
+          "surface-container-highest": "#f0dfdb",
+          "on-tertiary-fixed": "#00210c",
+          "surface": "#fff8f6",
+          "outline": "#8d706d",
+          "surface-container": "#fbeae7",
+          "on-secondary": "#ffffff",
+          "on-primary-fixed": "#410002",
+          "inverse-primary": "#ffb4ab",
+          "surface-container-low": "#fff0ed",
+          "on-tertiary": "#ffffff",
+          "on-error": "#ffffff",
+          "secondary-fixed-dim": "#ffb689",
+          "on-secondary-fixed-variant": "#733500",
+          "on-secondary-fixed": "#311300",
+          "on-background": "#221a18",
+          "primary-fixed-dim": "#ffb4ab",
+          "secondary-container": "#fd9348",
+          "inverse-on-surface": "#feede9",
+          "on-secondary-container": "#6b3100",
+          "tertiary-fixed": "#bdefc4",
+          "on-primary": "#ffffff",
+          "on-surface-variant": "#59413e",
+          "surface-container-lowest": "#ffffff",
+          "tertiary-fixed-dim": "#a2d2a9",
+          "on-error-container": "#93000a",
+          "surface-variant": "#f0dfdb",
+          "surface-container-high": "#f5e5e1",
+          "on-surface": "#221a18"
+        },
+        "borderRadius": {
+          "DEFAULT": "1rem",
+          "lg": "1.5rem",
+          "xl": "2rem",
+          "2xl": "2.25rem",
+          "3xl": "2.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin": "1.25rem",
+          "margin-mobile": "1rem",
+          "space-md": "1rem",
+          "space-2xs": "0.25rem",
+          "gutter-sm": "0.75rem",
+          "gutter-lg": "1.5rem",
+          "space-xs": "0.5rem",
+          "space-2xl": "3rem",
+          "space-sm": "0.75rem",
+          "gutter": "1rem",
+          "margin-desktop": "2.5rem",
+          "space-xl": "2rem",
+          "space-lg": "1.5rem"
+        },
+        "fontFamily": {
+          "headline-lg-mobile": ["Plus Jakarta Sans"],
+          "headline-lg": ["Plus Jakarta Sans"],
+          "headline-sm": ["Plus Jakarta Sans"],
+          "body-md": ["Plus Jakarta Sans"],
+          "body-lg": ["Plus Jakarta Sans"],
+          "headline-xl-mobile": ["Plus Jakarta Sans"],
+          "headline-xl": ["Plus Jakarta Sans"],
+          "headline-md": ["Plus Jakarta Sans"],
+          "label-lg": ["Plus Jakarta Sans"],
+          "body-sm": ["Plus Jakarta Sans"],
+          "label-md": ["Plus Jakarta Sans"],
+          "label-sm": ["Plus Jakarta Sans"],
+          "label-currency": ["Plus Jakarta Sans"],
+          "label-badge": ["Plus Jakarta Sans"],
+          "label-numeric": ["Plus Jakarta Sans"],
+          "label-pin": ["Plus Jakarta Sans"]
+        },
+        "fontSize": {
+          "headline-lg-mobile": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "headline-sm": ["17px", {"lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+          "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "headline-xl-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+          "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800"}],
+          "headline-md": ["20px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+          "label-lg": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+          "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+          "label-md": ["13px", {"lineHeight": "18px", "fontWeight": "600"}],
+          "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+          "label-currency": ["15px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+          "label-badge": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "700"}],
+          "label-numeric": ["16px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+          "label-pin": ["28px", {"lineHeight": "32px", "letterSpacing": "0.25em", "fontWeight": "700"}]
+        }
+      }
+    }
+  }
+</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl border-b border-surface-container-high/80 shadow-[0_2px_12px_rgba(171,45,40,0.04)]"><div class="h-20 w-full max-w-[1400px] mx-auto px-margin md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><div class="flex items-center gap-3"><span class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary-container text-on-primary flex items-center justify-center shadow-md shadow-primary/20"><span class="material-symbols-outlined text-2xl">local_fire_department</span></span><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary tracking-tight leading-none uppercase font-extrabold">Bazaar Flame &amp; Grill</span><span class="font-body-sm text-[11px] text-on-surface-variant font-medium mt-0.5">Gourmet Charcoal &amp; Direct-to-Consumer Kitchen Hub</span></div></div><div class="hidden xl:flex items-center gap-2 bg-surface-container-low px-space-sm py-1.5 rounded-full border border-outline-variant/40"><span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse"></span><span class="font-label-badge text-label-badge text-on-surface">Kampala, Uganda | EAT UTC+3</span></div></div><!-- Instant Search Bar with Clear [X] --><div class="flex-1 max-w-md hidden md:flex items-center relative"><div class="w-full flex items-center bg-surface-container-lowest border border-outline-variant/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 rounded-full px-4 py-2 transition-all shadow-sm"><span class="material-symbols-outlined text-primary text-lg mr-2">search</span><input class="w-full bg-transparent text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none" id="instant-search" placeholder="Search dishes (e.g., Tilapia, Luwombo, Rolex)..." type="text" value="Tilapia Flame"/><button class="p-1 hover:bg-surface-container text-on-surface-variant hover:text-on-surface rounded-full transition-colors" id="clear-search-btn" title="Clear Search"><span class="material-symbols-outlined text-base">close</span></button></div></div><div class="flex items-center gap-space-sm shrink-0"><!-- Dine-In Hybrid Pill Toggle --><div class="flex items-center gap-1.5 bg-surface-container text-on-surface px-3 py-1.5 rounded-full border border-outline-variant/50 text-xs font-semibold shadow-sm"><span class="material-symbols-outlined text-base text-primary">table_restaurant</span><span class="font-label-badge text-label-badge">Dine-In Hybrid: <span class="text-primary font-bold">?table=4</span></span></div><!-- Cart Summary Link Trigger --><button class="flex items-center gap-2 bg-gradient-to-r from-primary to-primary-container text-on-primary px-space-md py-2 rounded-full font-headline-sm text-body-md shadow-md shadow-primary/25 hover:brightness-105 active:scale-[0.98] transition-all" id="open-cart-checkout"><span class="material-symbols-outlined text-lg">shopping_bag</span><span class="hidden sm:inline">Basket</span><span class="bg-surface-container-lowest text-primary px-2 py-0.5 rounded-full text-label-badge font-extrabold shadow-sm" id="header-basket-count">2</span><span class="hidden lg:inline font-label-numeric ml-1 font-bold">USh 34,000</span></button></div></div></header><main class="w-full pt-20 bg-surface min-h-[calc(100vh-140px)]"><div class="flex flex-col w-full">
+<!-- Top Operational Micro-Banner -->
+<div class="w-full bg-surface-container-low/95 border-b border-outline-variant/30 py-space-xs px-margin md:px-margin-desktop">
+<div class="max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-space-sm font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-space-sm">
+<span class="flex h-2.5 w-2.5 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-tertiary"></span>
+</span>
+<span class="font-headline-sm text-label-badge text-primary uppercase tracking-wide font-bold">Live Dispatch Hub: Nakasero Relay active</span>
+<span class="hidden md:inline text-outline-variant">•</span>
+<span class="hidden md:inline">Current Wait: 20-25 mins</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="flex items-center gap-1.5 font-body-sm text-on-surface text-xs md:text-sm">
+<span class="material-symbols-outlined text-base text-tertiary">verified_user</span>
+          100% Sealed Food Guarantee: Serialized Tamper Tape
+        </span>
+<button class="flex items-center gap-1 bg-surface-container hover:bg-surface-container-high text-on-surface px-space-sm py-0.5 rounded-full font-headline-sm text-label-badge border border-outline-variant/40 transition-colors" id="toggle-active-order">
+<span>Live Tracking #KB-8492</span>
+<span class="material-symbols-outlined text-xs text-primary">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Category Navigation Pills (Horizontally Scrollable) -->
+<section class="w-full bg-surface-container-lowest border-b border-surface-container-high/80 sticky top-20 z-30 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<div class="max-w-[1400px] mx-auto px-margin md:px-margin-tablet lg:px-margin-desktop py-space-sm">
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5" id="category-pills">
+<button class="category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-surface-container-low text-on-surface hover:bg-surface-container border border-outline-variant/30" data-cat="all">
+          All
+        </button>
+<button class="category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-primary text-on-primary shadow-sm shadow-primary/20 flex items-center gap-1 border border-primary" data-cat="combos">
+<span>🔥 Combos</span>
+</button>
+<button class="category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-surface-container-low text-on-surface hover:bg-surface-container border border-outline-variant/30 flex items-center gap-1" data-cat="grills">
+<span>🍖 Grills</span>
+</button>
+<button class="category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-surface-container-low text-on-surface hover:bg-surface-container border border-outline-variant/30 flex items-center gap-1" data-cat="luwombo">
+<span>🍌 Luwombo</span>
+</button>
+<button class="category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-surface-container-low text-on-surface hover:bg-surface-container border border-outline-variant/30 flex items-center gap-1" data-cat="rolex">
+<span>Rolex &amp; Street</span>
+</button>
+<button class="category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-surface-container-low text-on-surface hover:bg-surface-container border border-outline-variant/30 flex items-center gap-1" data-cat="juices">
+<span>Fresh Juices</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Main Storefront Content + 2-Column Responsive Layout -->
+<div class="w-full max-w-[1400px] mx-auto px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl flex flex-col xl:flex-row gap-space-xl items-start">
+<!-- LEFT / MAIN COLUMN: Menu & Combos -->
+<div class="flex-1 w-full flex flex-col gap-space-xl">
+<!-- Section: Authentic Dishes from Spec -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-headline-sm text-label-badge text-primary uppercase tracking-wider font-bold">Kampala Spice &amp; Kinetic Grill</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Fresh Kitchen Direct Dishes</h1>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span> Live Charcoal Fired</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<!-- Dish Card 1: Whole Tilapia Flame Combo -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant/40 flex flex-col group hover:shadow-lg hover:shadow-primary/5 transition-all relative">
+<div class="relative h-56 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Golden crisp deep fried and charcoal flame grilled whole Lake Victoria Tilapia fish seasoned with Ugandan spice rub, served alongside golden potato chips, fresh lime wedges and chilled passion juice in amber light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr0yogyQueTPrslRiybTGOs5IqfmLKMfFP_dOe6CDic54kOTf_06YtWNpkRbKZxrklPGaOPuMf26z8cvr3E0k5ylnPQyYElyXipOuzhSFBftmSN9_eb0g91mYb-d6sSpSus3JimG4-ViY3nPB1d59NLCFkdlQiIYQkoGYTWDdyYoFnP9tbYWgQjOZSpKfxThDD-ojIyCezySH0YiTsRu7k0c-vGS80FK0Z5bOwP9Bs"/>
+<span class="absolute top-3 left-3 bg-inverse-surface/85 text-inverse-on-surface px-space-sm py-0.5 rounded-full font-label-badge text-[10px] tracking-wider uppercase backdrop-blur-sm">60KB WebP Optimized</span>
+<span class="absolute top-3 right-3 bg-primary text-on-primary px-3 py-1 rounded-full font-label-badge text-label-badge uppercase shadow-sm font-bold">Chef Combo</span>
+<span class="absolute bottom-3 left-3 bg-surface-container-lowest/95 text-on-surface px-space-md py-1.5 rounded-xl font-label-currency text-headline-sm backdrop-blur-sm shadow-sm border border-outline-variant/30">USh 32,000</span>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Whole Tilapia Flame Combo</h3>
+<span class="text-tertiary font-body-sm flex items-center gap-0.5 text-xs font-semibold"><span class="material-symbols-outlined text-sm">schedule</span> 20 min</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">Deep-fried or grilled Tilapia + Chips + Juice. Lake Victoria catch with aromatic spice crust.</p>
+</div>
+<div class="flex items-center justify-between pt-space-sm border-t border-surface-container-high/80">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Includes starch &amp; drink</span>
+<button class="bg-primary text-on-primary px-space-md py-2.5 rounded-full font-headline-sm text-body-md hover:bg-primary-container transition-all shadow-md shadow-primary/20 flex items-center gap-1.5" id="open-modifier-drawer-btn">
+<span class="material-symbols-outlined text-base">tune</span>
+<span>+ Customize</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dish Card 2: Quarter Charcoal Grilled Chicken -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant/40 flex flex-col group hover:shadow-lg hover:shadow-primary/5 transition-all relative">
+<div class="relative h-56 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Quarter charcoal flame grilled tender chicken glazed with local garlic herbs and roasted yellow plantain gonja on rustic banana leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw-3Lp2fne5LosXbWdC6uB6SBjWBF_5g1cOM4eXADVdwqwuaogDltgQ25ti5N8ixxvki3pnVKycTTVdDqC07xb4FBxJJ4iB08GFTNGI2l6DjYhUe4tD87fR0jqKno8rpuEJZJ3NLpEf1tCdxRnSZwbwbyNRRuRyjANTy7WwCI9J_bc7Cox13ghpEUWhm0xD5UzVbP20UIxXQi5Rojuz4Nw63XIcfBnBLq6zOdo7cEJ"/>
+<span class="absolute top-3 left-3 bg-inverse-surface/85 text-inverse-on-surface px-space-sm py-0.5 rounded-full font-label-badge text-[10px] tracking-wider uppercase backdrop-blur-sm">60KB WebP Optimized</span>
+<span class="absolute top-3 right-3 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-badge text-label-badge uppercase shadow-sm font-bold">Wood Charcoal</span>
+<span class="absolute bottom-3 left-3 bg-surface-container-lowest/95 text-on-surface px-space-md py-1.5 rounded-xl font-label-currency text-headline-sm backdrop-blur-sm shadow-sm border border-outline-variant/30">USh 18,000</span>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Quarter Charcoal Grilled Chicken</h3>
+<span class="text-tertiary font-body-sm flex items-center gap-0.5 text-xs font-semibold"><span class="material-symbols-outlined text-sm">schedule</span> 15 min</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">Flame-grilled with local herbs &amp; garlic glaze. Served with fresh tomato kachumbari.</p>
+</div>
+<div class="flex items-center justify-between pt-space-sm border-t border-surface-container-high/80">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Charcoal smoky crust</span>
+<button class="bg-surface-container-low hover:bg-primary hover:text-on-primary text-on-surface px-space-md py-2.5 rounded-full font-headline-sm text-body-md transition-all shadow-sm flex items-center gap-1.5 border border-outline-variant/40" onclick="addToCart('Quarter Charcoal Grilled Chicken', 18000)">
+<span class="material-symbols-outlined text-base">add</span>
+<span>+ Add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dish Card 3: Beef Luwombo Platter -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant/40 flex flex-col group hover:shadow-lg hover:shadow-primary/5 transition-all relative">
+<div class="relative h-56 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Traditional Ugandan royal beef Luwombo stew steamed in delicate smoked banana leaf parcels unwrapped on a rustic hand-woven mat, surrounded by fluffy yellow mashed matooke plantain and rich roasted groundnut peanut sauce" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVlhxAYQoTILioJ8rMcjhD2ptNNVGcmWp5TJ4U9ceuOBg7wkjUQKD1O6DCF0xuwtmw9JVfX7ANFt7c0RaGZYnrV1aKeJIUTExKxMIS4AesHpiVYXZX8v-XtVsjlW5o2mP6QcwjJG7WPjjKn1oJ2iTEJ6wK6ZeSdRb_KPjHOQddE_N01HI45gnTOgmW8uxm58pWGcg5dORBHLyHD_FD10H5gTCdlgYUxMGTbe7YOfBl"/>
+<span class="absolute top-3 left-3 bg-inverse-surface/85 text-inverse-on-surface px-space-sm py-0.5 rounded-full font-label-badge text-[10px] tracking-wider uppercase backdrop-blur-sm">60KB WebP Optimized</span>
+<span class="absolute top-3 right-3 bg-tertiary text-on-tertiary px-3 py-1 rounded-full font-label-badge text-label-badge uppercase shadow-sm font-bold">Royal Stew</span>
+<span class="absolute bottom-3 left-3 bg-surface-container-lowest/95 text-on-surface px-space-md py-1.5 rounded-xl font-label-currency text-headline-sm backdrop-blur-sm shadow-sm border border-outline-variant/30">USh 26,000</span>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Beef Luwombo Platter</h3>
+<span class="text-tertiary font-body-sm flex items-center gap-0.5 text-xs font-semibold"><span class="material-symbols-outlined text-sm">local_fire_department</span> Slow braised</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">Slow-steamed smoked tender beef in tied banana leaves, matooke &amp; rich g-nut stew.</p>
+</div>
+<div class="flex items-center justify-between pt-space-sm border-t border-surface-container-high/80">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Sealed leaf steamed</span>
+<button class="bg-surface-container-low hover:bg-primary hover:text-on-primary text-on-surface px-space-md py-2.5 rounded-full font-headline-sm text-body-md transition-all shadow-sm flex items-center gap-1.5 border border-outline-variant/40" onclick="addToCart('Beef Luwombo Platter', 26000)">
+<span class="material-symbols-outlined text-base">add</span>
+<span>+ Add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dish Card 4: Rolex Special Royale -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant/40 flex flex-col group hover:shadow-lg hover:shadow-primary/5 transition-all relative">
+<div class="relative h-56 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close up artisanal authentic Ugandan Rolex street food, flaky golden pan-toasted layered chapati rolled tightly with a steaming hot three-egg omelette filled with fresh finely shredded cabbage, sliced red tomatoes, and purple onions on rustic banana leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw-3Lp2fne5LosXbWdC6uB6SBjWBF_5g1cOM4eXADVdwqwuaogDltgQ25ti5N8ixxvki3pnVKycTTVdDqC07xb4FBxJJ4iB08GFTNGI2l6DjYhUe4tD87fR0jqKno8rpuEJZJ3NLpEf1tCdxRnSZwbwbyNRRuRyjANTy7WwCI9J_bc7Cox13ghpEUWhm0xD5UzVbP20UIxXQi5Rojuz4Nw63XIcfBnBLq6zOdo7cEJ"/>
+<span class="absolute top-3 left-3 bg-inverse-surface/85 text-inverse-on-surface px-space-sm py-0.5 rounded-full font-label-badge text-[10px] tracking-wider uppercase backdrop-blur-sm">60KB WebP Optimized</span>
+<span class="absolute top-3 right-3 bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-full font-label-badge text-label-badge uppercase shadow-sm font-bold">Kampala Classic</span>
+<span class="absolute bottom-3 left-3 bg-surface-container-lowest/95 text-on-surface px-space-md py-1.5 rounded-xl font-label-currency text-headline-sm backdrop-blur-sm shadow-sm border border-outline-variant/30">USh 8,000</span>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Rolex Special Royale</h3>
+<span class="text-tertiary font-body-sm flex items-center gap-0.5 text-xs font-semibold"><span class="material-symbols-outlined text-sm">schedule</span> 8 min</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">2 hot flaky chapatis, 3-egg omelette, diced sweet Nakasero tomatoes, shredded cabbage.</p>
+</div>
+<div class="flex items-center justify-between pt-space-sm border-t border-surface-container-high/80">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Direct pan rolled</span>
+<button class="bg-surface-container-low hover:bg-primary hover:text-on-primary text-on-surface px-space-md py-2.5 rounded-full font-headline-sm text-body-md transition-all shadow-sm flex items-center gap-1.5 border border-outline-variant/40" onclick="addToCart('Rolex Special Royale', 8000)">
+<span class="material-symbols-outlined text-base">add</span>
+<span>+ Add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Fuel Combo Builder (Section 2.1) -->
+<section class="bg-surface-container-lowest rounded-3xl p-space-lg lg:p-space-xl shadow-sm border border-outline-variant/40 flex flex-col gap-space-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-xs">
+<div>
+<span class="font-headline-sm text-label-badge text-primary uppercase tracking-wider font-bold">Fast Fuel Assembly</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Kampala Custom Flame Combo</h2>
+</div>
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-space-md py-1 rounded-full font-label-currency text-headline-sm font-bold border border-primary/20">
+            USh 21,500 Base
+          </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="bg-surface-container-low p-space-md rounded-2xl flex flex-col gap-space-xs border border-outline-variant/30">
+<span class="font-headline-sm text-body-md text-on-surface font-bold">1. Starch Base</span>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input checked="" class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-base" type="radio"/><span class="font-medium">Steamed Matooke</span></div><span class="text-tertiary font-semibold text-xs">Default</span></label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-base" type="radio"/><span class="font-medium">Spiced Pilau Rice</span></div><span class="text-on-surface-variant text-xs">+1,000</span></label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-base" type="radio"/><span class="font-medium">2x Flaky Chapatis</span></div><span class="text-on-surface-variant text-xs">Incl.</span></label>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-2xl flex flex-col gap-space-xs border border-outline-variant/30">
+<span class="font-headline-sm text-body-md text-on-surface font-bold">2. Braised Protein</span>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input checked="" class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-prot" type="radio"/><span class="font-medium">G-Nut Beef Cutlets</span></div><span class="text-tertiary font-semibold text-xs">Default</span></label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-prot" type="radio"/><span class="font-medium">Charcoal Smoked Chicken</span></div><span class="text-on-surface-variant text-xs">+1,500</span></label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-prot" type="radio"/><span class="font-medium">Simsim Tilapia Fish</span></div><span class="text-on-surface-variant text-xs">+3,000</span></label>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-2xl flex flex-col gap-space-xs border border-outline-variant/30">
+<span class="font-headline-sm text-body-md text-on-surface font-bold">3. Cold Pressed Juice</span>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input checked="" class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-juice" type="radio"/><span class="font-medium">Masaka Passion</span></div><span class="text-tertiary font-semibold text-xs">Fresh</span></label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-juice" type="radio"/><span class="font-medium">Luweero Mango</span></div><span class="text-on-surface-variant text-xs">Thick</span></label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer text-body-sm border border-outline-variant/20 hover:border-primary/40 transition-colors"><div class="flex items-center gap-2.5"><input class="text-primary focus:ring-primary/20 border-outline-variant" name="fc-juice" type="radio"/><span class="font-medium">Hibiscus Ginger Zobolo</span></div><span class="text-on-surface-variant text-xs">Spiced</span></label>
+</div>
+</div>
+<div class="flex items-center justify-end pt-space-xs">
+<button class="bg-primary text-on-primary px-space-lg py-3 rounded-full font-headline-sm text-body-md hover:bg-primary-container transition-all shadow-md shadow-primary/25 flex items-center gap-2" onclick="addToCart('Custom Kampala Flame Combo', 21500)">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+<span>Add Custom Combo to Cart</span>
+</button>
+</div>
+</section>
+</div>
+<!-- RIGHT COLUMN: Delivery Pin-Drop Checkout Sidebar (Section 2.2) -->
+<aside class="w-full xl:w-[440px] shrink-0 flex flex-col gap-space-md sticky top-24">
+<!-- Main Checkout Panel -->
+<div class="bg-surface-container-lowest rounded-3xl p-space-lg shadow-sm border border-outline-variant/40 flex flex-col gap-space-md">
+<!-- Section Header -->
+<div class="flex items-center justify-between border-b border-surface-container-high/80 pb-space-sm">
+<div class="flex items-center gap-2.5">
+<span class="w-8 h-8 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-lg">pin_drop</span></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Delivery Pin-Drop Checkout</h2>
+</div>
+<span class="text-label-badge font-headline-sm bg-tertiary-container/20 text-tertiary px-space-sm py-0.5 rounded-full font-bold">Sec. 2.2</span>
+</div>
+<!-- Target Basket MOV Indicator (USh 20,000 Minimum) -->
+<div class="bg-surface-container-low p-space-sm rounded-2xl flex flex-col gap-1.5 border border-outline-variant/30">
+<div class="flex items-center justify-between text-body-sm">
+<span class="font-headline-sm text-on-surface flex items-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-base text-tertiary">savings</span>
+              Target Basket MOV (USh 20,000)
+            </span>
+<span class="font-label-numeric text-tertiary font-bold text-xs" id="mov-amount-status">Goal Achieved! ✓</span>
+</div>
+<div class="w-full bg-surface-container-high h-2.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full transition-all duration-500" id="mov-progress-bar" style="width: 100%;"></div>
+</div>
+<span class="text-[11px] text-on-surface-variant" id="mov-helper-text">Free 5km delivery unlocked! Subtotal qualifies for hyper-local dispatch.</span>
+</div>
+<!-- Interactive Pin-Drop Map Visualizer (220px, fixed center crosshair pin) -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-body-sm">
+<span class="font-headline-sm text-on-surface font-bold">Precision Geo-Pin Drop</span>
+<span class="font-label-badge text-[11px] text-primary bg-primary-fixed px-2.5 py-0.5 rounded-full font-bold">Center Crosshair</span>
+</div>
+<div class="relative w-full h-[220px] rounded-2xl overflow-hidden shadow-inner border border-outline-variant/40 bg-surface-container-high select-none">
+<!-- Map Canvas Background (Kampala Street Grid / OSM Style) -->
+<div class="w-full h-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCA9iJYrn2NHFBYVG9BJNScLOFBaaXIfSLpiDfBKc1mGEg8Ruopz5hbjyyniS_ej49BObWjyW6MlV1KDn4kRRSkqbIpkvRwIIoaATS0mZkL0wSndjgb01mgO861to0lpFkJqVkKJ130mMp-Btm1NoBpZk0_yRXyUxHhh8JHLR7RN_QP7v_FGlxmGPRT6GFISvOjUEqUXXvZFJISIbP4ZMp0Vn6F6bjkSzRf9mm4prE8");'></div>
+<div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+<!-- Fixed Center Crosshair Pin -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+<div class="flex flex-col items-center animate-bounce -translate-y-2">
+<span class="bg-inverse-surface/90 text-inverse-on-surface text-[11px] font-headline-sm px-3 py-1 rounded-full shadow-lg border border-primary/30 whitespace-nowrap mb-1">
+                  📍 Drag Pin to House
+                </span>
+<span class="material-symbols-outlined text-4xl text-primary drop-shadow-md">location_on</span>
+</div>
+<div class="w-4 h-1.5 bg-on-surface/30 rounded-full blur-[1px]"></div>
+</div>
+<!-- Map Overlay Badge: Pinned Location & Fee -->
+<div class="absolute bottom-2.5 left-2.5 right-2.5 bg-surface-container-lowest/95 backdrop-blur-md p-2.5 rounded-xl border border-outline-variant/40 flex flex-col gap-1 shadow-sm">
+<div class="flex items-center justify-between text-body-sm">
+<span class="font-headline-sm text-on-surface flex items-center gap-1 text-xs font-semibold">
+<span class="material-symbols-outlined text-sm text-primary">my_location</span>
+                  Plot 14 Lumumba Ave, Nakasero (3.8 km)
+                </span>
+<span class="font-label-numeric text-xs text-on-surface-variant font-bold">3.8 KM</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[11px] text-tertiary font-bold bg-tertiary-container/20 px-2.5 py-0.5 rounded-full">
+                  Delivery Fee: USh 0 (Within Free 5 km Zone!)
+                </span>
+<span class="text-[11px] text-on-surface-variant">Boda Relay: 18m</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Basket Items Snapshot -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between text-body-sm">
+<span class="font-headline-sm text-on-surface font-bold">Items in Basket</span>
+<span class="text-xs text-on-surface-variant font-medium" id="cart-item-count">2 Selected</span>
+</div>
+<div class="flex flex-col gap-1.5 divide-y divide-surface-container-high/60" id="cart-items-list">
+<div class="flex items-center justify-between pt-1.5 text-body-sm">
+<div class="flex flex-col"><span class="font-headline-sm text-body-md text-on-surface leading-tight font-semibold">Whole Tilapia Flame Combo</span><span class="text-[11px] text-on-surface-variant">Light Salt • Extra Garlic Dip</span></div>
+<div class="flex items-center gap-2"><span class="font-label-numeric font-bold text-on-surface">USh 34,000</span><button class="text-primary hover:text-error transition-colors" onclick="removeCartItem(this, 34000)"><span class="material-symbols-outlined text-base">delete</span></button></div>
+</div>
+<div class="flex items-center justify-between pt-1.5 text-body-sm">
+<div class="flex flex-col"><span class="font-headline-sm text-body-md text-on-surface leading-tight font-semibold">Rolex Special Royale</span><span class="text-[11px] text-on-surface-variant">Qty: 1 • Street Pack</span></div>
+<div class="flex items-center gap-2"><span class="font-label-numeric font-bold text-on-surface">USh 8,000</span><button class="text-primary hover:text-error transition-colors" onclick="removeCartItem(this, 8000)"><span class="material-symbols-outlined text-base">delete</span></button></div>
+</div>
+</div>
+</div>
+<!-- Contact Fields (Section 2.2 Spec) -->
+<div class="flex flex-col gap-space-xs pt-space-xs border-t border-surface-container-high/80">
+<span class="font-headline-sm text-body-sm text-on-surface font-bold">Delivery Recipient</span>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<div>
+<label class="text-[11px] text-on-surface-variant font-medium">Full Name</label>
+<input class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low border border-outline-variant/40 font-headline-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="Sarah Namukasa"/>
+</div>
+<div>
+<label class="text-[11px] text-on-surface-variant font-medium">Uganda Phone</label>
+<input class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low border border-outline-variant/40 font-headline-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" type="tel" value="+256 772 000 111"/>
+</div>
+</div>
+<div>
+<label class="text-[11px] text-on-surface-variant font-medium">Gate / Delivery Instructions</label>
+<input class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low border border-outline-variant/40 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" type="text" value="Gate code 1234, call when at the gate"/>
+</div>
+</div>
+<!-- Payment Methods Selector (MTN MoMo selected, Airtel, COD, Visa/Mastercard) -->
+<div class="flex flex-col gap-space-xs pt-space-xs border-t border-surface-container-high/80">
+<span class="font-headline-sm text-body-sm text-on-surface font-bold">Payment Method</span>
+<div class="grid grid-cols-4 gap-1.5">
+<!-- MTN MoMo (Selected) -->
+<button class="pay-method-btn active p-2.5 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all bg-secondary-fixed/40 border-secondary text-on-surface shadow-sm font-semibold" id="pay-method-mtn" onclick="switchPayment('mtn')">
+<span class="material-symbols-outlined text-lg text-secondary">contactless</span>
+<span class="font-headline-sm text-[11px] leading-tight text-center">MTN MoMo</span>
+</button>
+<!-- Airtel Money -->
+<button class="pay-method-btn p-2.5 rounded-2xl border border-outline-variant/40 bg-surface-container-low hover:bg-surface-container flex flex-col items-center justify-center gap-1 transition-all text-on-surface font-semibold" id="pay-method-airtel" onclick="switchPayment('airtel')">
+<span class="material-symbols-outlined text-lg text-primary">phonelink_ring</span>
+<span class="font-headline-sm text-[11px] leading-tight text-center">Airtel</span>
+</button>
+<!-- Cash on Delivery -->
+<button class="pay-method-btn p-2.5 rounded-2xl border border-outline-variant/40 bg-surface-container-low hover:bg-surface-container flex flex-col items-center justify-center gap-1 transition-all text-on-surface font-semibold" id="pay-method-cod" onclick="switchPayment('cod')">
+<span class="material-symbols-outlined text-lg text-tertiary">payments</span>
+<span class="font-headline-sm text-[11px] leading-tight text-center">Cash (COD)</span>
+</button>
+<!-- Visa / Mastercard -->
+<button class="pay-method-btn p-2.5 rounded-2xl border border-outline-variant/40 bg-surface-container-low hover:bg-surface-container flex flex-col items-center justify-center gap-1 transition-all text-on-surface font-semibold" id="pay-method-card" onclick="switchPayment('card')">
+<span class="material-symbols-outlined text-lg text-primary-container">credit_card</span>
+<span class="font-headline-sm text-[11px] leading-tight text-center">Card</span>
+</button>
+</div>
+<!-- USSD Push Prompt Note (MTN / Airtel) -->
+<div class="bg-surface-container-low p-2.5 rounded-2xl flex items-start gap-2 border border-outline-variant/30" id="ussd-push-note">
+<span class="material-symbols-outlined text-primary text-base mt-0.5">flash_on</span>
+<p class="text-[11px] text-on-surface-variant leading-tight">
+<strong class="text-on-surface">Instant USSD PIN Prompt:</strong> Couriers &amp; telecommunications gateway will trigger a secure MTN MoMo PIN approval prompt directly to <strong class="text-on-surface">+256 772 000 111</strong> upon order authorization.
+            </p>
+</div>
+<!-- Cash Change Dropdown (Shown when COD selected) -->
+<div class="hidden flex flex-col gap-1 mt-1" id="cod-change-dropdown-wrap">
+<label class="text-[11px] text-on-surface-variant font-medium">Do you need change for?</label>
+<select class="w-full px-3 py-1.5 rounded-xl bg-surface-container-low border border-outline-variant/40 font-headline-sm text-body-sm text-on-surface focus:outline-none focus:border-primary">
+<option value="exact">Exact Cash (No Change Needed)</option>
+<option value="50k">USh 50,000 Bill</option>
+<option value="20k">USh 20,000 Bill</option>
+</select>
+</div>
+</div>
+<!-- Price Breakdown Totals -->
+<div class="flex flex-col gap-1.5 bg-surface-container-low/80 p-space-sm rounded-2xl font-body-sm text-body-sm border border-outline-variant/30">
+<div class="flex justify-between text-on-surface-variant">
+<span>Basket Subtotal</span>
+<span class="font-label-numeric font-bold text-on-surface" id="sidebar-subtotal">USh 42,000</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="flex items-center gap-1">Delivery Fee <span class="material-symbols-outlined text-xs text-tertiary">check_circle</span></span>
+<span class="font-label-numeric text-tertiary font-bold" id="sidebar-delivery-fee">USh 0 (Free)</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>Tamper Seal &amp; Box Packaging</span>
+<span class="font-label-numeric text-on-surface">USh 1,000</span>
+</div>
+<div class="flex justify-between text-on-surface font-headline-sm text-headline-sm pt-1 border-t border-surface-container-high/80">
+<span>Grand Total</span>
+<span class="font-headline-sm text-headline-sm text-primary font-extrabold" id="sidebar-grand-total">USh 43,000</span>
+</div>
+</div>
+<!-- Sticky Pay CTA: 'PAY USh 34,000 VIA MTN MOMO' -->
+<button class="w-full py-3.5 rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm shadow-lg shadow-primary/25 hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 sticky bottom-4 z-10 font-bold" id="sticky-pay-cta" onclick="executeCheckoutSimulation()">
+<span>PAY USh 34,000 VIA MTN MOMO</span>
+<span class="material-symbols-outlined text-xl">arrow_forward</span>
+</button>
+<!-- Anti-tamper security micro-copy -->
+<div class="bg-surface-container-high/70 p-3 rounded-2xl flex items-start gap-2 border border-outline-variant/40">
+<span class="material-symbols-outlined text-tertiary text-lg shrink-0">verified</span>
+<p class="text-[11px] text-on-surface-variant leading-snug">
+<strong class="text-on-surface">100% Sealed Food Guarantees:</strong> Serialized tamper tape. 4-digit handover PIN provided upon confirmation. Never accept an order with a broken red seal tag.
+            </p>
+</div>
+</div>
+</aside>
+</div>
+<!-- OPENED ITEM MODIFIERS BOTTOM SHEET / DRAWER (Section 2: Whole Tilapia Flame Combo) -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm flex justify-center items-end md:items-center p-0 md:p-space-md transition-opacity duration-300" id="modifiers-modal">
+<div class="w-full max-w-xl bg-surface-container-lowest rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-outline-variant/40 animate-slide-up">
+<!-- Drawer Top Bar -->
+<div class="p-space-lg bg-surface-container-low border-b border-surface-container-high/80 flex items-center justify-between shrink-0">
+<div class="flex items-center gap-space-sm">
+<div class="w-11 h-11 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-2xl">set_meal</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Whole Tilapia Flame Combo</h3>
+<span class="bg-primary/10 text-primary text-[10px] font-headline-sm px-2.5 py-0.5 rounded-full uppercase font-bold">Item Modifiers</span>
+</div>
+<span class="text-body-sm text-on-surface-variant">Deep-fried or grilled Tilapia + Chips + Juice (Base USh 32,000)</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container-high hover:bg-surface-container text-on-surface flex items-center justify-center transition-colors" onclick="document.getElementById('modifiers-modal').classList.add('hidden')">
+<span class="material-symbols-outlined text-base">close</span>
+</button>
+</div>
+<!-- Scrollable Modifier Sections -->
+<div class="p-space-lg flex-1 overflow-y-auto flex flex-col gap-space-lg">
+<!-- Section 1: Cooking Preference (Radio Group) -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-body-md text-on-surface flex items-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-primary text-base">skillet</span>
+              Section 1: Cooking Preference (Required)
+            </span>
+<span class="text-label-badge font-label-badge bg-surface-container-high text-on-surface-variant px-2.5 py-0.5 rounded-full font-bold">Radio Selection</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+<!-- Cooking Salt Radios -->
+<div class="bg-surface-container-low p-space-sm rounded-2xl flex flex-col gap-2 border border-outline-variant/30">
+<span class="text-xs font-headline-sm text-on-surface-variant uppercase font-bold tracking-wider">Salt Level</span>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container/60 transition-colors text-body-sm border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<input class="text-primary focus:ring-primary/20 border-outline-variant" name="mod-salt" type="radio" value="Normal Salt"/>
+<span class="font-medium text-on-surface">Normal Salt</span>
+</div>
+<span class="text-[11px] text-tertiary font-semibold">Standard</span>
+</label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container/60 transition-colors text-body-sm border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<input checked="" class="text-primary focus:ring-primary/20 border-outline-variant" name="mod-salt" type="radio" value="Light Salt"/>
+<span class="font-medium text-on-surface">Light Salt</span>
+</div>
+<span class="text-[11px] text-on-surface-variant">Recommended</span>
+</label>
+</div>
+<!-- Spice Heat Radios -->
+<div class="bg-surface-container-low p-space-sm rounded-2xl flex flex-col gap-2 border border-outline-variant/30">
+<span class="text-xs font-headline-sm text-on-surface-variant uppercase font-bold tracking-wider">Chili Heat</span>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container/60 transition-colors text-body-sm border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<input checked="" class="text-primary focus:ring-primary/20 border-outline-variant" name="mod-heat" type="radio" value="Mild"/>
+<span class="font-medium text-on-surface">Mild Heat</span>
+</div>
+<span class="text-[11px] text-on-surface-variant">Balanced</span>
+</label>
+<label class="flex items-center justify-between p-2.5 bg-surface-container-lowest rounded-xl cursor-pointer hover:bg-surface-container/60 transition-colors text-body-sm border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<input class="text-primary focus:ring-primary/20 border-outline-variant" name="mod-heat" type="radio" value="Hot Chili"/>
+<span class="font-medium text-on-surface">Hot Chili</span>
+</div>
+<span class="text-[11px] text-primary font-bold">Spicy</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Section 2: Free Omissions (Multi-Select Chips) -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-body-md text-on-surface flex items-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-primary text-base">do_not_disturb_on</span>
+              Section 2: Free Omissions (Multi-Select Chips)
+            </span>
+<span class="text-[11px] text-tertiary font-bold">Kitchen Note</span>
+</div>
+<div class="flex flex-wrap items-center gap-2">
+<!-- [✓] No Onions -->
+<button class="omission-chip flex items-center gap-1.5 px-space-md py-2 rounded-full border border-primary bg-primary-fixed/40 text-on-primary-fixed-variant font-headline-sm text-body-sm transition-all shadow-sm" data-selected="true" onclick="toggleOmission(this)">
+<span class="material-symbols-outlined text-base text-primary">check_circle</span>
+<span>[✓] No Onions</span>
+</button>
+<!-- [✓] No Pepper -->
+<button class="omission-chip flex items-center gap-1.5 px-space-md py-2 rounded-full border border-primary bg-primary-fixed/40 text-on-primary-fixed-variant font-headline-sm text-body-sm transition-all shadow-sm" data-selected="true" onclick="toggleOmission(this)">
+<span class="material-symbols-outlined text-base text-primary">check_circle</span>
+<span>[✓] No Pepper</span>
+</button>
+<button class="omission-chip flex items-center gap-1.5 px-space-md py-2 rounded-full border border-outline-variant/50 bg-surface-container-low text-on-surface-variant font-headline-sm text-body-sm transition-all hover:bg-surface-container" data-selected="false" onclick="toggleOmission(this)">
+<span class="material-symbols-outlined text-base">radio_button_unchecked</span>
+<span>No Mayo / Dip</span>
+</button>
+</div>
+</div>
+<!-- Section 3: Paid Upgrades (Counter/Add-On) -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-body-md text-on-surface flex items-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-tertiary text-base">add_circle</span>
+              Section 3: Paid Upgrades (Add-Ons)
+            </span>
+<span class="text-[11px] text-on-surface-variant">Tap to Add/Remove</span>
+</div>
+<div class="flex flex-col gap-2">
+<!-- [+] Extra Garlic Dip (+USh 2,000) (Active in mockup) -->
+<div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-2xl border border-primary/30">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-xl bg-surface-container-lowest text-primary flex items-center justify-center font-bold text-lg shadow-sm">+</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-semibold">Extra Garlic Dip</span>
+<span class="text-xs text-on-surface-variant">House roasted garlic &amp; lime reduction</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-numeric text-body-md text-primary font-bold">+USh 2,000</span>
+<button class="upgrade-btn px-3 py-1.5 rounded-full bg-primary text-on-primary font-headline-sm text-body-sm shadow-sm hover:bg-primary-container transition-all" data-active="true" data-cost="2000" onclick="toggleUpgrade(this)">
+                  [✓] Added
+                </button>
+</div>
+</div>
+<!-- [+] Extra Pilipili (+USh 1,000) -->
+<div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-2xl border border-outline-variant/30">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-xl bg-surface-container-lowest text-on-surface-variant flex items-center justify-center font-bold text-lg shadow-sm">+</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-semibold">Extra Pilipili Pepper</span>
+<span class="text-xs text-on-surface-variant">Freshly crushed bird's eye habanero</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-numeric text-body-md text-on-surface-variant font-bold">+USh 1,000</span>
+<button class="upgrade-btn px-3 py-1.5 rounded-full bg-surface-container hover:bg-primary hover:text-on-primary text-on-surface font-headline-sm text-body-sm transition-all" data-active="false" data-cost="1000" onclick="toggleUpgrade(this)">
+                  [+] Add
+                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom CTA in Bottom Sheet: '[ Add to Cart • USh 34,000 ]' -->
+<div class="p-space-md bg-surface-container-low border-t border-surface-container-high/80 flex items-center justify-between gap-space-md shrink-0">
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase font-medium">Tilapia Combo Total</span>
+<span class="font-headline-lg text-headline-sm text-primary font-extrabold" id="modifier-total-display">USh 34,000</span>
+</div>
+<button class="flex-1 py-3 px-space-lg rounded-full bg-primary text-on-primary font-headline-sm text-body-md hover:bg-primary-container transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2 font-bold" onclick="commitModifierItem()">
+<span class="material-symbols-outlined text-lg">check</span>
+<span>Add to Cart • USh 34,000</span>
+</button>
+</div>
+</div>
+</div>
+<!-- LIVE ORDER TRACKING MODAL (Secondary view accessible from header) -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm flex justify-end transition-opacity duration-300 opacity-0 pointer-events-none" id="live-order-drawer">
+<div class="w-full max-w-[460px] bg-surface-container-lowest h-full shadow-2xl flex flex-col justify-between overflow-y-auto transform translate-x-full transition-transform duration-300 ease-out" id="drawer-panel">
+<div class="p-space-lg bg-surface-container-low flex flex-col gap-space-sm border-b border-surface-container-high/80">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Order Live #KB-8492</span>
+</div>
+<button class="p-1 rounded-full hover:bg-surface-container-high text-on-surface transition-colors" id="close-drawer-btn">
+<span class="material-symbols-outlined text-lg">close</span>
+</button>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant text-body-sm">
+<span>Relay: Nakasero Central</span>
+<span class="font-headline-sm text-tertiary font-bold">EST. 18 MINS</span>
+</div>
+</div>
+<div class="p-space-lg flex-1 flex flex-col gap-space-lg">
+<!-- Handover 4-Digit Security PIN -->
+<div class="bg-inverse-surface text-inverse-on-surface p-space-lg rounded-3xl flex flex-col items-center justify-center text-center shadow-lg border border-primary/20">
+<span class="font-headline-sm text-label-badge text-primary-fixed uppercase tracking-widest font-bold">Handover 4-Digit Security PIN</span>
+<div class="font-headline-lg text-label-pin text-primary-fixed my-space-xs tracking-[0.3em] font-extrabold">4 8 2 1</div>
+<p class="text-body-sm text-surface-container-low leading-snug">Inspect red serialized tamper-evident seal before giving rider this code.</p>
+</div>
+<!-- Driver Card -->
+<div class="bg-surface-container-low p-space-md rounded-2xl flex items-center justify-between gap-space-md border border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="Boda boda delivery courier" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-T_5peIR13MyKdYspj8r2sUdDP5UXVjCHjsvajqeTKSI6cP17KTy3L2BQ1Ge0ZkSf_E4bmyn773UJutvyV1gvqnwGjLL8efy9CLFA42xCI1ClktB7AJoFgHFSQMnw_o9fLOV-9cKmDFxi-DAY9SRq2F9a7BleaDxLYF98AdewIoz31g7jXH9vanVxFvs9NC0_BS9nPZyU0d7q-BtRgEKDM3ztHXzECRDFrQFwfNCp"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-tertiary rounded-full border-2 border-surface flex items-center justify-center text-[9px] text-on-tertiary">✓</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-bold">Juma Kasule</span>
+<span class="text-xs text-on-surface-variant">Boxer 150 • Plate <strong class="text-on-surface font-bold">UFC 841X</strong></span>
+<span class="text-xs text-tertiary font-bold">4.92 ★ (1,480 drop-offs)</span>
+</div>
+</div>
+<a class="p-3 rounded-full bg-primary text-on-primary hover:bg-primary-container transition-colors shadow-sm" href="tel:+256772000000"><span class="material-symbols-outlined text-base">call</span></a>
+</div>
+</div>
+<div class="p-space-lg bg-surface-container-low flex flex-col gap-2 border-t border-surface-container-high/80">
+<button class="w-full py-3 bg-inverse-surface text-inverse-on-surface rounded-full font-headline-sm text-body-md hover:opacity-90 font-bold transition-opacity" onclick="document.getElementById('close-drawer-btn').click()">Return to Storefront</button>
+<span class="text-center text-xs text-on-surface-variant">Bazaar Hotline: +256 800 229 227 (Toll-Free)</span>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-low border-t border-surface-container-high/80 mt-space-2xl"><div class="w-full max-w-[1400px] mx-auto px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex flex-col sm:flex-row items-center gap-space-sm text-center sm:text-left"><span class="font-headline-sm text-headline-sm text-primary font-extrabold">BAZAAR FLAME &amp; GRILL</span><span class="hidden sm:inline text-outline-variant">•</span><span class="font-body-sm text-body-sm text-on-surface-variant">Kampala Direct-To-Consumer Food Hub © 2025</span><span class="bg-surface-container px-space-sm py-space-xs rounded-full font-label-badge text-label-badge text-tertiary font-bold border border-outline-variant/30">MTN &amp; Airtel MoMo USSD Rails</span></div><div class="flex items-center gap-space-lg text-on-surface-variant font-body-sm text-body-sm"><span class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>Plot 14 Lumumba Ave Relay Active</span><span>EAT UTC+3</span></div></div></footer>
+<script>
+  let cartTotal = 42000;
+  const MOV_MINIMUM = 20000;
+
+  // Search input clear button
+  const searchInput = document.getElementById('instant-search');
+  const clearBtn = document.getElementById('clear-search-btn');
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchInput.focus();
+  });
+
+  // Category filter chips active toggle
+  document.querySelectorAll('.category-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.category-pill').forEach(b => {
+        b.className = 'category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-surface-container-low text-on-surface hover:bg-surface-container border border-outline-variant/30';
+      });
+      btn.className = 'category-pill whitespace-nowrap px-space-md py-1.5 rounded-full font-headline-sm text-body-sm transition-all bg-primary text-on-primary shadow-sm shadow-primary/20 flex items-center gap-1 border border-primary';
+    });
+  });
+
+  // Modifiers Drawer Toggle
+  const modDrawerBtn = document.getElementById('open-modifier-drawer-btn');
+  const modModal = document.getElementById('modifiers-modal');
+  if (modDrawerBtn) {
+    modDrawerBtn.addEventListener('click', () => {
+      modModal.classList.remove('hidden');
+    });
+  }
+
+  function toggleOmission(btn) {
+    const isSelected = btn.getAttribute('data-selected') === 'true';
+    if (isSelected) {
+      btn.setAttribute('data-selected', 'false');
+      btn.className = 'omission-chip flex items-center gap-1.5 px-space-md py-2 rounded-full border border-outline-variant/50 bg-surface-container-low text-on-surface-variant font-headline-sm text-body-sm transition-all hover:bg-surface-container';
+      btn.innerHTML = `<span class="material-symbols-outlined text-base">radio_button_unchecked</span><span>${btn.innerText.replace('[✓] ', '')}</span>`;
+    } else {
+      btn.setAttribute('data-selected', 'true');
+      btn.className = 'omission-chip flex items-center gap-1.5 px-space-md py-2 rounded-full border border-primary bg-primary-fixed/40 text-on-primary-fixed-variant font-headline-sm text-body-sm transition-all shadow-sm';
+      btn.innerHTML = `<span class="material-symbols-outlined text-base text-primary">check_circle</span><span>[✓] ${btn.innerText.trim()}</span>`;
+    }
+  }
+
+  function toggleUpgrade(btn) {
+    const isActive = btn.getAttribute('data-active') === 'true';
+    const cost = parseInt(btn.getAttribute('data-cost'));
+    const totalDisplay = document.getElementById('modifier-total-display');
+    let base = 32000;
+    
+    // check garlic dip state
+    if (isActive) {
+      btn.setAttribute('data-active', 'false');
+      btn.className = 'upgrade-btn px-3 py-1.5 rounded-full bg-surface-container hover:bg-primary hover:text-on-primary text-on-surface font-headline-sm text-body-sm transition-all';
+      btn.textContent = '[+] Add';
+    } else {
+      btn.setAttribute('data-active', 'true');
+      btn.className = 'upgrade-btn px-3 py-1.5 rounded-full bg-primary text-on-primary font-headline-sm text-body-sm shadow-sm hover:bg-primary-container transition-all';
+      btn.textContent = '[✓] Added';
+    }
+
+    // calculate total
+    let addTotal = 0;
+    document.querySelectorAll('.upgrade-btn').forEach(b => {
+      if (b.getAttribute('data-active') === 'true') {
+        addTotal += parseInt(b.getAttribute('data-cost'));
+      }
+    });
+    const finalModPrice = base + addTotal;
+    totalDisplay.textContent = `USh ${finalModPrice.toLocaleString()}`;
+  }
+
+  function commitModifierItem() {
+    modModal.classList.add('hidden');
+    addToCart('Whole Tilapia Flame Combo', 34000);
+  }
+
+  // Cart operations
+  function addToCart(title, price) {
+    const list = document.getElementById('cart-items-list');
+    const itemEl = document.createElement('div');
+    itemEl.className = 'flex items-center justify-between pt-1.5 text-body-sm';
+    itemEl.innerHTML = `
+      <div class="flex flex-col">
+        <span class="font-headline-sm text-body-md text-on-surface leading-tight font-semibold">${title}</span>
+        <span class="text-[11px] text-on-surface-variant">Qty: 1 • Fresh order</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-label-numeric font-bold text-on-surface">USh ${price.toLocaleString()}</span>
+        <button onclick="removeCartItem(this, ${price})" class="text-primary hover:text-error transition-colors">
+          <span class="material-symbols-outlined text-base">delete</span>
+        </button>
+      </div>
+    `;
+    list.appendChild(itemEl);
+    cartTotal += price;
+    updateSidebarTotals();
+  }
+
+  function removeCartItem(btn, price) {
+    const row = btn.closest('.flex.items-center.justify-between');
+    if (row) {
+      row.remove();
+      cartTotal = Math.max(0, cartTotal - price);
+      updateSidebarTotals();
+    }
+  }
+
+  function updateSidebarTotals() {
+    const count = document.getElementById('cart-items-list').children.length;
+    document.getElementById('cart-item-count').textContent = `${count} Selected`;
+    document.getElementById('header-basket-count').textContent = count;
+    document.getElementById('sidebar-subtotal').textContent = `USh ${cartTotal.toLocaleString()}`;
+    const grand = cartTotal + 1000; // 1000 packaging
+    document.getElementById('sidebar-grand-total').textContent = `USh ${grand.toLocaleString()}`;
+    
+    // Update sticky CTA
+    const payCta = document.getElementById('sticky-pay-cta');
+    payCta.innerHTML = `<span>PAY USh ${grand.toLocaleString()} VIA MTN MOMO</span><span class="material-symbols-outlined text-xl">arrow_forward</span>`;
+
+    // MOV update
+    const movBar = document.getElementById('mov-progress-bar');
+    const movStatus = document.getElementById('mov-amount-status');
+    const movHelper = document.getElementById('mov-helper-text');
+    if (cartTotal >= MOV_MINIMUM) {
+      movBar.style.width = '100%';
+      movBar.className = 'bg-tertiary h-full rounded-full transition-all duration-500';
+      movStatus.textContent = 'Goal Achieved! ✓';
+      movStatus.className = 'font-label-numeric text-tertiary font-bold text-xs';
+      movHelper.textContent = 'Free 5km delivery unlocked! Subtotal qualifies for hyper-local dispatch.';
+    } else {
+      const needed = MOV_MINIMUM - cartTotal;
+      const pct = Math.max(10, Math.floor((cartTotal / MOV_MINIMUM) * 100));
+      movBar.style.width = `${pct}%`;
+      movBar.className = 'bg-primary h-full rounded-full transition-all duration-500';
+      movStatus.textContent = `USh ${needed.toLocaleString()} needed`;
+      movStatus.className = 'font-label-numeric text-primary font-bold text-xs';
+      movHelper.textContent = 'Add another side or drink to qualify for free 5km delivery!';
+    }
+  }
+
+  // Payment rail switcher
+  function switchPayment(method) {
+    const btnMtn = document.getElementById('pay-method-mtn');
+    const btnAirtel = document.getElementById('pay-method-airtel');
+    const btnCod = document.getElementById('pay-method-cod');
+    const btnCard = document.getElementById('pay-method-card');
+    const ussdNote = document.getElementById('ussd-push-note');
+    const codWrap = document.getElementById('cod-change-dropdown-wrap');
+    const payCta = document.getElementById('sticky-pay-cta');
+    const grandTotal = document.getElementById('sidebar-grand-total').textContent;
+
+    [btnMtn, btnAirtel, btnCod, btnCard].forEach(b => {
+      b.className = 'pay-method-btn p-2.5 rounded-2xl border border-outline-variant/40 bg-surface-container-low hover:bg-surface-container flex flex-col items-center justify-center gap-1 transition-all text-on-surface font-semibold';
+    });
+
+    if (method === 'mtn') {
+      btnMtn.className = 'pay-method-btn active p-2.5 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all bg-secondary-fixed/40 border-secondary text-on-surface shadow-sm font-semibold';
+      ussdNote.classList.remove('hidden');
+      codWrap.classList.add('hidden');
+      payCta.innerHTML = `<span>PAY ${grandTotal} VIA MTN MOMO</span><span class="material-symbols-outlined text-xl">arrow_forward</span>`;
+    } else if (method === 'airtel') {
+      btnAirtel.className = 'pay-method-btn active p-2.5 rounded-2xl border border-primary bg-primary-fixed/40 flex flex-col items-center justify-center gap-1 transition-all text-on-surface shadow-sm font-semibold';
+      ussdNote.classList.remove('hidden');
+      codWrap.classList.add('hidden');
+      payCta.innerHTML = `<span>PAY ${grandTotal} VIA AIRTEL MONEY</span><span class="material-symbols-outlined text-xl">arrow_forward</span>`;
+    } else if (method === 'cod') {
+      btnCod.className = 'pay-method-btn active p-2.5 rounded-2xl border border-tertiary bg-tertiary-container/20 flex flex-col items-center justify-center gap-1 transition-all text-on-surface shadow-sm font-semibold';
+      ussdNote.classList.add('hidden');
+      codWrap.classList.remove('hidden');
+      payCta.innerHTML = `<span>CONFIRM CASH ORDER • ${grandTotal}</span><span class="material-symbols-outlined text-xl">arrow_forward</span>`;
+    } else if (method === 'card') {
+      btnCard.className = 'pay-method-btn active p-2.5 rounded-2xl border border-primary bg-primary-fixed/40 flex flex-col items-center justify-center gap-1 transition-all text-on-surface shadow-sm font-semibold';
+      ussdNote.classList.add('hidden');
+      codWrap.classList.add('hidden');
+      payCta.innerHTML = `<span>PAY ${grandTotal} VIA CARD</span><span class="material-symbols-outlined text-xl">arrow_forward</span>`;
+    }
+  }
+
+  // Live order drawer
+  const liveDrawer = document.getElementById('live-order-drawer');
+  const panel = document.getElementById('drawer-panel');
+  const openOrderBtn = document.getElementById('toggle-active-order');
+  const closeOrderBtn = document.getElementById('close-drawer-btn');
+
+  function openTrackingDrawer() {
+    liveDrawer.classList.remove('pointer-events-none');
+    liveDrawer.classList.add('opacity-100');
+    panel.classList.remove('translate-x-full');
+  }
+
+  function closeTrackingDrawer() {
+    liveDrawer.classList.add('pointer-events-none');
+    liveDrawer.classList.remove('opacity-100');
+    panel.classList.add('translate-x-full');
+  }
+
+  openOrderBtn.addEventListener('click', openTrackingDrawer);
+  closeOrderBtn.addEventListener('click', closeTrackingDrawer);
+  liveDrawer.addEventListener('click', (e) => {
+    if (e.target === liveDrawer) closeTrackingDrawer();
+  });
+
+  function executeCheckoutSimulation() {
+    const trigger = document.getElementById('sticky-pay-cta');
+    const original = trigger.innerHTML;
+    trigger.innerHTML = `<span class="material-symbols-outlined animate-spin text-xl">refresh</span> Authorizing USSD Push...`;
+    trigger.disabled = true;
+    setTimeout(() => {
+      trigger.innerHTML = original;
+      trigger.disabled = false;
+      openTrackingDrawer();
+    }, 1100);
+  }
+
+  // Scroll to checkout on header basket click
+  document.getElementById('open-cart-checkout').addEventListener('click', () => {
+    document.querySelector('aside').scrollIntoView({ behavior: 'smooth' });
+  });
+</script></body></html>

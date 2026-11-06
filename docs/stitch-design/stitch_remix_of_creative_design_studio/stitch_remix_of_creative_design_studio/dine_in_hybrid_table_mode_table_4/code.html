@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dinein" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-primary-container": "#fffbff",
+          "tertiary-fixed-dim": "#a2d2a9",
+          "on-error-container": "#93000a",
+          "surface-variant": "#f0dfdb",
+          "secondary-container": "#fd9348",
+          "primary": "#ab2d28",
+          "primary-terracotta": "#e8594f",
+          "on-primary-fixed": "#410002",
+          "on-secondary": "#ffffff",
+          "on-surface-variant": "#59413e",
+          "primary-fixed-dim": "#ffb4ab",
+          "inverse-on-surface": "#feede9",
+          "tertiary": "#396544",
+          "surface-container-low": "#fff0ed",
+          "error": "#ba1a1a",
+          "on-surface": "#221a18",
+          "tertiary-container": "#517f5b",
+          "error-container": "#ffdad6",
+          "primary-container": "#cd453d",
+          "on-secondary-fixed": "#311300",
+          "secondary-fixed-dim": "#ffb689",
+          "outline": "#8d706d",
+          "on-tertiary-container": "#f6fff3",
+          "on-primary": "#ffffff",
+          "on-tertiary-fixed": "#00210c",
+          "surface-container": "#fbeae7",
+          "on-primary-fixed-variant": "#8d1515",
+          "surface-container-high": "#f5e5e1",
+          "on-secondary-fixed-variant": "#733500",
+          "surface": "#fff8f6",
+          "surface-container-highest": "#f0dfdb",
+          "secondary-fixed": "#ffdbc7",
+          "surface-tint": "#ae2f2a",
+          "surface-container-lowest": "#ffffff",
+          "background": "#fff8f6",
+          "secondary": "#974800",
+          "inverse-surface": "#382e2c",
+          "surface-dim": "#e7d6d3",
+          "primary-fixed": "#ffdad6",
+          "on-tertiary": "#ffffff",
+          "on-secondary-container": "#6b3100",
+          "on-tertiary-fixed-variant": "#234f30",
+          "on-background": "#221a18",
+          "surface-bright": "#fff8f6",
+          "inverse-primary": "#ffb4ab",
+          "outline-variant": "#e0bfbb",
+          "on-error": "#ffffff",
+          "tertiary-fixed": "#bdefc4"
+        },
+        "borderRadius": {
+          "DEFAULT": "1rem",
+          "lg": "1.5rem",
+          "xl": "2rem",
+          "2xl": "2.5rem",
+          "3xl": "3rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin": "1.25rem",
+          "space-2xs": "0.25rem",
+          "margin-desktop": "2.5rem",
+          "gutter-lg": "1.5rem",
+          "space-lg": "1.5rem",
+          "space-2xl": "3rem",
+          "margin-mobile": "1rem",
+          "space-xs": "0.5rem",
+          "gutter": "1rem",
+          "gutter-sm": "0.75rem",
+          "space-md": "1rem",
+          "space-sm": "0.75rem",
+          "space-xl": "2rem"
+        },
+        "fontFamily": {
+          "sans": ["Plus Jakarta Sans", "sans-serif"],
+          "headline-xl": ["Plus Jakarta Sans", "sans-serif"],
+          "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+          "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+          "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+          "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+          "body-md": ["Plus Jakarta Sans", "sans-serif"],
+          "body-sm": ["Plus Jakarta Sans", "sans-serif"],
+          "label-lg": ["Plus Jakarta Sans", "sans-serif"],
+          "label-md": ["Plus Jakarta Sans", "sans-serif"],
+          "label-sm": ["Plus Jakarta Sans", "sans-serif"]
+        }
+      }
+    }
+  };
+</script>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Header -->
+<header class="fixed top-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_2px_12px_rgba(34,26,24,0.04)]">
+<div class="h-20 w-full max-w-[1400px] mx-auto px-margin md:px-margin-desktop flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md shrink-0">
+<div class="flex items-center gap-3">
+<span class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary-terracotta to-primary text-on-primary flex items-center justify-center font-bold shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-2xl">restaurant_menu</span>
+</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-[17px] font-bold text-primary tracking-tight leading-none uppercase">Kampala Spice • Bazaar Grill</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant font-medium mt-1">Tabletop QR Order &amp; Direct Pay</span>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low text-primary px-3.5 py-1.5 rounded-full border border-primary-fixed shadow-sm">
+<span class="text-base leading-none">🍽️</span>
+<span class="text-body-sm font-bold tracking-wide">Dine-In: Table 4</span>
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse ml-0.5"></span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<button class="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface px-4 py-2 rounded-2xl text-body-sm font-semibold transition-all border border-outline-variant/40 hover:border-primary/40 shadow-sm" id="topCallWaiterBtn">
+<span class="material-symbols-outlined text-lg text-primary">notifications_active</span>
+<span class="hidden sm:inline">Call Waiter</span>
+</button>
+<div class="flex items-center gap-3 bg-surface-container-lowest px-3 py-2 rounded-2xl border border-outline-variant/30 shadow-sm">
+<div class="flex flex-col text-right pl-1">
+<span class="text-[10px] text-on-surface-variant font-semibold tracking-wider uppercase leading-tight">Table Bill</span>
+<span class="text-body-md font-extrabold text-primary">USh 48,000</span>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-3.5 py-2 rounded-xl font-bold text-body-sm transition-all flex items-center gap-1 shadow-sm">
+<span>Bill &amp; Pay</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main class="w-full pt-20 bg-surface min-h-[calc(100vh-140px)]">
+<div class="flex flex-col w-full">
+<div class="w-full max-w-[1400px] mx-auto px-margin md:px-margin-desktop py-space-lg flex flex-col gap-space-lg">
+<!-- Section 1: Dine-In Master Alert Banner (Warm Gourmet Terracotta theme) -->
+<div class="w-full bg-surface-container-low border border-primary-fixed/60 text-on-surface rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden">
+<div class="absolute -right-8 -bottom-8 w-60 h-60 rounded-full bg-gradient-to-br from-primary-fixed/50 to-primary-terracotta/10 pointer-events-none blur-xl"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
+<div class="flex items-start gap-5">
+<div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-primary-terracotta to-primary text-on-primary flex items-center justify-center shrink-0 shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-3xl">table_restaurant</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2.5">
+<span class="text-[20px] md:text-[24px] font-extrabold tracking-tight text-on-surface">🍽️ DINE-IN MODE: TABLE 4</span>
+<span class="bg-surface-container-lowest text-primary font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-outline-variant/30">INDOOR BOOTH 04</span>
+<span class="bg-tertiary text-on-tertiary font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed animate-pulse"></span> Live KDS Stream
+</span>
+</div>
+<p class="text-body-md text-on-surface-variant mt-2 max-w-2xl leading-relaxed">
+Ordering direct to your table inside <strong class="font-bold text-on-surface">Bazaar Flame &amp; Grill</strong>. No delivery fee, no minimum order limit, expedited indoor runner direct from charcoal hearth.
+</p>
+</div>
+</div>
+<!-- Dine-in Badges & Quick Controls -->
+<div class="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
+<div class="bg-surface-container-lowest/90 backdrop-blur px-4 py-2.5 rounded-2xl border border-outline-variant/30 flex items-center gap-3 shadow-sm">
+<span class="material-symbols-outlined text-tertiary text-2xl">bolt</span>
+<div class="flex flex-col">
+<span class="text-[11px] font-bold tracking-wider text-on-surface-variant uppercase">Kitchen Rail</span>
+<span class="text-body-sm font-extrabold text-on-surface">Direct Table Fire</span>
+</div>
+</div>
+<button class="bg-surface-container-lowest hover:bg-surface-container text-on-surface border border-outline-variant/40 hover:border-primary/40 px-5 py-3 rounded-2xl font-bold text-body-sm flex items-center gap-2 shadow-sm transition-all" id="callWaiterModalBtn">
+<span class="material-symbols-outlined text-primary text-xl">person_pin</span>
+<span>Call Table Server</span>
+</button>
+</div>
+</div>
+<!-- Dine-in Protocol Micro-Strip -->
+<div class="mt-6 pt-5 border-t border-outline-variant/30 flex flex-wrap items-center gap-y-3 gap-x-space-xl text-on-surface-variant font-body-sm text-sm">
+<div class="flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-base text-tertiary">check_circle</span>
+<span>Delivery Address: <strong class="font-bold text-on-surface underline decoration-primary-terracotta underline-offset-4">Tabletop QR Dock #04</strong></span>
+</div>
+<div class="flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-base text-tertiary">verified</span>
+<span>Boda Delivery Fee: <strong class="font-bold text-tertiary bg-tertiary-fixed/40 px-2 py-0.5 rounded-full">USh 0 (Bypassed)</strong></span>
+</div>
+<div class="flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-base text-tertiary">shopping_bag</span>
+<span>Min. Order Value (MOV): <strong class="font-bold text-tertiary bg-tertiary-fixed/40 px-2 py-0.5 rounded-full">USh 0 (None)</strong></span>
+</div>
+<div class="flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-base text-primary">speed</span>
+<span>Est. Table Runner: <strong class="font-bold text-on-surface">12–15 mins</strong></span>
+</div>
+</div>
+</div>
+<!-- Main Dine-In Grid: Catalog & Interactive Table Tray -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left 8 Cols: Food Selection & Menu Categories -->
+<div class="lg:col-span-8 flex flex-col gap-space-lg">
+<!-- Category Chips / Pills -->
+<div class="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+<button class="bg-primary hover:bg-primary-container text-on-primary px-5 py-2.5 rounded-full font-bold text-body-sm whitespace-nowrap shadow-sm shadow-primary/20 flex items-center gap-1.5 transition-all">
+<span>🔥 Combos</span>
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40 px-5 py-2.5 rounded-full font-semibold text-body-sm whitespace-nowrap transition-all">
+🍗 Charcoal Grills
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40 px-5 py-2.5 rounded-full font-semibold text-body-sm whitespace-nowrap transition-all">
+🍌 Traditional Luwombo
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40 px-5 py-2.5 rounded-full font-semibold text-body-sm whitespace-nowrap transition-all">
+🌯 Rolex Corner
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40 px-5 py-2.5 rounded-full font-semibold text-body-sm whitespace-nowrap transition-all">
+🥤 Cold Juices &amp; Sips
+</button>
+</div>
+<!-- MOV Exemption Banner -->
+<div class="bg-surface-container-low border border-primary-fixed rounded-2xl p-4 flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-xl bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-xl">local_dining</span>
+</div>
+<p class="text-body-sm text-on-surface-variant leading-snug">
+<strong class="font-bold text-on-surface">Table 4 Guest Privilege:</strong> Minimum Order Value bypassed (MOV = USh 0). Add single drinks, skewered bites, or full grills anytime during your seating!
+</p>
+</div>
+<!-- Menu Cards Container -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Dish 1: Whole Tilapia Flame Combo -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm hover:shadow-md border border-outline-variant/30 hover:border-primary-terracotta/40 transition-all flex flex-col justify-between group">
+<div>
+<div class="relative w-full h-52 rounded-2xl overflow-hidden mb-4 bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Whole fresh Lake Victoria Tilapia grilled to golden crisp perfection over glowing red wood charcoal, served on a sizzling black cast iron platter with fresh hand-cut chips, spicy shredded cabbage kachumbari, charred lemon slices, garnished with aromatic herbs in a warm ambient restaurant light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzQsf3wfcM4k8OFKgXJujP_DP72vf_hIFsGNGMTbKa2LslZxu9J3ioO2OyBWaHk7y4tXRI_OizGnHk53dEA6TWalmD-xTdUPbC20neP9IZCFpbeulJzDA5aCjgfPL6a99b705Ohqj7tHVSO1vAtF2-MLsHaaKMKvT7SjFEFD5fpip43wAwAqfJ67D-NkqmEj_MbR-E9AzAhS2Tx6hEazJkChD_cIKTnEpvnYfF55CH"/>
+<div class="absolute top-3 left-3 bg-primary text-on-primary font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow">
+Cast-Iron Sizzler
+</div>
+<div class="absolute bottom-3 right-3 bg-surface-container-lowest/90 backdrop-blur font-bold text-body-sm text-tertiary px-2.5 py-1 rounded-xl flex items-center gap-1.5 shadow">
+<span class="material-symbols-outlined text-sm">schedule</span> 18 min prep
+</div>
+</div>
+<div>
+<h3 class="text-[19px] font-bold text-on-surface">Whole Tilapia Flame Combo</h3>
+<p class="text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+Crispy seasoned Victoria catch hot on cast-iron sizzler. Accompanied by rustic potato chips, house chili salsa &amp; garden slaw.
+</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-5 mt-2 border-t border-outline-variant/20">
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wide">Table Portion</span>
+<span class="text-[20px] font-extrabold text-primary">USh 32,000</span>
+</div>
+<button class="bg-surface-container-low hover:bg-primary hover:text-on-primary text-on-surface border border-outline-variant/40 px-4 py-2.5 rounded-2xl font-bold text-body-sm transition-all flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-lg">tune</span>
+<span>Customize &amp; Add</span>
+</button>
+</div>
+</div>
+<!-- Dish 2: 2x Special Rolex (Already in order) -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm ring-2 ring-primary/50 relative flex flex-col justify-between group">
+<div class="absolute -top-3 right-5 bg-primary text-on-primary font-bold text-[11px] px-3.5 py-1 rounded-full shadow uppercase flex items-center gap-1 tracking-wider">
+<span class="material-symbols-outlined text-xs">done</span> In Active Order
+</div>
+<div>
+<div class="relative w-full h-52 rounded-2xl overflow-hidden mb-4 bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Classic Kampala street food style special Rolex served sliced on a wooden board, double fried farm eggs rolled inside hot layered golden flaky chapati with minced spiced tomatoes, onions, sweet bell peppers, and fresh cilantro, steam rising softly, high-contrast warm studio food lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnD8NfLfsXQ9kLbAUbjvk-rZexJFeHH2blx3nVQCkwkZWckiC44h7Gz0oEDSPzdRdHmy4Ei4zxX4xQi88KMVfnwEuXxAcgy2-fTqaMUeYUXxRKbV5Qu6b_o8FmI-4qzTZs6NITe7CgXROVUjFY2ZA-WYT8PYDDq-IO6V2UyM9PS7Ki4nFOOOnPZ4Ma1MyEk8oQRN7oCrbA5YBZT6Qt2zUlBpA1sSuiQO9eBRdSWHbg"/>
+<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur text-on-surface font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow">
+Tawa Griddle Fire
+</div>
+</div>
+<div>
+<h3 class="text-[19px] font-bold text-on-surface">2x Special Rolex (Tawa Griddle)</h3>
+<p class="text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+Double egg omelette, minced spiced garden onions, crisp shredded cabbage wrapped in two layered buttery chapatis.
+</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-5 mt-2 border-t border-outline-variant/20">
+<div class="flex flex-col">
+<span class="text-[11px] text-tertiary font-extrabold uppercase tracking-wide">Added to Table 4</span>
+<span class="text-[20px] font-extrabold text-primary">USh 18,000</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-low px-2 py-1 rounded-2xl border border-outline-variant/30">
+<button class="w-8 h-8 rounded-xl bg-surface-container-lowest flex items-center justify-center text-on-surface hover:bg-surface-container transition shadow-xs">
+<span class="material-symbols-outlined text-sm font-bold">remove</span>
+</button>
+<span class="font-extrabold text-body-md px-2">1</span>
+<button class="w-8 h-8 rounded-xl bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container transition shadow-sm">
+<span class="material-symbols-outlined text-sm font-bold">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dish 3: Quarter Charcoal Grilled Chicken -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm hover:shadow-md border border-outline-variant/30 hover:border-primary-terracotta/40 transition-all flex flex-col justify-between group">
+<div>
+<div class="relative w-full h-52 rounded-2xl overflow-hidden mb-4 bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Marinated spiced Ugandan charcoal grilled quarter chicken quarter leg with glistening charred skin, seasoned with ground coriander, paprika, garlic, served alongside grilled plantain gonja and fresh green chili dip on handcrafted terracotta tableware" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSQRq87GmSxCJXkGPtYU2ykdBkalBQBjad6M4WOWOrngnrp4L23Jfj4cQnntWESyPpWY7gzzMMB0VnXE-Q28GJcBjhf-MmrdTCHOKYw7uxJk9saZ4jbuuTdkNTQ1s5FP22eKeklAZxtX5_zp7yeTuJVFncKz-hdy50--RRQfmN4a1QK2ao574yMzL9hwtYahErqQV0FznUW44-HTDf0jDd0zGhbgAxUpkIIj-xObh0"/>
+<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur text-on-surface font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow">
+Slow Smoked
+</div>
+</div>
+<div>
+<h3 class="text-[19px] font-bold text-on-surface">Quarter Charcoal Grilled Chicken</h3>
+<p class="text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+Marinated overnight in Bugisu spices &amp; charred over sweetwood coals. Tender, smoky, served with grilled Gonja plantain.
+</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-5 mt-2 border-t border-outline-variant/20">
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wide">Table Portion</span>
+<span class="text-[20px] font-extrabold text-primary">USh 18,000</span>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-4 py-2.5 rounded-2xl font-bold text-body-sm transition-all flex items-center gap-1.5 shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+<span>Add to Table</span>
+</button>
+</div>
+</div>
+<!-- Dish 4: Beef Luwombo Stew -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm hover:shadow-md border border-outline-variant/30 hover:border-primary-terracotta/40 transition-all flex flex-col justify-between group">
+<div>
+<div class="relative w-full h-52 rounded-2xl overflow-hidden mb-4 bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Authentic Ugandan royal Beef Luwombo stew unwrapped inside fresh green smoked banana leaves, revealing tender beef cubes simmered slowly in rich groundnut peanut sauce with matooke plantain mash and steamed pumpkin in soft golden daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjzjoyeEDrg9WLgpgd9yj5C02ZK-eg127P1d-QtwCUl1gYs5FcdgWAK1f6riuniPhWm4gAWkgbOwWJPqFwQOHo66I5dr1KYuuIvJQPwIVhOzzkDUoNCZtbis0Jxs-QNxgPfVFRXnerMwKE5aDOSeFhKpY1di1f7Pq9AOyLEPc9WmGsYEz_0xVncZHD4VZ39i5HHQvoNmx_XisYcnhMfTbONH5_qiJzOZFzbn4ktakl"/>
+<div class="absolute top-3 left-3 bg-tertiary text-on-tertiary font-bold text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow">
+Heritage Pot
+</div>
+</div>
+<div>
+<h3 class="text-[19px] font-bold text-on-surface">Beef Luwombo Stew</h3>
+<p class="text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+Steamed patiently in smoked banana leaves with aromatic roasted peanut essence, sweet pumpkin wedges &amp; mashed Matooke.
+</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-5 mt-2 border-t border-outline-variant/20">
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase font-bold tracking-wide">Table Portion</span>
+<span class="text-[20px] font-extrabold text-primary">USh 26,000</span>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-4 py-2.5 rounded-2xl font-bold text-body-sm transition-all flex items-center gap-1.5 shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+<span>Add to Table</span>
+</button>
+</div>
+</div>
+<!-- Dish 5: Fresh Passion Juice -->
+<div class="bg-surface-container-lowest rounded-3xl p-5 shadow-sm hover:shadow-md border border-outline-variant/30 md:col-span-2">
+<div class="flex flex-col sm:flex-row gap-5 items-center">
+<div class="relative w-full sm:w-48 h-40 rounded-2xl overflow-hidden shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Chilled glass carafe of fresh Ugandan Masaka passion fruit juice with ice cubes and mint sprigs condensation running down glass surface, vivid golden amber nectar against textured wood tabletop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgkVwRs6IS5u_gbLhXUb5p3uAsKKlC3rcbLWKC3OeN8lqsV1r3pqKtnF4CyuRUCjRji_6D_sjGZgH9k1A8khNGtrMSjpHbbVs8okFQvRKkV_qzh4FKu9XohZVRljrcmICJtAOFJ0vUYqekU919ktJAU1wi4ifWXnDF6Ps0bmnyRX-Lv2mz64wU4gxWrDBNPxc4svFJBWrztv1j0BxBfvXuq_ZpO2dpfYUphcB1B8W8"/>
+</div>
+<div class="flex flex-col flex-1">
+<div class="flex items-center gap-2">
+<span class="text-[19px] font-bold text-on-surface">Fresh Masaka Passion Juice (Carafe)</span>
+<span class="bg-surface-container-low border border-outline-variant/30 px-2.5 py-0.5 rounded-full text-xs font-bold text-on-surface-variant">Cold Sip</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+100% cold-pressed organic passion fruits from Masaka hills. Lightly sweetened with sugarcane nectar, poured chilled table-side.
+</p>
+<div class="flex items-center justify-between mt-4 pt-3 border-t border-outline-variant/20">
+<span class="text-[20px] font-extrabold text-primary">USh 8,000</span>
+<button class="bg-surface-container-low hover:bg-primary hover:text-on-primary text-on-surface border border-outline-variant/40 px-4 py-2.5 rounded-2xl font-bold text-body-sm transition-all flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-base">add</span>
+<span>Add to Carafe</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Boda Map Omission Confirmation Box -->
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-3xl p-5 flex items-center justify-between text-on-surface-variant">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-2xl bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-2xl">explore_off</span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-sm text-on-surface font-bold">Delivery Map &amp; Courier Pin Disabled</span>
+<span class="text-body-sm text-on-surface-variant">Dining in at Table 4. GPS street routing, boda dispatch queue, and delivery tariffs do not apply.</span>
+</div>
+</div>
+<span class="bg-surface-container-lowest text-tertiary border border-outline-variant/30 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">TABLE QR ENGAGED</span>
+</div>
+</div>
+<!-- Right 4 Cols: Active Dine-In Table Tray / Order Panel -->
+<div class="lg:col-span-4 flex flex-col gap-space-md sticky top-24">
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-6 shadow-md flex flex-col gap-space-md">
+<!-- Tray Header -->
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/20">
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-2xl bg-surface-container-low text-primary flex items-center justify-center font-bold border border-primary-fixed">
+<span class="material-symbols-outlined text-xl">receipt_long</span>
+</span>
+<div>
+<h2 class="text-[18px] font-bold text-on-surface">Table 4 Order Tray</h2>
+<span class="text-body-sm text-on-surface-variant">Session #KLA-9402</span>
+</div>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">1 Item Active</span>
+</div>
+<!-- Table Tray Items -->
+<div class="flex flex-col gap-3">
+<div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-4 flex flex-col gap-2">
+<div class="flex items-start justify-between gap-2">
+<div class="flex flex-col">
+<span class="text-body-sm text-on-surface font-bold">2x Special Rolex (Tawa Griddle)</span>
+<span class="text-body-sm text-primary font-semibold flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-sm">local_fire_department</span> Modifier: Extra Fresh Chili
+</span>
+</div>
+<span class="text-body-md font-extrabold text-on-surface">USh 18,000</span>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant text-body-sm border-t border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="text-xs font-medium">Qty: 1</span>
+<span>•</span>
+<span class="text-xs text-tertiary font-bold">Ready to fire</span>
+</div>
+<button class="text-primary hover:underline text-xs font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs">delete</span> Remove
+</button>
+</div>
+</div>
+</div>
+<!-- KDS Kitchen Live Sync Note -->
+<div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-4 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-terracotta text-2xl mt-0.5">heat_pump</span>
+<div class="flex flex-col">
+<span class="text-body-sm text-on-surface font-bold">KDS Direct Kitchen Routing</span>
+<p class="text-body-sm text-on-surface-variant leading-relaxed mt-0.5">
+Displays amber <span class="bg-secondary-fixed text-on-secondary-fixed px-1.5 py-0.5 rounded-md font-bold text-xs">[TABLE 4 DINE-IN]</span> badge on chef expediter rail. Bypasses motorcycle dispatch pool.
+</p>
+</div>
+</div>
+<!-- Price Ledger -->
+<div class="flex flex-col gap-2.5 pt-2 border-t border-outline-variant/20 text-body-md">
+<div class="flex items-center justify-between text-on-surface-variant text-sm">
+<span>Kitchen Items Subtotal</span>
+<span class="font-bold text-on-surface">USh 18,000</span>
+</div>
+<div class="flex items-center justify-between text-tertiary text-sm font-semibold">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base">check_circle</span>
+Dine-In Indoor Service Fee
+</span>
+<span class="font-extrabold">USh 0</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant text-sm">
+<span>Local VAT / Gov Tax (18% Incl.)</span>
+<span class="font-medium text-on-surface">Included</span>
+</div>
+<div class="flex items-center justify-between text-on-surface pt-3 border-t border-outline-variant/20">
+<span class="text-[17px] font-bold">Order Due</span>
+<span class="text-[24px] font-extrabold text-primary">USh 18,000</span>
+</div>
+</div>
+<!-- Payment Choice Selector -->
+<div class="flex flex-col gap-2 pt-2">
+<label class="text-body-sm text-on-surface font-bold">Settlement Method</label>
+<div class="grid grid-cols-2 gap-2.5">
+<label class="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition border border-outline-variant/30 has-[:checked]:bg-primary-fixed has-[:checked]:text-on-primary-fixed has-[:checked]:border-primary/40 text-center">
+<input checked="" class="sr-only" name="settlement_mode" type="radio" value="momo"/>
+<span class="material-symbols-outlined text-2xl text-primary mb-1">payments</span>
+<span class="text-body-sm font-bold">Pay Now MoMo</span>
+<span class="text-[11px] opacity-80 mt-0.5">MTN / Airtel Instant</span>
+</label>
+<label class="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition border border-outline-variant/30 has-[:checked]:bg-primary-fixed has-[:checked]:text-on-primary-fixed has-[:checked]:border-primary/40 text-center">
+<input class="sr-only" name="settlement_mode" type="radio" value="cash"/>
+<span class="material-symbols-outlined text-2xl text-on-surface-variant mb-1">handshake</span>
+<span class="text-body-sm font-bold">Pay at Table</span>
+<span class="text-[11px] opacity-80 mt-0.5">Cash / Card Terminal</span>
+</label>
+</div>
+</div>
+<!-- Master Action CTA Button -->
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary py-4 px-4 rounded-2xl font-extrabold text-body-lg shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2 group" id="submitTableOrderBtn">
+<span>FIRE TICKET TO KITCHEN</span>
+<span class="font-extrabold">(USh 18,000)</span>
+<span class="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+<!-- Safe Table Confirmation Micro-text -->
+<p class="text-[12px] text-center text-on-surface-variant leading-normal">
+⚡ Table 4 station is locked to this session. Your runner Ronald K. will be alerted immediately upon order release.
+</p>
+</div>
+<!-- Tabletop Bill & Summary Pill -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-5 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-surface-container-low text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">receipt</span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-sm text-on-surface font-bold">Full Table Ledger</span>
+<span class="text-xs text-on-surface-variant">Includes earlier drinks</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-body-md font-extrabold text-on-surface">USh 48,000</span>
+<button class="bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40 px-3.5 py-1.5 rounded-xl text-body-sm font-bold transition">
+View Receipt
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro-Modal: Call Table Waiter Prompt -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-sm hidden items-center justify-center p-4" id="waiterModal">
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2.5">
+<span class="w-10 h-10 rounded-2xl bg-surface-container-low text-primary flex items-center justify-center border border-primary-fixed">
+<span class="material-symbols-outlined">notifications_active</span>
+</span>
+<h3 class="text-[20px] font-extrabold text-on-surface">Call Table Server</h3>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container transition" id="closeWaiterModalBtn">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<p class="text-body-sm text-on-surface-variant">
+Need assistance at <strong class="text-on-surface font-bold">Indoor Booth 04 (Table 4)</strong>? Choose a request for server Ronald K.:
+</p>
+<div class="grid grid-cols-1 gap-2.5">
+<button class="waiter-action-btn flex items-center justify-between p-3.5 rounded-2xl bg-surface-container-low hover:bg-primary-fixed text-on-surface hover:text-on-primary-fixed border border-outline-variant/20 text-left transition font-semibold text-body-sm">
+<span>Need Extra Cutlery &amp; Napkins</span>
+<span class="material-symbols-outlined text-sm">restaurant</span>
+</button>
+<button class="waiter-action-btn flex items-center justify-between p-3.5 rounded-2xl bg-surface-container-low hover:bg-primary-fixed text-on-surface hover:text-on-primary-fixed border border-outline-variant/20 text-left transition font-semibold text-body-sm">
+<span>Request Ice / Clean Glasses</span>
+<span class="material-symbols-outlined text-sm">local_bar</span>
+</button>
+<button class="waiter-action-btn flex items-center justify-between p-3.5 rounded-2xl bg-surface-container-low hover:bg-primary-fixed text-on-surface hover:text-on-primary-fixed border border-outline-variant/20 text-left transition font-semibold text-body-sm">
+<span>Bring Physical POS Card Machine</span>
+<span class="material-symbols-outlined text-sm">credit_card</span>
+</button>
+<button class="waiter-action-btn flex items-center justify-between p-3.5 rounded-2xl bg-surface-container-low hover:bg-primary-fixed text-on-surface hover:text-on-primary-fixed border border-outline-variant/20 text-left transition font-semibold text-body-sm">
+<span>General Question / Consultation</span>
+<span class="material-symbols-outlined text-sm">support_agent</span>
+</button>
+</div>
+<div class="hidden bg-tertiary text-on-tertiary p-3.5 rounded-2xl font-bold text-body-sm text-center" id="waiterSuccessAlert">
+🔔 Waiter Ronald paged! Arriving at Table 4 within 60 seconds.
+</div>
+</div>
+</div>
+<!-- Interactive Script for Dine-In Experience -->
+<script>
+    (function initDineInExperience() {
+      const waiterModal = document.getElementById('waiterModal');
+      const callWaiterBtn = document.getElementById('callWaiterModalBtn');
+      const topCallWaiterBtn = document.getElementById('topCallWaiterBtn');
+      const closeWaiterBtn = document.getElementById('closeWaiterModalBtn');
+      const waiterActionBtns = document.querySelectorAll('.waiter-action-btn');
+      const waiterSuccessAlert = document.getElementById('waiterSuccessAlert');
+      const submitOrderBtn = document.getElementById('submitTableOrderBtn');
+
+      function openModal() {
+        if (!waiterModal) return;
+        waiterModal.classList.remove('hidden');
+        waiterModal.classList.add('flex');
+      }
+
+      function closeModal() {
+        if (!waiterModal) return;
+        waiterModal.classList.add('hidden');
+        waiterModal.classList.remove('flex');
+        if (waiterSuccessAlert) waiterSuccessAlert.classList.add('hidden');
+      }
+
+      if (callWaiterBtn) callWaiterBtn.addEventListener('click', openModal);
+      if (topCallWaiterBtn) topCallWaiterBtn.addEventListener('click', openModal);
+      if (closeWaiterBtn) closeWaiterBtn.addEventListener('click', closeModal);
+
+      waiterActionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (waiterSuccessAlert) {
+            waiterSuccessAlert.classList.remove('hidden');
+            setTimeout(() => {
+              closeModal();
+            }, 1800);
+          }
+        });
+      });
+
+      if (submitOrderBtn) {
+        submitOrderBtn.addEventListener('click', () => {
+          const originalHTML = submitOrderBtn.innerHTML;
+          submitOrderBtn.disabled = true;
+          submitOrderBtn.innerHTML = `
+            <span class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
+            <span>SENDING TICKET TO TABLE 4 KDS...</span>
+          `;
+          
+          setTimeout(() => {
+            submitOrderBtn.innerHTML = `
+              <span class="material-symbols-outlined text-xl">check_circle</span>
+              <span>TICKET FIRED TO KITCHEN!</span>
+            `;
+            submitOrderBtn.classList.remove('bg-primary');
+            submitOrderBtn.classList.add('bg-tertiary');
+            
+            setTimeout(() => {
+              submitOrderBtn.innerHTML = originalHTML;
+              submitOrderBtn.disabled = false;
+              submitOrderBtn.classList.remove('bg-tertiary');
+              submitOrderBtn.classList.add('bg-primary');
+            }, 3000);
+          }, 1200);
+        });
+      }
+    })();
+  </script>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface-container-low border-t border-outline-variant/30 mt-space-2xl">
+<div class="w-full max-w-[1400px] mx-auto px-margin md:px-margin-desktop py-space-xl flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex flex-col sm:flex-row items-center gap-space-sm text-center sm:text-left">
+<span class="text-body-sm font-bold text-on-surface">BAZAAR DINE-IN SERVICE</span>
+<span class="hidden sm:inline text-on-surface-variant">•</span>
+<span class="text-body-sm text-on-surface-variant">Table 4 Session Active</span>
+<span class="bg-surface-container-lowest border border-outline-variant/30 px-3 py-1 rounded-full text-xs font-bold text-tertiary">Instant Kitchen Ticket Fire</span>
+</div>
+<div class="flex items-center gap-space-lg text-on-surface-variant text-body-sm">
+<span>Plot 14 Lumumba Ave</span>
+<span>Server: Ronald K.</span>
+</div>
+</div>
+</footer>
+</body></html>
