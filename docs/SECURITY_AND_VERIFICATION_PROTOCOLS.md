@@ -1,270 +1,176 @@
-# SECURITY_AND_VERIFICATION_PROTOCOLS.md
+# SECURITY AND VERIFICATION PROTOCOLS
 
-> **v1.1 normative amendment:** Custom staff sessions, plaintext PINs, in-memory lockout, and COD OTP storage are superseded by [`DECISIONS.md`](DECISIONS.md) ADR-001/003/013 and the migration. Staff use Supabase Auth; handover-PIN state is durable.
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **Supersedes** | v1.0 custom sessions, plaintext PINs, in-memory lockout, and OTP prose |
+| **Authority** | `supabase/migrations/20261029000000_initial_schema.sql`, `API_CONTRACTS.md`, `DECISIONS.md` ADR-001/002/003/013 |
 
-## Document Control & Metadata
-* **Document Version:** 1.0.0
-* **Status:** Approved Security Specification
-* **Target Audience:** Security Engineers, Backend Developers & Antigravity Agentic Builders
-* **Core Mandate:** Zero-Trust Verification, Cash Protection, Anti-Tampering, and Fraud Mitigation
-* **Operational Setting:** Kampala, Uganda (EAT / UTC+3)
-
----
-
-## 1. Threat Model & Security Posture
-
-In a direct-to-consumer food ordering and motorcycle delivery system, financial losses typically arise from operational fraud rather than sophisticated network intrusions. 
-
-The security architecture mitigates five specific threat vectors:
-
-```
-┌───────────────────────────────────────┬────────────────────────────────────────────────────────┐
-│ Threat Vector                         │ Architectural Counter-Measure                          │
-├───────────────────────────────────────┼────────────────────────────────────────────────────────┤
-│ 1. Frontend Price Tampering           │ Zero-Trust Server Recalculation Pipeline               │
-│ 2. False Delivery Claims              │ Cryptographic 4-Digit Handover PIN Verification Gate   │
-│ 3. Cash on Delivery (COD) Abuse       │ Phone Number OTP Gate + Risk Blacklisting              │
-│ 4. OSRM Routing API Scraping          │ IP-Based Leaky Bucket Rate Limiting & Keystroke Debounce│
-│ 5. Concurrency Race Conditions        │ PostgreSQL Atomic Row-Level Locking (`FOR UPDATE`)     │
-└───────────────────────────────────────┴────────────────────────────────────────────────────────┘
-```
+This document defines the security controls that the production implementation must preserve. It no longer contains illustrative code that bypasses the schema.
 
 ---
 
-## 2. The 4-Digit Handover PIN Verification Protocol
+## 1. Threat Model
 
-The Handover PIN serves as non-repudiable physical proof that the food package was transferred from the motorcycle rider to the customer.
-
-```
-[ Order Created ] ──(DB Trigger: pgcrypto)──> Generates 4-Digit PIN (e.g., '4821')
-                                                        │
-                      ┌─────────────────────────────────┴─────────────────────────────────┐
-                      ▼                                                                   ▼
-       [ Customer Storefront Token ]                                          [ Boda Rider View ]
-      PIN visible on /orders/[token]                                       PIN IS NEVER SENT TO RIDER!
-                      │                                                                   │
-                      └─────────────(Customer verbally shares PIN)────────────────────────┘
-                                                        │
-                                                        ▼
-                                           [ Rider Enters PIN: '4821' ]
-                                                        │
-                                    [ Server Action: verify_delivery_pin ]
-                                                        │
-                              ┌─────────────────────────┴─────────────────────────┐
-                              ▼                                                   ▼
-                         (Matches)                                           (Mismatches)
-                              │                                                   │
-                              ▼                                                   ▼
-                   • order_status = DELIVERED                           • Increment failed_attempts
-                   • delivered_at = now()                               • If attempts >= 3:
-                   • If COD: payment_status = PAID                        LOCK ORDER & ALERT ADMIN
-```
-
-### 2.1 Cryptographic Token Isolation
-* **Column Security:** The `handover_pin` column is strictly isolated in PostgreSQL.
-* **API Redaction:** The Supabase RLS policy for riders explicitly strips the `handover_pin` field from all `SELECT` queries executed on `/rider`. The rider's smartphone browser **never** possesses the plain-text PIN in its DOM or memory.
-* **Single Verification Gateway:** The only way to validate a PIN is through a protected Server Action that returns a boolean `match` flag.
-
-### 2.2 Atomic Verification Server Action (TypeScript)
-```typescript
-// src/actions/rider.ts
-"use server";
-
-import { createServerClient } from "@/lib/supabase/server";
-import { revalidatePath } from "next/cache";
-
-interface VerifyPinResponse {
-  success: boolean;
-  error?: "INVALID_PIN" | "MAX_ATTEMPTS_EXCEEDED" | "ORDER_LOCKED" | "UNAUTHORIZED";
-  remainingAttempts?: number;
-}
-
-export async function verifyDeliveryPin(
-  orderId: string,
-  riderId: string,
-  submittedPin: string
-): Promise<VerifyPinResponse> {
-  const supabase = createServerClient();
-
-  // 1. Fetch current order with strict lock
-  const { data: order, error } = await supabase
-    .from("orders")
-    .select("id, handover_pin, order_status, payment_method, rider_id")
-    .eq("id", orderId)
-    .single();
-
-  if (error || !order || order.rider_id !== riderId) {
-    return { success: false, error: "UNAUTHORIZED" };
-  }
-
-  if (order.order_status !== "OUT_FOR_DELIVERY") {
-    return { success: false, error: "ORDER_LOCKED" };
-  }
-
-  // 2. Fetch attempt counter from Redis/Database session
-  const attemptKey = `pin_attempts:${orderId}`;
-  const currentAttempts = await getAttemptCount(attemptKey);
-
-  if (currentAttempts >= 3) {
-    // Flag order for manager intervention on /admin
-    await supabase
-      .from("orders")
-      .update({ customer_notes: "SECURITY ALERT: 3 Failed PIN Attempts. Verification Locked." })
-      .eq("id", orderId);
-
-    return { success: false, error: "MAX_ATTEMPTS_EXCEEDED", remainingAttempts: 0 };
-  }
-
-  // 3. Cryptographic Constant-Time Comparison
-  // Prevents timing attacks on the 4-digit token
-  const pinBufferA = Buffer.from(order.handover_pin);
-  const pinBufferB = Buffer.from(submittedPin.trim());
-
-  const isMatch =
-    pinBufferA.length === pinBufferB.length &&
-    crypto.timingSafeEqual(pinBufferA, pinBufferB);
-
-  if (!isMatch) {
-    const newCount = await incrementAttemptCount(attemptKey);
-    const remaining = Math.max(0, 3 - newCount);
-    return { success: false, error: "INVALID_PIN", remainingAttempts: remaining };
-  }
-
-  // 4. Successful Verification: Atomic State Mutation
-  const updates: Record<string, unknown> = {
-    order_status: "DELIVERED",
-    delivered_at: new Date().toISOString(),
-  };
-
-  // If order was Cash on Delivery, this transition marks payment collected
-  if (order.payment_method === "CASH_ON_DELIVERY") {
-    updates.payment_status = "PAID";
-  }
-
-  await supabase.from("orders").update(updates).eq("id", orderId);
-
-  // Clear attempt counter
-  await clearAttemptCount(attemptKey);
-
-  revalidatePath("/rider");
-  revalidatePath(`/orders/${orderId}`);
-
-  return { success: true };
-}
-
-// In-memory or Redis-backed rate limiter simulation
-const attemptStore = new Map<string, number>();
-
-async function getAttemptCount(key: string): Promise<number> {
-  return attemptStore.get(key) || 0;
-}
-
-async function incrementAttemptCount(key: string): Promise<number> {
-  const current = (attemptStore.get(key) || 0) + 1;
-  attemptStore.set(key, current);
-  return current;
-}
-
-async function clearAttemptCount(key: string): Promise<void> {
-  attemptStore.delete(key);
-}
-```
+| Threat | Control |
+| :--- | :--- |
+| Client-side price tampering | Server-side recalculation from database prices and OSRM metres; client totals are ignored |
+| Fake delivery / false handover | Per-order 4-digit handover PIN verified by a durable `SECURITY DEFINER` RPC |
+| COD abuse and prank orders | 8.1 km COD ceiling, first-time-customer OTP, phone normalization, blacklist, delivery-failure events |
+| Order injection | No public `INSERT` on `orders`; creation only through a trusted server action after validation |
+| Rider overreach | Riders have no direct table writes; claim/start/release/verify are token-scoped RPCs using `auth.uid()` |
+| PIN or PII leakage | Column privileges revoked, safe RPC payloads, no raw `postgres_changes` on orders/telemetry |
+| Webhook forgery | Flutterwave `verif-hash` shared-secret comparison plus independent transaction verification |
+| Replay / duplicate webhook | `webhook_events(provider, provider_event_id)` unique constraint and processed-at state |
+| Brute force | Upstash distributed limits, Supabase Auth lockout, database PIN attempts/lockout |
+| OSRM scraping | Authenticated distance proxy, coordinate quantisation, 24 h cache, per-IP rate limit |
+| Search-path hijack | Every `SECURITY DEFINER` function sets `search_path = public, pg_temp` |
 
 ---
 
-## 3. Server-Side Price & Distance Hardening (Zero-Trust Pipeline)
+## 2. Identity and Session Model
 
-Web applications are inherently vulnerable to malicious users intercepting network requests or altering frontend JavaScript state (e.g., modifying item prices in browser memory from `USh 32,000` to `USh 1,000`).
+### 2.1 Staff
 
-### 3.1 Zero-Trust Checkout Execution Schema
-The checkout Server Action (`createOrderAction`) rejects **all client-calculated financial totals**:
+All staff (`ADMIN`, `KITCHEN`, `RIDER`) authenticate with **Supabase Auth**.
 
-```
-[ Client Sends Only Identifiers ]
-  • items: [{ id: "m1", quantity: 2, modifier_ids: ["mod_1"] }]
-  • target_coordinates: { lat: 0.3476, lng: 32.5825 }
-  • payment_method: "MTN_MOMO"
-                   │
-                   ▼
-[ Server-Side Pipeline Execution ]
-  1. Fetch actual DB prices for items and modifiers
-  2. Compute items_subtotal = Sum(db_price * qty)
-  3. Validate Minimum Order Value: items_subtotal >= MOV
-  4. Query OSRM routing engine independently for driving distance
-  5. Apply exact 5 km tier formula on server
-  6. Fetch default packaging fee from app_settings
-  7. Compute total_amount = subtotal + modifiers + packaging + delivery_fee
-  8. Insert transaction record into Supabase
-```
+1. The login screen accepts a Ugandan phone number and a **6-digit staff PIN**.
+2. The server normalizes the phone to E.164 and maps it to the synthetic email
+   `{digits}@staff.bazaareats.com`.
+3. The server calls `signInWithPassword`. Supabase stores only the password hash.
+4. The resulting JWT populates `auth.uid()` for RLS, RPCs, and Broadcast.
+5. Sessions last 12 hours. Logout revokes the refresh token.
+6. Five failed login attempts for one phone in 15 minutes lock login for 15 minutes.
+7. Staff PINs are never stored in `public.profiles` and never logged.
 
-### 3.2 Zod Input Validation Schema
-Every incoming checkout payload is parsed strictly:
+**Provisioning:** `scripts/seed-staff.mjs` creates the Auth user first, then the `profiles` row with the matching UUID and role. `profiles.id REFERENCES auth.users(id)` is mandatory. A staff account is deactivated by setting `profiles.is_active = false` and revoking the Auth user.
 
-```typescript
-import { z } from "zod";
+### 2.2 Customers
 
-export const CreateOrderInputSchema = z.object({
-  customerName: z.string().trim().min(2).max(100),
-  customerPhone: z
-    .string()
-    .trim()
-    .regex(
-      /^(?:\+256|0)(?:7[0-9]|20)[0-9]{7}$/,
-      "Must be a valid Ugandan phone number (e.g., +256772000111 or 0772000111)"
-    ),
-  orderType: z.enum(["DELIVERY", "DINE_IN"]),
-  tableNumber: z.string().trim().max(10).optional(),
-  deliveryCoordinates: z
-    .object({
-      latitude: z.number().min(-1.5).max(4.5), // Uganda geographic bounding box
-      longitude: z.number().min(29.5).max(35.0),
-    })
-    .optional(),
-  deliveryAddressText: z.string().trim().max(300).optional(),
-  items: z
-    .array(
-      z.object({
-        menuItemId: z.string().uuid(),
-        quantity: z.number().int().min(1).max(50),
-        modifierIds: z.array(z.string().uuid()).default([]),
-      })
-    )
-    .min(1, "Cart cannot be empty"),
-  paymentMethod: z.enum(["MTN_MOMO", "AIRTEL_MONEY", "CASH_ON_DELIVERY", "BANK_CARD"]),
-  codChangeRequestedFor: z.number().int().optional(),
-  customerNotes: z.string().trim().max(500).optional(),
-});
-```
+Customers do not create accounts. Each order receives:
+
+- an unguessable UUID `order_token` used only in the customer URL;
+- a 4-digit `handover_pin` that is shown only in the token-scoped tracker response;
+- no JWT and no direct table access.
+
+The token is a bearer capability. It must never appear in logs, referrers, analytics events, or staff list payloads.
+
+### 2.3 Route Guards
+
+| Route group | Guard |
+| :--- | :--- |
+| `/` and `/checkout` | Public, rate-limited, store-open gate |
+| `/orders/[token]` | Token-scoped RPC only; invalid/expired token shows the not-found state |
+| `/kitchen` | `KITCHEN` or `ADMIN` |
+| `/rider` | `RIDER` |
+| `/admin` | `ADMIN` |
+
+Middleware denies by default. Every server action repeats the role check; middleware is not the only control. The service-role key is imported only in server-only modules and is never bundled to the client.
 
 ---
 
-## 4. Driver Authentication & Session Authorization
+## 3. Handover PIN Protocol
 
-Motorcycle riders operate in fast-paced environments with gloved hands and smartphone mounts. Complex alphanumeric passwords cause high friction, leading riders to bypass the system.
+### 3.1 Generation and isolation
 
-### 4.1 Low-Friction 4-Digit Driver PIN Authentication
-* Each of the 5 motorcycle riders is assigned a persistent record in `public.profiles` with a role of `'RIDER'`.
-* Riders log in at `/rider` using their **Registered Phone Number** and a **4-Digit Staff PIN**.
+- `orders.handover_pin` is generated in the database with `pgcrypto` (`gen_random_bytes`), never `RANDOM()`.
+- The value is exactly 4 digits and is constrained by `CHECK (handover_pin ~ '^[0-9]{4}$')`.
+- `anon` and `authenticated` have no `SELECT` privilege on the column. The rider payload never contains it.
+- The customer sees the PIN only in `get_order_by_token(p_token)`.
+- Admin PIN reset uses `admin_reset_handover_pin(order_id, reason)`, which writes an audit row and clears attempts/lockout.
 
-### 4.2 Rider Session Claims (JWT)
-Upon successful PIN validation, the server generates a scoped session cookie (`httpOnly`, `secure`, `sameSite: 'strict'`):
-```typescript
-interface RiderSessionToken {
-  userId: string;
-  role: "RIDER";
-  motorcyclePlate: string; // e.g., 'UFD 342B'
-  exp: number;             // 12-hour session duration
-}
-```
+### 3.2 Verification
 
-* **Role Isolation:** A rider session token cannot access `/admin` or `/kitchen`. 
-* **Row-Level Enforcement:** PostgreSQL RLS policies restrict riders to updating only orders where `rider_id = auth.uid()` or where `order_status = 'READY_FOR_PICKUP'` (for the unclaimed pool).
+`verify_delivery_pin(p_order_id, p_pin, p_lat, p_lng, p_ip_hash, p_user_agent)` is the only verification path. It:
+
+1. Requires a rider JWT and derives the rider from `auth.uid()` — there is no `p_rider_id`.
+2. Locks the order row with `FOR UPDATE` and requires `order_status = 'OUT_FOR_DELIVERY'` and `rider_id = auth.uid()`.
+3. Refuses while `pin_locked_until > now()`.
+4. Optionally checks the rider's submitted coordinates against the delivery pin within `app_settings.pin_geofence_m`.
+5. Compares the PIN and persists every attempt in `pin_verification_attempts`.
+6. On failure increments `failed_pin_attempts`; at `pin_max_attempts` (3) sets `pin_locked_until` to `now() + pin_lock_minutes` (15) and `security_flag = 'PIN_LOCKED'`.
+7. On success transitions to `DELIVERED`, sets `delivered_at`, clears attempts and lockout, and for COD sets `payment_status = 'PAID'` and `cod_collected_at`.
+
+The rider UI reports the returned `code` (`INVALID_HANDOVER_PIN`, `PIN_LOCKED`, `TOO_FAR_FROM_DESTINATION`, `ORDER_STATE_INVALID`) and remaining attempts. Completion requires a connection: while offline, the UI blocks the handover with an explanation and keeps the PIN form. It never queues the completion, never offers “sync now”, and never reports “Delivered” before `verify_delivery_pin` succeeds.
+
+### 3.3 Offline completion
+
+- Do not store the completion intent or the PIN locally; offline completion is blocked.
+- No background retry or replay of a handover exists, so no completion can be reported late.
+- Cash liability changes only after the server returns success.
+- If the connection is unavailable, the rider is told to reconnect or contact the customer or admin; the order remains open.
 
 ---
 
-## 5. Cash on Delivery (COD) Anti-Fraud Protocols
+## 4. Row-Level Security and RPC Boundary
 
-Cash orders carry inherent financial risks: malicious users submitting fake orders, resulting in wasted food and stranded motorcycle fuel.
+The migration is deny-by-default.
+
+- RLS is enabled on every application table.
+- `anon` and `authenticated` receive no direct `INSERT`/`UPDATE`/`DELETE` on `orders`, `order_items`, `order_item_modifiers`, `payment_transactions`, `webhook_events`, `refunds`, `profiles`, `cash_settlements`, `rider_telemetry`, `notifications`, `admin_audit_log`, or `settings_history`.
+- Customer reads use `get_order_by_token`, `get_order_telemetry`, `get_public_settings`, and `submit_feedback`.
+- Rider reads/writes use `get_rider_pool`, `get_rider_active_order`, `claim_order_atomic`, `start_delivery`, `release_order`, `verify_delivery_pin`, `report_delivery_failed`, `update_rider_telemetry`, `start_rider_shift`, and `end_rider_shift`.
+- Kitchen reads/writes use `get_kitchen_orders`, `accept_order`, `bump_order`, `set_kitchen_busy`, and `set_menu_item_availability`.
+- Admin operations use the audited `admin_*`, `reconcile_rider_cash`, `get_admin_ledger`, and `get_admin_analytics` RPCs or server actions.
+- Safe views/RPCs omit phone numbers, exact addresses, notes, payment references, and PINs from the unclaimed pool.
+- `claim_order_atomic` accepts only `p_order_id`; it rejects a rider who already has a `CLAIMED` or `OUT_FOR_DELIVERY` order.
+- Every public mutation has an idempotency key or a natural unique event constraint.
+
+Supabase Realtime uses Broadcast from trusted server code plus polling. Raw `postgres_changes` is prohibited on tables containing PII or secrets.
+
+---
+
+## 5. COD, OTP, and Blacklist
+
+- COD is allowed only within `app_settings.cod_max_radius_km` (8.1 km, founder gate F-14).
+- A first-time COD customer must verify a 6-digit OTP sent by Africa's Talking.
+- OTPs are stored hashed in `otp_verifications`, expire after 10 minutes, allow 3 attempts, and are limited to 3 sends per phone per hour.
+- If the SMS provider is unavailable, COD checkout is disabled with a clear message. Verification is never silently skipped.
+- A returning customer with at least one successfully delivered order may skip OTP when the setting permits it.
+- Phones are normalized to E.164 by `normalize_ug_phone`; `customer_phone_normalized` is indexed and unique per customer record where required.
+- A confirmed COD refusal/abandonment creates a `delivery_attempts` row with outcome `REFUSED`, `CUSTOMER_UNAVAILABLE`, `WRONG_ADDRESS`, or `RETURNED`. Admin review may add the normalized phone to `blacklisted_phones`; future COD is disabled for that phone.
+
+---
+
+## 6. Checkout Integrity
+
+The server accepts identifiers only:
+
+```ts
+type CheckoutInput =
+  | { orderType: "DELIVERY"; delivery: { lat: number; lng: number; address: string }; tableToken?: never }
+  | { orderType: "DINE_IN"; tableToken: string; delivery?: never };
+```
+
+Validation requirements:
+
+- Valid Ugandan phone, normalized server-side.
+- Non-empty cart; quantity 1–20 per line; cart value and line count within `app_settings`.
+- Delivery requires coordinates and an address; dine-in requires a valid table token.
+- Payment method in the approved enum.
+- `idempotency_key` required and unique per customer/session; a replay returns the existing order.
+- Store-open gate checked server-side in `Africa/Kampala`.
+- MOV checked against items + modifiers only; dine-in MOV is 0.
+- Packaging is 1,000 for delivery and 0 for dine-in.
+- Delivery fee is computed from integer `road_distance_m`; food totals never come from the client.
+- `total_amount` is generated from its components and protected by a trigger.
+- Promotions are not part of v1.
+
+---
+
+## 7. Rate Limits and Abuse Controls
+
+| Surface | Limit | Store |
+| :--- | :--- | :--- |
+| `/api/distance` | 30 requests/minute/IP | Upstash |
+| Checkout | 5 attempts/minute/IP and 10/hour/phone | Upstash |
+| Staff login | 5 attempts/15 minutes/phone | Upstash + Supabase Auth |
+| OTP send | 3/hour/phone | Upstash + database |
+| Handover PIN | 3 attempts/order, then 15-minute lock | PostgreSQL |
+| Public tracker | 60 requests/minute/token | Upstash |
+| Feedback | 3 submissions/order | PostgreSQL |
 
 ### 5.1 First-Time Customer OTP Verification Gate
 * If a customer selects **Cash on Delivery**, the backend checks the customer's phone number against past order history:
@@ -290,29 +196,43 @@ CREATE TABLE public.blacklisted_phones (
 * If a delivery is marked `CANCELLED` due to the customer refusing payment or disappearing upon rider arrival, the phone number is added to `blacklisted_phones`.
 * Future checkout attempts from this number automatically disable Cash on Delivery, requiring 100% upfront digital payment via MTN MoMo or Airtel Money.
 
----
-
-## 6. Rate Limiting, API Debouncing & Infrastructure Cost Guards
-
-Because the platform uses public or low-cost APIs (such as OSRM for road distance routing), protective rate limiters must prevent abuse and denial-of-service (DoS) attacks.
-
-### 6.1 Distance Proxy Rate Limiter (`/api/distance`)
-To prevent automated scrapers from flooding the OSRM endpoint:
-* **Leaky Bucket Limiter:** Maximum **20 requests per minute per IP address**.
-* **Cache Header:** The distance route responds with:
-  `Cache-Control: public, s-maxage=86400, stale-while-revalidate=43200`.
-  Identical coordinate pairs return cached distances from edge memory rather than re-computing the route.
-
-### 6.2 Frontend Pin-Drop Debouncing
-The Leaflet map pin-drop interface on `/checkout` does **not** call `/api/distance` while the map is being actively dragged or panned.
-* A debounce interval of **`400ms`** is enforced. The distance calculation triggers **only** after the user has completely released the map crosshair for 400 milliseconds.
+No production limiter may rely on process memory. CAPTCHA or a proof-of-work challenge may be added to public checkout if abuse is observed; it is not a substitute for server validation.
 
 ---
 
-## 7. Data Privacy & Customer PII Safeguards
+## 8. Privacy and Retention
 
-Under Uganda's Data Protection and Privacy Act, customer Personally Identifiable Information (PII) must be handled with care:
+- Collect only the name, phone, delivery coordinates/address, order contents, and optional notes needed to fulfil the order.
+- Display full customer phone numbers only to the assigned rider, kitchen manager, and authorized admin.
+- Mask phone numbers on printed customer receipts and exports where full contact is unnecessary.
+- Do not store card data. Flutterwave hosted checkout keeps the app in PCI SAQ A scope.
+- Retain order/financial records for the founder-approved statutory period; anonymize or delete marketing data when consent is withdrawn.
+- Log access to admin audit records. Never log PINs, OTPs, tokens, full webhook payloads containing secrets, or raw phone lists.
+- Breach handling follows `COMPLIANCE_AND_LEGAL.md` and `OPERATIONS_RUNBOOK.md`.
 
-1. **Rider Phone Isolation:** Riders view customer phone numbers through a native `tel:+256...` deep link on `/rider`. Customer phone numbers are not exposed in plaintext CSV exports and are never stored in the rider’s personal device address book.
-2. **Order Token Unguessability:** Customer tracking URLs use version-4 UUID tokens (`/orders/550e8400-e29b-41d4-a716-446655440000`) with 122 bits of entropy. It is mathematically impossible for external attackers to enumerate or guess active customer order screens.
-3. **Receipt Sanitization:** Printed thermal receipts and downloadable PDF slips display customer phone numbers partially masked for packaging safety (e.g., `+256 772 ****11`). Only the active rider and kitchen manager see the full contact digits.
+---
+
+## 9. Security Verification Checklist
+
+- [ ] `anon` cannot select `orders` directly; token RPC returns only the safe payload.
+- [ ] `authenticated` rider cannot select `handover_pin` or update another rider's order.
+- [ ] `claim_order_atomic` fails for a second active claim and for another rider's order.
+- [ ] `verify_delivery_pin` rejects wrong PINs, locks after 3, resets on success, and enforces geofence.
+- [ ] Kitchen can accept/bump only through RPCs; menu price CRUD is admin-only.
+- [ ] Admin cancel on a paid order creates a `REQUESTED` refund and an audit row.
+- [ ] Settlement links only `DELIVERED` + `PAID` COD orders for the business date.
+- [ ] Flutterwave webhook rejects a bad `verif-hash`, replays are idempotent, and late success for a cancelled order triggers review/refund.
+- [ ] Staff logout revokes the session; deactivated staff cannot call RPCs.
+- [ ] No `postgres_changes` subscription exists on orders, telemetry, payments, or profiles.
+- [ ] CSP/HSTS/frame-ancestors headers are present in the Phase 1 build.
+- [ ] No secret appears in client bundles, source maps, logs, or Git.
+
+---
+
+## 10. Revision History
+
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.0.0 | 2026-10-29 | Original custom-session draft. |
+| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.2.0 | 2026-11-09 | Replaced with Supabase Auth, durable PIN RPC, RLS boundary, OTP, rate limits, and verification checklist. |

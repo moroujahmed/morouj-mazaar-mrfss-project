@@ -20,7 +20,7 @@ INSERT INTO public.app_settings (
 ) VALUES (
   1, 'Bazaar Flame & Grill', 0.3136000, 32.5811000, '+256700000000',
   'UGX', 'Africa/Kampala',
-  5.00, 1500, 15.00, 8.00,
+  5.00, 1500, 15.00, 8.10,
   20000, 0,
   1000, 0,
   200000, 20,

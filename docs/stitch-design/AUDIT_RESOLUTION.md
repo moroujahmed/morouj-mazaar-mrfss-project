@@ -87,7 +87,7 @@ This document records how every finding from the Stitch feature audit was resolv
 
 ### C6 — Accessibility and document structure failed across the package
 
-**Finding.** Screens used the Tailwind CDN, had two `h1` elements (brand in the header and page title), lacked a skip link or `<main id="main">`, contained `href="#"` dead links, and used a green/orange palette that did not match [`../ACCESSIBILITY.md`](../ACCESSIBILITY.md). The rider pool and earnings screens had no `main` landmark at all.
+**Finding.** Screens used the Tailwind CDN, had two `h1` elements (brand in the header and page title), lacked a skip link or `<main id="main">`, contained `href="#"` dead links, and used an unapproved palette that did not match [`../ACCESSIBILITY.md`](../ACCESSIBILITY.md). The rider pool and earnings screens had no `main` landmark at all.
 
 **Resolution.**
 
@@ -95,7 +95,7 @@ This document records how every finding from the Stitch feature audit was resolv
 - Added [`assets/app.css`](assets/app.css) with semantic components, focus styles and responsive layout rules.
 - Converted every header brand `h1` to a `span`; each page now has exactly one `h1` inside `main#main`.
 - Added the skip link to every screen and fixed all dead links.
-- Applied the normative palette: `#B83817` action, `#A63312` hover, `#D84A26` decorative, `#F9F8F6` ground, `#1A1918` ink.
+- Applied the normative palette: `#173F35` brand, `#F28C28` action with `#102E27` text, `#A65A0F` orange text, `#F2F4F3` canvas, `#102E27` ink.
 - Added small-screen overrides for the admin, cart, checkout, tracker and calculator grid layouts.
 
 **Evidence.** `validate.js` reports **54 files, 0 issues**. The checks are skip link, one `h1`, both CSS links, `main#main`, no `cdn.tailwindcss.com`, no `href="#"`.
@@ -148,7 +148,7 @@ This document records how every finding from the Stitch feature audit was resolv
 | ID | Finding | Resolution and evidence |
 | :--- | :--- | :--- |
 | M1 | Retired distances and totals still appeared in docs and site copy | Removed active `3.8 km`, `7.4 km`, `4,500`, `35,600` and `36,500`; the only remaining mention is the intentional warning in [`screens/design-system.html`](screens/design-system.html). |
-| M2 | `site/assets/css/tokens.css` still used the old green/orange palette | Remapped the token values to the normative terracotta/linen palette while keeping the legacy token names. |
+| M2 | `site/assets/css/tokens.css` still used a retired palette | Remapped the token values to the normative green/orange palette while keeping the legacy token names. |
 | M3 | `site/ui-kit.html` used the retired 34,000 total | Updated both occurrences to `USh 35,000`. |
 | M4 | `DESIGN_SYSTEM_V2.md` had stale palette, fixtures and offline claims | Rewrote the palette, fixture and rider sections; removed the “offline-safe completion” and “queues and retries” claims. |
 | M5 | Brand naming drifted between “Bazaar Flame”, “Bazaar Flame & Grill” and “Morouj Mazaar” | Standardised the restaurant brand to **Bazaar Flame & Grill**; `site/` keeps Morouj Mazaar as the umbrella portal brand by design. |

@@ -112,16 +112,16 @@
       address: "Plot 5 Spring Road, Bugolobi",
       notes: "Extra chilli on the side",
       status: "Ready",
-      payment: "Airtel Money",
-      paid: true,
+      payment: "Cash on delivery",
+      paid: false,
       rider: "",
       time: "13:12",
       items: [
-        { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "" },
-        { name: "Special Bazaar Rolex", qty: 1, price: 8000, mods: "" }
+        { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "Extra chilli on the side" },
+        { name: "Extra chilli", qty: 1, price: 1000, mods: "" }
       ],
       packaging: 1000,
-      delivery: 0
+      delivery: 1500
     }
   ];
 
@@ -913,7 +913,9 @@
         const cleared = rider.cash === 0;
         return (
           "<tr>" +
-            "<td><strong>" + escapeHtml(rider.name) + "</strong></td>" +
+            "<td><strong>" + escapeHtml(rider.name) + "</strong>" +
+              (rider.cashOrders ? '<span class="sub mono">' + escapeHtml(rider.cashOrders) + "</span>" : "") +
+            "</td>" +
             '<td><span class="mono">' + escapeHtml(rider.plate) + "</span></td>" +
             '<td class="num">' + rider.deliveries + "</td>" +
             '<td class="num">' + money(rider.cash) + "</td>" +

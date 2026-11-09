@@ -1,435 +1,377 @@
-# TESTING_PERSONAS_AND_E2E_SCENARIOS.md
+# TESTING PERSONAS AND E2E SCENARIOS
 
-> **v1.1 normative amendment:** Seed UUIDs, staff auth, distances, totals, and the Playwright blueprint are superseded by [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md), [`TEST_PLAN.md`](TEST_PLAN.md), [`../supabase/seed.sql`](../supabase/seed.sql), and [`../scripts/seed-staff.mjs`](../scripts/seed-staff.mjs).
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **Supersedes** | v1.0 seed SQL, 4-digit staff PINs, retired distances/totals, and the unrunnable Playwright blueprint |
+| **Canonical data** | [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md) |
+| **Runnable tests** | [`TEST_PLAN.md`](TEST_PLAN.md) — unit, database, RLS, E2E, accessibility |
+| **Seed data** | [`../supabase/seed.sql`](../supabase/seed.sql) and [`../scripts/seed-staff.mjs`](../scripts/seed-staff.mjs) |
 
-## Document Control & Metadata
-* **Document Version:** 1.0.0
-* **Status:** Approved QA & Testing Specification
-* **Target Audience:** QA Engineers, Automated Test Agents (Playwright/Vitest) & Antigravity Builders
-* **Scope:** Test Seed Data, User Personas, End-to-End Acceptance Scenarios, and Concurrency Test Scripts
-* **Geographic Baseline:** Kampala, Uganda (EAT / UTC+3)
+If a persona, fixture, or assertion in this file disagrees with `CANONICAL_EXAMPLES.md`, the canonical file wins. If it disagrees with `TEST_PLAN.md` about how a test is executed, `TEST_PLAN.md` wins.
 
----
-
-## 1. Master QA Test Seed Dataset
-
-To ensure consistent testing across automated agent runs and human acceptance reviews, the database must be seeded with these deterministic records.
-
-### 1.1 Staff & Rider Profiles (`public.profiles`)
-```sql
--- Password / PIN for all test staff accounts is: '1234'
-INSERT INTO public.profiles (id, full_name, phone_number, role, pin_code, motorcycle_plate, is_active) VALUES
-  ('a1000000-0000-0000-0000-000000000001', 'Mr. Kasule (Admin)', '+256700111000', 'ADMIN', '1234', NULL, true),
-  ('k1000000-0000-0000-0000-000000000002', 'Chef Musa (Kitchen)', '+256700111001', 'KITCHEN', '1234', NULL, true),
-  ('r1000000-0000-0000-0000-000000000003', 'Rider Juma', '+256700111002', 'RIDER', '1234', 'UFD 342B', true),
-  ('r2000000-0000-0000-0000-000000000004', 'Rider David', '+256700111003', 'RIDER', '1234', 'UEX 119A', true),
-  ('r3000000-0000-0000-0000-000000000005', 'Rider Brian', '+256700111004', 'RIDER', '1234', 'UEE 902C', true);
-```
-
-### 1.2 Baseline System Settings (`public.app_settings`)
-```sql
-UPDATE public.app_settings SET
-  restaurant_name = 'Bazaar Flame & Grill',
-  restaurant_lat = 0.3136000,
-  restaurant_lng = 32.5811000,
-  free_delivery_radius_km = 5.0,
-  rate_per_excess_km = 1500,
-  minimum_order_value = 20000,
-  max_delivery_radius_km = 15.0,
-  packaging_fee_default = 1000,
-  is_kitchen_busy = false,
-  is_store_open = true
-WHERE id = 1;
-```
+This file defines **who** the system serves and **what a successful journey looks like**. It does not contain duplicate seed SQL, a second Playwright blueprint, or hard-coded credentials.
 
 ---
 
-## 2. Realistic User Personas
+## 1. Test Identities
 
+Staff do not log in with a PIN stored in `public.profiles`. Each staff member is a Supabase Auth user with a synthetic email and a **6-digit PIN used as the Auth password** (see `SECURITY_AND_VERIFICATION_PROTOCOLS.md` §2.1).
+
+### 1.1 Local and CI staff
+
+Create `scripts/staff.test.json` from [`../scripts/staff.example.json`](../scripts/staff.example.json), then provision it:
+
+```bash
+STAFF_SEED_FILE=scripts/staff.test.json node scripts/seed-staff.mjs
 ```
-[ Persona 1: Sarah ] ─── Nakasero (3.8 km)  ─── Pre-Paid MTN MoMo  ─── Happy Path Delivery
-[ Persona 2: Brian ] ─── Ntinda (7.4 km)    ─── Cash on Delivery   ─── Distance Surcharge & MOV
-[ Persona 3: Alex ]  ─── Bazaar Table 4     ─── Dine-In QR Scan    ─── Zero-Fee Bypass
-[ Persona 4: Musa ]  ─── Kitchen KDS        ─── Line Cook          ─── Audio Alerts & 86 Toggles
-[ Persona 5: Juma ]  ─── Boda UFD 342B      ─── Motorcycle Courier ─── Navigation & Handover PIN
-[ Persona 6: Kasule] ─── Admin Hub          ─── Owner / Auditor    ─── Live Edits & Cash Balancing
-```
+
+`scripts/staff.local.json` is gitignored. Test files must use test-only PINs and `must_change_pin: false`; never reuse a production PIN.
+
+| Persona | Role | Phone | Plate | Login route |
+| :--- | :--- | :--- | :--- | :--- |
+| Mr. Kasule | `ADMIN` | `+256700111000` | — | `/admin/login` |
+| Chef Musa | `KITCHEN` | `+256700111001` | — | `/kitchen/login` |
+| Juma Mukasa | `RIDER` | `+256700111002` | `UFD 342B` | `/rider/login` |
+| David Okello | `RIDER` | `+256700111003` | `UEX 119A` | `/rider/login` |
+
+The seed script creates the Auth user first and then the `profiles` row with the same UUID. Do not insert staff rows directly with `profiles.pin_code`; that column does not exist.
+
+### 1.2 Customers
+
+Customers are anonymous. A customer is identified by the order token returned at checkout. The token is a bearer capability: it must not be logged or shared, and it is the only way to read the order from `/orders/[token]`.
+
+### 1.3 Deterministic catalog and tables
+
+Menu items, modifier prices, combo steps, and table QR tokens come from `supabase/seed.sql`. Tests must resolve prices from the seeded catalog instead of duplicating them in code. The canonical fixtures below assume:
+
+| Seed object | Value used in the scenarios |
+| :--- | :--- |
+| Whole Tilapia Flame Combo | `USh 32,000` |
+| Extra Garlic Pepper Dip | `USh 2,000` |
+| Smoked Beef Luwombo | `USh 26,000` |
+| Cold-Pressed Passion Juice (500 ml) | `USh 5,000` |
+| Special Bazaar Rolex | `USh 8,000` |
+| Table T4 QR token | `88888888-8888-4888-8888-888888888804` |
 
 ---
 
-### Persona 1: Sarah Namukasa — The Office Worker (Digital Pre-Paid Path)
-* **Profile:** 29, Corporate Accountant at an audit firm on Lumumba Avenue, Nakasero.
-* **Device:** iPhone 13 running Safari on 4G.
-* **Location:** Plot 14 Lumumba Ave (`lat: 0.3245000, lng: 32.5782000`).
-* **Road Distance:** **`3.8 km`** from Bazaar Hub.
-* **Goal:** Quick lunch order delivered to the office gate without leaving her desk.
-* **Primary Behavior:** Pays digitally via **MTN Mobile Money**, selects custom modifiers, verifies safety seal, and provides 4-digit PIN.
+## 2. Personas
+
+```
+[ Persona 1: Sarah ] ── Nakasero (1.562 km) ── Prepaid MTN MoMo ── Happy-path delivery
+[ Persona 2: Brian ] ── Ntinda (8.093 km)   ── Cash on delivery ── Surcharge, MOV, change
+[ Persona 3: Alex ]  ── Table T4            ── Airtel Money     ── Dine-in, zero fees
+[ Persona 4: Musa ]  ── Kitchen KDS         ── Line cook        ── Audio, 86, busy mode
+[ Persona 5: Juma ]  ── Boda UFD 342B       ── Courier          ── Claim, navigate, PIN
+[ Persona 6: Kasule] ── Admin hub           ── Owner/auditor    ── Edits, ledger, audit
+```
+
+### Persona 1 — Sarah Namukasa, the office worker (prepaid delivery)
+
+- **Profile:** 29, corporate accountant on Lumumba Avenue, Nakasero.
+- **Device:** iPhone 13, Safari, 4G.
+- **Location:** Plot 14 Lumumba Avenue, `lat: 0.3245, lng: 32.5782`.
+- **Road distance:** **1.562 km** from the restaurant.
+- **Goal:** Order lunch without leaving her desk and pay digitally.
+- **Behaviour:** Adds a paid modifier, pays with MTN Mobile Money, checks the safety seal, and gives the rider the 4-digit handover PIN only after receiving the bag.
+
+### Persona 2 — Brian Kato, the far customer paying cash (COD edge case)
+
+- **Profile:** 34, architect working from a home studio in Ntinda Ministers' Village.
+- **Device:** Tecno Spark, Android, 3G.
+- **Location:** Ntinda Ministers' Village, `lat: 0.3542, lng: 32.6120`.
+- **Road distance:** **8.093 km** from the restaurant.
+- **Goal:** A substantial meal for two, paid with a `USh 50,000` note.
+- **Behaviour:** Hits the minimum-order guardrail, pays the excess-distance fee, asks for change, completes first-time COD phone verification, and expects the rider to carry `USh 12,000` change.
+
+> **Policy dependency:** the canonical COD fixture is 8.093 km. The seeded `cod_max_radius_km` must therefore be **8.1 km** (or higher) for this scenario to be valid; the final commercial ceiling remains founder gate F-14.
+
+### Persona 3 — Alex Wandera, the walk-up guest (dine-in)
+
+- **Profile:** 22, university student at the bazaar food court.
+- **Device:** Samsung Galaxy A12.
+- **Location:** Table T4 inside the bazaar stall.
+- **Goal:** Order a low-cost snack without queueing at the counter.
+- **Behaviour:** Scans the table QR code, skips address entry, pays with Airtel Money, and expects no delivery fee, no packaging fee, and no minimum-order block.
+
+### Persona 4 — Chef Musa, the kitchen line operator (KDS)
+
+- **Profile:** 42, grill master working on a wall-mounted 10-inch Android tablet.
+- **Context:** Hot, noisy kitchen; greasy fingers; viewing distance over 1.5 m.
+- **Goal:** No missed tickets, fast bumping, instant 86-ing when an item runs out.
+- **Behaviour:** Enables audio at shift start, watches ticket age move green → amber → red, accepts cash orders, bumps delivery orders to `READY_FOR_PICKUP`, serves dine-in orders directly, toggles item availability, and enables busy mode during a rush.
+
+### Persona 5 — Juma Mukasa, the boda rider (logistics and proof of handover)
+
+- **Profile:** 28, professional courier on motorcycle `UFD 342B`.
+- **Device:** Rugged Android phone mounted on the handlebars.
+- **Context:** Bright sunlight, vibration, helmet audio.
+- **Goal:** Claim orders quickly, navigate with one tap, collect cash accurately, and end the shift with zero variance.
+- **Behaviour:** Signs in with phone + 6-digit PIN, claims atomically from the pool, starts the trip, streams telemetry only while `OUT_FOR_DELIVERY`, and asks for the customer PIN before releasing the food.
+
+### Persona 6 — Mr. Kasule, the owner and auditor (admin)
+
+- **Profile:** 51, owner of Bazaar Flame & Grill.
+- **Device:** iPad Pro or laptop at `/admin`.
+- **Goal:** Protect margin, stop cash leakage across the fleet, and correct live mistakes without direct database access.
+- **Behaviour:** Changes settings through audited server actions, resets a handover PIN with a reason, monitors stuck orders, and reconciles each rider's cash against the linked orders.
 
 ---
 
-### Persona 2: Brian Kato — The Far Customer with Cash (Edge-Case Surcharge & COD)
-* **Profile:** 34, Architect working from his home studio in Ntinda Ministers' Village.
-* **Device:** Tecno Spark Android on 3G mobile data.
-* **Location:** Ntinda Ministers' Village (`lat: 0.3542000, lng: 32.6120000`).
-* **Road Distance:** **`7.4 km`** from Bazaar Hub.
-* **Goal:** Substantial meal for two, paying with physical paper cash.
-* **Primary Behavior:** Triggers Minimum Order Value (MOV) guardrail, incurs excess kilometer delivery surcharge, requests change for a `USh 50,000` banknote, and completes first-time phone verification.
+## 3. End-to-End Scenarios
+
+These scenarios are the acceptance narrative. The executable versions, selectors, mocks, and CI gates live in `TEST_PLAN.md` §4–§6. Do not add a second test implementation to this file.
+
+### Scenario A — Sarah's prepaid lunch rush
+
+**Covers:** menu selection, paid modifier, free-delivery zone, Flutterwave hosted checkout, verified webhook, KDS ticket, atomic claim, live tracking, PIN handover, feedback.
+
+1. Sarah opens `/` and adds **Whole Tilapia Flame Combo** (`USh 32,000`).
+2. She opens the customization drawer and selects **No Onions** (`USh 0`) and **Extra Garlic Pepper Dip** (`USh 2,000`).
+3. Items + modifiers = **`USh 34,000`**.
+4. At `/checkout` she drops a pin at `0.3245, 32.5782`. The server calls the routing adapter and stores `road_distance_m = 1562`.
+5. Pricing assertions:
+   - road distance **1.562 km** ≤ 5.0 km free radius;
+   - delivery fee **`USh 0`**;
+   - packaging fee **`USh 1,000`**;
+   - **TOTAL DUE `USh 35,000`**.
+6. She enters name and phone `0772000111`, selects **MTN Mobile Money**, and taps **Pay `USh 35,000`**.
+7. The server creates the order as `PENDING_PAYMENT` and returns the Flutterwave checkout URL. Sarah completes the sandbox payment.
+8. Flutterwave calls `POST /api/webhooks/flutterwave`:
+   - `verif-hash` matches the shared secret;
+   - the transaction is re-verified against the Flutterwave API;
+   - amount and currency match the order;
+   - the event is stored in `webhook_events` with a unique provider event ID.
+9. The order becomes `PREPARING`; the kitchen ticket appears with the paid badge.
+10. Chef Musa packs the order, applies safety seal `#9482`, and taps **Bump**. The order becomes `READY_FOR_PICKUP`.
+11. Juma opens `/rider`, sees order `#1042` in the pool, and taps **Claim**. `claim_order_atomic` assigns him inside a row lock; the order becomes `CLAIMED`.
+12. Juma taps **Start trip**. The order becomes `OUT_FOR_DELIVERY`; telemetry starts.
+13. Sarah's tracker shows the rider position and the 4-digit handover PIN.
+14. At the door Juma asks for the PIN. Sarah checks seal `#9482` and reads the PIN from `/orders/[token]`.
+15. Juma submits the PIN through `verify_delivery_pin(p_order_id, p_pin, p_lat, p_lng, ...)`.
+16. Assertions:
+    - `order_status = 'DELIVERED'`;
+    - `delivered_at IS NOT NULL`;
+    - `payment_status = 'PAID'`;
+    - telemetry stops;
+    - the customer sees the one-tap feedback prompt and can submit a rating.
+
+**Negative branches:** invalid webhook signature → `401`, no state change; amount mismatch → flagged and not fulfilled; duplicate webhook → ignored; expired `PENDING_PAYMENT` order → `CANCELLED` by `expire_pending_orders`.
 
 ---
 
-### Persona 3: Alex Wandera — The Bazaar Walk-Up Guest (Dine-In Hybrid Mode)
-* **Profile:** 22, University student shopping at the bazaar food court.
-* **Device:** Samsung Galaxy A12.
-* **Location:** Physical Table #4 inside the bazaar stall.
-* **Goal:** Quick, low-cost snack without standing in line at the physical counter.
-* **Primary Behavior:** Scans laminated table QR code, bypasses delivery address inputs, enjoys `USh 0` delivery fee and `USh 0` MOV, pays via **Airtel Money**.
+### Scenario B — Brian's COD surcharge, MOV, and change
+
+**Covers:** minimum order value, excess-distance fee, COD radius, change due, first-time COD OTP, cash liability.
+
+1. Brian adds **Cold-Pressed Passion Juice (500 ml)** (`USh 5,000`).
+2. Cart assertions:
+   - subtotal `USh 5,000` < MOV `USh 20,000`;
+   - checkout is disabled;
+   - copy says: “Add `USh 15,000` more to unlock delivery.”
+3. He adds **Smoked Beef Luwombo** (`USh 26,000`). Items + modifiers = **`USh 31,000`**; MOV satisfied.
+4. At `/checkout` he drops a pin at `0.3542, 32.6120`. The routing adapter returns `road_distance_m = 8093`.
+5. Fee assertions:
+   - distance **8.093 km**;
+   - free allowance 5.0 km;
+   - excess `3.093 km`;
+   - billable `ceil(3.093) = 4 km`;
+   - delivery fee `4 × USh 1,500 =` **`USh 6,000`**;
+   - packaging **`USh 1,000`**;
+   - **TOTAL DUE `USh 38,000`**.
+6. COD assertions:
+   - distance is within `app_settings.cod_max_radius_km` (8.1 km);
+   - the change selector offers `USh 50,000`;
+   - change due = `50,000 − 38,000 =` **`USh 12,000`**.
+7. First-time COD verification: Brian enters the mock SMS OTP; the order is created as `CONFIRMED_UNPAID`.
+8. The kitchen ticket shows “Collect `USh 38,000` cash — change for `USh 50,000`”. Musa taps **Accept** (`CONFIRMED_UNPAID → PREPARING`).
+9. Musa bumps to `READY_FOR_PICKUP`. Juma claims and starts the trip.
+10. Juma enters one wrong PIN (`INVALID_HANDOVER_PIN`, remaining 2), then the correct PIN.
+11. Assertions:
+    - `order_status = 'DELIVERED'`;
+    - `payment_status = 'PAID'`;
+    - `cod_collected_at IS NOT NULL`;
+    - Juma's expected cash increases by exactly `USh 38,000`.
+12. Admin ledger shows Juma expected `USh 38,000` for the day; reconciliation with `USh 38,000` yields `SETTLED`, variance `0`.
+
+**Negative branches:** COD above `cod_max_radius_km` → `COD_NOT_AVAILABLE`; COD below MOV → blocked; OTP expired or wrong → no order; rider cannot start before claiming.
 
 ---
 
-### Persona 4: Chef Musa — The Kitchen Line Operator (High-Stress KDS)
-* **Profile:** 42, Veteran grill master managing the tickets on a wall-mounted 10-inch Android tablet.
-* **Physical Context:** Hot, steamy, noisy open-flame kitchen. Greasy fingers, visual distance viewing ($> 1.5\text{ m}$).
-* **Goal:** Zero missed tickets, rapid order bumping, instant 86-ing when meat runs out.
-* **Primary Behavior:** Unlocks Web Audio API on shift start, monitors elapsed ticket timers (Green $\rightarrow$ Amber $\rightarrow$ Red), bumps orders to "Ready for Pickup", toggles busy-mode buffers.
+### Scenario C — Alex's table QR dine-in
+
+**Covers:** table token, dine-in mode, MOV bypass, zero fees, direct `DELIVERED`.
+
+1. Alex scans the Table T4 QR code, which opens `/?table=88888888-8888-4888-8888-888888888804`.
+2. The server validates the QR token with `validate_table_token`. The storefront shows the dine-in banner **“Dine-in — Table T4”**.
+3. The map, address fields, delivery-fee row, and rider instructions are not rendered.
+4. Alex adds **Special Bazaar Rolex** (`USh 8,000`).
+5. Pricing assertions:
+   - MOV bypassed (`minimum_order_value_dine_in = 0`);
+   - delivery fee `USh 0`;
+   - packaging fee `USh 0`;
+   - **TOTAL DUE `USh 8,000`**.
+6. Alex pays with Airtel Money (`0701000222`); the verified webhook moves the order to `PREPARING`.
+7. The KDS ticket shows **TABLE T4 — DINE-IN**. Musa prepares the Rolex and taps **Served to table**.
+8. `bump_order` moves a dine-in order directly from `PREPARING → DELIVERED`.
+9. Assertions:
+   - the order never appears in `get_rider_pool`;
+   - no handover PIN gate is shown;
+   - no `CLAIMED`, `OUT_FOR_DELIVERY`, or telemetry rows exist.
+
+**Negative branches:** invalid or inactive table token → dine-in mode is not enabled; payment failure → order remains `PENDING_PAYMENT` until expiry.
 
 ---
 
-### Persona 5: Juma Mukasa — The Motorcycle Boda Rider (Logistics & Proof of Handover)
-* **Profile:** 28, Professional courier operating motorcycle plate `UFD 342B`.
-* **Device:** Ruggedized Android phone mounted on motorcycle handlebars.
-* **Physical Context:** Bright ambient equatorial sunlight, road vibrations, helmet audio.
-* **Goal:** Fast claiming of orders, hands-free turn-by-turn navigation, zero cash discrepancies at shift end.
-* **Primary Behavior:** Logs in via 4-digit PIN, claims orders atomically from the unclaimed pool, launches Google Maps with one tap, broadcasts GPS telemetry, and demands customer PIN before releasing food.
+### Scenario D — Chef Musa: 86 an item and enable busy mode
+
+**Covers:** availability propagation, cart invalidation, ETA buffer.
+
+1. Musa opens `/kitchen` and toggles **Golden Chips** to unavailable through `set_menu_item_availability`.
+2. Storefront assertions:
+   - the card is greyed out and labelled **Sold out**;
+   - adding it is blocked;
+   - if it was already in a cart, checkout returns `ITEM_OUT_OF_STOCK` and names the item.
+3. Musa enables **Busy mode +20 minutes** through `set_kitchen_busy`.
+4. Assertions:
+   - new orders' ETA includes the 20-minute buffer;
+   - existing orders keep their original ETA (no retroactive change);
+   - the customer tracker explains the delay without changing the order status.
+5. Musa disables busy mode; new ETAs return to the calculated value.
 
 ---
 
-### Persona 6: Mr. Kasule — The Restaurant Owner & General Manager (Control & Audit)
-* **Profile:** 51, Owner of Bazaar Flame & Grill.
-* **Device:** iPad Pro / Laptop running `/admin`.
-* **Goal:** Protect profit margins, eliminate cash leakage across the 5 bikes, and fix live customer mistakes.
-* **Primary Behavior:** Adjusts per-km delivery rates, edits incorrect phone numbers on live tickets, and audits the End-of-Day Cash Settlement Ledger.
+### Scenario E — two riders claim the same order
+
+**Covers:** atomic claim, one-active-order rule, race feedback.
+
+1. Order `#1042` is `READY_FOR_PICKUP` with `rider_id = NULL`.
+2. Juma and David both open `/rider` and see the order.
+3. Both tap **Claim** at nearly the same time. Each request calls `claim_order_atomic(p_order_id)`; the rider is derived from `auth.uid()`.
+4. Exactly one call succeeds and returns `CLAIMED`.
+5. The other call returns `ORDER_ALREADY_CLAIMED`; the UI shows “Order was just claimed by another rider,” removes the card, and refreshes the pool.
+6. The winner's active order appears immediately; the partial unique index `orders_one_active_per_rider` prevents either rider from holding two active orders.
+7. A rider who already has an active order receives `RIDER_HAS_ACTIVE_ORDER` even if the order is still unclaimed.
+
+**Database assertion:** `SELECT count(*) FROM orders WHERE id = ... AND rider_id IS NOT NULL` is exactly 1 after the race.
 
 ---
 
-## 3. End-to-End Test Execution Scenarios (Traceability Matrix)
+### Scenario F — handover PIN failure, lockout, and admin reset
+
+**Covers:** durable attempts, 15-minute lock, geofence, admin override with audit.
+
+1. Order `#1042` is `OUT_FOR_DELIVERY`, assigned to Juma, with a 4-digit PIN.
+2. Juma submits a wrong PIN:
+   - response `{ ok: false, code: "INVALID_HANDOVER_PIN", remainingAttempts: 2 }`;
+   - `pin_verification_attempts` gains a failed row.
+3. Second wrong PIN: `remainingAttempts: 1`.
+4. Third wrong PIN:
+   - response `{ ok: false, code: "PIN_LOCKED", remainingAttempts: 0, lockedUntil: ... }`;
+   - `pin_locked_until = now() + 15 minutes`;
+   - `security_flag = 'PIN_LOCKED'`;
+   - order remains `OUT_FOR_DELIVERY`.
+5. A correct PIN submitted before the lock expires still returns `PIN_LOCKED` and does not count as an attempt.
+6. Geofence assertion: coordinates more than `pin_geofence_m` (300 m) from the delivery pin return `TOO_FAR_FROM_DESTINATION` **without consuming a PIN attempt**.
+7. Mr. Kasule calls `admin_reset_handover_pin(order_id, reason)`:
+   - a new 4-digit PIN is generated with `pgcrypto`;
+   - attempts and lock are cleared;
+   - `security_flag = 'PIN_RESET_BY_ADMIN'`;
+   - an `ADMIN_RESET_HANDOVER_PIN` audit row records the reason.
+8. Juma enters the new PIN at the correct location; the order becomes `DELIVERED`, and the successful attempt is recorded.
+
+**Security assertions:** another rider cannot verify the order (`AUTH_UNAUTHORIZED`); direct `SELECT` on `orders.handover_pin` is denied to `anon` and `authenticated`; no PIN appears in logs or analytics.
 
 ---
 
-### Scenario A: The "Digital Lunch Rush" (Sarah's Happy Path)
-**Target:** Verifies menu selection, structured modifiers, zero-fee 5 km threshold, MTN MoMo USSD trigger, live tracking, and PIN handover.
+### Scenario G — end-of-day cash reconciliation
 
-```
-[ Step 1: Sarah visits Storefront / ]
-   ├── Adds 'Whole Tilapia Flame Combo' (Base: USh 32,000)
-   ├── Opens Customization Drawer:
-   │     • Selects: [✓] No Onions (Free Omission: USh 0)
-   │     • Selects: [+] Extra Garlic Dip (Paid Add-On: +USh 2,000)
-   └── Subtotal = USh 34,000
+**Covers:** expected cash, linked orders, idempotent settlement, variance, audit.
 
-[ Step 2: Checkout /checkout ]
-   ├── Drops Map Pin at Plot 14 Lumumba Ave (lat: 0.3245, lng: 32.5782)
-   ├── System calls /api/distance -> Returns 3.8 km
-   ├── Verification Assertion:
-   │     • Road Distance: 3.8 km <= 5.0 km
-   │     • Delivery Fee: USh 0 (FREE ZONE BADGE RENDERS GREEN)
-   │     • Packaging Fee: USh 1,000
-   │     • Total Due: USh 35,000
-   ├── Inputs Name: "Sarah Namukasa", Phone: "0772000111"
-   ├── Selects: 'MTN Mobile Money'
-   └── Clicks [ PAY USh 35,000 VIA MTN MOMO ]
+1. Juma has completed two COD orders on the same `Africa/Kampala` business date:
 
-[ Step 3: Webhook & KDS Ingestion ]
-   ├── Simulated Webhook POST /api/webhooks/payment:
-   │     { tx_ref: "order_token", status: "successful", amount: 35000 }
-   ├── Order status mutates: PENDING_PAYMENT -> PREPARING
-   ├── Kitchen Tablet: Loud harmonic bell chimes; Ticket #1042 appears in Green queue
+   | Order | Payment | Amount |
+   | :--- | :--- | ---: |
+   | `#1043` | COD | `USh 38,000` |
+   | `#1047` | COD | `USh 27,500` |
+   | **Expected cash** | | **`USh 65,500`** |
 
-[ Step 4: Kitchen Line & Rider Claim ]
-   ├── Chef Musa finishes packaging, tags bag with Safety Seal #9482
-   ├── Musa taps [ READY FOR PICKUP ] on KDS
-   ├── Rider Juma visits /rider -> Sees Order #1042 in pool
-   ├── Juma taps [ CLAIM DELIVERY ] -> Locks rider_id = Juma.id
-   └── Juma taps [ START TRIP ] -> Telemetry starts streaming
+2. Mr. Kasule opens `/admin/ledger`. The row for Juma (`UFD 342B`) shows expected **`USh 65,500`**, status `OPEN`.
+3. Juma hands over `USh 65,500`. Kasule calls `reconcile_rider_cash(rider_id, 65500, notes, business_date)`.
+4. Assertions:
+   - settlement status `SETTLED`;
+   - variance `0`;
+   - both orders receive the same `settlement_id` and `settled_at`;
+   - the audit row records expected, counted, and variance.
+5. A second reconciliation for the same rider and date with `USh 60,000` **updates the same settlement**:
+   - status `PARTIAL`;
+   - variance **`−USh 5,500`**;
+   - no duplicate settlement row;
+   - already-linked orders are not double-counted.
+6. The ledger never derives its total from UI state. It is computed from `orders.total_amount` for `CASH_ON_DELIVERY`, `PAID`, `DELIVERED`, and the selected business date.
 
-[ Step 5: Living Tracker & Handover ]
-   ├── Sarah's screen /orders/[token] shows motorcycle moving on Leaflet map
-   ├── Juma arrives at Lumumba Ave; asks: "Please provide your 4-digit code"
-   ├── Sarah checks seal #9482, verbally gives PIN: "4821"
-   ├── Juma enters '4821' on /rider -> Verification succeeds
-   ├── Database Assertion:
-   │     • order_status = 'DELIVERED'
-   │     • delivered_at IS NOT NULL
-   │     • telemetry streaming halts
-   └── Sarah's screen transitions to 1-Tap Feedback Modal -> Taps [ 😃 Great ]
-```
+**Negative branches:** negative counted cash → validation error; a settlement cannot link an order belonging to another rider; a non-admin caller receives `AUTH_UNAUTHORIZED`.
 
 ---
 
-### Scenario B: Distance Surcharge, MOV Guardrail & Cash on Delivery (Brian)
-**Target:** Verifies Minimum Order Value blocking, excess distance road calculation, COD change requirement, and rider cash liability logging.
+### Scenario H — payment failure and retry
 
-```
-[ Step 1: Brian triggers MOV Block ]
-   ├── Brian visits / -> Adds 1x Cold-Pressed Passion Juice (USh 5,000)
-   ├── Navigates to Cart Dock
-   ├── Verification Assertion:
-   │     • Subtotal (USh 5,000) < MOV (USh 20,000)
-   │     • Checkout Button is DISABLED
-   │     • Progress text: "Add USh 15,000 more to unlock delivery."
+**Covers:** failed hosted checkout, retry, expiry, no duplicate order.
 
-[ Step 2: Brian fulfills MOV & Pins Ntinda ]
-   ├── Adds: 1x Smoked Beef Luwombo (USh 26,000)
-   ├── Total Food Subtotal = USh 31,000 (MOV SATISFIED)
-   ├── Proceeds to /checkout -> Drops pin at Ntinda Ministers' Village
-   ├── System calls /api/distance -> Returns 7.4 km
-
-[ Step 3: Distance Surcharge Calculation Engine ]
-   ├── Verification Assertion:
-   │     • Total Road Distance: 7.4 km
-   │     • Free Allowance: 5.0 km
-   │     • Excess Distance: 7.4 - 5.0 = 2.4 km
-   │     • Billable Excess (Ceiling Rounding): ceil(2.4) = 3 km
-   │     • Rate per Excess Km: USh 1,500
-   │     • Delivery Fee: 3 km * USh 1,500 = USh 4,500
-   │     • Packaging Fee: USh 1,000
-   │     • Final Total: 31,000 + 4,500 + 1,000 = USh 36,500
-
-[ Step 4: Cash on Delivery Checkout ]
-   ├── Brian selects: 'Cash on Delivery'
-   ├── System displays dropdown: "Do you need change?"
-   ├── Brian selects: "Change for USh 50,000"
-   ├── First-Time Phone Verification: Inputs SMS code '5544'
-   └── Submits Order -> Status: CONFIRMED_UNPAID
-
-[ Step 5: Kitchen & Rider Cash Liability ]
-   ├── KDS Ticket flashes amber warning: "COLLECT USH 36,500 CASH (CHANGE FOR 50k)"
-   ├── Musa cooks, packs, bumps to READY_FOR_PICKUP
-   ├── Juma claims order; completes trip via Handover PIN
-   └── Database Ledger Assertion:
-         • order_status = 'DELIVERED'
-         • payment_status = 'PAID'
-         • Juma's un-reconciled cash balance increases by EXACTLY USh 36,500
-```
+1. Sarah starts checkout but the Flutterwave payment fails or is abandoned.
+2. The order remains `PENDING_PAYMENT`; the customer sees a retry action and the payment status, not a false “confirmed” state.
+3. Retrying with the same idempotency key and unchanged payload returns the same order; changing the payload returns `IDEMPOTENCY_CONFLICT`.
+4. A successful retry moves the order to `PREPARING` through the verified webhook path.
+5. If the retry window expires, `expire_pending_orders` cancels the order and releases any reserved stock.
 
 ---
 
-### Scenario C: Table QR Dine-In Bypass (Alex)
-**Target:** Verifies table parameter parsing, map hiding, zero delivery fee, zero packaging fee, and MOV bypass.
+### Scenario I — store closed and kitchen paused
 
-```
-[ Step 1: Alex scans Table QR ]
-   ├── Browser opens: https://bazaar-eats.com/?table=4
-   ├── Verification Assertion:
-   │     • Header banner renders: "🍽️ Dine-In: Table 4"
-   │     • Leaflet map is NOT mounted in DOM
-   │     • Address input fields are REMOVED
+**Covers:** store hours, closed-state copy, no order creation.
 
-[ Step 2: Order Single Low-Cost Item ]
-   ├── Alex adds: 1x Special Bazaar Rolex (USh 8,000)
-   ├── Verification Assertion:
-   │     • Subtotal: USh 8,000
-   │     • MOV Guardrail is BYPASSED (Allowed despite USh 8,000 < USh 20,000)
-   │     • Delivery Fee: Hardcoded USh 0
-   │     • Packaging Fee: USh 0
-   │     • Total Due: USh 8,000
-   ├── Alex selects: 'Airtel Money' (Phone: 0701000222)
-   └── Submits Order -> Webhook confirms payment
-
-[ Step 3: Kitchen Fulfillment ]
-   ├── KDS Ticket renders with blue badge: "TABLE 4 [DINE-IN]"
-   ├── Musa prepares Rolex
-   ├── Musa taps [ SERVED TO TABLE ]
-   └── Order transitions directly to 'DELIVERED' (Never enters rider pool)
-```
+1. Outside `opening_time`–`closing_time` in `Africa/Kampala`, the storefront shows **Closed** with the next opening time.
+2. Checkout is disabled and the server rejects order creation with `STORE_CLOSED` even if the client is bypassed.
+3. Staff can still sign in, review history, and reconcile cash.
+4. If the kitchen pauses intake, new orders are blocked with `KITCHEN_PAUSED`; existing orders continue through the FSM.
 
 ---
 
-### Scenario D: Kitchen Stock-Out & High Rush Buffer (Chef Musa)
-**Target:** Verifies instantaneous 86-ing across active client sessions and delivery time buffering.
+## 4. Traceability Matrix
 
-```
-[ Step 1: Musa 86es Tilapia ]
-   ├── Musa on /kitchen taps [ 🚫 86 Items ]
-   ├── Toggles 'Whole Tilapia Flame Combo' to UNAVAILABLE
-   ├── Realtime Sync Assertion:
-   │     • Sarah's active storefront immediately grays out the Tilapia card
-   │     • Button changes to: [ SOLD OUT ]
-   │     • If Tilapia was in a cart, checkout displays:
-   │       "Item 'Tilapia Flame Combo' is sold out. Please remove to proceed."
+| Scenario | Persona | Primary assertions | Executable reference |
+| :--- | :--- | :--- | :--- |
+| A | Sarah | 1,562 m, fee 0, total 35,000, webhook verification, PIN delivery | `TEST_PLAN.md` §4 Scenario A, §2 |
+| B | Brian | 8,093 m, fee 6,000, total 38,000, change 12,000, COD paid | `TEST_PLAN.md` §4 Scenario B, §2.1 |
+| C | Alex | dine-in 8,000, zero fees, MOV bypass, direct delivery | `TEST_PLAN.md` §4 Scenario C |
+| D | Musa | 86 propagation, `ITEM_OUT_OF_STOCK`, busy buffer | `TEST_PLAN.md` §4 Scenario D |
+| E | Juma / David | one claim winner, `ORDER_ALREADY_CLAIMED`, active-order index | `TEST_PLAN.md` §3.3, §4 Scenario E |
+| F | Juma / Kasule | 3 attempts, 15-minute lock, geofence, admin reset | `TEST_PLAN.md` §2.5, §4 Scenario F |
+| G | Kasule / Juma | 65,500 expected, linked orders, `SETTLED`, `PARTIAL`, variance | `TEST_PLAN.md` §2.6, §4 Scenario G |
+| H | Sarah | failed payment, idempotent retry, expiry | `TEST_PLAN.md` §2.7 |
+| I | Sarah / Kasule | `STORE_CLOSED`, `KITCHEN_PAUSED`, no order creation | `TEST_PLAN.md` §2.2 |
 
-[ Step 2: Musa activates Busy Mode ]
-   ├── Walk-in bazaar crowd surges; Musa taps [ ⚠️ Busy Mode (+20 mins) ]
-   ├── Settings update: is_kitchen_busy = true, busy_buffer_minutes = 20
-   └── Storefront Assertion:
-         • All dish prep estimates increase: e.g., "25 mins" -> "45 mins"
-         • Delivery tracking displays: "Kitchen experiencing high bazaar demand (+20m buffer)"
-```
+### 4.1 Required data-testids
 
----
+Use the IDs defined in `TEST_PLAN.md` §6.4. Do not introduce selector names that are not in that table without updating it first.
 
-### Scenario E: Concurrency Race Condition — Two Riders Claim Same Order
-**Target:** Verifies that row-level locking (`claim_order_atomic`) prevents double allocation.
+### 4.2 Rules
 
-```
-[ Initial State ]
-   ├── Order #1042 is READY_FOR_PICKUP with rider_id = NULL
-   ├── Rider Juma (Phone A) and Rider David (Phone B) both view /rider
-
-[ Simultaneous Click Execution: T = 0ms ]
-   ├── Juma clicks [ CLAIM DELIVERY ] ──(Request arrives at DB at T=12ms)
-   └── David clicks [ CLAIM DELIVERY ] ──(Request arrives at DB at T=16ms)
-
-[ Database Execution: claim_order_atomic ]
-   ├── Juma's query executes:
-   │     UPDATE orders SET rider_id = Juma.id, order_status = 'CLAIMED'
-   │     WHERE id = #1042 AND rider_id IS NULL;
-   │     --> ROW COUNT: 1 (SUCCESS: Returns TRUE)
-   │
-   └── David's query executes 4ms later:
-         UPDATE orders SET rider_id = David.id, order_status = 'CLAIMED'
-         WHERE id = #1042 AND rider_id IS NULL;
-         --> ROW COUNT: 0 (LOCK FAILED: Returns FALSE)
-
-[ UI State Assertion ]
-   ├── Juma's screen: Transitions immediately to Active Navigation mode
-   └── David's screen: Displays high-contrast toast:
-         "Order was just claimed by another rider."
-         Order #1042 disappears from David's unclaimed pool
-```
+- Every scenario starts from `supabase db reset` plus the canonical seed and a test staff file.
+- Routing is mocked in E2E; do not call public OSRM.
+- Payments use Flutterwave sandbox or a mock adapter; never live keys.
+- OTP uses a fixed mock code; never a real SMS.
+- Assertions use web-first waits or `expect.poll`; no hard-coded sleeps.
+- A test must fail if a retired number, a 4-digit staff PIN, or a direct staff-table write is introduced.
 
 ---
 
-### Scenario F: Handover PIN Challenge & Lockout
-**Target:** Verifies brute-force protection on the 4-digit verification gate.
+## 5. Revision History
 
-```
-[ Initial State: Order #1042 is OUT_FOR_DELIVERY with PIN = '4821' ]
-
-[ Attempt 1: T = 0s ]
-   ├── Rider Juma enters: '9999'
-   └── Response: { success: false, error: "INVALID_PIN", remainingAttempts: 2 }
-
-[ Attempt 2: T = 5s ]
-   ├── Juma enters: '0000'
-   └── Response: { success: false, error: "INVALID_PIN", remainingAttempts: 1 }
-
-[ Attempt 3: T = 10s ]
-   ├── Juma enters: '1111'
-   └── Response: { success: false, error: "MAX_ATTEMPTS_EXCEEDED", remainingAttempts: 0 }
-
-[ State Assertion ]
-   ├── Order verification locks
-   ├── Order status remains 'OUT_FOR_DELIVERY' (Cannot complete)
-   └── Admin Hub (/admin) flashes red alert:
-         "SECURITY ALERT: 3 Failed PIN attempts on Order #1042. Manager action required."
-```
-
----
-
-### Scenario G: End-of-Day Rider Cash Balancing & Ledger Reconciliation (Mr. Kasule)
-**Target:** Verifies mathematical closure of cash liabilities accumulated across the fleet.
-
-```
-[ Context: End of Shift at 21:30 EAT ]
-   ├── Rider Juma has completed 7 deliveries today:
-   │     • 5 Paid Online via MTN MoMo
-   │     • 2 Paid via Cash on Delivery:
-   │         - Order #1043: USh 36,500
-   │         - Order #1047: USh 27,500
-   │     • Total Physical Cash Owed = USh 64,000
-
-[ Execution: /admin/ledger ]
-   ├── Mr. Kasule opens End-of-Day Cash Ledger
-   ├── Table displays row:
-   │     Rider: Juma Mukasa | Plate: UFD 342B | Cash Collected: USh 64,000
-   ├── Juma hands over physical banknotes totaling USh 64,000 to Kasule
-   ├── Kasule clicks [ RECONCILE & CLEAR RIDER ]
-   ├── Database Execution:
-   │     INSERT INTO cash_settlements (rider_id, admin_id, total_cash_collected, is_settled, settled_at)
-   │     VALUES (Juma.id, Kasule.id, 64000, true, now());
-   └── Assertion:
-         • Juma's active cash liability balance immediately resets to USh 0
-         • Audit log records timestamped reconciliation
-```
-
----
-
-## 4. Automated Playwright E2E Test Blueprint
-
-Agentic builders can translate this TypeScript specification directly into executable Playwright tests (`tests/e2e/order-flow.spec.ts`):
-
-```typescript
-import { test, expect } from "@playwright/test";
-
-test.describe("Bazaar D2C Delivery Pipeline", () => {
-  test("Persona 1: Complete Happy Path Pre-Paid Delivery", async ({ page, browser }) => {
-    // 1. Customer visits storefront and adds Tilapia combo
-    await page.goto("/");
-    await page.click("text=Whole Tilapia Flame Combo");
-    
-    // Customization Drawer
-    await page.click("text=No Onions");
-    await page.click("text=Extra Garlic Dip");
-    await page.click("text=Add to Cart");
-
-    // 2. Checkout
-    await page.click("text=VIEW CART");
-    await page.click("text=PROCEED TO CHECKOUT");
-
-    // Set delivery address (Nakasero 3.8 km)
-    await page.fill('input[name="customerName"]', "Sarah Namukasa");
-    await page.fill('input[name="customerPhone"]', "0772000111");
-    
-    // Simulate map pin drop at 3.8 km
-    await page.evaluate(() => {
-      window.dispatchEvent(new CustomEvent("test:set-coordinates", {
-        detail: { lat: 0.3245, lng: 32.5782 }
-      }));
-    });
-
-    // Verify distance fee calculation
-    await expect(page.locator("text=Delivery Fee")).toContainText("USh 0");
-    await expect(page.locator("text=TOTAL DUE")).toContainText("USh 37,000");
-
-    // Select MTN MoMo and submit
-    await page.click("text=MTN Mobile Money");
-    await page.click("button:has-text('PAY USh 37,000 VIA MTN MOMO')");
-
-    // 3. Verify Living Tracker and Handover PIN
-    await expect(page).toHaveURL(/\/orders\/[a-f0-9-]+/);
-    const pinElement = page.locator("[data-testid='handover-pin']");
-    await expect(pinElement).toBeVisible();
-    const handoverPin = (await pinElement.textContent())?.trim();
-    expect(handoverPin).toHaveLength(4);
-
-    // 4. Kitchen Tablet Context (Second Browser Tab)
-    const kitchenContext = await browser.newContext();
-    const kitchenPage = await kitchenContext.newPage();
-    await kitchenPage.goto("/kitchen");
-    await kitchenPage.click("text=Start Shift / Enable Sound");
-    
-    // Bump order to ready
-    await expect(kitchenPage.locator("text=TILAPIA COMBO")).toBeVisible();
-    await kitchenPage.click("button:has-text('READY FOR PICKUP')");
-
-    // 5. Rider Context (Third Browser Tab)
-    const riderContext = await browser.newContext();
-    const riderPage = await riderContext.newPage();
-    await riderPage.goto("/rider");
-    await riderPage.fill('input[name="pin"]', "1234");
-    await riderPage.click("text=LOGIN");
-
-    // Claim order from pool
-    await riderPage.click("button:has-text('CLAIM THIS DELIVERY')");
-    await riderPage.click("button:has-text('START TRIP')");
-
-    // Enter correct Handover PIN to complete
-    await riderPage.click("button:has-text('ENTER 4-DIGIT PIN')");
-    await riderPage.fill('input[name="handoverPin"]', handoverPin!);
-    await riderPage.click("button:has-text('CONFIRM & COMPLETE')");
-
-    // 6. Verify Customer Screen updates to Delivered
-    await expect(page.locator("text=Meal Delivered!")).toBeVisible();
-  });
-});
-```
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Rewritten to canonical fixtures, Supabase Auth staff identities, schema-authoritative RPCs, and references to `TEST_PLAN.md`; added payment-retry and store-closed scenarios; removed duplicate seed SQL and unrunnable Playwright code. |
+| 1.0.0 | 2026-10-27 | Initial personas and E2E narrative. |

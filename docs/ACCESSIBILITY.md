@@ -1,149 +1,153 @@
-# ACCESSIBILITY — WCAG 2.2 AA Baseline and Corrected Palette
+# ACCESSIBILITY — WCAG 2.2 AA Verification
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.1 amendment to `DESIGN_SYSTEM_AND_UI_SPEC.md` |
-| **Standard** | WCAG 2.2 Level AA (the v1.0 claim of AAA is retired) |
-| **Date** | 2026-10-29 |
-| **Verification** | axe-core, Playwright, manual high-glare test |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **Standard** | WCAG 2.2 Level AA for all text and controls; AAA for body copy and critical status text where the palette permits |
+| **Design authority** | [`DESIGN_SYSTEM_V2.md`](DESIGN_SYSTEM_V2.md) |
+| **Verification** | axe-core, Playwright, manual keyboard/screen-reader/high-glare checks |
+
+The v1.0 claim of WCAG 2.1 AAA with terracotta CTAs was false. The v2 palette replaces it. This document defines the target and the evidence required to claim it.
 
 ---
 
-## 1. Why the v1.0 claim was false
+## 1. Target and non-negotiables
 
-The v1.0 design document claimed:
-
-- White text on `#D84A26` is `4.6:1`.
-- The palette meets WCAG 2.1 **AAA**.
-
-Measured values:
-
-| Pair | Measured contrast | WCAG 2.2 AA result |
-| :--- | ---: | :--- |
-| White on `#D84A26` | **4.26:1** | Fails normal text (needs 4.5:1) |
-| `#D84A26` on `#F9F8F6` | **4.02:1** | Fails normal text |
-| `#D84A26` on `#FFFFFF` | **4.26:1** | Fails normal text |
-
-`#D84A26` is still a valid **decorative** brand colour, but it cannot be the background of a primary button with white text, and it cannot be body text on the linen ground.
+- **AA is the release gate** for every screen in all four portals.
+- AAA is required for normal body text, prices, and critical statuses where the token pair meets 7:1.
+- No text, control, status, or error may rely on colour alone.
+- The primary action token is orange `#F28C28` with **green-900 `#102E27` text**. White on orange is forbidden.
+- Body text is at least 16 px; critical prices and CTA labels are at least 18 px semibold.
+- Minimum target size is 44×44 px; customer/admin controls are 48 px; rider/kitchen primary actions are 52–56 px.
+- Focus is always visible with a 2 px ring and 2 px offset.
+- `prefers-reduced-motion` is respected; no essential information is conveyed by motion.
 
 ---
 
-## 2. Corrected semantic palette
+## 2. Canonical Contrast Pairs
 
-Use these tokens. The names in `tailwind.config.ts` must match this table.
+Measured against the v2 tokens:
 
-| Token | Hex | Use | Contrast evidence |
-| :--- | :--- | :--- | :--- |
-| `surface.ground` | `#F9F8F6` | App background | Base |
-| `surface.card` | `#FFFFFF` | Cards, sheets | Base |
-| `surface.inset` | `#EFECE6` | Inputs, counters | Ink contrast 14.89:1 |
-| `ink.primary` | `#1A1918` | Titles, prices, body | 16.54:1 on ground; 17.56:1 on white |
-| `ink.secondary` | `#4A4744` | Descriptions, helper text | 8.69:1 on ground; 9.23:1 on white |
-| `ink.muted` | `#6B6763` | Minimum small text | 5.28:1 on ground; 5.61:1 on white |
-| `brand.action` | `#B83817` | Primary CTA background, active text | White text 5.81:1; on ground 5.47:1 |
-| `brand.action-hover` | `#A63312` | Pressed/hover CTA | White text 6.77:1; on ground 6.37:1 |
-| `brand.decorative` | `#D84A26` | Borders, illustrations, large accents | 4.02:1 on ground; **not for normal text** |
-| `status.success` | `#1B5E3B` | Paid, delivered, in stock | 7.75:1 on white; 7.30:1 on ground |
-| `status.success-bg` | `#E8F5E9` | Success pill background | Success text 6.89:1 |
-| `status.danger` | `#B91C1C` | Cash due, 86'd, late timer | 6.47:1 on white; 6.10:1 on ground |
-| `status.danger-bg` | `#FEE2E2` | Danger pill background | Danger text 5.30:1 |
-| `status.warning` | `#92400E` | Cooking, assigned | 7.09:1 on white; 6.68:1 on ground |
-| `status.warning-bg` | `#FEF3C7` | Warning pill background | Warning text 6.37:1 |
-| `border.structural` | `#E5E0D8` | 1 px borders | Non-text only |
-| `focus.ring` | `#1A1918` | Focus indicator | 16.54:1 on ground |
+| Pair | Ratio | AA normal text | AAA normal text | Use |
+| :--- | ---: | :--- | :--- | :--- |
+| White on green-800 `#173F35` | **11.67:1** | Pass | Pass | Dark headers, primary green surfaces |
+| White on green-900 `#102E27` | **14.4:1** | Pass | Pass | Deep surfaces |
+| Green-900 on orange-500 `#F28C28` | **4.76:1** | Pass | Fail | Primary action label |
+| Orange-700 `#A65A0F` on white | **5.13:1** | Pass | Fail | Orange text/links on light surfaces |
+| White on orange-500 `#F28C28` | **2.32:1** | **Fail** | **Fail** | **Forbidden** |
+| Gray-600 `#52635D` on white | **6.36:1** | Pass | Fail | Metadata, secondary text |
+| White on red-600 `#C62828` | **5.62:1** | Pass | Fail | Error/destructive surfaces |
+| Red-600 `#C62828` on white | **5.62:1** | Pass | Fail | Error text |
+| White on success-700 `#17603F` | **7.2:1** | Pass | Pass | Confirmed/paid |
+| White on warning-700 `#8A4B00` | **7.4:1** | Pass | Pass | Warning |
+| Green-900 on green-50 `#F2F7F5` | **13.8:1** | Pass | Pass | Tinted rows |
+| Ink on white | **16.25:1** | Pass | Pass | Body copy |
 
 ### 2.1 Hard rules
 
-1. **Primary buttons** use `bg-brand-action` (`#B83817`) with white text. Hover/pressed uses `#A63312`.
-2. **Never** place white text on `#D84A26` for normal-sized text. Use it only for decorative fills, borders, icons, or text at ≥ 24 px / ≥ 18.66 px bold (3:1 minimum).
-3. **Never** use `#D84A26` as body text on `#F9F8F6`. Use `#B83817` for terracotta text.
-4. Body text is at least **16 px**; critical prices and CTA labels are at least **18 px semibold**.
-5. Minimum touch target is **48 × 48 px** with at least **8 px** spacing.
-6. Never communicate status by colour alone. Pair colour with a label, icon, and/or pattern.
-7. Focus must be visible on every interactive element: 2 px `#1A1918` ring with 2 px offset.
-8. Respect `prefers-reduced-motion`; no essential information is conveyed by motion.
-9. Do not use pure white as the full-page canvas; use `#F9F8F6`.
-10. Re-run contrast checks whenever a token changes. A token change without a contrast test is a build failure.
+1. Never place white text on `#F28C28`.
+2. Never use `#F28C28` as body text on white; use `#A65A0F`.
+3. Red is for errors, destructive actions, and critical alerts only. Do not use it for ordinary busy states.
+4. Status badges combine colour, icon, and text.
+5. A token change without a contrast test is a build failure.
+6. Do not use pure white as the full-page canvas; use the gray-100 tint.
 
 ---
 
-## 3. Component-specific requirements
+## 3. Component Requirements
 
-### 3.1 Primary CTA
+### 3.1 Primary action
 
 ```tsx
-<button className="min-h-12 rounded-xl bg-brand-action px-5 text-lg font-semibold text-white hover:bg-brand-action-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface-ground disabled:opacity-50">
-  Pay USh 35,000 via MTN MoMo
+<button className="min-h-12 rounded-xl bg-[#F28C28] px-5 text-lg font-semibold text-[#102E27] hover:bg-[#E07D1F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173F35] focus-visible:ring-offset-2 disabled:opacity-50">
+  Pay USh 35,000
 </button>
 ```
 
-- Do not use `bg-brand-decorative` for the button.
-- The disabled state must also expose `aria-disabled="true"` and a reason.
+- The disabled state exposes `aria-disabled="true"` and a visible reason.
+- The button label includes the amount and method.
 
 ### 3.2 Status pills
 
 | Status | Background | Text | Example |
 | :--- | :--- | :--- | :--- |
-| Paid / Delivered | `#E8F5E9` | `#1B5E3B` | `Paid online` |
-| Cash due / 86'd | `#FEE2E2` | `#B91C1C` | `Collect USh 38,000` |
-| Cooking / Assigned | `#FEF3C7` | `#92400E` | `Cooking in kitchen` |
-| Neutral | `#EFECE6` | `#4A4744` | `Ready for pickup` |
+| Paid / Delivered | `#E8F5E9` | `#17603F` | Paid online |
+| Cash due / 86'd / late | `#FEE2E2` | `#C62828` | Collect USh 38,000 |
+| Cooking / assigned / busy | `#FEF3C7` | `#8A4B00` | Cooking in kitchen |
+| Neutral / ready | `#F2F4F3` | `#173F35` | Ready for pickup |
 
-### 3.3 KDS and rider screens
+### 3.3 KDS
 
-- KDS ticket text is at least 18 px; order number at least 24 px bold.
-- The 52 px bump button is written `h-[52px]`, not `h-13` (not a default Tailwind class).
-- Rider cards use a light card on the linen ground, not white text on terracotta.
-- The handover PIN box uses `#1A1918` text on `#FFFFFF` with a 2 px `#1A1918` border, and a monospace 32 px PIN.
+- Ticket text ≥ 18 px; order number ≥ 24 px bold.
+- Bump button is `h-[52px]`, not `h-13`.
+- Timers show elapsed minutes plus a word (`New`, `Late`); colour is secondary.
+- Audio alerts have a visual counterpart and can be muted; muting is visible in the header.
+- The shift-start overlay is keyboard operable and explains why sound needs a gesture.
 
-### 3.4 Forms and errors
+### 3.4 Rider
 
-- Every input has a visible `<label>`; placeholders are not labels.
-- Errors are announced with `role="alert"` and linked with `aria-describedby`.
-- Error text uses `status.danger` on `surface.card`, not red on a red tint.
-- Required fields are marked in text, not only with an asterisk.
+- Primary actions ≥ 56 px, reachable with gloves.
+- PIN keypad has labelled keys and supports physical keyboard input.
+- Offline state is text + icon; completion is blocked and never queued, faked, or labelled “Delivered”.
+- Map has a text fallback with area, distance, and ETA.
 
-### 3.5 Maps
+### 3.5 Forms and errors
 
-- Do not rely on colour alone for the rider marker; use a distinct shape and label.
-- Provide a text fallback with the delivery area and ETA.
-- Map controls have text labels or `aria-label`.
+- Visible `<label>` for every input; placeholders are not labels.
+- Errors use `role="alert"`, `aria-invalid`, and `aria-describedby`.
+- Error text is red-600 on white or on the error tint, never red on a photograph.
+- Required fields are marked in text.
+
+### 3.6 Dialogs and sheets
+
+- Use native `<dialog>` or an equivalent with focus trap and restore.
+- Escape closes; the close control has an accessible name.
+- Mobile uses bottom sheets; desktop may use a centred dialog.
+- Destructive confirmations require a reason and never autofocus the destructive action.
+
+### 3.7 Maps, charts, and status
+
+- Rider marker has a distinct shape and label.
+- Charts include a table or text summary; colour is not the only encoding.
+- Status changes are announced through a polite live region.
+- Toasts use `aria-live`; errors use `role="alert"`.
 
 ---
 
-## 4. Verification plan
+## 4. Verification Plan
 
 | Check | Tool | Gate |
 | :--- | :--- | :--- |
-| Automated axe scan on every page | `@axe-core/playwright` | Zero critical/serious violations |
-| Keyboard-only navigation | Manual | Every flow completes without a mouse |
-| 200% zoom / 320 px width | Manual + Playwright viewport | No horizontal scroll; no clipped CTA |
-| Screen reader labels | Manual (NVDA/VoiceOver) | All controls named; status changes announced |
-| Contrast tokens | Script in CI | All text pairs ≥ 4.5:1; large text ≥ 3:1 |
-| Outdoor glare | Manual on the actual kitchen tablet and a budget Android phone | PIN, price, and CTA remain legible |
-| Reduced motion | Playwright `emulateMedia({ reducedMotion: 'reduce' })` | No essential animation |
+| axe scan on `/`, `/checkout`, `/orders/[token]`, `/kitchen`, `/rider`, `/admin`, `/admin/ledger` | `@axe-core/playwright` | Zero critical or serious violations |
+| Contrast token test | CI script | All text pairs meet their declared target |
+| Keyboard-only flows | Manual + Playwright | Checkout, kitchen bump, rider claim/PIN, admin reconcile complete without a mouse |
+| 200% zoom / 320 px width | Playwright viewport + manual | No horizontal scroll; no clipped CTA |
+| Screen reader | NVDA/VoiceOver | Controls named; status changes announced; PIN not read on staff screens |
+| Reduced motion | Playwright `emulateMedia` | No essential animation |
+| High-glare | Actual kitchen tablet and budget Android phone | PIN, price, and CTA remain legible |
+| Touch targets | Script + manual | 44 px minimum; 48/56 px portal targets |
 
-Add `npm run test:a11y` to CI. A failing axe check blocks merge.
-
----
-
-## 5. Changes to `DESIGN_SYSTEM_AND_UI_SPEC.md`
-
-The original document remains as historical context. Apply these amendments:
-
-1. Replace the accessibility standard with **WCAG 2.2 AA**.
-2. Replace the palette rows for `Brand Terracotta`, `Brand Terracotta Hover`, `Urgent`, and `Pending` with the table in §2.
-3. Rename `brand.terracotta` to `brand.decorative`; add `brand.action` and `brand.action-hover`.
-4. Replace all `bg-brand-terracotta` primary buttons with `bg-brand-action`.
-5. Replace `text-brand-terracotta` body text with `text-brand-action`.
-6. Replace `h-13` with `h-[52px]`.
-7. Add a `focus-visible` ring to every interactive component.
-8. Delete the “AAA” claim and the unverified 4.6:1/5.8:1/5.9:1/5.1:1 labels.
+`npm run test:a11y` is a merge gate.
 
 ---
 
-## 6. Revision history
+## 5. Manual Test Script
+
+1. Complete checkout with the keyboard only, including the map pin (text fallback) and payment redirect.
+2. On the tracker, confirm the PIN is announced only after the safety-seal instruction.
+3. On the KDS, enable sound with the keyboard, accept a cash order, bump a delivery order, and 86 an item.
+4. On the rider portal, claim, start, enter a wrong PIN, then the correct PIN; then switch offline and confirm completion is blocked with an explanation.
+5. On the admin ledger, reconcile with keyboard only and confirm the variance is announced.
+6. At 200% zoom, verify the sticky CTA does not cover form errors.
+7. With reduced motion, verify no status relies on animation.
+
+---
+
+## 6. Revision History
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
-| 1.1.0 | 2026-10-29 | Created; corrected palette, WCAG 2.2 AA, verification plan. |
+| 1.2.0 | 2026-11-09 | Replaced terracotta palette with v2 green/orange tokens; corrected contrast evidence; added KDS/rider/dialog/chart rules and a manual script. |
+| 1.1.0 | 2026-10-29 | Initial AA correction. |

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Kitchen board | Morouj Mazaar</title>
+  <meta name="description" content="Morouj Mazaar kitchen board: oldest-first tickets, COD acceptance, bump, busy mode, 86 toggles and browser-print dockets.">
+  <meta name="theme-color" content="#173F35">
+  <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/kitchen.css">
+</head>
+<body class="kitchen-body">
+  <a class="skip-link" href="#kitchenMain">Skip to kitchen board</a>
+
+  <header class="kitchen-header on-dark">
+    <div class="container kitchen-header-inner">
+      <a class="brand" href="index.html" aria-label="Morouj Mazaar portal home">
+        <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-flame"></use></svg></span>
+        <span class="brand-text">
+          <strong>Morouj Mazaar</strong>
+          <span>Kitchen board</span>
+        </span>
+      </a>
+
+      <div class="kitchen-header-meta">
+        <span class="kitchen-store">
+          <span class="connection-dot" aria-hidden="true"></span>
+          Store open · closes 22:00 EAT
+        </span>
+        <button class="kitchen-connection" type="button" id="kitchenConnection" data-state="online" aria-label="Connection status: online. Simulate offline">
+          <svg class="icon" aria-hidden="true"><use href="#i-wifi"></use></svg>
+          <span id="kitchenConnectionLabel">Online</span>
+        </button>
+        <div class="kitchen-user">
+          <span class="avatar avatar-dark" aria-hidden="true">AK</span>
+          <div><strong>Amina Nakato</strong><span>Kitchen lead</span></div>
+        </div>
+        <a class="btn btn-secondary btn-sm" href="index.html">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Portal
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="kitchen-main" id="kitchenMain">
+    <div class="kitchen-page-head">
+      <div>
+        <h1>Kitchen board</h1>
+        <p id="kitchenDate">Sunday, 1 November 2026 · Kampala, EAT · Oldest ticket first</p>
+      </div>
+      <div class="kitchen-head-actions">
+        <button class="btn btn-secondary" type="button" id="busyToggle" aria-pressed="false">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-clock"></use></svg>
+          <span id="busyToggleLabel">Busy mode: off</span>
+        </button>
+        <button class="btn btn-secondary" type="button" data-open-sheet="stockSheet">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-box"></use></svg>
+          86'd items <span class="badge badge-neutral" id="stockCount">2</span>
+        </button>
+        <button class="btn btn-primary" type="button" id="refreshTickets">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-refresh"></use></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="kitchen-banners">
+      <div class="kitchen-banner kitchen-banner-offline" id="kitchenOfflineBanner" role="alert" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-wifi-off"></use></svg>
+        <div>
+          <strong>Kitchen board offline</strong>
+          <p>Do not accept or bump tickets until the connection returns. The last confirmed queue stays visible.</p>
+        </div>
+      </div>
+      <div class="kitchen-banner kitchen-banner-busy" id="kitchenBusyBanner" role="status" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+        <div>
+          <strong>Busy mode is on</strong>
+          <p>New orders receive a longer ETA. Existing tickets keep their promised times.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="kitchen-stats" id="kitchenStats" aria-label="Kitchen summary"></div>
+
+    <div class="kitchen-toolbar">
+      <div class="kitchen-filter" role="group" aria-label="Filter tickets">
+        <button type="button" data-filter="all" aria-pressed="true">All tickets</button>
+        <button type="button" data-filter="delivery" aria-pressed="false">Delivery</button>
+        <button type="button" data-filter="dine-in" aria-pressed="false">Dine-in</button>
+      </div>
+      <p class="kitchen-updated" id="kitchenUpdated">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#i-sync"></use></svg>
+        Updated just now · polls every 10 seconds
+      </p>
+    </div>
+
+    <div class="kitchen-board" id="kitchenBoard" aria-live="polite"></div>
+  </main>
+
+  <dialog class="sheet" id="stockSheet" aria-labelledby="stockTitle">
+    <div class="sheet-inner">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div>
+          <h2 id="stockTitle">86'd items</h2>
+          <p>Toggle an item when the kitchen runs out. The storefront hides it immediately.</p>
+        </div>
+        <button class="icon-btn" type="button" data-close-sheet aria-label="Close stock sheet">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="stock-list" id="stockList"></div>
+        <p class="field-hint">Stock changes are audited in production. This prototype keeps them in memory only.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="print-docket" id="printDocket" aria-hidden="true"></div>
+
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/kitchen.js"></script>
+</body>
+</html>

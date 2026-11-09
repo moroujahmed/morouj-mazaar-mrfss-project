@@ -1,455 +1,238 @@
-# INTEGRATIONS_AND_HARDWARE_APIS.md
+# INTEGRATIONS AND HARDWARE APIS
 
-> **v1.1 normative amendment:** Payment signatures, OTP provider, map tiles, printing, and deep links are superseded by [`DECISIONS.md`](DECISIONS.md) ADR-002/003/004/007 and [`API_CONTRACTS.md`](API_CONTRACTS.md) §3.
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **Supersedes** | v1.0 generic HMAC contract, OTP prose, OSM tiles, ESC/POS assumptions, background-GPS promise |
+| **Authority** | `DECISIONS.md` ADR-002/003/004/005/007/009/014/016, `API_CONTRACTS.md`, migration |
 
-## Document Control & Metadata
-* **Document Version:** 1.0.0
-* **Status:** Approved Technical Integration Specification
-* **Target Environment:** Standard Mobile Web Browsers (Chrome for Android / Safari iOS)
-* **Scope:** Geolocation Telemetry, Web Audio Synthesizer, Thermal Printing, Payment Webhooks, and Native URI Schemes
-* **Regional Telecommunications:** Uganda (MTN Uganda, Airtel Uganda)
-
----
-
-## 1. HTML5 Geolocation Telemetry Engine (Rider GPS Streaming)
-
-To achieve live motorcycle tracking on customer screens without paid tracking SDKs (e.g., HyperTrack, Radar), the rider interface utilizes the browser-native **HTML5 Geolocation API** (`navigator.geolocation.watchPosition`).
-
-```
-[ Boda Rider Phone Browser: /rider ]
-                 │
-                 ├──(navigator.geolocation.watchPosition)
-                 │
-                 ▼
-     [ Local Coordinate Buffer ] ──(Filter: Distance > 20m OR Elapsed > 12s)
-                 │
-                 ▼
-  [ Supabase: UPSERT rider_telemetry ] ──(Realtime WebSocket)──> [ Customer Map: /orders/[token] ]
-```
-
-### 1.1 Watcher Configuration & Throttling
-Continuous polling drains phone batteries rapidly under tropical heat and consumes excessive mobile data. Coordinates must be throttled before hitting the database:
-
-* **High Accuracy Mode:** `enableHighAccuracy: true` (forces GPS hardware lock rather than cell-tower triangulation).
-* **Timeout:** `10000` ($10\text{ seconds}$).
-* **Maximum Age:** `0` (prevents serving stale cached coordinates).
-* **Adaptive Push Filter:** Coordinates are dispatched to Supabase **only if**:
-  1. The rider has moved more than **`20 meters`** from the last recorded point (calculated via Haversine), **OR**
-  2. At least **`12 seconds`** have elapsed since the last transmission.
-
-### 1.2 Telemetry Ingestion Contract (TypeScript)
-```typescript
-export interface RiderTelemetryPayload {
-  rider_id: string;      // UUID referencing public.profiles
-  order_id: string;      // UUID referencing active public.orders
-  latitude: number;      // DECIMAL(10, 7) e.g., 0.3136123
-  longitude: number;     // DECIMAL(10, 7) e.g., 32.5811456
-  heading: number | null;// Degrees (0-360) from compass or motion vector
-  speed: number | null;  // Speed in m/s (used to calculate moving/idle state)
-  updated_at: string;    // ISO-8601 Timestamp
-}
-```
-
-### 1.3 Telemetry Client Implementation Hook
-```typescript
-// src/hooks/use-geolocation.ts
-"use client";
-
-import { useEffect, useRef } from "react";
-import { createBrowserClient } from "@/lib/supabase/client";
-
-export function useRiderTelemetry(riderId: string, activeOrderId: string | null) {
-  const lastPushTime = useRef<number>(0);
-  const lastCoords = useRef<{ lat: number; lng: number } | null>(null);
-  const supabase = createBrowserClient();
-
-  useEffect(() => {
-    if (!activeOrderId) return;
-
-    if (!("geolocation" in navigator)) {
-      console.error("Geolocation is not supported by this browser.");
-      return;
-    }
-
-    const watchId = navigator.geolocation.watchPosition(
-      async (position) => {
-        const now = Date.now();
-        const { latitude, longitude, heading, speed } = position.coords;
-
-        const timeElapsed = now - lastPushTime.current;
-        const hasMovedSignificantly = lastCoords.current
-          ? calculateDistanceMeters(
-              lastCoords.current.lat,
-              lastCoords.current.lng,
-              latitude,
-              longitude
-            ) > 20
-          : true;
-
-        if (hasMovedSignificantly || timeElapsed > 12000) {
-          lastPushTime.current = now;
-          lastCoords.current = { lat: latitude, lng: longitude };
-
-          await supabase.from("rider_telemetry").upsert({
-            rider_id: riderId,
-            order_id: activeOrderId,
-            latitude,
-            longitude,
-            heading: heading || 0,
-            updated_at: new Date().toISOString(),
-          });
-        }
-      },
-      (error) => console.warn(`GPS Telemetry error (${error.code}): ${error.message}`),
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
-
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [riderId, activeOrderId, supabase]);
-}
-
-function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371e3;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-```
+All providers are behind adapters. The application must keep working with a mock adapter in local/E2E mode and must fail closed when a production provider is unavailable.
 
 ---
 
-## 2. Web Audio API Alert Synthesizer (Kitchen Audio Engine)
+## 1. Provider Matrix
 
-To guarantee that kitchen cooks never miss incoming orders while eliminating external audio file dependencies (`.mp3` downloads that can fail over spotty 3G networks), audio alarms are **synthesized programmatically in real time via the Web Audio API**.
+| Capability | Production | Development / test |
+| :--- | :--- | :--- |
+| Payments | Flutterwave hosted checkout (MoMo, Airtel, card) | Mock adapter, no network |
+| Webhook route | `POST /api/webhooks/flutterwave` | Same route with mock adapter |
+| SMS/OTP | Africa's Talking | Console/mock adapter |
+| Routing | Self-hosted OSRM | Mock fixtures or public demo, never a final-fee fallback |
+| Map tiles | MapTiler (restricted key) | OSM standard tiles with attribution |
+| Rate limits/cache | Upstash Redis REST | In-memory adapter allowed for local tests only |
+| Printing | Browser print to 58/80 mm thermal printer | Browser print preview |
+| Notifications | SMS via Africa's Talking; WhatsApp support link | Console/mock outbox |
 
-```
-[ Browser User Gesture: "Tap to Enable Sound" ]
-                        │
-                        ▼
-           [ Initialize AudioContext ]
-                        │
-      ┌─────────────────┴─────────────────┐
-      ▼                                   ▼
-[ New Order Chime ]              [ Urgent Overdue Pulse ]
-Sine wave frequency ramp         Square wave alternating tone
-587.33Hz (D5) -> 880Hz (A5)      440Hz <-> 880Hz (1Hz interval)
-```
-
-### 2.1 Browser Autoplay Policy Bypass Pattern
-Modern browsers strictly forbid audio execution until a direct user gesture occurs. 
-1. Upon loading `/kitchen`, the application checks `audioContext.state`.
-2. If `state === 'suspended'`, a high-visibility modal covers the UI:
-   `[ 🔔 TAP TO START SHIFT & ACTIVATE KITCHEN AUDIO ]`.
-3. Tapping this button invokes `audioContext.resume()`, permanently enabling sound for that browser tab session.
-
-### 2.2 Programmatic Chime Synthesizer
-```typescript
-// src/lib/audio/chimes.ts
-class KitchenAudioEngine {
-  private ctx: AudioContext | null = null;
-
-  public init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
-    }
-    if (this.ctx.state === "suspended") {
-      this.ctx.resume();
-    }
-  }
-
-  // Double-tone harmonic bell: Plays when a new order arrives
-  public playNewOrderChime() {
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = "sine";
-    // Pitch envelope: D5 (587.33Hz) jumping up to A5 (880.00Hz)
-    osc.frequency.setValueAtTime(587.33, now);
-    osc.frequency.setValueAtTime(880.0, now + 0.15);
-
-    // Exponential decay (simulates physical brass bell strike)
-    gain.gain.setValueAtTime(0.8, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 1.2);
-  }
-
-  // Urgent pulsed alarm: Fires if an order remains unbumped > 20 minutes
-  public playUrgentWarning() {
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = "square";
-    osc.frequency.setValueAtTime(440, now);
-    osc.frequency.setValueAtTime(880, now + 0.1);
-
-    gain.gain.setValueAtTime(0.5, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.4);
-  }
-}
-
-export const kitchenAudio = new KitchenAudioEngine();
-```
+Secrets live in the hosting secret manager or local `.env.local`. They are never committed, logged, or bundled.
 
 ---
 
-## 3. Thermal Receipt Printing Subsystem (58mm & 80mm)
+## 2. Flutterwave Payments
 
-Kitchen staff and packaging lines rely on physical paper tickets. The platform provides native print output without specialized printer drivers using **CSS `@media print` rules** calibrated for standard $58\text{mm}$ and $80\text{mm}$ thermal paper roll profiles.
+### 2.1 Initiation
 
-### 3.1 Browser Native Print Stylesheet (`globals.css`)
-```css
-@media print {
-  /* Hide all interactive viewport UI */
-  body * {
-    visibility: hidden;
-  }
+1. Server creates the order in `PENDING_PAYMENT` with integer totals and a unique `order_token`.
+2. Server calls Flutterwave `POST https://api.flutterwave.com/v3/payments` with:
+   - `tx_ref = orders.order_token`;
+   - `amount` and `currency = "UGX"`;
+   - customer name/phone/email placeholder;
+   - `redirect_url` to the customer tracker return route;
+   - approved payment options for MTN/Airtel/card.
+3. Server stores the provider response reference in `payment_transactions` and returns the hosted-checkout URL.
+4. The browser redirects to Flutterwave. No card data enters the app.
 
-  /* Expose only the print container */
-  #thermal-print-container,
-  #thermal-print-container * {
-    visibility: visible;
-  }
+### 2.2 Webhook Authentication
 
-  #thermal-print-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 58mm; /* Defaults to 58mm roll; changes to 80mm via .format-80mm */
-    margin: 0;
-    padding: 2mm;
-    background: #ffffff !important;
-    color: #000000 !important;
-    font-family: "Courier New", Courier, monospace !important;
-    font-size: 11pt;
-    line-height: 1.2;
-  }
+Flutterwave sends a `verif-hash` header that is a **plain shared-secret comparison**, not an HMAC of the request body.
 
-  .format-80mm {
-    width: 80mm !important;
-  }
-
-  @page {
-    margin: 0;
-    size: auto;
-  }
-}
+```ts
+const expected = process.env.FLW_WEBHOOK_HASH!;
+const received = request.headers.get("verif-hash") ?? "";
+const ok = received.length === expected.length &&
+  crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected));
 ```
 
-### 3.2 Structured Plaintext Format (Raw Thermal Format)
-When using direct Bluetooth serial printing, format the ticket text deterministically:
+- Reject a missing/mismatched hash with `401` and no state change.
+- Do not trust the webhook body's status alone.
+- On a valid event, call `GET https://api.flutterwave.com/v3/transactions/{id}/verify` with the secret key.
+- Compare the verified amount, currency, and `tx_ref` to the stored order.
+- Only then mark the payment successful.
 
-```
-================================
-     BAZAAR FLAME & GRILL       
-   Plot 12, Bazaar Main Hub     
-      Tel: +256 700 000000      
-================================
-ORDER: #1042       TYPE: DELIVERY
-DATE: 29-OCT-2026 12:45 EAT
-CUSTOMER: Sarah Namukasa
-PHONE: +256 772 000 111
-DROP: Plot 14 Lumumba Ave
---------------------------------
-QTY  ITEM                  PRICE
---------------------------------
-1x   Tilapia Flame Combo  32,000
-     * NO ONIONS *
-     * EXTRA CHILI *
-1x   Passion Juice 500ml   5,000
---------------------------------
-SUBTOTAL:             USh 37,000
-DELIVERY FEE (3.8km):     USh  0
-PACKAGING:            USh  1,000
-TOTAL DUE:            USh 38,000
-PAYMENT: PAID (MTN MOMO)
---------------------------------
-   *** HANDOVER PIN: 4821 ***   
-   CHECK SAFETY SEAL BEFORE PIN 
-================================
-```
+### 2.3 Idempotency and Late Events
+
+- Insert the provider event into `webhook_events` with a unique `(provider, provider_event_id)`.
+- If the event already exists and is processed, return `200` without reprocessing.
+- A successful event for a `CANCELLED`, `DELIVERY_FAILED`, or already-`DELIVERED` order must **not** resurrect the order. Record the event and create a refund/manual-review task.
+- A failed event for a paid order does not downgrade it; reconcile against the verification API.
+- Payment success moves `PENDING_PAYMENT → PREPARING` exactly once and sets `acknowledged_at`.
+
+### 2.4 Timeout, Retry, and Refund
+
+- `expire_pending_orders()` runs every minute (Supabase `pg_cron` or Vercel Cron) and cancels digital orders still pending after 10 minutes.
+- A failed or abandoned payment returns the customer to checkout with the existing idempotency key and a “Try again” action. A new key is generated only when the cart changes.
+- Refunds are recorded in `refunds` with status `REQUESTED → PROCESSING → COMPLETED/FAILED`.
+- Admin cancellation of a paid order creates a `REQUESTED` refund. The worker calls Flutterwave's refund endpoint and stores the provider reference. Cash refunds require an admin reason and audit row.
+- Refund limits and approvers are founder policy (`F-34`, `F-41`).
+
+### 2.5 Mock Mode
+
+`PAYMENTS_MODE=mock` is allowed only when `NODE_ENV !== "production"`. It must be rejected at startup in production. Mock mode simulates success/failure/timeout and never contacts Flutterwave.
 
 ---
 
-## 4. Mobile Money & Payment Webhook Handlers
+## 3. SMS and OTP (Africa's Talking)
 
-### 4.1 Inbound Webhook Specification (`/api/webhooks/payment`)
-Payment aggregators (e.g., Flutterwave / Paystack) dispatch an HTTP `POST` event upon successful completion of a customer's USSD push prompt.
+- Use the approved sender ID and transactional templates.
+- OTP: 6 digits, 10-minute expiry, 3 attempts, 3 sends per phone per hour.
+- Store only a hash in `otp_verifications`; never log the code.
+- First-time COD customers must verify. Returning customers with a delivered order may skip when the setting permits.
+- If the provider is down, COD checkout is disabled with a clear message; do not silently bypass.
+- Status notifications are written to the `notifications` outbox and dispatched with bounded retries and a dead-letter state. Dine-in orders do not receive delivery-status SMS.
+- WhatsApp is a human support link in v1, not an automated channel.
 
-#### Security & Signature Validation:
-1. Webhook payloads must be verified against an HMAC-SHA256 signature passed in the request header (`x-signature` or `verif-hash`).
-2. Webhook execution must be **idempotent**: processing the same transaction ID twice must produce no duplicate state mutations.
-
-### 4.2 Webhook Request Schema (Zod Validation)
-```typescript
-import { z } from "zod";
-
-export const PaymentWebhookSchema = z.object({
-  event: z.enum(["charge.completed", "payment.failed"]),
-  data: z.object({
-    id: z.string(),
-    tx_ref: z.string().uuid(), // Maps directly to public.orders.order_token
-    amount: z.number().int(),  // Amount in whole UGX
-    currency: z.literal("UGX"),
-    payment_type: z.enum(["mobilemoneyuganda", "card"]),
-    status: z.enum(["successful", "failed"]),
-    customer: z.object({
-      phone_number: z.string(),
-      name: z.string(),
-    }),
-  }),
-});
-```
-
-### 4.3 Webhook Handler Implementation
-```typescript
-// src/app/api/webhooks/payment/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { PaymentWebhookSchema } from "@/lib/schemas/payment";
-import crypto from "crypto";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-export async function POST(req: NextRequest) {
-  try {
-    const rawBody = await req.text();
-    const signature = req.headers.get("x-signature");
-
-    // 1. Cryptographic Signature Verification
-    const secret = process.env.PAYMENT_WEBHOOK_SECRET!;
-    const hash = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
-    if (hash !== signature) {
-      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-    }
-
-    // 2. Payload Parsing & Schema Validation
-    const payload = PaymentWebhookSchema.parse(JSON.parse(rawBody));
-    const { tx_ref, status, amount } = payload.data;
-
-    // 3. Fetch Matching Order
-    const { data: order, error: fetchErr } = await supabaseAdmin
-      .from("orders")
-      .select("id, total_amount, order_status, payment_status")
-      .eq("order_token", tx_ref)
-      .single();
-
-    if (fetchErr || !order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    }
-
-    // 4. Idempotency Guard: Ignore if already processed
-    if (order.payment_status === "PAID") {
-      return NextResponse.json({ message: "Already processed" }, { status: 200 });
-    }
-
-    // 5. Amount Verification Guard (Anti-Tampering)
-    if (amount !== order.total_amount) {
-      console.error(`Fraud alert: Amount mismatch on order ${order.id}`);
-      return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
-    }
-
-    // 6. Transition State: Shift to PREPARING
-    if (status === "successful") {
-      await supabaseAdmin
-        .from("orders")
-        .update({
-          payment_status: "PAID",
-          order_status: "PREPARING",
-        })
-        .eq("id", order.id);
-    } else {
-      await supabaseAdmin
-        .from("orders")
-        .update({
-          payment_status: "FAILED",
-          order_status: "CANCELLED",
-        })
-        .eq("id", order.id);
-    }
-
-    return NextResponse.json({ success: true }, { status: 200 });
-  } catch (err) {
-    console.error("Webhook processing error:", err);
-    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
-  }
-}
-```
+Webhook/callback authentication for delivery receipts must be verified before updating a notification as `SENT`.
 
 ---
 
-## 5. External URI Schemes & WhatsApp Concierge Protocols
+## 4. Routing and Distance
 
-To maintain an ultra-low codebase size and avoid third-party mapping SDKs, all off-app integrations leverage standardized **Mobile Deep-Linking URI Schemes**.
+### 4.1 OSRM
 
-### 5.1 One-Tap Google Maps Navigation (Rider Trigger)
-When the motorcycle rider taps `[ 🗺️ Launch Navigation ]` on `/rider`, the phone opens native Google Maps with the destination coordinates pinned:
+- Production uses a self-hosted OSRM instance with a Uganda/OSM extract.
+- Development uses a mock adapter or the public demo server.
+- `/api/distance` accepts only validated coordinates, quantizes them for the cache key, and returns integer metres plus duration.
+- Cache identical routes for 24 hours.
+- If OSRM fails and no valid cache exists, return `DISTANCE_UNAVAILABLE` and block checkout. Never return a Haversine estimate as the final fee.
+- Rate limit: 30 requests/minute/IP in production.
 
-```typescript
-// src/lib/navigation.ts
-export function getNavigationUri(latitude: number, longitude: number, addressText: string): string {
-  const isAndroid = typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
-  const encodedAddress = encodeURIComponent(addressText);
+### 4.2 Request / Response
 
-  if (isAndroid) {
-    // Native Android Intent URI (Bypasses browser directly into Google Maps app)
-    return `google.navigation:q=${latitude},${longitude}&mode=d`;
-  }
-  // Standard Cross-Platform Universal Link
-  return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+```http
+GET /api/distance?lat=0.3245&lng=32.5782
+```
+
+```json
+{
+  "distanceM": 1562,
+  "durationSeconds": 212,
+  "source": "OSRM",
+  "cached": false
 }
 ```
 
-### 5.2 Contextual WhatsApp Concierge Generator
-When a customer clicks `[ 💬 Help with Order ]`, WhatsApp opens with the order number, customer name, and order tracking link pre-populated:
+Errors use `{ "code": "DISTANCE_UNAVAILABLE" | "DISTANCE_OUT_OF_BOUNDS" | "VALIDATION_ERROR", "message": "..." }`.
 
-```typescript
-// src/lib/whatsapp.ts
-export function generateWhatsAppHelpLink(
-  supportNumber: string, // e.g., "+256700000000"
-  orderNumber: number,   // e.g., 1042
-  customerName: string,
-  orderToken: string
-): string {
-  const cleanPhone = supportNumber.replace(/[^0-9]/g, "");
-  const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/orders/${orderToken}`;
+### 4.3 Map Tiles and Leaflet
 
-  const message = 
-    `Hello Bazaar Flame & Grill! 👋\n` +
-    `My name is ${customerName}. I have a question regarding Order #${orderNumber}.\n` +
-    `Tracking Link: ${trackingUrl}`;
+- Production: MapTiler with a domain-restricted key and visible attribution.
+- Development: OSM standard tiles with attribution.
+- Leaflet CSS must be imported in the client map wrapper or global stylesheet.
+- `next/dynamic` with `ssr: false` belongs inside a `"use client"` wrapper.
+- The map skeleton has a text fallback and `aria-busy`.
 
-  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-}
-```
+---
+
+## 5. Rider Telemetry
+
+### 5.1 Permissions and Scope
+
+- Foreground only. Do not promise background/locked-screen tracking.
+- Ask for geolocation permission in context, explain why, and provide a manual fallback.
+- Use the Screen Wake Lock API while the rider is on an active delivery, and show a “keep this screen open” instruction.
+- `update_rider_telemetry(order_id, lat, lng, accuracy, heading, speed)` validates:
+  - caller is a rider;
+  - the order belongs to `auth.uid()`;
+  - the order is `OUT_FOR_DELIVERY`;
+  - coordinate bounds.
+- Pool and customer payloads never include another rider's exact position.
+
+### 5.2 Sampling and Offline Queue
+
+- Send at most one point every 15 seconds or every 20 metres, whichever is later.
+- Batch up to 10 points.
+- Store unsent points in IndexedDB (not `localStorage`) with a bounded queue (e.g., 500 points / 30 minutes).
+- Retry with exponential backoff and jitter. Drop the oldest points only after the bound is reached.
+- When reconnecting, replay in timestamp order; the server rejects points for a completed order.
+- Show a visible “GPS paused/offline” state. Do not show a moving map when data is stale.
+
+### 5.3 Customer Tracker
+
+- Poll `get_order_telemetry(order_token)` every 10 seconds while the page is visible.
+- Stop polling when hidden; resume on visibility.
+- If stale by more than 60 seconds, show “Last seen N minutes ago” rather than a false live position.
+
+---
+
+## 6. Printing and Receipts
+
+- MVP uses browser print (`window.print()` + `@media print`) to a 58 mm or 80 mm thermal printer.
+- The print stylesheet defines roll width, margins, font size, and page breaks.
+- Kitchen dockets show order number, time, type, items/modifiers, notes, and payment status. They never show the handover PIN.
+- Customer receipts show masked phone, item totals, fees, total, order token/QR, and the legal footer from the founder-approved content.
+- A reprint button is available to kitchen/admin and writes an audit row.
+- ESC/POS over Web Bluetooth/USB is a future enhancement, not a launch dependency.
+- If printing fails, the kitchen can use a handwritten docket; the order remains visible on the KDS.
+
+Canonical receipt totals must match `CANONICAL_EXAMPLES.md`; do not hardcode old values in templates.
+
+---
+
+## 7. Deep Links and Device Behaviour
+
+| Action | Link |
+| :--- | :--- |
+| Call customer/rider | `tel:+256...` |
+| WhatsApp support | `https://wa.me/256...?text=...` |
+| Navigation | Provider-neutral geo URI or Maps URL with destination coordinates |
+| Copy tracker | `https://{domain}/orders/{token}` |
+
+- Phone numbers in links are E.164.
+- Never put a PIN, token, or customer address in a WhatsApp prefilled case number.
+- Handle `tel:` failure with a visible fallback number.
+- Test on the actual kitchen tablet and rider phones before launch (`F-62`, `F-63`).
+
+---
+
+## 8. Hardware and Browser Matrix
+
+| Device | Requirement |
+| :--- | :--- |
+| Kitchen tablet/PC | Current Chrome/Edge, stable power, printer installed, sound enabled once per session |
+| Rider phone | Android Chrome 120+ or iOS Safari 17+, GPS, data plan, mount, power bank |
+| Admin laptop | Current Chrome/Edge/Firefox/Safari |
+| Printer | 58 mm or 80 mm thermal, OS driver installed; browser print is the fallback |
+
+KDS audio:
+
+- Browsers block autoplay until a gesture. Show a “Enable sound” banner.
+- After unlock, chime on a new ticket and repeat every 15 seconds until `acknowledged_at`.
+- Stop repeating on accept, cancel, or when the ticket leaves the new queue.
+- Multiple tablets may chime; acceptance in one is reflected through the shared state/polling.
+
+---
+
+## 9. Failure Modes
+
+| Failure | Behaviour |
+| :--- | :--- |
+| Flutterwave down | Checkout shows retry; no order is marked paid; COD remains available within policy |
+| Webhook backlog | Events are stored and retried; order stays pending until verification succeeds or timeout |
+| OSRM down | Checkout blocked with `DISTANCE_UNAVAILABLE` |
+| SMS down | COD checkout disabled; tracker and prepaid checkout continue |
+| Map tiles down | Address form and distance still work; map shows a text fallback |
+| Printer down | KDS remains authoritative; handwritten docket fallback |
+| Rider GPS unavailable | Rider can call/navigate manually; admin can complete with reason |
+| Supabase down | Read-only offline shell; mutations queue only where the contract permits |
+| Upstash down | Fail closed on rate-limited public mutations; staff read paths continue |
+
+---
+
+## 10. Revision History
+
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.0.0 | 2026-10-29 | Original integration draft. |
+| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.2.0 | 2026-11-09 | Corrected Flutterwave, OTP, OSRM, telemetry, printing, deep-link, and failure contracts. |

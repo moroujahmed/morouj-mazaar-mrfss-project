@@ -110,7 +110,7 @@ CREATE TABLE public.app_settings (
     CHECK (rate_per_excess_km >= 0),
   max_delivery_radius_km NUMERIC(5, 2) NOT NULL DEFAULT 15.00
     CHECK (max_delivery_radius_km > 0),
-  cod_max_radius_km NUMERIC(5, 2) NOT NULL DEFAULT 8.00
+  cod_max_radius_km NUMERIC(5, 2) NOT NULL DEFAULT 8.10
     CHECK (cod_max_radius_km > 0),
 
   minimum_order_value INTEGER NOT NULL DEFAULT 20000

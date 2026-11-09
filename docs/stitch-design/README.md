@@ -155,11 +155,12 @@ Rules reflected in the screens:
 
 The normative palette is defined in [`../ACCESSIBILITY.md`](../ACCESSIBILITY.md):
 
-- Brand action `#B83817`, hover `#A63312`, decorative `#D84A26`.
-- Page ground `#F9F8F6`, cards `#FFFFFF`, inset `#EFECE6`.
-- Ink `#1A1918`, secondary `#4A4744`, muted `#6B6763`.
+- Brand green `#173F35`, deep green `#102E27`, hover `#1D4F42`.
+- Action orange `#F28C28` with green-900 `#102E27` text; orange text `#A65A0F`.
+- Page canvas `#F2F4F3`, cards `#FFFFFF`, tint `#F2F7F5`, inset `#E3EEEA`.
+- Ink `#102E27`, secondary `#52635D`.
 
-Do not use `#D84A26` as normal body text on the linen ground. Do not place white text on it at normal size. Full contrast tables and focus rules are in `ACCESSIBILITY.md`.
+Never place white text on `#F28C28`; use green-900 `#102E27` instead. Never use `#F28C28` as body text on a light surface; use `#A65A0F`. Full contrast tables and focus rules are in [`../ACCESSIBILITY.md`](../ACCESSIBILITY.md).
 
 ## Rebuilding the CSS
 
@@ -172,6 +173,8 @@ node <tailwind-cli> -c <generated-config> -i <input.css> -o docs/stitch-design/a
 The generated configuration must keep the normative colour map from `ACCESSIBILITY.md`, scan `screens/**/*.html`, and preserve the legacy token aliases used by existing screens.
 
 ## Validation
+
+Run `node docs/stitch-design/validate.js` from the repository root; it must print `54 files, 0 issues`.
 
 Before handing off, check every screen for:
 

@@ -1,253 +1,220 @@
-# SYSTEM_OVERVIEW.md
+# SYSTEM OVERVIEW
 
-> **v1.1 normative amendment (2026-10-29):** This v1.0 document is retained for product context. Pricing, routing, cost, and topology statements are superseded by [`SPEC_AMENDMENTS.md`](SPEC_AMENDMENTS.md), [`DECISIONS.md`](DECISIONS.md), and [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md).
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **System code** | `PROJECT-BAZAAR-D2C` / MRFSS |
+| **Environment** | Mobile-first responsive web application (installable PWA) |
+| **Locale** | Kampala, Uganda — `Africa/Kampala` (EAT, UTC+3) |
+| **Currency** | UGX (`USh`), whole integers |
 
-## Document Control & Metadata
-* **Document Version:** 1.0.0
-* **Status:** Approved Architecture Draft
-* **System Code:** `PROJECT-BAZAAR-D2C`
-* **Target Environment:** Mobile-First Responsive Web Application (Progressive Web Architecture)
-* **Geographic & Economic Context:** Kampala, Uganda (East Africa)
-* **Primary Currency:** Ugandan Shillings (`UGX`, symbol: `USh`)
-* **Primary Payment Rails:** Mobile Money (MTN MoMo, Airtel Money), Cash on Delivery (COD), Visa/Mastercard
+This document describes the product, the commercial rules, the four portals, and the system boundaries. It does not replace the detailed contracts:
+
+- Numbers and fixtures: [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md)
+- States and business rules: [`STATE_MACHINES_AND_BUSINESS_RULES.md`](STATE_MACHINES_AND_BUSINESS_RULES.md)
+- Schema: [`../supabase/migrations/20261029000000_initial_schema.sql`](../supabase/migrations/20261029000000_initial_schema.sql)
+- API events: [`API_CONTRACTS.md`](API_CONTRACTS.md)
+- Security: [`SECURITY_AND_VERIFICATION_PROTOCOLS.md`](SECURITY_AND_VERIFICATION_PROTOCOLS.md)
+- UX: [`PORTALS_AND_UX_SPECIFICATION.md`](PORTALS_AND_UX_SPECIFICATION.md)
 
 ---
 
-## 1. Executive Summary & Vision
+## 1. Product
 
-### 1.1 Problem Statement
-Urban restaurant vendors operating out of high-density retail markets, food courts, and bazaars face an unsustainable operational paradox:
-1. **Third-Party Aggregator Trap:** Commercial delivery platforms (e.g., Glovo, Bolt Food, Jumia Food) extract between **20% and 30% in direct merchant commissions** on every transaction. They intercept the customer relationship, withhold customer phone numbers and dining analytics, and enforce arbitrary promotional discounting that erodes the restaurant's margins.
-2. **The "WhatsApp / Phone Call" Chaos:** Direct ordering alternatives managed informally via phone calls or chat apps result in catastrophic operational inefficiencies:
-   * Kitchen cooks mishear verbal customer modifications (e.g., allergies, omissions, spice preferences).
-   * Delivery riders get lost due to informal street naming and vague directions (*"turn left by the yellow container"*), resulting in delayed drops and cold food.
-   * Delivery fee negotiations are friction-heavy, leaving riders underpaid or customers feeling exploited.
-   * Cash collected by riders is manually tracked on paper, causing substantial end-of-day cash reconciliation leaks.
+Bazaar Flame & Grill is a restaurant inside a Kampala bazaar. MRFSS is its own ordering and delivery system: customers order from a web storefront, the kitchen works from a kitchen display, riders claim deliveries from a shared pool, and the owner reconciles cash and settings from an admin hub.
 
-### 1.2 The Strategic Solution
-`PROJECT-BAZAAR-D2C` is an enterprise-grade, single-codebase web application suite engineered to establish an independent, direct-to-consumer digital ordering and delivery pipeline. 
+### 1.1 Problem
 
-The platform connects customer storefronts, live GPS order tracking, a kitchen display system (KDS), an automated motorcycle delivery fleet dispatch pool, and an administrative reconciliation engine into a **single, unified real-time system with zero ongoing third-party SaaS subscription costs**.
+Third-party aggregators charge high commissions, hide customer data, and own the customer relationship. Informal phone/WhatsApp ordering produces misheard modifiers, vague addresses, disputed delivery fees, and cash leakage.
+
+### 1.2 Solution
+
+A single Next.js codebase with four role-scoped portals:
 
 ```
-                           ┌─────────────────────────────────────────┐
-                           │      Single Unified Next.js Engine      │
-                           └────────────────────┬────────────────────┘
-                                                │
-         ┌───────────────────────┬──────────────┴──────────────┬───────────────────────┐
-         ▼                       ▼                             ▼                       ▼
-  [ / Storefront ]       [ /kitchen KDS ]             [ /rider Portal ]        [ /admin Hub ]
-  • Dynamic Menu         • Real-Time Order Queue      • Unclaimed Pool         • Menu & Modifiers
-  • OSRM Fee Engine      • Audio Chime Engine         • 1-Tap Google Maps      • Cash Ledger Audit
-  • Pin-Drop Map         • "Busy Mode" Buffer         • GPS Coordinate Stream  • Dynamic Rules
-  • Table QR Mode        • Stock Out (86) Toggles     • Handover PIN Gate      • Live Order Edit
+┌──────────────────────────────────────────────────────────────────────┐
+│                     Next.js App Router + Supabase                    │
+├───────────────┬────────────────┬─────────────────┬───────────────────┤
+│  Customer     │  Kitchen       │  Rider          │  Admin            │
+│  /            │  /kitchen      │  /rider         │  /admin           │
+│  /checkout    │  KDS tickets   │  claim pool     │  orders/settings  │
+│  /orders/[t]  │  86 + busy     │  start + PIN    │  ledger/audit     │
+└───────────────┴────────────────┴─────────────────┴───────────────────┘
 ```
 
----
-
-## 2. Core Commercial & Delivery Economics
-
-### 2.1 The Distance-Tiered Fee Engine
-To outcompete food aggregators while safeguarding unit economics, the restaurant deploys an automated distance-based delivery calculator using real-world road network calculations (strictly avoiding straight-line Euclidean/Haversine approximations):
-
-* **Tier 1 (Hyper-Local Zone: $0 \le d \le 5.0\text{ km}$):** 
-  * **Delivery Fee:** **`USh 0` (Completely Free of Charge)**.
-  * **Objective:** Capture hyper-local market share within high-density commercial and residential sectors surrounding the bazaar.
-* **Tier 2 (Extended Delivery Zone: $5.0\text{ km} < d \le 15.0\text{ km}$):** 
-  * **Delivery Fee:** Calculated per excess kilometer beyond the initial 5.0 km threshold at an administratively adjustable rate $\text{Rate}_{\text{per\_km}}$ (Baseline: `USh 1,500` to `USh 2,000` per km).
-  * **Rounding Rule:** Excess distance $(d - 5)$ is rounded up to the nearest whole kilometer ($0.1\text{ km}$ increments round up) to prevent awkward fractional accounting and ensure full driver fuel compensation.
-* **Tier 3 (Service Ceiling: $d > 15.0\text{ km}$):**
-  * **Hard Cutoff:** The system explicitly forbids order placement for drops beyond 15.0 km.
-  * **System Action:** Disables checkout button, marks the delivery zone as out-of-reach, and presents an informative toast: *"Location is outside our fresh delivery zone to guarantee meal temperature."*
-
-#### Delivery Fee Mathematical Specification
-$$\text{Fee}_{\text{delivery}} = \begin{cases} 0 & \text{if } d_{\text{road}} \le 5.0\text{ km} \\ \lceil d_{\text{road}} - 5.0 \rceil \times \text{Rate}_{\text{per\_km}} & \text{if } 5.0\text{ km} < d_{\text{road}} \le 15.0\text{ km} \\ \infty \text{ (Blocked)} & \text{if } d_{\text{road}} > 15.0\text{ km} \end{cases}$$
-
-### 2.2 Financial Safeguard: Minimum Order Value (MOV)
-A free 5.0 km delivery for a low-cost item (e.g., a single soft drink priced at `USh 3,000`) represents a net loss on driver fuel and packaging.
-* **Global Delivery MOV:** The baseline Minimum Order Value required to unlock delivery is set to **`USh 20,000`**.
-* **Cart Enforcement:**
-  * If $\text{Subtotal} < \text{MOV}$, the checkout button is disabled.
-  * The cart UI renders an active progress bar: 
-    $$\text{Remaining} = \text{MOV} - \text{Subtotal}$$
-    Displaying: *"Add USh [Remaining] more to unlock delivery."*
-* **Dine-In Exception:** When ordering via Table QR Mode at the bazaar, $\text{MOV} = \text{USh } 0$.
-
-### 2.3 The Master Order Pricing Pipeline
-Every order total is calculated on the server side using the following immutable formula:
-$$\text{Total Due} = \text{Subtotal}_{\text{items}} + \sum \text{Price}_{\text{modifiers}} + \text{Fee}_{\text{packaging}} + \text{Fee}_{\text{delivery}} - \text{Discount}_{\text{promo}}$$
+Dine-in is a **customer mode** (`/?table=<qr-token>`), not a fifth portal. The tracker is a customer subroute, not a separate portal. Staff routes are protected by Supabase Auth and role checks.
 
 ---
 
-## 3. Physical Fleet & Logistics Topology
+## 2. Commercial Rules
 
-### 3.1 The 5-Motorcycle (Boda-Boda) Fleet
-The restaurant maintains an in-house delivery fleet of **five (5) dedicated motorcycles**. The software platform is designed around the physical operational boundaries of this fleet.
+### 2.1 Delivery fee
 
-#### Fleet Turnaround Cycle (Per Order Drop)
-1. **Kitchen Staging & Packaging:** 5 minutes
-2. **Outbound Transit (City traffic, 5–8 km avg):** 15–20 minutes
-3. **Arrival, Contact & PIN Verification Handover:** 5–10 minutes
-4. **Return Transit to Bazaar Base:** 15–20 minutes
-* **Average Total Cycle Time:** **40 to 55 minutes per rider per trip.**
+All routing is road-network based. Distances are stored as **integer metres**; display rounds separately.
 
-#### Fleet Capacity Modeling
+```
+distance_m  = OSRM road distance
+distance_km = distance_m / 1000
 
-| Metric | Single Rider Capacity | 5-Rider Active Fleet Capacity |
+if distance_km <= 5.0:      fee = 0
+elif distance_km <= 15.0:   fee = ceil(distance_km - 5.0) × rate_per_excess_km
+else:                       BLOCKED (DISTANCE_OUT_OF_BOUNDS)
+```
+
+Baseline settings:
+
+| Setting | Value |
+| :--- | ---: |
+| Free delivery radius | 5.0 km |
+| Excess rate | USh 1,500 / km |
+| Maximum delivery radius | 15.0 km |
+| COD maximum radius | 8.1 km |
+| Minimum order value (delivery) | USh 20,000 |
+| Minimum order value (dine-in) | USh 0 |
+| Packaging (delivery) | USh 1,000 |
+| Packaging (dine-in) | USh 0 |
+
+The 8.1 km COD ceiling admits the canonical 8.093 km Ntinda fixture. The final commercial ceiling is founder gate F-14. A failed OSRM lookup blocks checkout; there is no Haversine fallback for a final fee.
+
+### 2.2 Pricing identity
+
+```
+items_subtotal  = Σ(base_price × quantity)
+modifiers_total = Σ(price_delta × quantity)
+total_amount    = items_subtotal + modifiers_total + packaging_fee + delivery_fee
+```
+
+There are no promotions or discount terms in v1 (ADR-010). Totals are computed server-side from database prices; the client total is never trusted. The database stores `total_amount` as a generated column so components cannot drift.
+
+### 2.3 Minimum order value and cart limits
+
+- Delivery MOV applies to items + modifiers only; packaging and delivery do not count.
+- Dine-in bypasses MOV.
+- Cart value and line quantity are capped by `app_settings.max_cart_value` and `max_item_quantity`.
+- A cart containing an 86'd item is rejected with `ITEM_OUT_OF_STOCK`, naming the item.
+
+### 2.4 Store hours
+
+Checkout is blocked when `is_store_open = false` or EAT time is outside `opening_time`–`closing_time`. The storefront shows a closed state with the next opening time and WhatsApp support. Staff can still work; pre-orders are out of scope.
+
+### 2.5 COD policy
+
+- COD is available only within `cod_max_radius_km`.
+- First-time COD customers complete a 6-digit SMS OTP. Returning customers with a delivered order may skip when the setting permits.
+- The customer selects a change denomination; change due is stored and shown to the rider.
+- Cash becomes a rider liability only after a successful PIN handover (`payment_status = PAID`, `cod_collected_at` set). It is cleared only by cash reconciliation.
+- If SMS is unavailable, COD checkout is disabled rather than silently skipping verification.
+
+---
+
+## 3. Fleet and Fulfilment
+
+- Five in-house motorcycles at launch.
+- One active delivery per rider in v1. Batching/clustered drops are a future feature (ADR-011).
+- Orders are claimed atomically; a rider cannot claim two active orders and two riders cannot claim the same order.
+- Telemetry is foreground-only: the rider keeps the screen open; the app uses Screen Wake Lock and shows an offline/stale state. Background/locked-screen GPS is not promised.
+- Bags use numbered tamper-evident safety seals. The customer checks the seal before sharing the 4-digit handover PIN.
+- Rider shifts and opening cash floats are recorded; end-of-day reconciliation links every COD order to one settlement.
+
+---
+
+## 4. Payments and Cash
+
+| Method | Flow |
+| :--- | :--- |
+| MTN MoMo / Airtel Money | Flutterwave hosted checkout; `verif-hash` webhook; independent transaction verification; `PENDING_PAYMENT → PREPARING` on verified success |
+| Visa / Mastercard | Same Flutterwave hosted checkout; no card data enters the app |
+| Cash on delivery | OTP (first time), change selection, `CONFIRMED_UNPAID`, kitchen accept, cash liability after PIN handover |
+
+- Webhook events are stored with a unique provider event ID.
+- Late success events for cancelled/failed/completed orders do not resurrect them; they create a refund/manual-review task.
+- Unpaid digital orders expire after 10 minutes.
+- Refunds are recorded and processed through Flutterwave for digital payments; cash refunds require an admin reason and audit.
+- Cash settlement uses `Africa/Kampala` business dates and links `orders.settlement_id` to one settlement. A settlement total must equal the sum of its linked orders.
+
+---
+
+## 5. Architecture
+
+### 5.1 Application
+
+- Next.js App Router, React 19, TypeScript strict, Tailwind CSS 3.4.
+- Server Components for reads; Server Actions and route handlers for mutations.
+- The Supabase service-role key is imported only in server-only modules; it is never bundled to the client.
+- Customer order creation goes through a server action with idempotency; the browser never inserts financial rows.
+- Staff use Supabase Auth JWTs so `auth.uid()` works in RLS and RPCs.
+
+### 5.2 Data and realtime
+
+- Postgres is the source of truth. RLS is deny-by-default on every table.
+- `anon` and `authenticated` have no direct access to orders, PINs, telemetry, payments, settlements, or audit tables.
+- Customer reads use token-scoped RPCs. Rider/kitchen/admin reads use role-scoped RPCs.
+- Realtime uses server-emitted Broadcast with safe payloads plus polling fallback. Raw `postgres_changes` is not used on tables containing PINs or PII (ADR-014).
+- All `SECURITY DEFINER` functions set `search_path = public, pg_temp`.
+
+### 5.3 Integrations
+
+| Concern | Production | Development/test |
 | :--- | :--- | :--- |
-| **Throughput (Single-Drop Trips)** | 1.2 to 1.5 deliveries / hour | **6 to 8 deliveries / hour** |
-| **Throughput (Batched / Clustered Drops)** | 2.0 deliveries / hour | **10 to 12 deliveries / hour** |
-| **Shift Output (8-Hour Operational Day)** | 10 to 12 deliveries / day | **50 to 60 deliveries / day** |
+| Payments | Flutterwave | Mock adapter |
+| SMS/OTP | Africa's Talking | Console/mock |
+| Routing | Self-hosted OSRM | Mock fixtures / public demo |
+| Map tiles | MapTiler (restricted key) | OSM with attribution |
+| Rate limits/cache | Upstash Redis | In-memory local only |
+| Printing | Browser print to thermal printer | Print preview |
 
-### 3.2 Physical Staging & Quality Standards
-* **Thermal Compartments:** All five motorcycles are fitted with insulated delivery boxes.
-* **Tamper-Evident Safety Seals:** All bags must be physically sealed with numbered sticker seals before leaving the kitchen. The customer's digital tracker explicitly instructs the customer to confirm the seal is intact prior to releasing the 4-digit handover PIN to the rider.
+### 5.4 Hosting and cost
 
----
-
-## 4. Payment Infrastructure & Settlement Flows
-
-The platform accommodates three core payment channels natively:
-
-```
-                                [ Customer Checkout ]
-                                          │
-            ┌─────────────────────────────┼─────────────────────────────┐
-            ▼                             ▼                             ▼
-    [ Mobile Money ]                [ Bank Card ]                 [ Cash on Delivery ]
-   MTN MoMo / Airtel Money         Visa / Mastercard             Physical Paper Currency
-            │                             │                             │
-    USSD Push Prompt              3D-Secure Modal               SMS/OTP Verification
-   (Instant Real-Time)            (Standard Gateway)             + Change Calculation
-            │                             │                             │
-            └──────────────┬──────────────┘                             ▼
-                           ▼                               [ Mark: UNPAID - COLLECT CASH ]
-               [ Mark: PAID DIGITALLY ]                                 │
-                           │                                            │
-                           └──────────────────────┬─────────────────────┘
-                                                  ▼
-                                    [ Dispatch to Kitchen KDS ]
-```
-
-### 4.1 Mobile Money (MoMo) — Primary Rail
-* **Integration Strategy:** Automated USSD Push notification to customer handsets via regional payment aggregators (e.g., Flutterwave, Paystack, or direct telecom merchant APIs).
-* **Execution Flow:** Customer enters their mobile number (`077X...` or `070X...`). The system triggers an instant USSD popup on their physical device requesting their Mobile Money PIN.
-* **Settlement State:** Webhook fires $\rightarrow$ database updates `payment_status` to `PAID` $\rightarrow$ ticket immediately flashes on Kitchen Display. Zero manual payment validation required.
-
-### 4.2 Cash on Delivery (COD) — High Volume / High Risk
-To mitigate fake orders and driver safety hazards:
-* **First-Time Verification:** First-time cash customers must pass a frictionless 1-time SMS/OTP verification before the order enters the kitchen queue.
-* **The "Need Change?" Requirement:** Customer must select their expected cash denomination from a structured dropdown:
-  * *Exact Amount*
-  * *Change for USh 20,000*
-  * *Change for USh 50,000*
-* **Driver Balance Ledger:** Cash orders automatically post an outstanding balance to the claiming rider's internal profile. The rider remains financially liable for that physical cash until settled with the restaurant manager at shift closing.
-
-### 4.3 Bank Cards (Visa / Mastercard)
-* Served via a secure hosted checkout iframe or redirect. Funds settle via standard merchant clearing (T+1 / T+2).
+The system avoids aggregator commissions, but it is **not zero-cost**. Recurring costs include Supabase Pro, hosting, domain, SMS, payment processing fees, MapTiler, Upstash, and OSRM hosting. The cost model is maintained in the operations runbook and must be reviewed before launch.
 
 ---
 
-## 5. System Personas & User Journeys
+## 6. Personas
 
-### 5.1 Persona 1: The Customer
-* **Access Mode:** Responsive Mobile Web (Zero App Store installs, zero forced passwords).
-* **Core Actions:**
-  * Browses visual menu categorized with dietary tags and clear price badges.
-  * Builds meal combinations (Combos) using a 3-step visual builder.
-  * Customizes items via structured preference chips (`No Onions`, `Extra Pepper (+USh 1,000)`).
-  * Drops an exact GPS pin on a Leaflet/OpenStreetMap interface.
-  * Monitors order progress on an in-app Living Tracker displaying a moving motorcycle icon.
-  * Receives a secure **4-digit Handover PIN** to present to the driver upon physical receipt.
+| Persona | Primary job | Portal |
+| :--- | :--- | :--- |
+| Sarah, office worker | Prepaid lunch delivery | Customer |
+| Brian, far customer | COD with change and surcharge | Customer |
+| Alex, walk-up guest | Dine-in from table QR | Customer (dine-in mode) |
+| Musa, line cook | Tickets, 86, busy mode | Kitchen |
+| Juma, boda rider | Claim, navigate, hand over | Rider |
+| Kasule, owner | Orders, settings, cash, audit | Admin |
 
-### 5.2 Persona 2: The Kitchen Line Cook
-* **Access Mode:** Dedicated, wall-mounted 10-inch Android Tablet running `/kitchen`.
-* **Core Actions:**
-  * Taps **“Start Shift / Enable Sound”** to unlock the browser's Web Audio API context.
-  * Receives incoming tickets with distinct audio chimes and high-contrast color coding.
-  * Toggles items `In Stock` / `Out of Stock (86)` with a single tap.
-  * Activates **“Busy Mode”** (+15 to +30 min buffer) when walk-in bazaar traffic spikes.
-  * Bumps orders across phases: `[ Accept ]` $\rightarrow$ `[ Ready for Pickup ]`.
-
-### 5.3 Persona 3: The Motorcycle Boda Rider
-* **Access Mode:** Smartphone mounted on motorcycle handlebars running `/rider`.
-* **Core Actions:**
-  * Authenticates using a low-friction 4-digit driver PIN.
-  * Views the **Unclaimed Delivery Pool** and claims available orders.
-  * Taps **“Navigate”** to deep-link directly into native Google Maps or Waze with exact coordinates.
-  * Taps **“Start Delivery”** to initiate background HTML5 GPS broadcasting every 10–15 seconds.
-  * Demands the 4-digit Handover PIN from the customer; inputs it into the portal to complete the job and clear the delivery.
-
-### 5.4 Persona 4: The Restaurant Owner / Manager
-* **Access Mode:** Tablet or Desktop running `/admin`.
-* **Core Actions:**
-  * Modifies menu items, prices, active categories, and combo configurations.
-  * Adjusts delivery rules: free radius threshold, per-km surcharge, and Minimum Order Values.
-  * Rectifies live customer mistakes (edits phone numbers or adjusts drop pins on active tickets).
-  * Audits the **End-of-Day Rider Cash Settlement Ledger** to collect physical cash from all 5 drivers before closing registers.
+Detailed journeys and acceptance scenarios are in [`TESTING_PERSONAS_AND_E2E_SCENARIOS.md`](TESTING_PERSONAS_AND_E2E_SCENARIOS.md).
 
 ---
 
-## 6. Architectural Topology & System Boundaries
+## 7. Success Measures
 
-### 6.1 The Single-Codebase Monolith
-To ensure development velocity, low resource consumption, and rapid maintenance for a solo developer, the entire ecosystem is built as a **Single Next.js Application** utilizing route-based role segregation:
-
-```
-src/app/
-├── (storefront)/              # Public Customer Experience
-│   ├── page.tsx               # Menu, Instant Search, Cart & Map Pin-Drop
-│   └── orders/[token]/        # The Living Order Tracker & Real-Time Map
-├── (operations)/              # Internal Restaurant Staff Operations
-│   ├── kitchen/               # High-Glance Kitchen Display System (KDS)
-│   ├── rider/                 # Rider Self-Dispatch Pool & Trip Engine
-│   └── admin/                 # Management Hub, Audits & Reconciliation
-└── api/                       # API Route Handlers & Webhooks
-    ├── webhooks/payment/      # MoMo / Card Inbound Payment Callbacks
-    ├── routing/distance/      # OSRM Road Distance Proxy
-    └── verification/pin/      # Ephemeral Handover PIN Validation
-```
-
-### 6.2 Data Flow & Real-Time Synchronization Engine
-All real-time communication between the four interfaces is orchestrated via **Supabase Realtime (PostgreSQL CDC - Change Data Capture)** over WebSockets:
-
-```
-[ Customer Places Order ] ──> [ Database: Insert 'orders' ]
-                                          │
-                                 (Realtime WebSocket)
-                                          │
-             ┌────────────────────────────┼────────────────────────────┐
-             ▼                            ▼                            ▼
-   [ Kitchen Tablet ]             [ Rider Screen ]           [ Customer Tracker ]
-   Chime sounds instantly;        Order appears in           Receipt initializes;
-   Ticket appears on screen       "Available Deliveries"     Pin is generated
-```
+- 100% of fees computed from integer OSRM metres; no out-of-zone order is accepted.
+- Order reaches the KDS within 1.5 seconds of verified payment or COD confirmation.
+- Kitchen audio alerts are reliable after the shift-start gesture.
+- Daily cash expected equals the sum of linked COD orders; every variance is explained and audited.
+- A rider reaches the destination pin without more than one clarification call in normal operation.
+- WCAG 2.2 AA for all text and controls; AAA for body and critical status text where achievable.
+- No retired fixture value, staff PIN, or customer token appears in UI copy, logs, or analytics.
 
 ---
 
-## 7. Operational Environment & Infrastructure Constraints
+## 8. Out of Scope for v1
 
-### 7.1 Low-Bandwidth & 3G Network Optimization
-Because mobile data in urban Uganda is variable and cellular towers frequently drop connections in crowded markets:
-* **Image Compression:** All food imagery must be pre-converted to modern **WebP format** with aggressive 80% lossy compression (file size target: $< 60\text{ KB}$ per dish).
-* **Optimistic UI:** Cart additions, status toggles, and ticket bumping must update the UI instantly (optimistically) before server roundtrips complete.
-* **Payload Economy:** Real-time location packets sent by riders consist only of two float numbers: `{"lat": 0.3476, "lng": 32.5825, "heading": 180}`. Total network usage: $< 2\text{ MB}$ per 8-hour rider shift.
-
-### 7.2 Zero-Cost Open Infrastructure
-The platform explicitly excludes proprietary, metered APIs that introduce unpredictable monthly expenses:
-* **Maps:** OpenStreetMap (OSM) vector/raster tiles served via Leaflet.js (**$0/month**).
-* **Routing:** Open Source Routing Machine (OSRM) driving profile API (**$0/month**).
-* **Database & Auth:** Supabase Free/Pro Tier (**$0 to $25/month flat**).
-* **Hosting:** Vercel or Netlify edge network (**$0/month within standard bandwidth**).
+- Customer accounts and loyalty.
+- Promotions and discount codes.
+- Rider batching.
+- Pre-orders and scheduled delivery.
+- Automated WhatsApp messaging (support link only).
+- ESC/POS over Web Bluetooth/USB (browser print only).
+- Multi-branch or multi-tenant operation.
+- Native mobile apps.
 
 ---
 
-## 8. Definition of Success & System Health Metrics
+## 9. Revision History
 
-The system implementation is deemed production-ready when the following operational standards are satisfied:
-
-1. **Delivery Fee Precision:** 100% of delivery fees within 5.0 km road distance calculate to `USh 0`; all points beyond calculate strictly according to the agreed per-km excess formula.
-2. **Order Turnaround Velocity:** Average duration between customer checkout and kitchen receipt display is $< 1.5\text{ seconds}$.
-3. **Kitchen Sound Reliability:** Kitchen chimes ring reliably 100% of the time upon order receipt once the shift audio context is initialized.
-4. **Zero Cash Discrepancies:** Daily reconciliation between total physical cash collected by riders and the owner's cash register balance matches to within `USh 0` tolerance.
-5. **Zero Lost Riders:** Riders reach the destination pin without making more than one clarifying phone call to the customer.
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Rewritten: four-portal model, integer-metre fee, 8.1 km COD alignment, no Haversine fallback, accurate cost statement, token-scoped RPC/Broadcast architecture, explicit v1 scope. |
+| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.0.0 | 2026-10-27 | Original architecture draft. |

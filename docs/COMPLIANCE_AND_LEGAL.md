@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | v1.1 working baseline — **not legal advice** |
-| **Version** | 1.1.0 |
-| **Date** | 2026-10-29 |
+| **Status** | v1.2 working baseline — **not legal advice** |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
 | **Owner** | Founders |
 | **Required review** | Qualified Ugandan legal counsel and tax adviser before launch |
 | **Related** | `AUDIT_REPORT.md` §12, `DECISIONS.md`, `OPERATIONS_RUNBOOK.md`, `ACCESSIBILITY.md` |
@@ -234,7 +234,7 @@ State clearly:
 
 - Delivery zones and the maximum radius.
 - Fee formula and free-delivery radius.
-- COD availability and maximum COD radius.
+- COD availability and the maximum COD radius (8.1 km, founder gate F-14).
 - Estimated time is an estimate, not a guarantee.
 - What happens if the customer is unreachable.
 - Who bears the risk of loss after handover.
@@ -514,7 +514,7 @@ These are drafting aids. Replace every placeholder, then have counsel review.
 
 - Delivery zones and map.
 - Fee formula, free radius, maximum radius.
-- COD availability and maximum radius.
+- COD availability and maximum radius (8.1 km).
 - Preparation and delivery estimates.
 - Handover PIN requirement.
 - Customer responsibilities: reachable phone, correct address, change ready.
@@ -530,7 +530,7 @@ These are drafting aids. Replace every placeholder, then have counsel review.
 | :--- | :--- | :--- | :--- |
 | `cart` | Cart contents | Session | Yes |
 | `order_token` | Order tracking capability | `[[...]]` | Yes |
-| `staff_session` | Staff authentication | 12 hours | Yes |
+| `sb-<project-ref>-auth-token` | Supabase Auth staff session | 12 hours / refresh policy | Yes |
 | `[[analytics]]` | Usage analytics | `[[...]]` | No — consent required |
 | `[[marketing]]` | Advertising | `[[...]]` | No — consent required |
 
@@ -626,4 +626,5 @@ MVP should have no non-essential cookies. If analytics is added, update this tab
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Aligned to v1.2: COD radius 8.1 km, Supabase Auth session cookie, four-portal scope. |
 | 1.1.0 | 2026-10-29 | Created; Uganda compliance checklist, data inventory, policy skeletons, and legal action register. |

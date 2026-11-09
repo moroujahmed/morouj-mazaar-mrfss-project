@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.1 operations baseline |
-| **Version** | 1.1.0 |
-| **Date** | 2026-10-29 |
+| **Status** | Normative v1.2 operations baseline |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
 | **Owner** | Founders + on-call engineer |
 | **Scope** | Supabase, Vercel/Next.js, Flutterwave, Africa's Talking, MapTiler, OSRM, Upstash |
 
@@ -328,7 +328,7 @@ After any rotation: redeploy, run `/api/health`, create a staging test order, an
 ### Business
 
 - [ ] Restaurant coordinates verified on site.
-- [ ] Fee, MOV, COD radius, packaging, and opening hours confirmed.
+- [ ] Fee, MOV, COD radius (8.1 km), packaging, and opening hours confirmed.
 - [ ] Menu, prices, modifiers, combos, and 86 list confirmed.
 - [ ] Staff/rider roster and PINs provisioned.
 - [ ] Printer model and paper width confirmed.
@@ -350,7 +350,7 @@ After any rotation: redeploy, run `/api/health`, create a staging test order, an
 - [ ] Backup restore drill completed.
 - [ ] Rollback tested.
 - [ ] Accessibility gate passes.
-- [ ] Scenarios A–G pass on staging.
+- [ ] Scenarios A–I pass on staging.
 - [ ] Load test at 50 concurrent checkouts passes.
 - [ ] On-call rota and escalation contacts published.
 
@@ -371,7 +371,7 @@ After any rotation: redeploy, run `/api/health`, create a staging test order, an
 | Situation | Template |
 | :--- | :--- |
 | Order delayed | “Hi {name}, your order #{number} is still in the kitchen. New ETA: {eta}. Reply here for help.” |
-| Rider nearby | “Hi {name}, your rider is {minutes} minutes away. Please have your 4-digit PIN ready.” |
+| Rider nearby | “Hi {name}, your rider is {minutes} minutes away. Please have your 4-digit handover PIN ready.” |
 | Payment pending | “We have not received confirmation from {provider} yet. Please do not pay twice. We will update you within 10 minutes.” |
 | Payment failed | “Your payment was not completed. You can retry or choose cash on delivery if eligible.” |
 | Store closed | “We are closed now. Opening hours: {hours}. You can browse the menu and order when we reopen.” |
@@ -399,4 +399,5 @@ These are deliberate. Do not add them mid-build without an ADR and a test plan u
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Aligned to v1.2: COD test ceiling 8.1 km and scenarios A–I. |
 | 1.1.0 | 2026-10-29 | Created; deploy, backup, incident, SOP, KPI, and go-live baseline. |

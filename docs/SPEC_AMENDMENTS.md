@@ -1,13 +1,13 @@
-# SPEC AMENDMENTS — v1.1 Normative Changes to the Original 10 Documents
+# SPEC AMENDMENTS — v1.2 Reconciliation and Amendment Register
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative. Supersedes conflicting text in the v1.0 specification set. |
-| **Version** | 1.1.1 |
-| **Date** | 2026-10-29 |
-| **Precedence** | `DECISIONS.md` → `CANONICAL_EXAMPLES.md` → `API_CONTRACTS.md` / `ERD.md` / `ACCESSIBILITY.md` → this file → the original 10 documents |
+| **Status** | Normative closure record. All catalogued v1.0 documents have been rewritten to v1.2. |
+| **Version** | 1.2.1 |
+| **Date** | 2026-11-09 |
+| **Precedence** | `DECISIONS.md` → `CANONICAL_EXAMPLES.md` → `DESIGN_SYSTEM_V2.md` / `ACCESSIBILITY.md` / `API_CONTRACTS.md` / `ERD.md` → this file → historical v1.0 text in `AUDIT_REPORT.md` |
 
-If a v1.0 document conflicts with this file, **this file wins** until the original is corrected. The original documents are retained for history and product context; they are not the build contract where amended.
+This file records how each audit finding was closed and the technical amendments that remain binding. The v1.2 documents are now the build contract; the original v1.0 wording is historical context only and is not authoritative where it conflicts with v1.2.
 
 ---
 
@@ -18,7 +18,7 @@ If a v1.0 document conflicts with this file, **this file wins** until the origin
 | `SYSTEM_OVERVIEW.md` | Pricing formula, distance fallback, “zero ongoing cost” claims, route map | `CANONICAL_EXAMPLES.md` §8; `DECISIONS.md` ADR-005/ADR-010; `API_CONTRACTS.md` §3 |
 | `TECH_STACK_AND_CONVENTIONS.md` | Version matrix, Realtime `postgres_changes`, OSM tiles, directory manifest, environment variables | `DECISIONS.md` ADR-004/005/006/008/014/016; `API_CONTRACTS.md` §5/§7; `SPEC_AMENDMENTS.md` §4 |
 | `DATABASE_SCHEMA_AND_RLS.md` | Entire schema, RLS, seed, triggers | `supabase/migrations/20261029000000_initial_schema.sql`; `ERD.md`; `supabase/seed.sql` |
-| `DESIGN_SYSTEM_AND_UI_SPEC.md` | Accessibility standard, palette contrast claims, primary CTA tokens, `h-13` | `ACCESSIBILITY.md` |
+| `DESIGN_SYSTEM_AND_UI_SPEC.md` | Entire visual language: terracotta “Bazaar Warmth”, AAA claim, primary CTA tokens, `h-13`, six-portal claims | `DESIGN_SYSTEM_V2.md` (green/orange palette); `ACCESSIBILITY.md`; `DECISIONS.md` ADR-017 |
 | `PORTALS_AND_UX_SPECIFICATION.md` | Auth screens, closed-store state, dine-in completion, rider background GPS | `API_CONTRACTS.md` §1.3/§2; `DECISIONS.md` ADR-001/012/014; `TEST_PLAN.md` |
 | `STATE_MACHINES_AND_BUSINESS_RULES.md` | FSM transitions, OSRM fallback, pricing formula, claim RPC, PIN logic, settlement linkage | `ERD.md` §4; `CANONICAL_EXAMPLES.md`; `supabase/migrations/...initial_schema.sql` §16–18 |
 | `INTEGRATIONS_AND_HARDWARE_APIS.md` | Payment webhook signature, OTP provider, map tiles, printing, deep links | `DECISIONS.md` ADR-002/003/004/007; `API_CONTRACTS.md` §3.2/§3.3 |
@@ -30,7 +30,7 @@ If a v1.0 document conflicts with this file, **this file wins** until the origin
 
 ## 2. P0 Remediation Matrix
 
-| ID | Original finding | v1.1 resolution | Evidence artifact | Status |
+| ID | Original finding | v1.2 resolution | Evidence artifact | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | P0-01 | Auth model incompatible with RLS | Supabase Auth for all staff; synthetic email + 6-digit PIN as password; customer remains token-based. No `profiles.pin_code`. | `DECISIONS.md` ADR-001; migration `profiles`; `API_CONTRACTS.md` §2.5–2.6; `scripts/seed-staff.mjs` | **Resolved** |
 | P0-02 | Unsafe RLS and public order inserts | Deny-by-default RLS; no direct anon/authenticated access to orders/PIN/telemetry; all reads/writes through RPCs or service-role server actions; column grants revoked; helper functions `SECURITY DEFINER` with `search_path`. | Migration §19–21; smoke tests in §6; `ERD.md` §5 | **Resolved** |
@@ -40,8 +40,9 @@ If a v1.0 document conflicts with this file, **this file wins** until the origin
 | P0-06 | Missing domain models | Added modifier groups, combo steps/options, dining tables + QR tokens, delivery attempts, rider shifts, refunds, OTP, blacklist, notifications outbox, settings history, admin audit, checkout idempotency. | `ERD.md`; migration §3–§10 | **Resolved** |
 | P0-07 | Distances and totals wrong | Live OSRM values: Nakasero **1.562 km / fee 0**; Ntinda **8.093 km / fee 6,000**; totals **35,000** and **38,000**; metres stored as integer. | `CANONICAL_EXAMPLES.md` §3–§9; `TEST_PLAN.md` | **Resolved** |
 | P0-08 | Seed UUIDs invalid; profiles need auth users | All seed UUIDs valid hex; catalog/settings/tables seeded by SQL; staff created through Auth Admin API script. | `supabase/seed.sql`; `scripts/seed-staff.mjs`; `scripts/staff.example.json` | **Resolved** |
-| P0-09 | Accessibility claim false | WCAG 2.2 AA baseline; corrected palette; `#B83817` primary action; `#D84A26` decorative only; focus/touch/contrast rules. | `ACCESSIBILITY.md` | **Resolved** |
+| P0-09 | Accessibility claim false | WCAG 2.2 AA baseline; v2 green/orange palette: primary green `#173F35`, action orange `#F28C28` with green-900 text (never white on orange), orange text `#A65A0F`; focus/touch/contrast rules. The retired `#B83817`/`#D84A26` pair is not normative. | `DESIGN_SYSTEM_V2.md`; `ACCESSIBILITY.md`; `DECISIONS.md` ADR-017 | **Resolved** |
 | P0-10 | Ops/legal/compliance gaps | Runbook, compliance checklist, legal policy skeletons, founder-only action register, go-live/rollback gates. | `OPERATIONS_RUNBOOK.md`; `COMPLIANCE_AND_LEGAL.md`; `AUDIT_REPORT.md` §12 | **Contracted; founder inputs required** |
+| P0-11 | COD radius contradiction (found during v1.2 reconciliation) | Canonical Ntinda fixture is 8.093 km, but the COD ceiling was 8.0 km, making the canonical COD example ineligible. Raised the test ceiling to **8.1 km**; final commercial ceiling remains founder gate F-14. | `CANONICAL_EXAMPLES.md` §3; migration `app_settings.cod_max_radius_km` default `8.10`; `supabase/seed.sql`; `ERD.md`; `SECURITY_AND_VERIFICATION_PROTOCOLS.md`; `SYSTEM_OVERVIEW.md` | **Resolved** |
 
 ---
 
@@ -49,7 +50,7 @@ If a v1.0 document conflicts with this file, **this file wins** until the origin
 
 Status meanings:
 
-- **Resolved** — the v1.1 specification/schema now answers the finding.
+- **Resolved** — the v1.2 specification/schema now answers the finding.
 - **Contracted** — the behavior is fully specified, but code must implement it in the named phase.
 - **Founder input** — blocked on a business decision or credential.
 
@@ -80,11 +81,11 @@ Status meanings:
 | P1-23 | Service role is server-only; documented import ban | `README.md` §Security; `API_CONTRACTS.md` §7 | Contracted |
 | P1-24 | Middleware + per-action role guards; auth matrix | `API_CONTRACTS.md` §1.3/§2 | Contracted |
 | P1-25 | `verify_delivery_pin` derives rider from `auth.uid()`; no riderId input | migration §16 | Resolved |
-| P1-26 | Kitchen/admin/rider login screens and logout specified | `API_CONTRACTS.md` §2.5–2.6; `PORTALS` amendment | Contracted |
+| P1-26 | Kitchen/admin/rider login screens and logout specified; kitchen is the fourth portal at `/kitchen`, not an admin tab | `API_CONTRACTS.md` §2.5–2.6; `PORTALS_AND_UX_SPECIFICATION.md`; `site/kitchen.html` | Contracted |
 | P1-27 | Admin cancel, force-complete, reassign, reset PIN, refund request | migration §18; `API_CONTRACTS.md` §2.9 | Resolved |
 | P1-28 | SMS outbox + Africa's Talking dispatch contract | `DECISIONS.md` ADR-003/009; `API_CONTRACTS.md` §3.3 | Founder input (sender ID) |
-| P1-29 | ETA fields + formula; `eta_at` stored | `ERD.md` §3.1; `CANONICAL_EXAMPLES.md` §10 | Contracted |
-| P1-30 | `get_admin_analytics` KPI RPC + KPI definitions | migration §18; `OPERATIONS_RUNBOOK.md` §9 | Resolved |
+| P1-29 | ETA fields + formula `max(prep) + busy buffer + OSRM duration`; `eta_at` stored and recomputed on status events | `ERD.md` §3.1; `CANONICAL_EXAMPLES.md` §10; `STATE_MACHINES_AND_BUSINESS_RULES.md` | Contracted |
+| P1-30 | `get_admin_analytics` KPI RPC, `/admin/analytics` dashboard, and KPI definitions | migration §18; `docs/ANALYTICS.md`; `OPERATIONS_RUNBOOK.md` §9 | Resolved |
 | P1-31 | `is_active`/`archived` semantics; menu items are never hard-deleted | migration §4; `ERD.md` §2.2 | Resolved |
 | P1-32 | `menu-images` bucket, 5 MiB limit, WebP/JPEG/PNG, public read | `20261029000001_storage.sql` | Resolved |
 | P1-33 | Store-closed hard block + admin override + closed screen | `DECISIONS.md` ADR-012; `API_CONTRACTS.md` §2.1 | Resolved |
@@ -104,7 +105,7 @@ Status meanings:
 | P1-47 | Staff provisioned before profiles; seed script | `scripts/seed-staff.mjs` | Resolved |
 | P1-48 | Local Supabase config + reset/seed workflow | `supabase/config.toml`; `README.md` | Resolved |
 | P1-49 | Playwright plan rewritten with fixtures/storage states/auth | `TEST_PLAN.md` §6 | Resolved |
-| P1-50 | Scenarios A–G + unit tests for fee/MOV/FSM | `TEST_PLAN.md` §3–§4 | Resolved |
+| P1-50 | Scenarios A–I + unit tests for fee/MOV/FSM | `TEST_PLAN.md` §3–§4; `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` | Resolved |
 
 ---
 
@@ -200,6 +201,22 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - Eligibility rule: COD is offered when `road_distance_m <= 8100`. Prepaid delivery remains capped at 15.0 km.
 - All worked examples, settings screens, audit copy and mockups must use **8.1 km**. The old `8.0 km` figure is retired.
 
+### 4.10 Design system authority (supersedes `DESIGN_SYSTEM_AND_UI_SPEC.md` visual language)
+
+- `DESIGN_SYSTEM_V2.md` is the normative visual contract; the older “Bazaar Warmth” terracotta system is non-normative history.
+- Primary green `#173F35`; deep green `#102E27`; action orange `#F28C28` with green-900 text; orange text `#A65A0F`; red `#C62828`; success `#17603F`; warning `#8A4B00`.
+- Never use white text on orange. Orange is an action/accent color, not a large background.
+- Four portals: Customer, Kitchen, Rider, Admin. Dine-in is a customer mode and tracker subroute, not a separate portal.
+- `site/` is the static prototype of record. `docs/stitch-design/screens/` is the canonical screen-by-screen visual reference for the same v1.2 contract; its `_archive/` folder and `site/ui-kit.html` are archived, non-normative design explorations.
+
+### 4.11 Kitchen portal (supersedes “kitchen is an admin tab”)
+
+- `/kitchen` is a first-class authenticated portal for `KITCHEN` and `ADMIN` roles.
+- It shows the live ticket queue, age/SLA, item modifiers, 86 toggles, busy mode, bump, and the browser-print docket.
+- Prepaid orders arrive already `PREPARING`; only `CONFIRMED_UNPAID` COD orders show an Accept action.
+- Kitchen cannot edit prices, menu records, refunds, settlements, or delivery data.
+- The static prototype is `site/kitchen.html` with `site/assets/js/kitchen.js`.
+
 ---
 
 ## 5. Document Control
@@ -217,5 +234,6 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Rewritten as the v1.2 closure register: corrected P0-09 palette, added P0-11 COD radius, added design-system and kitchen-portal amendments, scenarios A–I. |
 | 1.1.0 | 2026-10-29 | Created; closes P0/P1 specification gaps and records technical amendments. |
 | 1.1.1 | 2026-11-07 | Aligns the COD radius ceiling to 8.1 km so the canonical 8.093 km Ntinda COD fixture is valid. |

@@ -161,8 +161,6 @@
 
 .rider-banner-offline { background: var(--red-50); border-color: var(--red-600); color: var(--red-600); }
 .rider-banner-weak { background: var(--warning-50); border-color: var(--orange-500); color: var(--warning-700); }
-.rider-banner-pending { background: var(--orange-50); border-color: var(--orange-500); color: var(--green-900); }
-.rider-banner-pending .icon { color: var(--orange-700); }
 .rider-banner .btn { flex: none; min-height: 48px; }
 
 /* Layout ----------------------------------------------------------------- */

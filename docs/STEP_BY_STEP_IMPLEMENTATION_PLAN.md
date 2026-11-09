@@ -1,468 +1,284 @@
-# STEP_BY_STEP_IMPLEMENTATION_PLAN.md
+# STEP-BY-STEP IMPLEMENTATION PLAN
 
-> **v1.1 normative amendment:** File paths, phase gates, and provider references are superseded by [`../README.md`](../README.md), [`TEST_PLAN.md`](TEST_PLAN.md), and [`DECISIONS.md`](DECISIONS.md). Acknowledge the founder gates in [`AUDIT_REPORT.md`](AUDIT_REPORT.md) §12 before Phase 1.
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **Execution model** | Phased, test-driven, contract-verified |
+| **Start condition** | Founder gates in [`AUDIT_REPORT.md`](AUDIT_REPORT.md) §12 that block the phase must be acknowledged before that phase starts |
 
-## Document Control & Metadata
-* **Document Version:** 1.0.0
-* **Status:** Master Execution Blueprint
-* **Target Audience:** Antigravity Agentic Builders & Lead Software Engineers
-* **Execution Paradigm:** Phased, Test-Driven, Contract-Verified Development
-* **Zero-Guesswork Mandate:** Agents must complete each phase sequentially, running all verification gates before progressing to the subsequent phase.
-
----
-
-## Master Phase Execution Overview
-
-```
-[ Phase 1: Project Foundation & Environment Setup ]
-                     │
-                     ▼
-[ Phase 2: Database Provisioning, Schema & RLS Policies ]
-                     │
-                     ▼
-[ Phase 3: Design System Tokens & Custom UI Kit ]
-                     │
-                     ▼
-[ Phase 4: Customer Storefront, Menu & Cart Engine ]
-                     │
-                     ▼
-[ Phase 5: Map Engine, Pin-Drop & OSRM Distance Surcharge ]
-                     │
-                     ▼
-[ Phase 6: Server-Side Zero-Trust Order Pipeline ]
-                     │
-                     ▼
-[ Phase 7: The Living Order Tracker & Real-Time Sync ]
-                     │
-                     ▼
-[ Phase 8: Kitchen Display System (KDS) & Audio Engine ]
-                     │
-                     ▼
-[ Phase 9: Rider Fleet Portal & HTML5 Telemetry Relay ]
-                     │
-                     ▼
-[ Phase 10: Admin Control Hub & Cash Reconciliation Ledger ]
-                     │
-                     ▼
-[ Phase 11: Table QR Dine-In Hybrid Mode ]
-                     │
-                     ▼
-[ Phase 12: E2E Playwright Suite, Performance & Security Audit ]
-```
+Agents complete phases in order and run every gate before moving on. This plan describes the production build; it is not permission to start the build during the specification phase.
 
 ---
 
-## Phase 1: Project Foundation & Environment Setup
+## Phase 0 — Specification Baseline
 
-### 1.1 Objective
-Initialize a clean, production-grade Next.js App Router repository with TypeScript strict mode, Tailwind CSS compilation, and required zero-cost dependencies.
+**Objective:** keep specs, schema, seed, and prototype consistent before application code.
 
-### 1.2 File Manifest
-* `package.json`
-* `tsconfig.json`
-* `next.config.mjs`
-* `postcss.config.mjs`
-* `tailwind.config.ts`
-* `.env.example`
-* `.env.local`
-* `src/lib/utils.ts`
+**Artifacts:** `docs/`, `supabase/`, `scripts/`, `site/`.
 
-### 1.3 Execution Directives
-1. **Initialize Project:**
-   ```bash
-   npx create-next-app@latest . \
-     --typescript \
-     --tailwind \
-     --eslint \
-     --app \
-     --src-dir \
-     --import-alias "@/*" \
-     --use-npm
-   ```
-2. **Install Locked Dependencies:**
-   ```bash
-   npm install @supabase/supabase-js@^2.43.0 @supabase/ssr@^0.3.0 \
-     zustand@^4.5.2 zod@^3.23.8 lucide-react@^0.390.0 \
-     clsx@^2.1.1 tailwind-merge@^2.3.0 date-fns@^3.6.0 leaflet@^1.9.4
-   npm install -D @types/leaflet@^1.9.12 @playwright/test@^1.44.0
-   ```
-3. **Configure TypeScript:** Ensure `tsconfig.json` has `strict: true`, `noImplicitAny: true`, and `target: "ES2022"`.
-4. **Configure Image Optimization (`next.config.mjs`):** Add `deviceSizes`, `imageSizes`, and WebP/AVIF format declarations matching `01_TECH_STACK_AND_CONVENTIONS.md`.
-5. **Setup `cn()` Helper (`src/lib/utils.ts`):** Export `cn(...inputs: ClassValue[])` combining `clsx` and `tailwind-merge`.
+**Exit criteria:**
 
-### 1.4 Verification & Exit Criteria
-* Command `npm run build` succeeds with zero TypeScript or linting errors.
-* Development server boots cleanly via `npm run dev` at `http://localhost:3000`.
+- `AUDIT_REPORT.md` v1.2 closure matrix is current.
+- `CANONICAL_EXAMPLES.md` is the only numeric source.
+- Migration applies cleanly to a local Supabase instance.
+- `node --check` passes for every `site/assets/js/*.js`.
+- No retired fixture, invalid UUID, default PIN, or unsafe RLS pattern remains outside historical audit text.
 
 ---
 
-## Phase 2: Database Provisioning, Schema & RLS Policies
+## Phase 1 — Project Foundation
 
-### 2.1 Objective
-Deploy the complete PostgreSQL schema, custom ENUMs, relational constraints, triggers, Row Level Security (RLS) policies, and seed data into Supabase.
+**Objective:** initialize the Next.js application with pinned dependencies and security headers.
 
-### 2.2 File Manifest
-* `supabase/migrations/20261029000000_initial_schema.sql`
-* `supabase/seed.sql`
-* `src/types/database.types.ts`
-* `src/lib/supabase/client.ts`
-* `src/lib/supabase/server.ts`
-* `src/lib/supabase/admin.ts`
+**Files:** `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.mjs`, `postcss.config.mjs`, `tailwind.config.ts`, `.env.example`, `src/lib/utils.ts`, `src/lib/env.ts`, `.github/workflows/ci.yml`, `.github/dependabot.yml`.
 
-### 2.3 Execution Directives
-1. **Migration File Creation:** Copy the complete SQL DDL from `03_DATABASE_SCHEMA_AND_RLS.md` into `supabase/migrations/20261029000000_initial_schema.sql`:
-   * Custom ENUMs (`order_status`, `payment_method`, etc.).
-   * Tables: `profiles`, `categories`, `menu_items`, `item_modifiers`, `orders`, `order_items`, `order_item_modifiers`, `rider_telemetry`, `cash_settlements`, `app_settings`.
-   * Triggers: `handle_updated_at()`, `generate_handover_pin()`.
-   * RLS policies and helper functions (`is_admin`, `is_staff`, `is_rider`).
-2. **Seed Data Insertion:** Place the seed script from `03_DATABASE_SCHEMA_AND_RLS.md` into `supabase/seed.sql`.
-3. **Generate Typed Schema:**
-   * Generate `src/types/database.types.ts` matching the Supabase tables.
-4. **Initialize Supabase Clients:**
-   * `client.ts`: Uses `createBrowserClient` from `@supabase/ssr`.
-   * `server.ts`: Uses `createServerClient` reading cookies for Server Components and Server Actions.
-   * `admin.ts`: Uses `createClient` with `SUPABASE_SERVICE_ROLE_KEY` (restricted to webhooks).
+**Directives:**
 
-### 2.4 Verification & Exit Criteria
-* Direct SQL execution in Supabase succeeds with all 10 tables present and RLS enabled.
-* Executing `SELECT * FROM app_settings WHERE id = 1` returns the default Kampala Bazaar configuration.
-* Executing `SELECT count(*) FROM menu_items` returns 5 baseline seeded dishes.
+1. Create the app with a **pinned** Next.js 15 scaffold. Do not run `create-next-app@latest`; pin the exact version in `package.json` and commit the lockfile.
+2. Install React 19, Tailwind 3.4.x, `@supabase/supabase-js`, `@supabase/ssr`, `zod`, `zustand`, `leaflet`, `lucide-react`, `clsx`, `tailwind-merge`, `date-fns`/`date-fns-tz`.
+3. Enable `strict`, `noImplicitAny`, and ES2022.
+4. Add the security headers and CSP from `SPEC_AMENDMENTS.md` §4.2.
+5. Add the env schema; no default admin PIN, no restaurant coordinates in env.
+6. Add the CI workflow: `npm ci`, lint, typecheck, unit, and build; enable secret scanning and weekly Dependabot updates. DB/RLS and E2E jobs join in Phases 2 and 12.
+
+**Gate:** lint, typecheck, unit, and build pass; `env.ts` rejects missing secrets; no secret is present in the client bundle; the required CI check is green and branch protection is on.
 
 ---
 
-## Phase 3: Design System Tokens & Custom UI Kit
+## Phase 2 — Database, Auth, RLS, Seed
 
-### 3.1 Objective
-Implement the anti-AI-slop "Bazaar Warmth" design tokens, typography scale, and tactile restaurant components.
+**Objective:** apply the schema, provision staff, and prove the security boundary.
 
-### 3.2 File Manifest
-* `tailwind.config.ts`
-* `src/app/globals.css`
-* `src/components/ui/button.tsx`
-* `src/components/ui/badge.tsx`
-* `src/components/ui/input.tsx`
-* `src/components/ui/bottom-sheet.tsx`
-* `src/components/ui/living-docket.tsx`
-* `src/components/ui/modifier-chip.tsx`
+**Files:** `supabase/migrations/20261029000000_initial_schema.sql`, `supabase/seed.sql`, `scripts/seed-staff.mjs`, `src/lib/supabase/{client,server,admin}.ts`, `src/types/database.types.ts`, `src/middleware.ts`, `src/lib/auth/*`.
 
-### 3.3 Execution Directives
-1. **Tailwind Token Binding:** Paste the extended theme object from `02_DESIGN_SYSTEM_AND_UI_SPEC.md` into `tailwind.config.ts` (`surface-ground: #F9F8F6`, `ink-primary: #1A1918`, `brand-terracotta: #D84A26`, etc.).
-2. **Thermal Print Stylesheet:** Append the `@media print` rules from `06_INTEGRATIONS_AND_HARDWARE_APIS.md` into `src/app/globals.css`.
-3. **Build Tactile Components:**
-   * `button.tsx`: Implements high-contrast states, 48px standard touch target, 56px rider target, zero diffuse shadows.
-   * `bottom-sheet.tsx`: Mobile drawer anchored to the bottom edge with pull-handle and safe-area padding (`pb-safe`).
-   * `living-docket.tsx`: Replicates the physical kitchen order docket with dashed tear border and monospace tabular figures.
-   * `modifier-chip.tsx`: High-contrast toggle pill with checkmark state and price delta label.
+**Directives:**
 
-### 3.4 Verification & Exit Criteria
-* Visual review confirms no SaaS purple or glowing drop-shadows exist.
-* Base canvas renders `#F9F8F6` (Warm Linen).
-* Components respect mobile safe-area insets on mobile viewports.
+1. Apply the migration; do not re-type DDL from prose. The migration is the schema authority.
+2. Run `supabase/seed.sql` (idempotent).
+3. Provision staff with `scripts/seed-staff.mjs`; staff are Auth users with 6-digit PINs as passwords.
+4. Generate `database.types.ts`.
+5. Implement `server-only` admin client and role guards.
+6. Add RLS/database tests from `TEST_PLAN.md` §3.
+
+**Gate:**
+
+- Local reset succeeds.
+- `profiles.id` references `auth.users`.
+- `anon`/`authenticated` direct selects on orders/PIN/telemetry are denied.
+- `claim_order_atomic` race test has exactly one winner.
+- No `profiles.pin_code`.
 
 ---
 
-## Phase 4: Customer Storefront, Menu & Cart Engine
+## Phase 3 — Design Tokens and UI Kit
 
-### 4.1 Objective
-Construct the mobile-first customer storefront featuring instant client-side filtering, category navigation, the 3-step combo builder, structured cooking modifiers, and persistent cart state.
+**Objective:** implement the v2 green/orange system and accessible primitives.
 
-### 4.2 File Manifest
-* `src/hooks/use-cart.ts`
-* `src/components/storefront/menu-card.tsx`
-* `src/components/storefront/category-bar.tsx`
-* `src/components/storefront/instant-search.tsx`
-* `src/components/storefront/modifier-modal.tsx`
-* `src/components/storefront/combo-builder.tsx`
-* `src/components/storefront/cart-dock.tsx`
-* `src/app/(storefront)/page.tsx`
+**Files:** `tailwind.config.ts`, `src/app/globals.css`, `src/components/ui/*`, `src/components/map/dynamic-map.tsx`.
 
-### 4.3 Execution Directives
-1. **Zustand Cart Store (`use-cart.ts`):**
-   * Implements item addition, quantity modification, and modifier array storage.
-   * Enforces `localStorage` synchronization via `persist` middleware.
-   * Exports computed selectors: `itemsCount`, `subtotalAmount`.
-2. **Storefront Page (`page.tsx`):**
-   * Server Component fetching active categories and menu items from `public.menu_items`.
-   * Passes data to client-side `InstantSearch` and `CategoryBar`.
-3. **Item Customization Drawer (`modifier-modal.tsx`):**
-   * Renders cooking styles (radio buttons), free omissions (`No Onions`), and paid add-ons (`Extra Chili +USh 2,000`).
-   * Dynamic CTA button updates total in real time: `[ Add to Cart • USh 34,000 ]`.
-4. **Persistent Cart Dock (`cart-dock.tsx`):**
-   * Floating bottom bar (`h-14`) displaying item count and subtotal in `font-mono`.
-   * Tapping opens the cart review drawer.
+**Directives:**
 
-### 4.4 Verification & Exit Criteria
-* Typing into search filters dishes live with zero layout jumps.
-* Customizing a dish updates cart subtotal accurately.
-* Refreshing the browser preserves cart contents in `localStorage`.
+1. Bind the v2 tokens: green-800 `#173F35`, green-900 `#102E27`, orange-500 `#F28C28`, orange-700 `#A65A0F`, red-600 `#C62828`, success `#17603F`, warning `#8A4B00`.
+2. Orange buttons use green-900 text; never white on orange.
+3. Build button, badge, input, sheet/dialog, toast, skeleton, table, and empty state.
+4. Import Leaflet CSS in the client wrapper.
+5. Add focus rings, reduced-motion handling, and 48/52/56 px targets.
+
+**Gate:** axe zero critical/serious; contrast script passes; no forbidden palette token.
 
 ---
 
-## Phase 5: Map Engine, Pin-Drop & OSRM Distance Surcharge
+## Phase 4 — Storefront, Menu, Cart
 
-### 5.1 Objective
-Implement the Leaflet interactive map with draggable pin-drop, connect to the OSRM road distance engine, enforce the 5.0 km free threshold and excess surcharge, and apply Minimum Order Value (MOV) guardrails.
+**Objective:** browse, customize, and cart with authoritative prices.
 
-### 5.2 File Manifest
-* `src/lib/distance.ts`
-* `src/app/api/distance/route.ts`
-* `src/components/map/dynamic-map.tsx`
-* `src/components/map/location-picker.tsx`
-* `src/app/(storefront)/checkout/page.tsx`
+**Files:** `src/hooks/use-cart.ts`, `src/components/storefront/*`, `src/app/(storefront)/page.tsx`.
 
-### 5.3 Execution Directives
-1. **OSRM Route Proxy (`/api/distance/route.ts`):**
-   * Accepts `lat` and `lng`.
-   * Calls OSRM public API: `https://router.project-osrm.org/route/v1/driving/32.5811,0.3136;lng,lat`.
-   * Returns road distance in kilometers.
-   * Implements fallback Haversine distance multiplied by urban curvature factor ($1.35\times$) if OSRM times out ($> 3\text{s}$).
-2. **Distance Fee Calculation Logic (`src/lib/distance.ts`):**
-   * If $d_{\text{road}} \le 5.0\text{ km} \implies \text{Fee} = 0$.
-   * If $5.0\text{ km} < d_{\text{road}} \le 15.0\text{ km} \implies \text{Fee} = \lceil d_{\text{road}} - 5.0 \rceil \times \text{Rate}_{\text{per\_km}}$.
-   * If $d_{\text{road}} > 15.0\text{ km} \implies \text{Error: OUT\_OF\_BOUNDS}$.
-3. **Location Picker (`location-picker.tsx`):**
-   * Dynamically imported client-side component (SSR disabled).
-   * Renders Leaflet map centered on Kampala Bazaar (`0.3136, 32.5811`).
-   * Center crosshair stays fixed while user pans/drags map.
-   * Debounces map movement ($400\text{ms}$) before triggering `/api/distance`.
-4. **Checkout Page (`checkout/page.tsx`):**
-   * Enforces Minimum Order Value: if $\text{subtotal} < \text{MOV}$, checkout CTA is disabled and progress bar renders deficit.
-   * Displays dynamic fee badge (Green for USh 0 free zone).
-   * Collects customer name, phone, payment method, and optional COD change request.
+**Directives:**
 
-### 5.4 Verification & Exit Criteria
-* Setting test coordinates to Nakasero (`lat: 0.3245, lng: 32.5782`) results in **3.8 km** and **USh 0 Delivery Fee**.
-* Setting test coordinates to Ntinda (`lat: 0.3542, lng: 32.6120`) results in **7.4 km** and **USh 4,500 Delivery Fee** ($3\text{ km} \times \text{USh } 1,500$).
-* Setting test coordinates $> 15.0\text{ km}$ disables checkout and displays out-of-bounds warning.
+1. Server-fetch active categories, items, groups, and combos.
+2. Zustand cart with `persist`; validate against current availability.
+3. Modifier sheet enforces single/multi and min/max.
+4. Combo builder uses `combo_steps`/`combo_step_options`.
+5. Sold-out, empty, and store-closed states.
+6. Cart subtotal uses items + modifiers only.
+
+**Gate:** unit tests for pricing; keyboard-only customization; no stale image or price.
 
 ---
 
-## Phase 6: Server-Side Zero-Trust Order Pipeline
+## Phase 5 — Map, Routing, Fees, MOV
 
-### 6.1 Objective
-Construct the immutable order creation pipeline using Next.js Server Actions, recalculating all financial totals on the server and generating the 4-digit handover PIN.
+**Objective:** pin-drop, OSRM metres, fee, and MOV.
 
-### 6.2 File Manifest
-* `src/lib/schemas/order.ts`
-* `src/actions/checkout.ts`
-* `src/app/api/webhooks/payment/route.ts`
+**Files:** `src/lib/routing/*`, `src/app/api/distance/route.ts`, `src/components/map/*`, `src/app/(storefront)/checkout/page.tsx`.
 
-### 6.3 Execution Directives
-1. **Validation Schema (`order.ts`):** Define `CreateOrderInputSchema` matching `07_SECURITY_AND_VERIFICATION_PROTOCOLS.md` with strict phone regex and positive quantities.
-2. **Server Action (`checkout.ts`):**
-   * Validates input payload with Zod.
-   * Queries `public.menu_items` and `public.item_modifiers` for authoritative prices.
-   * Queries distance engine on the server to verify delivery fee.
-   * Computes master order total:
-     $$\text{Total} = \text{Subtotal} + \text{Modifiers} + \text{Packaging} + \text{DeliveryFee}$$
-   * Inserts into `public.orders`, `public.order_items`, and `public.order_item_modifiers`.
-   * Automatically generates 4-digit `handover_pin` via database trigger.
-   * Returns `{ success: true, orderToken: order.order_token }`.
-3. **Payment Webhook Handler (`webhooks/payment/route.ts`):**
-   * Validates HMAC-SHA256 signature header.
-   * Checks for idempotency (ignores already-paid orders).
-   * Verifies paid amount matches `orders.total_amount`.
-   * Shifts order status to `PREPARING` on success.
+**Directives:**
 
-### 6.4 Verification & Exit Criteria
-* Client-submitted price tampering is completely overridden by authoritative database prices.
-* Order record is successfully created in Supabase with a valid 4-digit `handover_pin`.
-* Successful webhook shifts status from `PENDING_PAYMENT` to `PREPARING`.
+1. `/api/distance` validates coordinates, calls OSRM, caches 24 h, returns integer metres + duration.
+2. On failure return `DISTANCE_UNAVAILABLE`; never substitute Haversine.
+3. `fee = 0` ≤5 km; `ceil((m−5000)/1000) × rate` ≤15 km; block >15 km.
+4. Checkout enforces MOV, COD radius (8.1 km), cart limits, store hours.
+5. Map has a text fallback and accessible pin control.
+
+**Gate:** canonical fixtures: Nakasero 1,562 m / fee 0; Ntinda 8,093 m / fee 6,000; out-of-bounds blocked. Unit tests use fixed metres; E2E mocks OSRM.
 
 ---
 
-## Phase 7: The Living Order Tracker & Real-Time Sync
+## Phase 6 — Order Pipeline and Payments
 
-### 7.1 Objective
-Build the persistent, real-time customer tracking page (`/orders/[token]`) featuring the 5-stage milestone timeline, moving Leaflet motorcycle telemetry, handover PIN display, and WhatsApp concierge link.
+**Objective:** create orders server-side, verify payments, and handle COD.
 
-### 7.2 File Manifest
-* `src/components/orders/milestone-bar.tsx`
-* `src/components/orders/pin-display-box.tsx`
-* `src/components/orders/feedback-modal.tsx`
-* `src/components/map/live-tracker-map.tsx`
-* `src/app/(storefront)/orders/[token]/page.tsx`
+**Files:** `src/lib/schemas/order.ts`, `src/actions/checkout.ts`, `src/actions/payments.ts`, `src/actions/otp.ts`, `src/app/api/webhooks/flutterwave/route.ts`, `src/app/api/cron/expire-orders/route.ts`.
 
-### 7.3 Execution Directives
-1. **Order Tracker Page (`page.tsx`):**
-   * Fetches order by `order_token` (UUID).
-   * Subscribes to Supabase Realtime channel `orders:id=eq.[order.id]`.
-   * Renders the Living Docket with perforated tear border.
-2. **Milestone Tracker (`milestone-bar.tsx`):**
-   * Visual progress stages: `Received` $\rightarrow$ `Confirmed` $\rightarrow$ `Cooking` $\rightarrow$ `On Road` $\rightarrow$ `Delivered`.
-3. **Live Telemetry Map (`live-tracker-map.tsx`):**
-   * Mounted only when `order_status === 'OUT_FOR_DELIVERY'`.
-   * Subscribes to `public.rider_telemetry` for the assigned `rider_id`.
-   * Renders moving motorcycle marker with heading arrow and radar ripple.
-4. **Handover PIN Box (`pin-display-box.tsx`):**
-   * Displays the 4-digit code in 24px monospace text.
-   * Displays safety reminder: *"Verify package safety seal before sharing PIN."*
-5. **Post-Delivery Feedback Modal (`feedback-modal.tsx`):**
-   * Automatically displays upon status transitioning to `DELIVERED`.
-   * Submits 1-tap rating (`GREAT`, `OKAY`, `BAD`) to `public.orders`.
+**Directives:**
 
-### 7.4 Verification & Exit Criteria
-* Manually updating `order_status` in Supabase updates the customer's browser screen instantly via WebSockets without page reload.
-* Handover PIN is clearly legible.
-* WhatsApp concierge link opens with pre-populated order context.
+1. Zod discriminated union for delivery/dine-in; normalize phone.
+2. Idempotency key required; recompute all totals; insert order/items/modifiers in one transaction.
+3. Digital: create `payment_transactions`, call Flutterwave hosted checkout; webhook validates `verif-hash`, verifies transaction, checks amount/currency, stores event, moves `PENDING_PAYMENT → PREPARING`.
+4. COD: enforce radius, OTP when required, store change due, create `CONFIRMED_UNPAID`.
+5. Duplicate/late events never resurrect a terminal order.
+6. Expire unpaid digital orders after 10 minutes.
+
+**Gate:** webhook signature/replay/amount tests; idempotency tests; canonical totals 35,000 / 38,000 / 8,000; no client-supplied price accepted.
 
 ---
 
-## Phase 8: Kitchen Display System (KDS) & Audio Engine
+## Phase 7 — Customer Tracker
 
-### 8.1 Objective
-Implement the high-contrast `/kitchen` display system for wall-mounted tablets, featuring the Web Audio API synthesizer, elapsed cook timers, ticket bumping, 86-ing toggles, and Busy Mode buffering.
+**Objective:** token-scoped tracking, PIN, telemetry, feedback.
 
-### 8.2 File Manifest
-* `src/lib/audio/chimes.ts`
-* `src/components/kitchen/audio-banner.tsx`
-* `src/components/kitchen/kds-ticket.tsx`
-* `src/components/kitchen/stock-out-drawer.tsx`
-* `src/actions/kitchen.ts`
-* `src/app/(operations)/kitchen/page.tsx`
+**Files:** `src/components/tracker/*`, `src/app/(storefront)/orders/[token]/page.tsx`, `src/actions/orders.ts`.
 
-### 8.3 Execution Directives
-1. **Audio Synthesizer (`chimes.ts`):** Implement the Web Audio API class from `06_INTEGRATIONS_AND_HARDWARE_APIS.md` (dual-tone harmonic bell D5 $\rightarrow$ A5, zero MP3 downloads).
-2. **User Gesture Unlock (`audio-banner.tsx`):** Full-screen overlay prompt: `[ 🔔 TAP TO START SHIFT & ENABLE SOUND ALERTS ]` to unlock browser audio context.
-3. **KDS Ticket Grid (`kds-ticket.tsx`):**
-   * Displays order number, order type, elapsed timer, and line items.
-   * Highlights omissions in bold amber tags (`* NO ONIONS *`).
-   * Color-codes timer badges: Green (0–10m), Amber (10–20m), Flashing Red (>20m).
-   * Full-width 52px bump button: `[ BUMP TO READY FOR PICKUP ]`.
-4. **Quick 86-ing Drawer (`stock-out-drawer.tsx`):** Drawer to toggle menu items in/out of stock instantly via Supabase mutation.
-5. **Busy Mode Buffer:** Toggle in header adding +20 minutes to global prep estimates.
+**Directives:**
 
-### 8.4 Verification & Exit Criteria
-* Tapping "Enable Sound" unlocks audio; creating a new order triggers a loud harmonic chime.
-* Tickets automatically shift color from green to red as time elapses.
-* Bumping a ticket changes status to `READY_FOR_PICKUP` and removes it from the active cook queue.
+1. Read only through `get_order_by_token`.
+2. Timeline, ETA, docket, payment status.
+3. Map only during `OUT_FOR_DELIVERY`; poll telemetry; show stale state.
+4. PIN displayed only after the safety-seal instruction.
+5. Feedback once on `DELIVERED`.
+6. Not-found, cancelled, failed, and payment-pending states.
+7. Broadcast + polling; no `postgres_changes`.
+
+**Gate:** unknown token produces not-found; PIN absent from network payloads except the token RPC; tracker updates without reload.
 
 ---
 
-## Phase 9: Rider Fleet Portal & HTML5 Telemetry Relay
+## Phase 8 — Kitchen Display
 
-### 9.1 Objective
-Construct the mobile handlebar `/rider` portal with low-friction 4-digit PIN authentication, atomic order claiming, turn-by-turn Google Maps launching, background GPS streaming, and the Handover PIN verification gate.
+**Objective:** reliable KDS with audio, accept/bump, 86, and busy mode.
 
-### 9.2 File Manifest
-* `src/hooks/use-geolocation.ts`
-* `src/components/rider/claim-card.tsx`
-* `src/components/rider/pin-modal.tsx`
-* `src/actions/rider.ts`
-* `src/app/(operations)/rider/page.tsx`
+**Files:** `src/lib/audio/chimes.ts`, `src/components/kitchen/*`, `src/actions/kitchen.ts`, `src/app/(operations)/kitchen/{login,page}.tsx`, `src/app/(operations)/kitchen/layout.tsx`.
 
-### 9.3 Execution Directives
-1. **Staff PIN Auth:** Rider enters registered phone number and 4-digit PIN (`1234`).
-2. **Unclaimed Pool & Atomic Claiming (`claim-card.tsx` & `rider.ts`):**
-   * Renders available orders in `READY_FOR_PICKUP` state.
-   * `claimOrderAction` executes `claim_order_atomic` PostgreSQL function with row-level locking.
-   * If claim succeeds, order moves to Rider's Active Delivery view. If another rider claimed first, displays error toast and updates pool.
-3. **Active Delivery "Glance-and-Go" View:**
-   * 56px oversized touch targets.
-   * If Cash on Delivery: High-visibility yellow/amber banner renders: `COLLECT USH [Amount] CASH`.
-   * Direct URI trigger: `[ 🗺️ Launch Navigation ]` opens Google Maps via `geo:` or universal link.
-4. **HTML5 Telemetry Relay (`use-geolocation.ts`):** Streams rider's coordinates to `public.rider_telemetry` every 12 seconds or when moved $> 20\text{ meters}$.
-5. **Handover PIN Verification Modal (`pin-modal.tsx`):**
-   * Numerical keypad for entering the customer's 4-digit code.
-   * Calls `verifyDeliveryPin` Server Action.
-   * Enforces 3-attempt maximum lockout.
-   * On success, order marks `DELIVERED`, cash is logged, and GPS streaming halts.
+**Directives:**
 
-### 9.4 Verification & Exit Criteria
-* Simulating two concurrent claim requests results in exactly one winner and one handled failure.
-* Correct 4-digit PIN completes the delivery.
-* Entering 3 incorrect PINs locks the order and triggers security alert.
+1. Auth gate with 6-digit PIN.
+2. Shift-start gesture unlocks Web Audio; repeated chime stops on `acknowledged_at`.
+3. Prepaid orders arrive `PREPARING`; **Accept** applies only to `CONFIRMED_UNPAID`.
+4. Bump: delivery → `READY_FOR_PICKUP`; dine-in → `DELIVERED`.
+5. 86 via RPC; busy mode via RPC; both audited.
+6. Late timers show text, not colour alone.
+7. Print docket; no PIN/phone.
+
+**Gate:** audio test after gesture; accept/bump state tests; 86 propagation; busy buffer does not change existing orders.
 
 ---
 
-## Phase 10: Admin Control Hub & Cash Reconciliation Ledger
+## Phase 9 — Rider Portal
 
-### 10.1 Objective
-Build the management control center (`/admin`) to monitor live orders, edit customer typos on active tickets, adjust dynamic delivery sliders, and reconcile physical cash collected by the 5 motorcycle riders.
+**Objective:** auth, atomic claim, navigation, telemetry, PIN, cash summary.
 
-### 10.2 File Manifest
-* `src/components/admin/live-order-editor.tsx`
-* `src/components/admin/settings-sliders.tsx`
-* `src/components/admin/cash-ledger-table.tsx`
-* `src/actions/admin.ts`
-* `src/app/(operations)/admin/page.tsx`
-* `src/app/(operations)/admin/ledger/page.tsx`
-* `src/app/(operations)/admin/settings/page.tsx`
+**Files:** `src/hooks/use-geolocation.ts`, `src/components/rider/*`, `src/actions/rider.ts`, `src/app/(operations)/rider/{login,page}.tsx`.
 
-### 10.3 Execution Directives
-1. **Live Typo Rectifier (`live-order-editor.tsx`):**
-   * Modal allowing manager to edit customer phone number, drop-off notes, or adjust pinned coordinates on live orders.
-   * Saving immediately broadcasts updates to the assigned rider's screen in real time.
-2. **Dynamic Settings Sliders (`settings-sliders.tsx`):**
-   * Sliders for free delivery distance (3–7 km), per-km surcharge (USh 1,000–3,000), and Minimum Order Value (USh 10,000–30,000).
-   * Persists changes to `public.app_settings`.
-3. **End-of-Day Cash Ledger (`cash-ledger-table.tsx`):**
-   * Aggregates completed COD deliveries per motorcycle rider plate.
-   * Computes exact cash liability owed to the restaurant drawer.
-   * `[ RECONCILE & CLEAR RIDER ]` button records audit entry in `public.cash_settlements` and resets active balance to USh 0.
+**Directives:**
 
-### 10.4 Verification & Exit Criteria
-* Editing a customer's phone number on an active order syncs to the rider's screen within 1 second.
-* Cash settlement cleanly clears driver liability in the database.
+1. Phone + 6-digit PIN; role guard.
+2. Start/end shift with opening float.
+3. Pool uses safe RPC; no PII/PIN.
+4. `claim_order_atomic`; one active order; refresh on loss.
+5. Start trip → `OUT_FOR_DELIVERY`; foreground telemetry with IndexedDB queue and Wake Lock.
+6. PIN modal calls `verify_delivery_pin`; handles invalid/locked/too-far/offline.
+7. Offline completion is blocked with a clear message; it is never queued or reported as delivered.
+8. Report failed delivery/release with reason; cash summary read-only.
+
+**Gate:** claim race; PIN lockout/reset; telemetry scope; offline queue replay drops stale points; no background GPS claim.
 
 ---
 
-## Phase 11: Table QR Dine-In Hybrid Mode
+## Phase 10 — Admin Hub
 
-### 11.1 Objective
-Implement the bazaar table ordering extension triggered via URL parameter (`/?table=[id]`).
+**Objective:** orders, menu, settings, ledger, analytics, audit, staff, tables.
 
-### 11.2 File Manifest
-* `src/components/storefront/table-header.tsx`
-* `src/app/(storefront)/page.tsx` (Updated parameter parsing)
-* `src/actions/checkout.ts` (Dine-in branch handling)
+**Files:** `src/components/admin/*`, `src/actions/admin.ts`, `src/app/(operations)/admin/**`.
 
-### 11.3 Execution Directives
-1. **Parameter Detection:** Read `searchParams.table` in `page.tsx`.
-2. **UI Adaptations:**
-   * Display persistent header badge: `🍽️ Dine-In: Table [ID]`.
-   * Unmount Leaflet map and address fields from checkout view.
-   * Hardcode delivery fee to `USh 0` and packaging fee to `USh 0`.
-   * Override Minimum Order Value: Allow checkout for any subtotal ($> 0$).
-3. **Order Insertion:** Set `order_type = 'DINE_IN'` and populate `table_number`.
-4. **KDS Routing:** KDS flags ticket with blue badge: `TABLE [ID] [DINE-IN]`. Completing the ticket marks it `DELIVERED` directly, bypassing the motorcycle rider pool.
+**Directives:**
 
-### 11.4 Verification & Exit Criteria
-* Loading `/?table=4` allows ordering a single Rolex (USh 8,000) with zero delivery fee.
-* Kitchen tablet shows `TABLE 4 [DINE-IN]` and bump action completes the order immediately.
+1. Auth gate; ADMIN only.
+2. Live monitor and order drawer with edit/cancel/complete/reassign/reset PIN/refund, each with reason + audit.
+3. Menu CRUD with soft archive and image upload validation.
+4. Settings with bounds and `settings_history`.
+5. Ledger with EAT business date and linked orders; reconcile.
+6. Analytics and audit views.
+7. Staff cannot demote the last admin.
+8. Destructive confirmations require a typed reason.
+
+**Gate:** every admin action writes an audit row; ledger 65,500 example reconciles; second settlement updates the same row; refund request created on paid cancellation.
 
 ---
 
-## Phase 12: E2E Playwright Suite, Performance & Security Audit
+## Phase 11 — Dine-In
 
-### 12.1 Objective
-Execute automated end-to-end integration tests verifying all 6 realistic personas, validate bundle budgets, and verify zero-cost open-source map compliance.
+**Objective:** table QR mode end to end.
 
-### 12.2 File Manifest
-* `tests/e2e/persona-1-happy-path.spec.ts`
-* `tests/e2e/persona-2-distance-cod.spec.ts`
-* `tests/e2e/persona-3-table-qr.spec.ts`
-* `tests/e2e/concurrency-claim.spec.ts`
-* `public/manifest.json`
+**Files:** `src/components/storefront/table-header.tsx`, `src/app/(storefront)/page.tsx`, `src/actions/checkout.ts`, `src/app/(operations)/kitchen/*`.
 
-### 12.3 Execution Directives
-1. **Implement Playwright Tests:** Convert scenarios A, B, C, and E from `08_TESTING_PERSONAS_AND_E2E_SCENARIOS.md` into executable test suites.
-2. **PWA Manifest Configuration:** Configure `public/manifest.json` with theme color `#D84A26` and standalone display mode.
-3. **Bundle Performance Audit:**
-   * Verify Leaflet is dynamically imported on client components only.
-   * Verify total gzipped JS transfer on `/` is $< 150\text{ KB}$.
-   * Verify all images load in WebP format with dimensions $\le 600 \times 400\text{px}$.
-4. **Security Audit:**
-   * Verify RLS blocks unauthenticated users from reading `orders.handover_pin`.
-   * Verify client price tampering fails with server-calculated totals.
+**Directives:**
 
-### 12.4 Verification & Exit Criteria
-* All Playwright E2E test suites pass with 100% green status:
-  ```bash
-  npx playwright test
-  ```
-* Production build passes audit:
-  ```bash
-  npm run build
-  ```
-* System is verified ready for deployment to Vercel/Netlify with Supabase backend.
+1. Validate table QR token server-side; do not trust `?table=4`.
+2. Hide delivery UI; fee/packaging/MOV = 0.
+3. Store `order_type = DINE_IN` and `table_id`.
+4. KDS shows table badge; bump marks `DELIVERED`.
+5. No rider pool or PIN.
+6. Canonical Alex total 8,000.
+
+**Gate:** forged/inactive token rejected; dine-in never enters rider pool; KDS completion works.
+
+---
+
+## Phase 12 — E2E, Performance, Security, Launch
+
+**Objective:** prove the whole system and prepare launch.
+
+**Files:** `tests/e2e/*`, `tests/db/*`, `tests/unit/*`, `playwright.config.ts`, `vitest.config.ts`, `public/manifest.webmanifest`, `public/sw.js`.
+
+**Directives:**
+
+1. Implement scenarios A–I from `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` / `TEST_PLAN.md`.
+2. Mock OSRM and payments; fixed test OTP; no live keys.
+3. Accessibility suite on all portals.
+4. Performance budgets and bundle check.
+5. Security checks: RLS, PIN isolation, webhook replay, price tampering, CSP.
+6. Runbook rollback and backup restore exercise.
+7. PWA manifest with v2 theme color `#173F35`.
+8. Run `npm audit --omit=dev --audit-level=high`, CodeQL or Semgrep, and provider secret scanning; resolve high/critical findings before launch.
+
+**Gate:**
+
+- All E2E, DB, unit, and a11y gates pass.
+- No retired numbers or invalid fixtures.
+- Ledger sums to linked orders.
+- Dependency and secret scans have no unresolved high/critical findings.
+- Rollback/restore exercised.
+- Founder go-live checklist signed.
+
+---
+
+## Revision History
+
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Rewritten for pinned Next 15, Supabase Auth, integer-metre OSRM, canonical fixtures, v2 palette, kitchen portal, payment/refund/audit, scenarios A–I, CI and dependency/secret scanning. |
+| 1.1.0 | 2026-10-29 | Amendment banner. |
+| 1.0.0 | 2026-10-27 | Original 12-phase plan. |

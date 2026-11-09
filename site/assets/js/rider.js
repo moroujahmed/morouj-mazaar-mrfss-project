@@ -20,8 +20,6 @@
   } = window.MM;
 
   const CONNECTION_KEY = "mm-rider-connection-v2";
-  const PENDING_KEY = "mm-rider-pending-v2";
-  const QUEUE_KEY = "mm-rider-queue-v2";
   const PIN_CODE = "4821";
   const PIN_MAX_ATTEMPTS = 3;
   const PIN_LOCK_SECONDS = 20;
@@ -91,8 +89,6 @@
 
   let state = {
     connection: storageGet(CONNECTION_KEY, "online"),
-    pending: null,
-    queue: [],
     onShift: true,
     delivered: false,
     delivery: null,
@@ -102,8 +98,6 @@
   };
 
   if (["online", "weak", "offline"].indexOf(state.connection) === -1) state.connection = "online";
-  state.queue = [];
-  state.pending = null;
 
   /* ---------------------------------------------------------------------
      Elements
@@ -119,9 +113,6 @@
     pageStatusText: document.getElementById("pageStatusText"),
     offlineBanner: document.getElementById("offlineBanner"),
     weakBanner: document.getElementById("weakBanner"),
-    pendingBanner: document.getElementById("pendingBanner"),
-    pendingText: document.getElementById("pendingText"),
-    syncPending: document.getElementById("syncPending"),
     activeOrderCard: document.getElementById("activeOrderCard"),
     activeOrderBody: document.getElementById("activeOrderBody"),
     deliveredPanel: document.getElementById("deliveredPanel"),
@@ -131,7 +122,7 @@
     shiftDeliveries: document.getElementById("shiftDeliveries"),
     shiftCash: document.getElementById("shiftCash"),
     shiftCashLabel: document.getElementById("shiftCashLabel"),
-    shiftQueue: document.getElementById("shiftQueue"),
+    shiftActive: document.getElementById("shiftActive"),
     shiftNote: document.getElementById("shiftNote"),
     riderSticky: document.getElementById("riderSticky"),
     pinSheet: document.getElementById("pinSheet"),
@@ -166,14 +157,6 @@
     storageSet(CONNECTION_KEY, state.connection);
   }
 
-  function savePending() {
-    storageSet(PENDING_KEY, state.pending);
-  }
-
-  function saveQueue() {
-    storageSet(QUEUE_KEY, state.queue);
-  }
-
   function totalUnits(order) {
     return order.items.reduce(function (sum, item) { return sum + item.qty; }, 0);
   }
@@ -193,16 +176,11 @@
     return state.connection === "online" ? "Online" : state.connection === "weak" ? "Weak signal" : "Offline";
   }
 
-  function isPending() {
-    return Boolean(state.pending && state.pending.id === currentOrder.id);
-  }
-
   /* ---------------------------------------------------------------------
      Render — active order
      --------------------------------------------------------------------- */
   function orderTemplate(order) {
-    const pending = isPending();
-    const statusText = pending ? "Awaiting verification" : state.status;
+    const statusText = state.status;
     const quantity = totalUnits(order);
     const firstName = order.firstName || order.customer.split(" ")[0];
 
@@ -223,8 +201,8 @@
       '<div class="order-topbar">' +
         '<div class="cluster">' +
           '<span class="order-number">#' + escapeHtml(order.id) + "</span>" +
-          '<span class="badge ' + (pending ? "badge-warning" : "badge-orange") + '">' +
-            icon(pending ? "sync" : "bike") + escapeHtml(statusText) +
+          '<span class="badge badge-orange">' +
+            icon("bike") + escapeHtml(statusText) +
           "</span>" +
         "</div>" +
         paymentBadge(order) +
@@ -232,14 +210,14 @@
 
       '<div class="order-hero">' +
         "<div>" +
-          '<span class="label">' + (pending ? "Queued at" : "Arrive by") + "</span>" +
-          '<div class="eta-big">' + escapeHtml(pending ? state.pending.at : order.arrive) + "</div>" +
+          '<span class="label">Arrive by</span>' +
+          '<div class="eta-big">' + escapeHtml(order.arrive) + "</div>" +
           '<div class="eta-meta">' +
-            (pending ? "Waiting for a signal to verify" : escapeHtml(order.eta + " · " + order.distance)) +
+            escapeHtml(order.eta + " · " + order.distance) +
           "</div>" +
         "</div>" +
         '<div class="order-amount">' +
-          "<span>" + (pending ? "Cash collected" : order.cod ? "Collect cash" : "Prepaid") + "</span>" +
+          "<span>" + (order.cod ? "Collect cash" : "Prepaid") + "</span>" +
           "<strong>" + money(order.total) + "</strong>" +
         "</div>" +
       "</div>" +
@@ -293,17 +271,12 @@
 
         '<div class="order-note">' + icon("info") + "<span>" + escapeHtml(order.note) + "</span></div>" +
 
-        (pending
-          ? '<div class="order-note order-note-warning">' + icon("alert") +
-              "<span>This handover is saved on your phone but not verified yet. Tap Sync now when you have signal.</span></div>"
-          : "") +
-
         '<div class="big-actions">' +
-          '<button class="btn btn-secondary" type="button" data-navigate' + (pending ? ' disabled aria-disabled="true"' : "") + ">" +
+          '<button class="btn btn-secondary" type="button" data-navigate>' +
             icon("navigation") + "Navigate" +
           "</button>" +
-          '<button class="btn btn-primary" type="button" data-complete' + (pending ? ' disabled aria-disabled="true"' : "") + ">" +
-            icon(pending ? "sync" : "check-circle") + (pending ? "Queued" : "Complete") +
+          '<button class="btn btn-primary" type="button" data-complete>' +
+            icon("check-circle") + "Complete" +
           "</button>" +
         "</div>" +
 
@@ -335,17 +308,16 @@
       return;
     }
     els.riderSticky.hidden = false;
-    const pending = isPending();
     const navigate = els.riderSticky.querySelector("[data-navigate]");
     const complete = els.riderSticky.querySelector("[data-complete]");
     if (navigate) {
-      navigate.disabled = pending;
-      navigate.setAttribute("aria-disabled", String(pending));
+      navigate.disabled = false;
+      navigate.removeAttribute("aria-disabled");
     }
     if (complete) {
-      complete.disabled = pending;
-      complete.setAttribute("aria-disabled", String(pending));
-      complete.innerHTML = icon(pending ? "sync" : "check-circle") + (pending ? "Queued" : "Complete");
+      complete.disabled = false;
+      complete.removeAttribute("aria-disabled");
+      complete.innerHTML = icon("check-circle") + "Complete";
     }
   }
 
@@ -354,12 +326,15 @@
      --------------------------------------------------------------------- */
   function renderPool() {
     const openOrders = deliveryPool.filter(function (order) {
-      return order.id !== currentOrder.id && state.queue.indexOf(order.id) === -1;
+      return order.id !== currentOrder.id;
     });
+    const canClaim = state.onShift && state.delivered;
 
-    els.poolSub.textContent = state.onShift
-      ? "Ready for pickup · held for 10 minutes"
-      : "You are off shift. Go on shift to claim deliveries.";
+    els.poolSub.textContent = !state.onShift
+      ? "You are off shift. Go on shift to claim deliveries."
+      : state.delivered
+        ? "Ready for pickup · held for 10 minutes"
+        : "Finish your active delivery before claiming another.";
     els.poolCount.textContent = openOrders.length + " open";
 
     if (!deliveryPool.length) {
@@ -372,14 +347,11 @@
     els.poolList.innerHTML = deliveryPool
       .filter(function (order) { return order.id !== currentOrder.id; })
       .map(function (order) {
-        const queued = state.queue.indexOf(order.id) !== -1;
         const claimLabel = !state.delivered ? "Finish #" + currentOrder.id + " first" : state.onShift ? "Claim delivery" : "Off shift";
         return (
-          '<article class="pool-card' + (queued ? " is-claimed" : "") + '">' +
+          '<article class="pool-card">' +
             '<div class="pool-top">' +
-              '<span class="badge ' + (queued ? "badge-success" : "badge-orange") + '">' +
-                icon(queued ? "check-circle" : "clock") + (queued ? "Claimed" : "Ready") +
-              "</span>" +
+              '<span class="badge badge-orange">' + icon("clock") + "Ready</span>" +
               '<span class="tiny muted">Ready ' + escapeHtml(order.placed) + "</span>" +
             "</div>" +
             "<h3>" + escapeHtml(order.area) + " · #" + escapeHtml(order.id) + "</h3>" +
@@ -391,9 +363,9 @@
               "<span>" + icon("banknote") + money(order.total) + "</span>" +
             "</div>" +
             '<p class="pool-note">' + icon("pin") + "<span>" + escapeHtml(order.note) + "</span></p>" +
-            '<button class="btn ' + (!state.delivered || queued ? "btn-secondary" : "btn-primary") + '" type="button" data-claim="' +
-              escapeHtml(order.id) + '"' + (!state.delivered || queued || !state.onShift ? " disabled" : "") + ">" +
-              icon(queued ? "check" : "plus") + claimLabel +
+            '<button class="btn ' + (!state.delivered || !state.onShift ? "btn-secondary" : "btn-primary") + '" type="button" data-claim="' +
+              escapeHtml(order.id) + '"' + (!state.delivered || !state.onShift ? " disabled" : "") + ">" +
+              icon("plus") + claimLabel +
             "</button>" +
           "</article>"
         );
@@ -405,19 +377,15 @@
      Render — shift summary
      --------------------------------------------------------------------- */
   function renderShift() {
-    const pending = isPending();
     const activeCash = !state.delivered && currentOrder.cod ? currentOrder.total : 0;
-    const queuedCash = pending && state.pending.cod ? state.pending.amount : 0;
-    const cash = state.cashHeld + activeCash + queuedCash;
-    const cashLabel = pending || (!state.delivered && currentOrder.cod) ? "COD due" : "Cash held";
+    const cash = state.cashHeld + activeCash;
+    const cashLabel = !state.delivered && currentOrder.cod ? "COD due" : "Cash held";
 
     els.shiftDeliveries.textContent = String(7 + state.deliveriesDone);
     els.shiftCashLabel.textContent = cashLabel;
     els.shiftCash.textContent = money(cash);
-    els.shiftQueue.textContent = String(state.queue.length);
-    els.shiftNote.textContent = state.queue.length
-      ? "Your next claimed delivery is waiting in the queue."
-      : "Cash handover is due at the end of your shift.";
+    els.shiftActive.textContent = state.delivered ? "None" : "#" + currentOrder.id;
+    els.shiftNote.textContent = "One active delivery at a time. Cash handover is due at the end of your shift.";
   }
 
   /* ---------------------------------------------------------------------
@@ -430,8 +398,6 @@
     }
 
     const delivery = state.delivery || {};
-    const nextId = state.queue.length ? state.queue[0] : null;
-    const nextOrder = nextId ? deliveryPool.find(function (item) { return item.id === nextId; }) : null;
 
     els.deliveredPanel.hidden = false;
     els.deliveredPanel.innerHTML =
@@ -449,12 +415,7 @@
         "<div><span>Amount</span><strong>" + money(delivery.amount || 0) + "</strong></div>" +
       "</div>" +
       '<div class="cluster cluster-3" style="justify-content:center;margin-top:18px">' +
-        (nextOrder
-          ? '<button class="btn btn-primary" type="button" data-start-next="' + escapeHtml(nextOrder.id) + '">' +
-              icon("arrow-right") + "Start #" + escapeHtml(nextOrder.id) + " · " + escapeHtml(nextOrder.area) +
-            "</button>"
-          : "") +
-        '<button class="btn btn-secondary" type="button" data-view-pool>View delivery pool</button>' +
+        '<button class="btn btn-primary" type="button" data-view-pool>View delivery pool</button>' +
       "</div>";
   }
 
@@ -462,20 +423,13 @@
      Render — header, connection and banners
      --------------------------------------------------------------------- */
   function renderStatusHeader() {
-    const pending = isPending();
-    els.pageStatusBadge.className = "badge badge-lg " +
-      (state.delivered ? "badge-success" : pending ? "badge-warning" : "badge-orange");
+    els.pageStatusBadge.className = "badge badge-lg " + (state.delivered ? "badge-success" : "badge-orange");
 
     if (state.delivered) {
       els.pageTitle.textContent = "Delivery complete";
       els.pageSub.textContent = "Order #" + currentOrder.id + " · verified";
       els.pageStatusText.textContent = "Delivered";
       els.pageStatusBadge.querySelector("use").setAttribute("href", "#i-check-circle");
-    } else if (pending) {
-      els.pageTitle.textContent = "Delivery queued";
-      els.pageSub.textContent = "Order #" + currentOrder.id + " · waiting for a connection";
-      els.pageStatusText.textContent = "Awaiting verification";
-      els.pageStatusBadge.querySelector("use").setAttribute("href", "#i-sync");
     } else {
       els.pageTitle.textContent = "Active delivery";
       els.pageSub.textContent = "Order #" + currentOrder.id + " · " + currentOrder.area + " · " + currentOrder.distance;
@@ -496,28 +450,14 @@
 
     els.offlineBanner.hidden = state.connection !== "offline";
     els.weakBanner.hidden = state.connection !== "weak";
-    els.pendingBanner.hidden = !state.pending;
-
-    if (state.pending) {
-      const pending = state.pending;
-      const verb = state.connection === "offline"
-        ? "is saved on this phone and will be verified when you reconnect."
-        : state.connection === "weak"
-          ? "is ready to sync over this weak connection. Keep the screen open."
-          : "is ready to verify. Sync it to update your ledger.";
-      els.pendingText.textContent = "Order #" + pending.id + " completed at " + pending.at + " " + verb;
-      els.syncPending.disabled = state.connection === "offline";
-      els.syncPending.innerHTML = icon(state.connection === "offline" ? "clock" : "sync") +
-        (state.connection === "offline" ? "Waiting" : "Sync now");
-    }
 
     const hints = {
-      online: "You are online. Delivery updates sync immediately.",
-      weak: "Weak connection. Updates may take longer — keep this screen open until they confirm.",
+      online: "You are online. The handover PIN can be verified immediately.",
+      weak: "Weak connection. Keep this screen open while the PIN is verified.",
       offline: "Offline mode. Completing a delivery is blocked until you reconnect."
     };
     els.connectionHint.lastElementChild.textContent =
-      "Demo control: switch connection states to preview safe retry. " + hints[state.connection];
+      "Demo control: switch connection states to preview the offline block. " + hints[state.connection];
 
     Array.prototype.forEach.call(
       els.connectionSheet.querySelectorAll('input[name="riderConnection"]'),
@@ -600,10 +540,6 @@
   }
 
   function openPin() {
-    if (isPending()) {
-      toast("This handover is already queued. Sync it before starting another.", "error");
-      return;
-    }
     if (state.delivered) return;
 
     window.clearInterval(pinLockTimer);
@@ -700,7 +636,7 @@
   }
 
   /* ---------------------------------------------------------------------
-     Completion and sync
+     Completion
      --------------------------------------------------------------------- */
   function finalizeDelivery() {
     const order = currentOrder;
@@ -712,10 +648,8 @@
       cod: order.cod,
       at: nowTime()
     };
-    state.pending = null;
     state.deliveriesDone += 1;
     if (order.cod) state.cashHeld += order.total;
-    savePending();
     renderAll();
 
     const cashNote = order.cod
@@ -731,27 +665,11 @@
     }
   }
 
-  function syncPendingDelivery() {
-    if (!state.pending) return;
-    if (state.connection === "offline") {
-      toast("Still offline. Move to an area with signal, then try again.", "error");
-      haptic([20, 40, 20]);
-      return;
-    }
-
-    setBusy(els.syncPending, true, "Syncing…");
-    const delay = state.connection === "weak" ? 1700 : 850;
-    window.setTimeout(function () {
-      setBusy(els.syncPending, false);
-      finalizeDelivery();
-    }, delay);
-  }
-
   /* ---------------------------------------------------------------------
      Orders, navigation and claims
      --------------------------------------------------------------------- */
   function handleNavigate() {
-    if (isPending() || state.delivered) return;
+    if (state.delivered) return;
 
     if (state.status !== "On the way") {
       state.status = "On the way";
@@ -793,20 +711,11 @@
     currentOrder = order;
     state.delivered = false;
     state.delivery = null;
-    state.pending = null;
     state.status = "Assigned";
-    state.queue = state.queue.filter(function (id) { return id !== order.id; });
-    savePending();
-    saveQueue();
     renderAll();
     toast("Delivery #" + order.id + " started. Navigate when you are ready.", "success");
     haptic([20, 40, 20]);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function startNextDelivery(id) {
-    const order = deliveryPool.find(function (item) { return item.id === id; });
-    if (order) startOrder(order);
   }
 
   function viewPool() {
@@ -858,23 +767,16 @@
       return;
     }
 
-    const startNext = event.target.closest("[data-start-next]");
-    if (startNext) {
-      startNextDelivery(startNext.getAttribute("data-start-next"));
-      return;
-    }
-
     if (event.target.closest("[data-view-pool]")) {
       viewPool();
     }
   });
 
   els.pinVerify.addEventListener("click", verifyPin);
-  els.syncPending.addEventListener("click", syncPendingDelivery);
 
   els.offlineRetry.addEventListener("click", function () {
     if (state.connection === "offline") {
-      toast("Opening connection settings. Choose Online to restore sync.", "error");
+      toast("Opening connection settings. Choose Online to restore connectivity.", "error");
     }
     openSheet(els.connectionSheet);
   });

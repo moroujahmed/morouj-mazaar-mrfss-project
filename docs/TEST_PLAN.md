@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.1 replacement for `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` §1/§3/§4 |
-| **Version** | 1.1.0 |
-| **Date** | 2026-10-29 |
+| **Status** | Normative; executable test authority |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
 | **Canonical data** | `CANONICAL_EXAMPLES.md` |
 | **Test runner** | Vitest (unit/integration), Playwright (E2E), axe-core (a11y), k6 (load, optional) |
 
@@ -180,8 +180,8 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 1. Open storefront; add Whole Tilapia Flame Combo (32,000) + Extra Garlic Pepper Dip (2,000).
 2. Set Nakasero pin; `/api/distance` returns 1,562 m from the mock adapter.
 3. Assert delivery fee **0**, packaging **1,000**, total **35,000**.
-4. Pay with MTN MoMo sandbox; webhook verified; order becomes `PREPARING`.
-5. Kitchen accepts and bumps; rider claims, starts, enters PIN.
+4. Pay with MTN MoMo sandbox; webhook verified; order becomes `PREPARING` (paid orders do not need kitchen acceptance).
+5. Kitchen bumps to `READY_FOR_PICKUP`; rider claims, starts, enters PIN.
 6. Assert `DELIVERED`, payment `PAID`, feedback prompt appears.
 
 ### Scenario B — Brian, COD surcharge and change

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Morouj Mazaar · Design prototype portal</title>
-  <meta name="description" content="Morouj Mazaar interface prototype: customer ordering, operations dashboard, rider delivery app and the shared design system.">
+  <meta name="description" content="Morouj Mazaar interface prototype: customer ordering, kitchen ticket board, operations dashboard, rider delivery app and the shared design system.">
   <meta name="theme-color" content="#173F35">
   <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +30,7 @@
 
       <nav class="portal-nav" aria-label="Prototype pages">
         <a href="customer.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-utensils"></use></svg>Customer</a>
+        <a href="kitchen.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-receipt"></use></svg>Kitchen</a>
         <a href="admin.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-grid"></use></svg>Admin</a>
         <a href="rider.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-bike"></use></svg>Rider</a>
         <a href="design-system.html"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-settings"></use></svg>Design system</a>
@@ -52,15 +53,20 @@
       <div class="container portal-hero-grid">
         <div>
           <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-flame"></use></svg>Interface prototype · November 2026</span>
-          <h1 id="portalTitle">One kitchen.<br><em>Three focused experiences.</em></h1>
+          <h1 id="portalTitle">One kitchen.<br><em>Four focused experiences.</em></h1>
           <p class="lead">
-            A charcoal-fired Kampala kitchen needs a calm customer menu, a fast operations console and a rider app
-            that still works when the signal drops. This prototype applies one green-and-flame system to all three.
+            A charcoal-fired Kampala kitchen needs a calm customer menu, a fast ticket board, an operations console
+            and a rider app that still works when the signal drops. This prototype applies one green-and-flame
+            system to all four.
           </p>
           <div class="portal-hero-actions">
             <a class="btn btn-primary btn-lg" href="customer.html">
               <svg class="icon" aria-hidden="true"><use href="#i-utensils"></use></svg>
               Browse the menu
+            </a>
+            <a class="btn btn-secondary btn-lg" href="kitchen.html">
+              <svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg>
+              Kitchen board
             </a>
             <a class="btn btn-secondary btn-lg" href="admin.html">
               <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>
@@ -104,7 +110,7 @@
       <div class="container">
         <div class="portal-section-head">
           <div>
-            <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Three portals</span>
+            <span class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>Four portals</span>
             <h2 id="portalsTitle">Built around the person holding the screen.</h2>
             <p>
               Every interface shares the same tokens and components, but each one changes density, type size and
@@ -133,6 +139,26 @@
             <div class="portal-card-foot">
               <a class="btn btn-dark" href="customer.html">
                 Open customer app
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </a>
+            </div>
+          </article>
+
+          <article class="portal-card">
+            <div class="portal-card-top">
+              <span class="icon-tile icon-tile-orange"><svg class="icon" aria-hidden="true"><use href="#i-receipt"></use></svg></span>
+              <span class="portal-card-tag"><span class="connection-dot" aria-hidden="true"></span>Kitchen</span>
+            </div>
+            <h3>Cook the queue in order.</h3>
+            <p>A landscape board that puts ticket age, modifiers and the next bump first — without exposing customer secrets.</p>
+            <ul>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Oldest-first tickets with age/SLA</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Accept COD, bump, 86 items and busy mode</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Browser-print dockets and offline banner</li>
+            </ul>
+            <div class="portal-card-foot">
+              <a class="btn btn-dark" href="kitchen.html">
+                Open kitchen board
                 <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
               </a>
             </div>
@@ -264,6 +290,7 @@
       </div>
       <nav class="portal-footer-links" aria-label="Prototype links">
         <a href="customer.html">Customer</a>
+        <a href="kitchen.html">Kitchen</a>
         <a href="admin.html">Admin</a>
         <a href="rider.html">Rider</a>
         <a href="design-system.html">Design system</a>
