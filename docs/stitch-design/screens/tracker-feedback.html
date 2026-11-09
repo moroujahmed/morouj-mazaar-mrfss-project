@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Post-delivery feedback — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Post-delivery feedback" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="customer" data-screen="Post-delivery feedback">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="customer-storefront-mobile.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Rate your order</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-success"><span class="dot" aria-hidden="true"></span>Delivered</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="card card-pad stack" style="text-align:center">
+    <div style="width:60px;height:60px;border-radius:999px;background:var(--status-success-bg);color:var(--status-success);display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <span class="material-symbols-outlined" style="font-size:30px" aria-hidden="true">check_circle</span>
+    </div>
+    <h1 style="font-size:22px">Meal delivered</h1>
+    <p class="small secondary">Order #1042 · handover PIN accepted at 13:14 EAT</p>
+    <div class="row" style="justify-content:center"><span class="pill pill-success"><span class="dot" aria-hidden="true"></span>DELIVERED</span><span class="pill">UFD 342B</span></div>
+  </div>
+
+  <fieldset class="card card-pad stack">
+    <legend class="label">How was your experience?</legend>
+    <div class="grid-3" style="gap:8px">
+      <label class="panel" style="text-align:center;cursor:pointer"><input type="radio" name="rating" value="great" checked /><div style="font-size:24px">😃</div><strong class="small">Great</strong></label>
+      <label class="panel" style="text-align:center;cursor:pointer"><input type="radio" name="rating" value="okay" /><div style="font-size:24px">😐</div><strong class="small">Okay</strong></label>
+      <label class="panel" style="text-align:center;cursor:pointer"><input type="radio" name="rating" value="bad" /><div style="font-size:24px">🙁</div><strong class="small">Bad</strong></label>
+    </div>
+    <div class="row" style="flex-wrap:wrap" aria-label="What went well">
+      <label class="pill"><input type="checkbox" checked /> Hot food</label>
+      <label class="pill"><input type="checkbox" /> Speedy rider</label>
+      <label class="pill"><input type="checkbox" /> Seal intact</label>
+      <label class="pill"><input type="checkbox" /> Polite service</label>
+    </div>
+    <div class="field"><label>Note for the manager (optional)</label><textarea class="textarea" placeholder="Tell us what worked or what to fix…"></textarea></div>
+  </fieldset>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>No tip is collected in the app</strong><p class="small" style="margin-top:2px">Rider pay is handled by the restaurant. The app does not request or process tips.</p></div>
+  </div>
+
+  <a class="btn btn-primary btn-block" href="tracker-feedback-submitted.html">Submit feedback</a>
+  <a class="btn btn-ghost btn-block" href="customer-storefront-mobile.html">Skip</a>
+</main>
+</div>
+</body>
+</html>

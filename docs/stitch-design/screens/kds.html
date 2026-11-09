@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kitchen display — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="KDS with New, Cooking and Ready lanes; no customer PIN." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="kitchen" data-screen="Kitchen display">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Kitchen display · Nakawa hub</span></span>
+      </a>
+      <div class="row">
+        <a class="btn btn-sm btn-secondary" href="kds-86-drawer.html"><span class="material-symbols-outlined" aria-hidden="true">block</span>86 items</a><a class="btn btn-sm btn-primary" href="kds.html"><span class="material-symbols-outlined" aria-hidden="true">notifications_active</span>Sound on</a>
+        <span class="pill">kitchen</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap stack" style="padding-block:20px">
+  <div class="row-between">
+    <div><h1>Kitchen display</h1><p class="muted small">Lunch service · 12:52 EAT · shift started 10:00</p></div>
+    <div class="row"><span class="pill pill-success"><span class="dot"></span>Store open</span><span class="pill">Sound on</span></div>
+  </div>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Handover PIN stays with the customer</strong><p class="small" style="margin-top:2px">The kitchen confirms that the packed order was collected by the rider. The 4-digit customer PIN is never displayed here and is never verified at the pass.</p></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px" data-lanes="new-cooking-ready">
+    <section class="stack" aria-labelledby="lane-new">
+      <h2 id="lane-new" class="row"><span class="dot" style="color:var(--brand-action)"></span>New / incoming <span class="muted small">(1)</span></h2>
+      <article class="card card-pad stack" style="border-color:var(--border-structural)">
+  <div class="row-between">
+    <div><strong style="font-size:18px">#1044</strong> <span class="tiny muted">Table 4 · DINE-IN</span></div>
+    <span class="pill "><span class="dot" aria-hidden="true"></span>New</span>
+  </div>
+  <div class="row-between small">
+    <span class="muted">Elapsed <strong class="money" style="font-size:17px;color:var(--ink-primary)">2:14</strong></span>
+    <span class="muted">Target 12m</span>
+  </div>
+  <div class="stack" style="gap:6px">
+    <div class="row-between small"><span>1× Special Bazaar Rolex</span><strong class="money">USh 8,000</strong></div>
+  </div>
+  <hr class="divider" />
+  <div class="row-between"><span class="tiny muted">Order total</span><strong class="money">USh 8,000</strong></div>
+  <div class="row" style="flex-wrap:wrap"><button class="btn btn-primary btn-sm">Accept order</button><a class="btn btn-secondary btn-sm" href="kds-mobile-ticket.html">Open ticket</a></div>
+</article>
+    </section>
+
+    <section class="stack" aria-labelledby="lane-cooking">
+      <h2 id="lane-cooking" class="row"><span class="dot" style="color:var(--status-warning)"></span>In prep / cooking <span class="muted small">(1)</span></h2>
+      <article class="card card-pad stack" style="border-color:var(--border-structural)">
+  <div class="row-between">
+    <div><strong style="font-size:18px">#1045</strong> <span class="tiny muted">Ntinda · COD</span></div>
+    <span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>Cooking</span>
+  </div>
+  <div class="row-between small">
+    <span class="muted">Elapsed <strong class="money" style="font-size:17px;color:var(--ink-primary)">9:41</strong></span>
+    <span class="muted">Target 12m</span>
+  </div>
+  <div class="stack" style="gap:6px">
+    <div class="row-between small"><span>1× Smoked Beef Luwombo</span><strong class="money">USh 26,000</strong></div><div class="row-between small"><span>1× Passion Juice (500 ml)</span><strong class="money">USh 5,000</strong></div>
+  </div>
+  <hr class="divider" />
+  <div class="row-between"><span class="tiny muted">Order total</span><strong class="money">USh 38,000</strong></div>
+  <div class="row" style="flex-wrap:wrap"><button class="btn btn-primary btn-sm">Bump to ready</button><button class="btn btn-secondary btn-sm">Report delay</button></div>
+</article>
+    </section>
+
+    <section class="stack" aria-labelledby="lane-ready">
+      <h2 id="lane-ready" class="row"><span class="dot" style="color:var(--status-success)"></span>Ready / staging <span class="muted small">(1)</span></h2>
+      <article class="card card-pad stack" style="border-color:var(--border-structural)">
+  <div class="row-between">
+    <div><strong style="font-size:18px">#1042</strong> <span class="tiny muted">Nakasero · prepaid</span></div>
+    <span class="pill pill-success"><span class="dot" aria-hidden="true"></span>Ready for pickup</span>
+  </div>
+  <div class="row-between small">
+    <span class="muted">Elapsed <strong class="money" style="font-size:17px;color:var(--ink-primary)">14:20</strong></span>
+    <span class="muted">Target 12m</span>
+  </div>
+  <div class="stack" style="gap:6px">
+    <div class="row-between small"><span>1× Whole Tilapia Flame Combo</span><strong class="money">USh 32,000</strong></div><div class="row-between small"><span>1× Extra Garlic Pepper Dip</span><strong class="money">USh 2,000</strong></div>
+  </div>
+  <hr class="divider" />
+  <div class="row-between"><span class="tiny muted">Order total</span><strong class="money">USh 35,000</strong></div>
+  <div class="row" style="flex-wrap:wrap"><button class="btn btn-primary btn-sm">Mark collected by rider</button><button class="btn btn-secondary btn-sm">Reprint seal</button></div>
+</article>
+    </section>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Dispatched today</div><div class="kpi-value">42</div><div class="kpi-note">Orders that left the pass</div></div>
+    <div class="kpi"><div class="kpi-label">On-time prep SLA</div><div class="kpi-value">91.4%</div><div class="kpi-note">Bumped within 12 minutes</div></div>
+    <div class="kpi"><div class="kpi-label">Average pickup dwell</div><div class="kpi-value">3m 12s</div><div class="kpi-note">Ready → rider collection</div></div>
+    <div class="kpi"><div class="kpi-label">86’d items</div><div class="kpi-value">2</div><div class="kpi-note">Hidden from the storefront</div></div>
+  </div>
+
+  <div class="row-between">
+    <a class="btn btn-secondary" href="kds-late-ticket.html">Open the late ticket (>20m)</a>
+    <a class="btn btn-secondary" href="kds-audio-unlock.html">First-load sound unlock</a>
+  </div>
+</main>
+</body>
+</html>

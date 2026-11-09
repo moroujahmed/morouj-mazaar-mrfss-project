@@ -1,5 +1,5 @@
 /* ==========================================================================
-   RIDER APP — active delivery, pool claims, PIN handover, offline-safe sync
+   RIDER APP — active delivery, pool claims, PIN handover, connection-required completion
    All data is local demo data. No network requests are made.
    ========================================================================== */
 
@@ -22,7 +22,7 @@
   const CONNECTION_KEY = "mm-rider-connection-v2";
   const PENDING_KEY = "mm-rider-pending-v2";
   const QUEUE_KEY = "mm-rider-queue-v2";
-  const PIN_CODE = "7310";
+  const PIN_CODE = "4821";
   const PIN_MAX_ATTEMPTS = 3;
   const PIN_LOCK_SECONDS = 20;
 
@@ -32,99 +32,78 @@
   const deliveryPool = [
     {
       id: "1045",
-      customer: "Grace Achieng",
-      firstName: "Grace",
-      phone: "+256 705 888 112",
-      phoneHref: "+256705888112",
-      area: "Kololo",
-      address: "Plot 22 Acacia Avenue, Kololo",
-      distance: "3.4 km",
-      eta: "12 min",
-      arrive: "13:17",
-      placed: "13:08",
+      customer: "Brian Kato",
+      firstName: "Brian",
+      phone: "+256 772 000 222",
+      phoneHref: "+256772000222",
+      area: "Ntinda",
+      address: "Plot 8 Ntinda Road, Ntinda",
+      landmark: "Opposite Ntinda Shopping Complex · white gate",
+      distance: "8.093 km",
+      eta: "18 min",
+      arrive: "13:10",
+      placed: "12:46",
       status: "Ready for pickup",
-      payment: "MTN MoMo",
-      cod: false,
-      total: 25000,
+      payment: "Cash on delivery",
+      cod: true,
+      total: 38000,
+      tendered: 50000,
+      change: 12000,
       items: [
-        { name: "Quarter Charcoal Grilled Chicken", qty: 1, price: 18000, mods: "No onions" },
-        { name: "Golden Chips", qty: 1, price: 6000, mods: "" }
+        { name: "Smoked Beef Luwombo", qty: 1, price: 26000, mods: "Extra chilli on the side" },
+        { name: "Cold-Pressed Passion Juice", qty: 1, price: 5000, mods: "No ice" }
       ],
       packaging: 1000,
-      delivery: 0,
-      note: "Leave at reception if I do not answer."
-    },
-    {
-      id: "1047",
-      customer: "Miriam Nsubuga",
-      firstName: "Miriam",
-      phone: "+256 703 419 882",
-      phoneHref: "+256703419882",
-      area: "Bugolobi",
-      address: "Plot 5 Spring Road, Bugolobi",
-      distance: "4.2 km",
-      eta: "15 min",
-      arrive: "13:27",
-      placed: "13:12",
-      status: "Ready for pickup",
-      payment: "Airtel Money",
-      cod: false,
-      total: 33000,
-      items: [
-        { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "" },
-        { name: "Special Bazaar Rolex", qty: 1, price: 8000, mods: "Extra chilli on the side" }
-      ],
-      packaging: 1000,
-      delivery: 0,
-      note: "Extra chilli on the side."
+      delivery: 6000,
+      note: "Cash on delivery · Call when at the gate. Gate code 1234."
     }
   ];
 
   const firstOrder = {
-    id: "1043",
-    customer: "Brian Kato",
-    firstName: "Brian",
-    phone: "+256 701 234 567",
-    phoneHref: "+256701234567",
-    area: "Ntinda",
-    address: "Plot 8 Ntinda Road, Ntinda",
-    landmark: "Opposite Ntinda Shopping Complex · white gate",
-    distance: "8.093 km",
-    eta: "18 min",
+    id: "1042",
+    customer: "Sarah Namukasa",
+    firstName: "Sarah",
+    phone: "+256 772 000 111",
+    phoneHref: "+256772000111",
+    area: "Nakasero",
+    address: "Plot 14 Lumumba Avenue, Nakasero Hill",
+    landmark: "White gate opposite the fuel station",
+    distance: "1.562 km",
+    eta: "12 min",
     arrive: "13:10",
-    placed: "12:52",
-    status: "Ready for pickup",
-    payment: "Cash on delivery",
-    cod: true,
-    total: 38000,
-    tendered: 50000,
-    change: 12000,
+    placed: "12:35",
+    status: "On the way",
+    payment: "MTN MoMo",
+    cod: false,
+    total: 35000,
+    tendered: 0,
+    change: 0,
     items: [
-      { name: "Smoked Beef Luwombo", qty: 1, price: 26000, mods: "Extra chilli on the side" },
-      { name: "Cold-Pressed Passion Juice", qty: 1, price: 5000, mods: "No ice" }
+      { name: "Whole Tilapia Flame Combo", qty: 1, price: 32000, mods: "" },
+      { name: "Extra Garlic Pepper Dip", qty: 1, price: 2000, mods: "" }
     ],
     packaging: 1000,
-    delivery: 6000,
-    note: "Cash on delivery · Call when at the gate. Gate code 1234."
+    delivery: 0,
+    note: "Prepaid. Call on arrival. Handover PIN only after the customer inspects the seal."
   };
 
   let currentOrder = firstOrder;
 
   let state = {
     connection: storageGet(CONNECTION_KEY, "online"),
-    pending: storageGet(PENDING_KEY, null),
-    queue: storageGet(QUEUE_KEY, []),
+    pending: null,
+    queue: [],
     onShift: true,
     delivered: false,
     delivery: null,
     deliveriesDone: 0,
-    cashHeld: 0,
+    cashHeld: 65500,
     status: "Ready for pickup"
   };
 
   if (["online", "weak", "offline"].indexOf(state.connection) === -1) state.connection = "online";
-  if (!Array.isArray(state.queue)) state.queue = [];
-  if (state.pending && state.pending.id !== currentOrder.id) state.pending = null;
+  state.queue = [];
+  state.pending = null;
 
   /* ---------------------------------------------------------------------
      Elements
@@ -394,7 +373,7 @@
       .filter(function (order) { return order.id !== currentOrder.id; })
       .map(function (order) {
         const queued = state.queue.indexOf(order.id) !== -1;
-        const claimLabel = queued ? "Up next in queue" : state.onShift ? "Claim delivery" : "Off shift";
+        const claimLabel = !state.delivered ? "Finish #" + currentOrder.id + " first" : state.onShift ? "Claim delivery" : "Off shift";
         return (
           '<article class="pool-card' + (queued ? " is-claimed" : "") + '">' +
             '<div class="pool-top">' +
@@ -412,8 +391,8 @@
               "<span>" + icon("banknote") + money(order.total) + "</span>" +
             "</div>" +
             '<p class="pool-note">' + icon("pin") + "<span>" + escapeHtml(order.note) + "</span></p>" +
-            '<button class="btn ' + (queued ? "btn-secondary" : "btn-primary") + '" type="button" data-claim="' +
-              escapeHtml(order.id) + '"' + (queued || !state.onShift ? " disabled" : "") + ">" +
+            '<button class="btn ' + (!state.delivered || queued ? "btn-secondary" : "btn-primary") + '" type="button" data-claim="' +
+              escapeHtml(order.id) + '"' + (!state.delivered || queued || !state.onShift ? " disabled" : "") + ">" +
               icon(queued ? "check" : "plus") + claimLabel +
             "</button>" +
           "</article>"
@@ -535,7 +514,7 @@
     const hints = {
       online: "You are online. Delivery updates sync immediately.",
       weak: "Weak connection. Updates may take longer — keep this screen open until they confirm.",
-      offline: "Offline mode. Completing a delivery queues it securely on this phone."
+      offline: "Offline mode. Completing a delivery is blocked until you reconnect."
     };
     els.connectionHint.lastElementChild.textContent =
       "Demo control: switch connection states to preview safe retry. " + hints[state.connection];
@@ -702,21 +681,10 @@
     setKeypadDisabled(true);
 
     if (state.connection === "offline") {
-      window.setTimeout(function () {
-        closeSheet(els.pinSheet);
-        setKeypadDisabled(false);
-        state.pending = {
-          id: currentOrder.id,
-          customer: currentOrder.customer,
-          at: nowTime(),
-          amount: currentOrder.total,
-          cod: currentOrder.cod
-        };
-        savePending();
-        renderAll();
-        toast("Completion saved on this phone. Reconnect and tap Sync now to verify.", "success");
-        haptic([20, 50, 20]);
-      }, 350);
+      showPinError("A connection is required to verify the handover. Reconnect and try again.");
+      setKeypadDisabled(false);
+      toast("Offline. Completion is blocked until the server can verify the PIN.", "error");
+      haptic([30, 60, 30]);
       return;
     }
 
@@ -812,27 +780,13 @@
     const order = deliveryPool.find(function (item) { return item.id === id; });
     if (!order) return;
 
-    if (state.delivered) {
-      startOrder(order);
+    if (!state.delivered) {
+      toast("Finish #" + currentOrder.id + " before claiming another delivery.", "error");
+      haptic([20, 40, 20]);
       return;
     }
 
-    if (state.queue.indexOf(id) !== -1) {
-      toast("Order #" + id + " is already in your queue.");
-      return;
-    }
-
-    if (state.queue.length >= 2) {
-      toast("Your queue is full. Finish a delivery before claiming another.", "error");
-      return;
-    }
-
-    state.queue.push(id);
-    saveQueue();
-    renderPool();
-    renderShift();
-    toast("Order #" + id + " added to your queue. Finish #" + currentOrder.id + " first.", "success");
-    haptic([20, 40, 20]);
+    startOrder(order);
   }
 
   function startOrder(order) {
@@ -937,15 +891,13 @@
 
     if (next === "online" && previous !== "online") {
       toast(
-        state.pending
-          ? "Back online. Tap Sync now to verify the queued completion."
-          : "Back online. Delivery updates will sync immediately.",
+        "Back online. Complete the handover with the customer PIN when ready.",
         "success"
       );
     } else if (next === "weak") {
       toast("Weak connection. Keep the screen open until actions confirm.");
     } else if (next === "offline") {
-      toast("Offline. New completions will be queued on this phone.", "error");
+      toast("Offline. Completion is blocked until you reconnect.", "error");
     }
     haptic(12);
   });

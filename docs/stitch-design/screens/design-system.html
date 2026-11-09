@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design system — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Canonical tokens, components and accessibility rules." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="reference" data-screen="Design system">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Canonical design system · v1.1</span></span>
+      </a>
+      <div class="row">
+        
+        <span class="pill">reference</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap stack" style="padding-block:32px">
+  <div>
+    <h1>Design system reference</h1>
+    <p class="secondary">Single source of truth for the mockup package. Tokens follow <code>docs/ACCESSIBILITY.md</code>; numbers follow <code>docs/CANONICAL_EXAMPLES.md</code>.</p>
+  </div>
+
+  <div class="notice notice-success" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
+    <div><strong>One palette</strong><p class="small" style="margin-top:2px">Terracotta #B83817 on linen #F9F8F6 replaces all earlier Stitch, Kampala and V2 palettes. White on #B83817 is 5.81:1.</p></div>
+  </div>
+
+  <section class="card card-pad stack">
+    <h2>Colour tokens</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      <div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#F9F8F6"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">surface.ground</strong><code class="small">#F9F8F6</code></div>
+  <div class="tiny muted">Page background</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#FFFFFF"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">surface.card</strong><code class="small">#FFFFFF</code></div>
+  <div class="tiny muted">Cards and sheets</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#EFECE6"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">surface.inset</strong><code class="small">#EFECE6</code></div>
+  <div class="tiny muted">Inputs and counters</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#1A1918"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">ink.primary</strong><code class="small">#1A1918</code></div>
+  <div class="tiny muted">Titles, prices, body</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#4A4744"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">ink.secondary</strong><code class="small">#4A4744</code></div>
+  <div class="tiny muted">Descriptions</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#6B6763"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">ink.muted</strong><code class="small">#6B6763</code></div>
+  <div class="tiny muted">Minimum small text</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#B83817"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">brand.action</strong><code class="small">#B83817</code></div>
+  <div class="tiny muted">Primary CTA background</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#A63312"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">brand.action-hover</strong><code class="small">#A63312</code></div>
+  <div class="tiny muted">Pressed CTA</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#D84A26"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">brand.decorative</strong><code class="small">#D84A26</code></div>
+  <div class="tiny muted">Borders and large accents only</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#1B5E3B"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">status.success</strong><code class="small">#1B5E3B</code></div>
+  <div class="tiny muted">Paid, delivered</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#B91C1C"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">status.danger</strong><code class="small">#B91C1C</code></div>
+  <div class="tiny muted">Cash due, 86’d, late</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#92400E"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">status.warning</strong><code class="small">#92400E</code></div>
+  <div class="tiny muted">Cooking, assigned</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#E5E0D8"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">border.structural</strong><code class="small">#E5E0D8</code></div>
+  <div class="tiny muted">1 px borders</div>
+</div><div class="panel" style="padding:12px">
+  <div style="height:46px;border-radius:10px;border:1px solid var(--border-structural);background:#1A1918"></div>
+  <div class="row-between" style="margin-top:8px"><strong class="small">focus.ring</strong><code class="small">#1A1918</code></div>
+  <div class="tiny muted">Focus indicator</div>
+</div>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <section class="card card-pad stack">
+      <h2>Buttons and touch targets</h2>
+      <button class="btn btn-primary">Pay USh 35,000 via MTN MoMo</button>
+      <button class="btn btn-secondary">Secondary action</button>
+      <button class="btn btn-primary" aria-disabled="true">Checkout disabled — add USh 12,000</button>
+      <p class="help">Minimum 48 × 48 px, 8 px spacing. Disabled buttons set <code>aria-disabled="true"</code> and state the reason.</p>
+    </section>
+    <section class="card card-pad stack">
+      <h2>Status language</h2>
+      <div class="row" style="flex-wrap:wrap"><span class="pill pill-success"><span class="dot" aria-hidden="true"></span>PAID</span><span class="pill pill-success"><span class="dot" aria-hidden="true"></span>DELIVERED</span><span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>PREPARING</span><span class="pill pill-danger"><span class="dot" aria-hidden="true"></span>DELIVERY FAILED</span><span class="pill "><span class="dot" aria-hidden="true"></span>READY FOR PICKUP</span></div>
+      <p class="small secondary">Status is never colour-only: every pill pairs colour with a label and, where space allows, an icon.</p>
+      <table class="table">
+        <thead><tr><th>State</th><th>Customer copy</th></tr></thead>
+        <tbody>
+          <tr><td>PENDING_PAYMENT</td><td>Waiting for payment confirmation…</td></tr>
+          <tr><td>CONFIRMED_UNPAID</td><td>Order confirmed — pay cash on delivery.</td></tr>
+          <tr><td>PREPARING</td><td>Cooking in the kitchen</td></tr>
+          <tr><td>READY_FOR_PICKUP</td><td>Packed and waiting for a rider</td></tr>
+          <tr><td>OUT_FOR_DELIVERY</td><td>On the road</td></tr>
+          <tr><td>DELIVERED</td><td>Delivered — enjoy!</td></tr>
+          <tr><td>DELIVERY_FAILED</td><td>Delivery could not be completed — support will contact you.</td></tr>
+          <tr><td>CANCELLED</td><td>Order cancelled.</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <section class="card card-pad stack">
+    <h2>Accessibility rules</h2>
+    <div class="grid-2">
+      <ul class="stack small" style="gap:6px">
+        <li>WCAG 2.2 AA; normal text ≥ 4.5:1, large text ≥ 3:1.</li>
+        <li>Every page starts with a skip link and contains one <code>h1</code>.</li>
+        <li>Focus is always visible: 2 px #1A1918 ring, 2 px offset.</li>
+        <li>Icon-only controls have an <code>aria-label</code>.</li>
+      </ul>
+      <ul class="stack small" style="gap:6px">
+        <li>Body text ≥ 16 px; critical prices and CTAs ≥ 18 px semibold.</li>
+        <li>Never white text on #D84A26 at normal size.</li>
+        <li>Maps provide attribution and a text fallback.</li>
+        <li><code>prefers-reduced-motion</code> removes non-essential motion.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card card-pad stack">
+    <h2>Canonical fixtures used across the mockups</h2>
+    <table class="table">
+      <thead><tr><th>Scenario</th><th>Distance</th><th>Items</th><th>Packaging</th><th>Delivery</th><th class="num">Total</th></tr></thead>
+      <tbody>
+        <tr><td>Sarah · Nakasero · MoMo</td><td>1.562 km</td><td class="num">34,000</td><td class="num">1,000</td><td class="num">0</td><td class="num"><strong>35,000</strong></td></tr>
+        <tr><td>Brian · Ntinda · COD</td><td>8.093 km</td><td class="num">31,000</td><td class="num">1,000</td><td class="num">6,000</td><td class="num"><strong>38,000</strong></td></tr>
+        <tr><td>Alex · Table 4 · dine-in</td><td>—</td><td class="num">8,000</td><td class="num">0</td><td class="num">0</td><td class="num"><strong>8,000</strong></td></tr>
+        <tr><td>Juma · ledger</td><td>—</td><td colspan="3">#1043 38,000 + #1047 27,500</td><td class="num"><strong>65,500</strong></td></tr>
+      </tbody>
+    </table>
+    <p class="help">Retired values — 3.8 km, 7.4 km, 34,000 total, 35,600, 36,500, 4,500 — must not appear.</p>
+  </section>
+</main>
+</body>
+</html>

@@ -275,8 +275,8 @@ Cash orders carry inherent financial risks: malicious users submitting fake orde
 ### 5.2 COD Distance Restriction Ceiling
 While pre-paid orders (MTN MoMo, Card) can be delivered up to the global ceiling of **`15.0 km`**, Cash on Delivery orders are restricted to a tighter geographic radius:
 * **Prepaid Max Distance:** `15.0 km`
-* **Cash on Delivery Max Distance:** **`8.0 km`**
-* **Rationale:** A rejected or bogus cash delivery at 14 km results in a 28 km round trip (over 1 hour of rider time and high fuel burn). Restricting COD to 8.0 km limits maximum potential loss per occurrence.
+* **Cash on Delivery Max Distance:** **`8.1 km`**
+* **Rationale:** A rejected or bogus cash delivery at 14 km results in a 28 km round trip (over 1 hour of rider time and high fuel burn). Restricting COD to 8.1 km limits maximum potential loss per occurrence while keeping the canonical Ntinda COD fixture (8.093 km) valid.
 
 ### 5.3 Customer Phone Blacklisting
 A dedicated database table tracks phone numbers associated with abandoned deliveries:

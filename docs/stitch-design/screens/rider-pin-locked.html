@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rider PIN locked — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Rider PIN locked" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="rider" data-screen="Rider PIN locked">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="rider-pool.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Order locked</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-danger"><span class="dot" aria-hidden="true"></span>Locked</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="notice notice-danger" role="alert">
+    <span class="material-symbols-outlined" aria-hidden="true">error</span>
+    <div><strong>Too many incorrect PIN entries</strong><p class="small" style="margin-top:2px">Three wrong entries locked #1042. The order cannot be completed from this device.</p></div>
+  </div>
+  <div class="card card-pad stack" style="text-align:center">
+    <div style="width:72px;height:72px;border-radius:999px;background:var(--status-danger-bg);color:var(--status-danger);display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <span class="material-symbols-outlined" style="font-size:36px" aria-hidden="true">lock</span>
+    </div>
+    <h1 style="font-size:22px">PIN entry locked</h1>
+    <div class="row" style="justify-content:center"><span class="pill">#1042</span><span class="pill pill-danger"><span class="dot" aria-hidden="true"></span>LOCKED</span></div>
+    <div class="row-between small"><span class="muted">Locked at</span><strong>13:09 EAT</strong></div>
+    <div class="row-between small"><span class="muted">Failed attempts</span><strong>3 of 3</strong></div>
+  </div>
+
+  <div class="panel stack">
+    <strong>What to do now</strong>
+    <ol class="small secondary stack" style="gap:4px;padding-left:18px">
+      <li>Call the customer and confirm the correct PIN is being read from their tracker.</li>
+      <li>Call the manager. Only an admin can reset the PIN or force-complete with an audit reason.</li>
+      <li>Wait at the address; do not leave the order unattended.</li>
+    </ol>
+    <a class="btn btn-primary btn-block" href="tel:+256772000111">Call Sarah</a>
+    <a class="btn btn-secondary btn-block" href="https://wa.me/256700882119">Call dispatch</a>
+  </div>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>No supervisor bypass</strong><p class="small" style="margin-top:2px">There is no on-device override. Any reset is recorded against the admin account and the order in the audit log.</p></div>
+  </div>
+</main>
+</div>
+</body>
+</html>

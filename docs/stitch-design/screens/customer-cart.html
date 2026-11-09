@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Customer basket — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Basket with canonical Sarah order: items 34,000, packaging 1,000, delivery 0, total 35,000." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="customer" data-screen="Customer basket">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Order · Kampala</span></span>
+      </a>
+      <div class="row">
+        <a class="btn btn-sm btn-secondary" href="customer-storefront.html">Back to menu</a>
+        <span class="pill">customer</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap stack" style="padding-block:24px 48px">
+  <div class="row-between" style="flex-wrap:wrap">
+    <div><h1>Your basket</h1><p class="muted small">Delivery to Nakasero · 1.562 km · within the free zone</p></div>
+    <span class="pill pill-success"><span class="dot"></span>Minimum order met</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr);gap:24px" data-layout="cart">
+    <section class="stack" aria-labelledby="basket-heading">
+      <h2 id="basket-heading" class="sr-only">Basket items</h2>
+      <article class="card card-pad stack">
+        <div class="row-between" style="align-items:flex-start">
+          <div class="row" style="align-items:flex-start">
+            <div style="width:64px;height:64px;border-radius:12px;background:var(--surface-inset);display:flex;align-items:center;justify-content:center;flex:0 0 auto" aria-hidden="true">
+              <span class="material-symbols-outlined" style="color:var(--ink-muted)">restaurant</span>
+            </div>
+            <div>
+              <strong>Whole Tilapia Flame Combo</strong>
+              <div class="small muted">Charcoal-grilled tilapia, chips, slaw, passion juice</div>
+              <div class="small">USh USh 32,000 each</div>
+            </div>
+          </div>
+          <strong class="money">USh USh 32,000</strong>
+        </div>
+        <div class="row-between">
+          <div class="row">
+            <button class="btn btn-sm btn-secondary" aria-label="Decrease quantity of Whole Tilapia Flame Combo">−</button>
+            <strong class="money" style="min-width:28px;text-align:center">1</strong>
+            <button class="btn btn-sm btn-secondary" aria-label="Increase quantity of Whole Tilapia Flame Combo">+</button>
+          </div>
+          <button class="btn btn-sm btn-ghost">Remove</button>
+        </div>
+      </article><article class="card card-pad stack">
+        <div class="row-between" style="align-items:flex-start">
+          <div class="row" style="align-items:flex-start">
+            <div style="width:64px;height:64px;border-radius:12px;background:var(--surface-inset);display:flex;align-items:center;justify-content:center;flex:0 0 auto" aria-hidden="true">
+              <span class="material-symbols-outlined" style="color:var(--ink-muted)">restaurant</span>
+            </div>
+            <div>
+              <strong>Extra Garlic Pepper Dip</strong>
+              <div class="small muted">House habanero, garlic, lime</div>
+              <div class="small">USh USh 2,000 each</div>
+            </div>
+          </div>
+          <strong class="money">USh USh 2,000</strong>
+        </div>
+        <div class="row-between">
+          <div class="row">
+            <button class="btn btn-sm btn-secondary" aria-label="Decrease quantity of Extra Garlic Pepper Dip">−</button>
+            <strong class="money" style="min-width:28px;text-align:center">1</strong>
+            <button class="btn btn-sm btn-secondary" aria-label="Increase quantity of Extra Garlic Pepper Dip">+</button>
+          </div>
+          <button class="btn btn-sm btn-ghost">Remove</button>
+        </div>
+      </article>
+
+      <a class="btn btn-secondary" href="customer-storefront.html">Add more dishes</a>
+      <div class="row" style="flex-wrap:wrap">
+        <a class="small" href="cart-under-mov.html">See the below-minimum state</a>
+        <span class="muted" aria-hidden="true">·</span>
+        <a class="small" href="cart-empty.html">See the empty basket</a>
+        <span class="muted" aria-hidden="true">·</span>
+        <a class="small" href="item-sold-out.html">See an 86’d item</a>
+      </div>
+    </section>
+
+    <aside class="stack" aria-labelledby="summary-heading">
+      <section class="card card-pad stack">
+        <h2 id="summary-heading">Order summary</h2>
+        <div class="row-between small"><span class="muted">Items subtotal</span><strong class="money">USh 34,000</strong></div>
+        <div class="row-between small"><span class="muted">Packaging &amp; tamper seal</span><strong class="money">USh 1,000</strong></div>
+        <div class="row-between small"><span class="muted">Delivery · 1.562 km</span><strong class="money" style="color:var(--status-success)">USh 0</strong></div>
+        <hr class="divider" />
+        <div class="row-between"><strong>Total</strong><strong class="money" style="font-size:24px">USh 35,000</strong></div>
+        <p class="tiny muted">Delivery is free within 5.0 km. The fee for longer trips is shown before payment.</p>
+        <a class="btn btn-primary btn-block" href="checkout.html" >Continue to checkout</a>
+        <a class="btn btn-secondary btn-block" href="checkout-distance-calculator.html">Check another address</a>
+      </section>
+
+      <section class="card card-pad stack">
+        <h2>Payment</h2>
+        <div class="row" style="flex-wrap:wrap"><span class="pill pill-success">MTN MoMo</span><span class="pill">Airtel Money</span><span class="pill">Card</span><span class="pill">Cash on delivery</span></div>
+        <p class="small secondary">Choose the method at checkout. Cash is available up to 8.1 km; this address is 1.562 km.</p>
+      </section>
+
+      <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Minimum order value</strong><p class="small" style="margin-top:2px">Delivery orders need USh 20,000 of items and modifiers. This basket is USh 34,000, so checkout is unlocked. Packaging and delivery do not count toward the minimum.</p></div>
+  </div>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

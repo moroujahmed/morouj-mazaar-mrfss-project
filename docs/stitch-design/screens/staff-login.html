@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Staff login — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Role-based staff login with 6-digit PIN." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="shared" data-screen="Staff login">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Staff access · Kampala</span></span>
+      </a>
+      <div class="row">
+        
+        <span class="pill">shared</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap" style="padding-block:40px">
+  <div class="grid-2" style="grid-template-columns:1.1fr .9fr;align-items:start;gap:40px">
+    <section class="stack">
+      <h1>Sign in to your portal</h1>
+      <p class="secondary">Kitchen, rider and admin portals use a 6-digit staff PIN. Customer ordering stays account-free and is accessed through the order token.</p>
+      <div class="panel stack">
+        <div class="row-between"><strong>Roles and scope</strong><span class="pill">Role-gated</span></div>
+        <div class="small secondary"><strong>Kitchen</strong> — accept tickets, bump ready, toggle 86 availability.</div>
+        <div class="small secondary"><strong>Rider</strong> — claim one active delivery, start trip, submit customer PIN.</div>
+        <div class="small secondary"><strong>Admin</strong> — orders, menu, settings, ledger, reports, staff, audit.</div>
+      </div>
+      <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Sessions last 12 hours</strong><p class="small" style="margin-top:2px">Closing the browser does not end the session. Use “Sign out” at the end of a shift.</p></div>
+  </div>
+      <div class="notice notice-warning" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <div><strong>No shared PINs</strong><p class="small" style="margin-top:2px">Every staff member has a separate account. Dispatcher lockouts are reset by an admin, never bypassed at the door.</p></div>
+  </div>
+    </section>
+
+    <section class="card card-pad stack" aria-labelledby="login-title">
+      <h2 id="login-title">Staff sign in</h2>
+      <div class="segmented" role="tablist" aria-label="Select portal">
+        <a href="#main" class="is-active" role="tab" aria-selected="true">Kitchen</a>
+        <a href="#main" role="tab" aria-selected="false">Rider</a>
+        <a href="#main" role="tab" aria-selected="false">Admin</a>
+      </div>
+      <div class="field"><label>Phone number</label><input class="input" type="tel" inputmode="tel" autocomplete="username" value="+256 772 000 111" /><span class="help">The number registered by your manager.</span></div>
+      <div class="field"><label>6-digit staff PIN</label><input class="input" type="password" inputmode="numeric" autocomplete="current-password" maxlength="6" value="••••••" /><span class="help">Six digits. Not the customer handover PIN.</span></div>
+      <div class="row-between">
+        <label class="row small"><input type="checkbox" checked /> Keep me signed in on this device</label>
+        <span class="small muted">Forgot PIN?</span>
+      </div>
+      <a class="btn btn-primary btn-block" href="kds.html">Sign in to Kitchen</a>
+      <p class="help">Forgotten PINs are reset by an admin from <a href="admin-staff.html">Staff</a>. Self-service reset is not available.</p>
+      <hr class="divider" />
+      <div class="stack" style="gap:6px">
+        <strong class="small">Lockout state</strong>
+        <div class="notice notice-danger" role="alert">
+          <span class="material-symbols-outlined" aria-hidden="true">lock_clock</span>
+          <div><strong>Too many attempts</strong><p class="small">This account is locked for 14:32. Ask an admin to reset it. A dispatcher cannot bypass the lock.</p></div>
+        </div>
+      </div>
+      <div class="stack" style="gap:6px">
+        <strong class="small">Invalid credentials</strong>
+        <p class="error-text" role="alert">Phone number or PIN is incorrect. 2 attempts remaining before a 15-minute lock.</p>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

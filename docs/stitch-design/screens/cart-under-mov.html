@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cart below minimum order — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Cart below minimum order" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="customer" data-screen="Cart below minimum order">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="customer-storefront-mobile.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <h1 style="font-size:17px">Your basket</h1>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>Below minimum</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="card card-pad stack">
+    <div class="row-between"><h2>1 item</h2><span class="small muted">Delivery order</span></div>
+    <div class="row-between">
+      <div><strong>Special Bazaar Rolex</strong><div class="tiny muted">1 × USh 8,000</div></div>
+      <strong class="money">USh 8,000</strong>
+    </div>
+    <hr class="divider" />
+    <div class="row-between small"><span class="muted">Items subtotal</span><strong class="money">USh 8,000</strong></div>
+    <div class="row-between small"><span class="muted">Packaging</span><strong class="money">USh 1,000</strong></div>
+    <div class="row-between small"><span class="muted">Delivery</span><span>Calculated at checkout</span></div>
+  </div>
+
+  <div class="panel stack" aria-label="Minimum order progress">
+    <div class="row-between"><strong>USh 20,000 delivery minimum</strong><span class="small money">USh 8,000 / 20,000</span></div>
+    <div style="height:10px;border-radius:999px;background:var(--surface-inset);overflow:hidden" role="progressbar" aria-valuemin="0" aria-valuemax="20000" aria-valuenow="8000" aria-label="Basket progress toward the minimum order value">
+      <div style="width:40%;height:100%;background:var(--brand-action)"></div>
+    </div>
+    <p class="small secondary">Add <strong>USh 12,000</strong> more to unlock delivery.</p>
+    <p class="tiny muted">The minimum is measured on items and modifiers only. Packaging and delivery fees do not count toward it.</p>
+  </div>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Dine-in is exempt</strong><p class="small" style="margin-top:2px">Scanning a table QR opens a dine-in session with a USh 0 minimum. This basket is a delivery order.</p></div>
+  </div>
+
+  <a class="btn btn-secondary" href="customer-storefront-mobile.html">Browse more dishes</a>
+</main>
+<div class="bottom-dock">
+  <a class="btn btn-primary btn-block" href="cart-under-mov.html" aria-disabled="true" tabindex="-1">Checkout disabled — add USh 12,000</a>
+</div>
+</div>
+</body>
+</html>

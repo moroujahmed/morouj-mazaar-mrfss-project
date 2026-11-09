@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Checkout with canonical Sarah order, 1.562 km free delivery and USh 35,000 total." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="customer" data-screen="Checkout">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Checkout · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success"><span class="dot"></span>Store open</span>
+        <span class="pill">customer</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap stack" style="padding-block:24px 48px">
+  <div class="row-between" style="flex-wrap:wrap">
+    <div><h1>Checkout</h1><p class="muted small">Delivery to Sarah Namukasa · Nakasero · 1.562 km</p></div>
+    <a class="btn btn-sm btn-secondary" href="customer-cart.html">Edit basket</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(320px,.8fr);gap:24px" data-layout="checkout">
+    <form class="stack" onsubmit="return false">
+      <section class="card card-pad stack" aria-labelledby="address-title">
+        <h2 id="address-title">Delivery address</h2>
+        <div class="map-box" role="img" aria-label="Map pin at Plot 14 Lumumba Avenue, Nakasero">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--ink-secondary)">
+            <span class="material-symbols-outlined" style="font-size:34px" aria-hidden="true">location_on</span>
+            <strong class="small">Plot 14 Lumumba Ave</strong>
+            <span class="tiny">Nakasero Hill, Kampala</span>
+          </div>
+          <span class="map-attribution">© MapTiler · © OpenStreetMap</span>
+        </div>
+        <p class="map-fallback">If the map does not load, the address and fee below are still correct.</p>
+        <div class="grid-2">
+          <div class="field"><label>Recipient name</label><input class="input" type="text" id="name" name="name" value="Sarah Namukasa" placeholder="" autocomplete="name" /></div>
+          <div class="field"><label>Phone number</label><input class="input" type="tel" id="phone" name="phone" value="+256 772 000 111" placeholder="" autocomplete="tel" /><span class="help">Used by the rider only after the order is claimed.</span></div>
+        </div>
+        <div class="field"><label>Gate or drop-off note</label><textarea class="textarea" placeholder="Gate 2 on Lumumba, call on arrival"></textarea></div>
+        <div class="row-between small"><span class="muted">Road distance</span><strong>1.562 km</strong></div>
+        <div class="row-between small"><span class="muted">Delivery fee</span><strong class="money" style="color:var(--status-success)">USh 0 · free zone</strong></div>
+        <a class="small" href="checkout-distance-calculator.html">Check a different address</a>
+      </section>
+
+      <section class="card card-pad stack" aria-labelledby="payment-title">
+        <h2 id="payment-title">Payment method</h2>
+        <fieldset class="stack" style="border:0;padding:0;margin:0">
+          <legend class="sr-only">Choose a payment method</legend>
+          <label class="panel row" style="cursor:pointer"><input type="radio" name="pay" value="momo" checked /> <strong>MTN Mobile Money</strong><span class="tiny muted">— instant USSD prompt</span></label>
+          <label class="panel row" style="cursor:pointer"><input type="radio" name="pay" value="airtel" /> <strong>Airtel Money</strong><span class="tiny muted">— instant USSD prompt</span></label>
+          <label class="panel row" style="cursor:pointer"><input type="radio" name="pay" value="card" /> <strong>Visa / Mastercard</strong><span class="tiny muted">— Flutterwave hosted page</span></label>
+          <label class="panel row" style="cursor:pointer"><input type="radio" name="pay" value="cod" /> <strong>Cash on delivery</strong><span class="tiny muted">— up to 8.1 km</span></label>
+        </fieldset>
+        <div class="panel stack" aria-label="Cash change">
+          <strong class="small">If paying cash, do you need change?</strong>
+          <select class="select" aria-label="Cash denomination">
+            <option selected>Change for USh 50,000 — rider brings USh 15,000</option>
+            <option>Change for USh 40,000 — rider brings USh 5,000</option>
+            <option>Exact cash — no change needed</option>
+            <option>Change for USh 100,000 — rider brings USh 65,000</option>
+          </select>
+          <p class="help">Change is calculated from the total of USh 35,000. The rider carries a float; never send cash with a third party.</p>
+        </div>
+        <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Payment is confirmed before cooking</strong><p class="small" style="margin-top:2px">For mobile money the kitchen sees the order only after the provider webhook confirms payment. If the prompt is not approved within 10 minutes the order expires and nothing is charged.</p></div>
+  </div>
+      </section>
+
+      <section class="card card-pad stack">
+        <h2>Contactless handover</h2>
+        <p class="small secondary">A 4-digit PIN is created with the order. You will see it in the tracker after payment. Give it to the rider only after you inspect the seal.</p>
+        <div class="row" style="flex-wrap:wrap"><span class="pill">Seal checked at the door</span><span class="pill">PIN never sent by SMS</span><span class="pill">No rider sees it before delivery</span></div>
+      </section>
+    </form>
+
+    <aside class="stack" aria-labelledby="docket-title">
+      <section class="card card-pad stack">
+        <div class="row-between"><h2 id="docket-title">Live order docket</h2><span class="pill mono">#1042</span></div>
+        <div class="row-between small"><span>1× Whole Tilapia Flame Combo</span><span class="money">USh 32,000</span></div>
+        <div class="row-between small"><span>1× Extra Garlic Pepper Dip</span><span class="money">USh 2,000</span></div>
+        <div class="row-between small"><span class="muted">Items subtotal</span><strong class="money">USh 34,000</strong></div>
+        <div class="row-between small"><span class="muted">Packaging</span><strong class="money">USh 1,000</strong></div>
+        <div class="row-between small"><span class="muted">Delivery · 1.562 km</span><strong class="money" style="color:var(--status-success)">USh 0</strong></div>
+        <hr class="divider" />
+        <div class="row-between"><strong>Total due</strong><strong class="money" style="font-size:24px">USh 35,000</strong></div>
+        <a class="btn btn-primary btn-block" href="payment-pending.html" >Pay USh 35,000 via MTN MoMo</a>
+        <p class="tiny muted">By paying you accept the cancellation and refund policy. A paid order can be refunded before preparation.</p>
+      </section>
+
+      <section class="card card-pad stack">
+        <h2>Delivery estimate</h2>
+        <div class="row-between small"><span class="muted">Prep target</span><strong>12 min</strong></div>
+        <div class="row-between small"><span class="muted">Ride time</span><strong>3.54 min</strong></div>
+        <div class="row-between"><span class="muted">Estimated arrival</span><strong>13:02 EAT</strong></div>
+        <p class="tiny muted">Estimates start when the kitchen accepts the order. Traffic can change the arrival time.</p>
+      </section>
+
+      <section class="panel stack">
+        <strong class="small">Other checkout states</strong>
+        <a class="small" href="checkout-tier2.html">Tier 2 address — Ntinda 8.093 km</a>
+        <a class="small" href="checkout-out-of-range.html">Address beyond 15 km</a>
+        <a class="small" href="checkout-distance-error.html">Distance service unavailable</a>
+        <a class="small" href="checkout-cod-change.html">Cash order with change</a>
+        <a class="small" href="checkout-cod-otp.html">Cash order phone verification</a>
+      </section>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

@@ -141,8 +141,8 @@
   ];
 
   let riders = [
-    { name: "Juma Mukasa", plate: "UFD 342B", status: "On delivery", order: "#1043", cash: 64000, deliveries: 7, phone: "+256 772 100 201" },
-    { name: "David Ochieng", plate: "UEX 119A", status: "On delivery", order: "#1042", cash: 35600, deliveries: 5, phone: "+256 701 300 118" },
+    { name: "Juma Mukasa", plate: "UFD 342B", status: "On delivery", order: "#1042", cash: 65500, deliveries: 7, phone: "+256 772 100 201" },
+    { name: "David Ochieng", plate: "UEX 119A", status: "Available", order: "", cash: 0, deliveries: 5, phone: "+256 701 300 118" },
     { name: "Brian Kato", plate: "UEE 902C", status: "Available", order: "", cash: 112000, deliveries: 8, phone: "+256 782 900 332" },
     { name: "Samuel Ssebo", plate: "UFA 450P", status: "Available", order: "", cash: 0, deliveries: 6, phone: "+256 705 440 900" },
     { name: "Alex Wandera", plate: "UFD 881M", status: "Offline", order: "", cash: 28000, deliveries: 4, phone: "+256 774 881 004" }

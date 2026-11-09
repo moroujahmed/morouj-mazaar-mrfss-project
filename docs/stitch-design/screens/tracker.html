@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order tracker — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Live tracker showing the customer handover PIN, canonical totals and delivery timeline." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="customer" data-screen="Order tracker">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Order tracker · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success"><span class="dot"></span>On the way</span>
+        <span class="pill">customer</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap stack" style="padding-block:24px 48px">
+  <div class="row-between" style="flex-wrap:wrap">
+    <div><h1>Order #1042 is on the way</h1><p class="muted small">Sarah Namukasa · Nakasero · placed 12:35 EAT</p></div>
+    <a class="btn btn-sm btn-secondary" href="tracker-mobile.html">Open mobile view</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr);gap:24px" data-layout="tracker">
+    <section class="stack">
+      <div class="card card-pad stack">
+        <div class="map-box" role="img" aria-label="Map of rider Juma on the route to Nakasero">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--ink-secondary)">
+            <span class="material-symbols-outlined" style="font-size:38px" aria-hidden="true">two_wheeler</span>
+            <strong class="small">Juma is 0.7 km away</strong>
+            <span class="tiny">Estimated arrival 13:02 EAT</span>
+          </div>
+          <span class="map-attribution">© MapTiler · © OpenStreetMap</span>
+        </div>
+        <p class="map-fallback">If the live map does not load, your ETA and status still update.</p>
+        <div class="row-between small"><span class="muted">Rider</span><strong>Juma M. · UFD 342B</strong></div>
+        <div class="row-between small"><span class="muted">Payment</span><strong>Prepaid · MTN MoMo</strong></div>
+        <div class="row-between small"><span class="muted">Cash to collect</span><strong class="money">USh 0</strong></div>
+      </div>
+
+      <section class="card card-pad stack">
+        <h2>Progress</h2>
+        <div class="timeline">
+          <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Order placed</strong><div class="small muted">12:35 EAT · payment confirmed</div></div></div>
+          <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Cooking</strong><div class="small muted">12:36 EAT · accepted by the kitchen</div></div></div>
+          <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Packed and collected</strong><div class="small muted">12:47 EAT · seal #0941</div></div></div>
+          <div class="timeline-step is-current"><span class="timeline-dot">4</span><div><strong>On the road</strong><div class="small muted">12:58 EAT · rider started the trip</div></div></div>
+          <div class="timeline-step"><span class="timeline-dot">5</span><div><strong>Delivered</strong><div class="small muted">PIN accepted at the door</div></div></div>
+        </div>
+      </section>
+
+      <section class="card card-pad stack">
+        <h2>Receipt</h2>
+        <div class="row-between small"><span>1× Whole Tilapia Flame Combo</span><span class="money">USh 32,000</span></div>
+        <div class="row-between small"><span>1× Extra Garlic Pepper Dip</span><span class="money">USh 2,000</span></div>
+        <div class="row-between small"><span class="muted">Packaging</span><span class="money">USh 1,000</span></div>
+        <div class="row-between small"><span class="muted">Delivery · 1.562 km</span><span class="money">USh 0</span></div>
+        <hr class="divider" />
+        <div class="row-between"><strong>Total</strong><strong class="money" style="font-size:20px">USh 35,000</strong></div>
+        <div class="row-between tiny muted"><span>Payment reference</span><span class="mono">MOMO-94182</span></div>
+      </section>
+    </section>
+
+    <aside class="stack">
+      <section class="card card-pad stack" aria-labelledby="pin-title">
+        <div class="row-between"><h2 id="pin-title">Handover PIN</h2><span class="pill pill-warning">Keep private</span></div>
+        <p class="small secondary">Give this 4-digit code to the rider only after you inspect the seal.</p>
+        <div class="pin-display" aria-label="Handover PIN 4 8 2 1">
+          <span class="pin-digit">4</span><span class="pin-digit">8</span><span class="pin-digit">2</span><span class="pin-digit">1</span>
+        </div>
+        <p class="small">The rider never sees this code until you say it. Do not share it by SMS or WhatsApp.</p>
+      </section>
+
+      <section class="card card-pad stack">
+        <h2>Need help?</h2>
+        <a class="btn btn-secondary btn-block" href="tel:+256772000111">Call the rider</a>
+        <a class="btn btn-secondary btn-block" href="https://wa.me/256700882119">Message the restaurant</a>
+        <a class="btn btn-ghost btn-block" href="tracker-invalid-token.html">Order link problem</a>
+      </section>
+
+      <section class="panel stack">
+        <strong class="small">Other order states</strong>
+        <a class="small" href="tracker-cancelled.html">Order cancelled</a>
+        <a class="small" href="tracker-delivery-failed.html">Delivery failed</a>
+        <a class="small" href="tracker-feedback.html">Post-delivery feedback</a>
+      </section>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

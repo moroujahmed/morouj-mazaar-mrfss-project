@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Rider delivery | Morouj Mazaar</title>
-  <meta name="description" content="Morouj Mazaar rider app: active delivery details, customer contact, navigation, cash-on-delivery totals, handover PIN and offline-safe completion.">
+  <meta name="description" content="Morouj Mazaar rider app: active delivery details, customer contact, navigation, cash-on-delivery totals, handover PIN and connection-required completion.">
   <meta name="theme-color" content="#173F35">
   <link rel="icon" href="assets/images/placeholder-dish.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,7 +59,7 @@
     <div class="rider-page-head">
       <div>
         <h1 id="riderPageTitle">Active delivery</h1>
-        <p id="riderPageSub">Order #1043 · Ntinda · 8.093 km</p>
+        <p id="riderPageSub">Order #1042 · Nakasero · 1.562 km</p>
       </div>
       <span class="badge badge-orange badge-lg" id="pageStatusBadge">
         <svg class="icon" aria-hidden="true"><use href="#i-bike"></use></svg>
@@ -73,7 +73,7 @@
         <svg class="icon" aria-hidden="true"><use href="#i-wifi-off"></use></svg>
         <div>
           <strong>You are offline</strong>
-          <p>Delivery updates are saved on this phone and verified when you reconnect. Never tell the customer the delivery is confirmed until it syncs.</p>
+          <p>Delivery completion is blocked while you are offline. Reconnect before entering the customer PIN; never tell the customer the delivery is confirmed until the server verifies it.</p>
         </div>
         <button class="btn btn-secondary btn-sm" type="button" id="offlineRetry">Retry</button>
       </div>
@@ -89,10 +89,10 @@
       <div class="rider-banner rider-banner-pending" id="pendingBanner" role="status" hidden>
         <svg class="icon" aria-hidden="true"><use href="#i-sync"></use></svg>
         <div>
-          <strong>Completion waiting for verification</strong>
-          <p id="pendingText">Your delivery is queued on this phone. Reconnect to verify it.</p>
+          <strong>Completion requires a connection</strong>
+          <p id="pendingText">Reconnect, then enter the customer PIN to verify the handover.</p>
         </div>
-        <button class="btn btn-dark btn-sm" type="button" id="syncPending">Sync now</button>
+        <button class="btn btn-dark btn-sm" type="button" id="syncPending">Connection settings</button>
       </div>
     </div>
 
@@ -119,7 +119,7 @@
           <div class="pool-list" id="poolList"></div>
           <p class="pool-note">
             <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
-            <span>Claim a delivery while you are on shift. You can queue one more job while finishing the current drop.</span>
+            <span>You can hold one active delivery at a time. Claim the next order only after the current handover is verified.</span>
           </p>
         </section>
       </div>
@@ -136,7 +136,7 @@
             </div>
             <div class="shift-stat">
               <span id="shiftCashLabel">COD due</span>
-              <strong id="shiftCash">USh 38,000</strong>
+              <strong id="shiftCash">USh 65,500</strong>
             </div>
             <div class="shift-stat">
               <span>Queue</span>
@@ -163,7 +163,7 @@
             </div>
             <div class="safety-item">
               <span class="safety-num" aria-hidden="true">3</span>
-              <span>Never mark a delivery complete while offline. Queue it and sync.</span>
+              <span>Never mark a delivery complete while offline. Completion needs a connection and the customer PIN.</span>
             </div>
             <div class="safety-item">
               <span class="safety-num" aria-hidden="true">4</span>
@@ -196,7 +196,7 @@
       <div class="sheet-head">
         <div>
           <h2 id="pinSheetTitle">Confirm handover</h2>
-          <p id="pinSheetSub">Ask Brian for the 4-digit PIN before handing over the order.</p>
+          <p id="pinSheetSub">Ask Sarah for the 4-digit PIN before handing over the order.</p>
         </div>
         <button class="icon-btn icon-btn-sm" type="button" data-close-sheet aria-label="Close handover confirmation">
           <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
@@ -206,8 +206,8 @@
         <div class="cash-banner" id="pinCashBanner">
           <svg class="icon" aria-hidden="true"><use href="#i-banknote"></use></svg>
           <div>
-            <strong>USh 38,000 cash due</strong>
-            <span>Give USh 12,000 change from USh 50,000.</span>
+            <strong>USh 35,000 prepaid</strong>
+            <span>No cash to collect on this order.</span>
           </div>
         </div>
 
@@ -285,13 +285,13 @@
             <span class="icon-tile icon-tile-red"><svg class="icon" aria-hidden="true"><use href="#i-wifi-off"></use></svg></span>
             <span>
               <strong>Offline</strong>
-              <span>Completions are queued on this phone.</span>
+              <span>Completion is blocked until you reconnect.</span>
             </span>
           </label>
         </div>
         <p class="pin-help" id="connectionHint">
           <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
-          <span>Demo control: switch connection states to preview safe retry and queued completion behaviour.</span>
+          <span>Demo control: switch connection states to preview the connection-required completion rule.</span>
         </p>
       </div>
       <div class="sheet-foot">

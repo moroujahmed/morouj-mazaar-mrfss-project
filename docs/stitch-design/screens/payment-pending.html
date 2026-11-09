@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment pending — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Payment pending" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="customer" data-screen="Payment pending">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="customer-storefront-mobile.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Waiting for payment</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px">
+  <div class="card card-pad stack" style="text-align:center">
+    <div style="width:64px;height:64px;border-radius:999px;background:var(--status-warning-bg);color:var(--status-warning);display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <span class="material-symbols-outlined" style="font-size:32px" aria-hidden="true">hourglass_top</span>
+    </div>
+    <h1 style="font-size:22px">Waiting for payment confirmation…</h1>
+    <p class="small secondary">Approve the MTN MoMo prompt on <strong>+256 772 000 111</strong>. Keep the screen unlocked.</p>
+    <div class="money" style="font-size:30px;font-weight:800">USh 35,000</div>
+    <div class="pill pill-warning" style="justify-self:center"><span class="dot"></span>Expires in 09:47</div>
+  </div>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Your order is not with the kitchen yet</strong><p class="small" style="margin-top:2px">A paid webhook moves the order to PREPARING. If the prompt is not approved within 10 minutes the order is cancelled automatically and nothing is charged.</p></div>
+  </div>
+
+  <div class="panel stack">
+    <div class="row-between small"><span class="muted">Reference</span><strong class="mono">MOMO-94182</strong></div>
+    <div class="row-between small"><span class="muted">Method</span><strong>MTN Mobile Money</strong></div>
+    <div class="row-between small"><span class="muted">Status</span><span>PENDING_PAYMENT</span></div>
+  </div>
+
+  <a class="btn btn-secondary" href="payment-pending.html">Check status</a>
+  <a class="btn btn-ghost" href="checkout.html">Cancel this order</a>
+</main>
+</div>
+</body>
+</html>

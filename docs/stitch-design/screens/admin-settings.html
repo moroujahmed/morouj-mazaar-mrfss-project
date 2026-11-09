@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin settings — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Admin settings" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="admin" data-screen="Admin settings">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Operations console · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success">Store open</span>
+        <span class="pill">admin</span>
+      </div>
+    </div>
+  </header>
+  <div class="wrap" style="display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;padding-block:24px" data-layout="admin">
+    <aside>
+      <div class="card card-flat card-pad" style="margin-bottom:12px">
+        <div class="tiny muted">Signed in</div>
+        <strong>Amina N.</strong>
+        <div class="tiny muted">General manager · 12 h session</div>
+      </div>
+      <nav aria-label="Admin sections" class="stack" style="gap:4px">
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-orders.html"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>Orders</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-menu.html"><span class="material-symbols-outlined" aria-hidden="true">restaurant_menu</span>Menu</a>
+    <a class="btn btn-primary" style="justify-content:flex-start" href="admin-settings.html"><span class="material-symbols-outlined" aria-hidden="true">tune</span>Settings</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-ledger.html"><span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>Cash ledger</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-reports.html"><span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>Reports</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-staff.html"><span class="material-symbols-outlined" aria-hidden="true">badge</span>Staff</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-audit.html"><span class="material-symbols-outlined" aria-hidden="true">history</span>Audit log</a>
+  </nav>
+    </aside>
+    <main id="main" class="stack">
+      <div class="row-between">
+        <div><h1>Settings</h1><p class="muted small">Delivery pricing, store hours and access rules.</p></div>
+      </div>
+      
+  <form class="stack" onsubmit="return false">
+    <section class="card card-pad stack">
+      <h2>Delivery pricing</h2>
+      <p class="small secondary">These values drive every fee calculation. Changes apply to new checkouts only and are audited.</p>
+      <div class="grid-2">
+        <div class="field"><label>Free delivery radius (km)</label><input class="input" type="number" id="free-radius" name="free-radius" value="5.0" placeholder="" min="0" max="15" step="0.1" /><span class="help">Within this distance the delivery fee is USh 0.</span></div>
+        <div class="field"><label>Excess rate (USh per km)</label><input class="input" type="number" id="rate" name="rate" value="1500" placeholder="" min="0" step="100" /><span class="help">Charged per billable kilometre after rounding up.</span></div>
+        <div class="field"><label>Maximum delivery radius (km)</label><input class="input" type="number" id="max-radius" name="max-radius" value="15.0" placeholder="" min="0" max="50" step="0.1" /><span class="help">Beyond this checkout is blocked.</span></div>
+        <div class="field"><label>COD maximum radius (km)</label><input class="input" type="number" id="cod-radius" name="cod-radius" value="8.1" placeholder="" min="0" max="15" step="0.1" /><span class="help">Cash on delivery is unavailable beyond this distance.</span></div>
+        <div class="field"><label>Minimum order value — delivery (USh)</label><input class="input" type="number" id="mov" name="mov" value="20000" placeholder="" min="0" step="1000" /><span class="help">Measured on items and modifiers only.</span></div>
+        <div class="field"><label>Packaging fee (USh)</label><input class="input" type="number" id="packaging" name="packaging" value="1000" placeholder="" min="0" step="100" /><span class="help">Dine-in packaging is always USh 0.</span></div>
+      </div>
+      <div class="notice notice-info" role="status">
+        <span class="material-symbols-outlined" aria-hidden="true">calculate</span>
+        <div><strong>Live preview</strong><p class="small">Nakasero 1.562 km → USh 0. Ntinda 8.093 km → 4 billable km × USh 1,500 = USh 6,000.</p></div>
+      </div>
+    </section>
+
+    <section class="card card-pad stack">
+      <h2>Store state and hours</h2>
+      <div class="row-between">
+        <div><strong>Store open</strong><div class="tiny muted">Customers can place delivery and dine-in orders.</div></div>
+        <label class="row"><input type="checkbox" checked /> Open</label>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Opening time</label><input class="input" type="time" id="open-time" name="open-time" value="10:00" placeholder=""  /><span class="help">Africa/Kampala (EAT).</span></div>
+        <div class="field"><label>Closing time</label><input class="input" type="time" id="close-time" name="close-time" value="22:00" placeholder=""  /><span class="help">Africa/Kampala (EAT).</span></div>
+      </div>
+      <div class="notice notice-warning" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <div><strong>Manual override is audited</strong><p class="small" style="margin-top:2px">Closing the store hides checkout but leaves the menu readable. Reopening outside hours requires a reason and is logged.</p></div>
+  </div>
+    </section>
+
+    <section class="card card-pad stack">
+      <h2>Access and session</h2>
+      <div class="grid-2">
+        <div class="field"><label>Staff session length (hours)</label><input class="input" type="number" id="session" name="session" value="12" placeholder="" min="1" max="24" /></div>
+        <div class="field"><label>Handover PIN attempts</label><input class="input" type="number" id="pin-attempts" name="pin-attempts" value="3" placeholder="" min="1" max="10" /></div>
+        <div class="field"><label>Handover PIN lock (minutes)</label><input class="input" type="number" id="pin-lock" name="pin-lock" value="15" placeholder="" min="1" max="120" /></div>
+        <div class="field"><label>COD OTP length</label><input class="input" type="number" id="otp-length" name="otp-length" value="6" placeholder="" min="4" max="8" /></div>
+      </div>
+    </section>
+
+    <div class="row">
+      <button class="btn btn-primary">Save settings</button>
+      <a class="btn btn-secondary" href="admin-audit.html">View audit log</a>
+    </div>
+  </form>
+
+    </main>
+  </div>
+</body>
+</html>

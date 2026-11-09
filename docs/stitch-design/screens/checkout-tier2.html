@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tier 2 checkout — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Tier 2 checkout" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="customer" data-screen="Tier 2 checkout">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="customer-storefront-mobile.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="font-size:17px;font-weight:700">Checkout</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="row-between small"><span class="muted">Step 1 of 2</span><span><span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>Tier 2 delivery</span></span></div>
+  <div class="card card-pad stack">
+    <h1 style="font-size:20px">Deliver to Ntinda</h1>
+    <div class="row-between small"><span class="muted">Road distance</span><strong>8.093 km</strong></div>
+    <div class="row-between small"><span class="muted">Free allowance</span><span>5.000 km</span></div>
+    <div class="row-between small"><span class="muted">Billable excess (rounded up)</span><span>4 km × USh 1,500</span></div>
+    <div class="row-between"><strong>Delivery fee</strong><strong class="money">USh 6,000</strong></div>
+    <p class="tiny muted">Distance is measured on the road network in integer metres. The fee uses <code>ceil((metres − 5000) / 1000)</code>.</p>
+  </div>
+
+  <div class="card card-pad stack">
+    <h2>Order summary</h2>
+    <div class="row-between small"><span>Smoked Beef Luwombo</span><span class="money">USh 26,000</span></div>
+    <div class="row-between small"><span>Cold-Pressed Passion Juice (500 ml)</span><span class="money">USh 5,000</span></div>
+    <div class="row-between small"><span>Packaging</span><span class="money">USh 1,000</span></div>
+    <div class="row-between small"><span>Delivery</span><span class="money">USh 6,000</span></div>
+    <hr class="divider" />
+    <div class="row-between"><strong>Total due</strong><strong class="money" style="font-size:20px">USh 38,000</strong></div>
+  </div>
+
+  <fieldset class="panel stack">
+    <legend class="label">Payment method</legend>
+    <label class="row"><input type="radio" name="pay" /> Airtel Money <span class="tiny muted">— instant prompt</span></label>
+    <label class="row"><input type="radio" name="pay" /> MTN Mobile Money <span class="tiny muted">— instant prompt</span></label>
+    <label class="row"><input type="radio" name="pay" checked /> Cash on delivery <span class="tiny muted">— within the 8.1 km ceiling</span></label>
+    <label class="row"><input type="radio" name="pay" /> Visa / Mastercard <span class="tiny muted">— Flutterwave</span></label>
+    <p class="help">Cash on delivery is available up to 8.1 km. Ntinda is 8.093 km, so cash is allowed. A 6-digit phone check is required for first-time cash customers.</p>
+  </fieldset>
+</main>
+<div class="bottom-dock">
+  <a class="btn btn-primary btn-block" href="checkout-cod-change.html">Continue with cash on delivery — USh 38,000</a>
+  
+</div>
+</div>
+</body>
+</html>

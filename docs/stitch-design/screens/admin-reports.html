@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin reports — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Admin reports" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="admin" data-screen="Admin reports">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Operations console · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success">Store open</span>
+        <span class="pill">admin</span>
+      </div>
+    </div>
+  </header>
+  <div class="wrap" style="display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;padding-block:24px" data-layout="admin">
+    <aside>
+      <div class="card card-flat card-pad" style="margin-bottom:12px">
+        <div class="tiny muted">Signed in</div>
+        <strong>Amina N.</strong>
+        <div class="tiny muted">General manager · 12 h session</div>
+      </div>
+      <nav aria-label="Admin sections" class="stack" style="gap:4px">
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-orders.html"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>Orders</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-menu.html"><span class="material-symbols-outlined" aria-hidden="true">restaurant_menu</span>Menu</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-settings.html"><span class="material-symbols-outlined" aria-hidden="true">tune</span>Settings</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-ledger.html"><span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>Cash ledger</a>
+    <a class="btn btn-primary" style="justify-content:flex-start" href="admin-reports.html"><span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>Reports</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-staff.html"><span class="material-symbols-outlined" aria-hidden="true">badge</span>Staff</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-audit.html"><span class="material-symbols-outlined" aria-hidden="true">history</span>Audit log</a>
+  </nav>
+    </aside>
+    <main id="main" class="stack">
+      <div class="row-between">
+        <div><h1>Reports</h1><p class="muted small">Sales, payment mix and operational signals for the business day.</p></div>
+      </div>
+      
+  <div class="row-between" style="flex-wrap:wrap">
+    <div class="segmented" role="tablist" aria-label="Report period">
+      <a href="admin-reports.html" class="is-active" role="tab" aria-selected="true">Today</a>
+      <a href="admin-reports.html" role="tab" aria-selected="false">7 days</a>
+      <a href="admin-reports.html" role="tab" aria-selected="false">30 days</a>
+    </div>
+    <a class="btn btn-sm btn-secondary" href="admin-ledger.html">Cash ledger</a>
+  </div>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Sample business day</strong><p class="small" style="margin-top:2px">This mockup uses the three canonical fixture orders: Sarah USh 35,000, Brian USh 38,000 and Alex USh 8,000. Totals below are the exact sum of those orders.</p></div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Orders</div><div class="kpi-value">3</div><div class="kpi-note">2 delivery · 1 dine-in</div></div>
+    <div class="kpi"><div class="kpi-label">Revenue</div><div class="kpi-value money">USh 81,000</div><div class="kpi-note">35,000 + 38,000 + 8,000</div></div>
+    <div class="kpi"><div class="kpi-label">Average order</div><div class="kpi-value money">USh 27,000</div><div class="kpi-note">81,000 ÷ 3</div></div>
+    <div class="kpi"><div class="kpi-label">Prepaid share</div><div class="kpi-value">43%</div><div class="kpi-note">USh 35,000 of 81,000</div></div>
+  </div>
+
+  <div class="grid-2">
+    <section class="card card-pad stack">
+      <h2>Payment mix</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th scope="col">Method</th><th scope="col" class="num">Orders</th><th scope="col" class="num">Amount</th></tr></thead>
+          <tbody>
+            <tr><td>MTN MoMo</td><td class="num">1</td><td class="num money">USh 35,000</td></tr>
+            <tr><td>Cash on delivery</td><td class="num">1</td><td class="num money">USh 38,000</td></tr>
+            <tr><td>Airtel Money</td><td class="num">1</td><td class="num money">USh 8,000</td></tr>
+            <tr><td><strong>Total</strong></td><td class="num"><strong>3</strong></td><td class="num money"><strong>USh 81,000</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card card-pad stack">
+      <h2>Order type</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th scope="col">Type</th><th scope="col" class="num">Orders</th><th scope="col" class="num">Amount</th></tr></thead>
+          <tbody>
+            <tr><td>Delivery</td><td class="num">2</td><td class="num money">USh 73,000</td></tr>
+            <tr><td>Dine-in</td><td class="num">1</td><td class="num money">USh 8,000</td></tr>
+            <tr><td><strong>Total</strong></td><td class="num"><strong>3</strong></td><td class="num money"><strong>USh 81,000</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section class="card card-pad stack">
+    <h2>Top items</h2>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th scope="col">Item</th><th scope="col" class="num">Qty</th><th scope="col" class="num">Revenue</th></tr></thead>
+        <tbody>
+          <tr><td>Whole Tilapia Flame Combo</td><td class="num">1</td><td class="num money">USh 32,000</td></tr>
+          <tr><td>Smoked Beef Luwombo</td><td class="num">1</td><td class="num money">USh 26,000</td></tr>
+          <tr><td>Special Bazaar Rolex</td><td class="num">1</td><td class="num money">USh 8,000</td></tr>
+          <tr><td>Cold-Pressed Passion Juice (500 ml)</td><td class="num">1</td><td class="num money">USh 5,000</td></tr>
+          <tr><td>Extra Garlic Pepper Dip</td><td class="num">1</td><td class="num money">USh 2,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tiny muted">Packaging and delivery are excluded from item revenue. No margin or profit figure is shown because ingredient cost is not recorded in this system.</p>
+  </section>
+
+  <section class="card card-pad stack">
+    <h2>Operational signals</h2>
+    <div class="row-between small"><span class="muted">Late tickets</span><strong>0 of 3</strong></div>
+    <div class="row-between small"><span class="muted">Delivery failures</span><strong>0</strong></div>
+    <div class="row-between small"><span class="muted">Refunds</span><strong>0</strong></div>
+    <div class="row-between small"><span class="muted">Cash variance</span><strong class="money">USh 0</strong></div>
+  </section>
+
+    </main>
+  </div>
+</body>
+</html>

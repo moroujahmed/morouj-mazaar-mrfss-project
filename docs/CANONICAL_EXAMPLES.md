@@ -20,7 +20,7 @@ This file exists because the v1.0 documents used four different totals for the s
 | Free delivery radius | **5.0 km** | `app_settings.free_delivery_radius_km` |
 | Excess rate | **USh 1,500 / km** | `app_settings.rate_per_excess_km` |
 | Maximum delivery radius | **15.0 km** | `app_settings.max_delivery_radius_km` |
-| COD maximum radius | **8.0 km** | `app_settings.cod_max_radius_km` |
+| COD maximum radius | **8.1 km** | `app_settings.cod_max_radius_km` |
 | Minimum order value (delivery) | **USh 20,000** | `app_settings.minimum_order_value` |
 | Minimum order value (dine-in) | **USh 0** | `app_settings.minimum_order_value_dine_in` |
 | Packaging fee (delivery) | **USh 1,000** | `app_settings.packaging_fee_default` |

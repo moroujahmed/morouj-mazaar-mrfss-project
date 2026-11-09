@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delivery distance calculator — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Delivery distance calculator" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="customer" data-screen="Delivery distance calculator">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Delivery calculator · Kampala</span></span>
+      </a>
+      <div class="row">
+        <a class="btn btn-sm btn-secondary" href="checkout.html">Go to checkout</a>
+        <span class="pill">customer</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap stack" style="padding-block:24px 48px">
+  <div><h1>Delivery distance and fee</h1><p class="muted small">Road distance from Bazaar Flame &amp; Grill, not a straight line. Fees are integer shillings.</p></div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:24px" data-layout="calculator">
+    <section class="card card-pad stack">
+      <h2>Pin your delivery address</h2>
+      <div class="map-box" role="img" aria-label="Map with restaurant origin and a delivery pin">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--ink-secondary)">
+          <span class="material-symbols-outlined" style="font-size:36px" aria-hidden="true">pin_drop</span>
+          <strong class="small">Drop a pin or search</strong>
+          <span class="tiny">Nakasero · 1.562 km</span>
+        </div>
+        <span class="map-attribution">© MapTiler · © OpenStreetMap</span>
+      </div>
+      <p class="map-fallback">Map unavailable? Enter a landmark and we will still calculate from the road network.</p>
+      <div class="field"><label>Search address or landmark</label><input class="input" type="search" id="address" name="address" value="Plot 14 Lumumba Ave, Nakasero" placeholder=""  /></div>
+      <div class="row">
+        <button class="btn btn-primary">Calculate fee</button>
+        <button class="btn btn-secondary">Use my location</button>
+      </div>
+      <p class="help">We do not fall back to a straight-line estimate for the final fee. If routing fails, checkout is blocked.</p>
+    </section>
+
+    <aside class="stack">
+      <section class="card card-pad stack">
+        <div class="row-between"><h2>Result</h2><span class="pill pill-success">In range</span></div>
+        <div class="row-between small"><span class="muted">Road distance</span><strong>1.562 km</strong></div>
+        <div class="row-between small"><span class="muted">Free allowance</span><strong>5.000 km</strong></div>
+        <div class="row-between small"><span class="muted">Billable excess</span><strong>0 km</strong></div>
+        <div class="row-between"><strong>Delivery fee</strong><strong class="money" style="font-size:22px;color:var(--status-success)">USh 0</strong></div>
+        <a class="btn btn-primary btn-block" href="checkout.html">Continue with this address</a>
+      </section>
+
+      <section class="card card-pad stack">
+        <h2>Fee examples</h2>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th scope="col">Address</th><th scope="col" class="num">Distance</th><th scope="col" class="num">Fee</th></tr></thead>
+            <tbody>
+              <tr><td>Nakasero</td><td class="num">1.562 km</td><td class="num money">USh 0</td></tr>
+              <tr><td>Ntinda</td><td class="num">8.093 km</td><td class="num money">USh 6,000</td></tr>
+              <tr><td>Beyond 15 km</td><td class="num">&gt; 15.0 km</td><td class="num">Blocked</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="tiny muted">Ntinda: ceil(8.093 − 5.0) = 4 km × USh 1,500 = USh 6,000.</p>
+      </section>
+
+      <section class="panel stack">
+        <strong class="small">Edge states</strong>
+        <a class="small" href="checkout-out-of-range.html">Beyond 15 km</a>
+        <a class="small" href="checkout-distance-error.html">Routing service unavailable</a>
+      </section>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order tracker mobile — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Order tracker mobile" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="customer" data-screen="Order tracker mobile">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="customer-storefront-mobile.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Order #1042</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>On the way</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="card card-pad stack" style="text-align:center">
+    <div style="width:64px;height:64px;border-radius:999px;background:var(--status-warning-bg);color:var(--status-warning);display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <span class="material-symbols-outlined" style="font-size:32px" aria-hidden="true">two_wheeler</span>
+    </div>
+    <h1 style="font-size:22px">Juma is on the way</h1>
+    <p class="small secondary">Estimated arrival 13:02 EAT · 0.7 km away</p>
+    <div class="row" style="justify-content:center"><span class="pill pill-warning"><span class="dot"></span>OUT FOR DELIVERY</span><span class="pill">Prepaid</span></div>
+  </div>
+
+  <div class="map-box" role="img" aria-label="Map of the rider approaching Nakasero">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--ink-secondary)">
+      <span class="material-symbols-outlined" style="font-size:34px" aria-hidden="true">route</span>
+      <strong class="small">Route to Nakasero</strong>
+      <span class="tiny">1.562 km total</span>
+    </div>
+    <span class="map-attribution">© MapTiler · © OpenStreetMap</span>
+  </div>
+  <p class="map-fallback">Map unavailable? Your rider will call on arrival.</p>
+
+  <section class="card card-pad stack" aria-labelledby="pin-title">
+    <div class="row-between"><h2 id="pin-title">Handover PIN</h2><span class="pill pill-warning">Keep private</span></div>
+    <p class="small secondary">Give this code to Juma only after you check the seal is unbroken.</p>
+    <div class="pin-display" aria-label="Handover PIN 4 8 2 1">
+      <span class="pin-digit">4</span><span class="pin-digit">8</span><span class="pin-digit">2</span><span class="pin-digit">1</span>
+    </div>
+  </section>
+
+  <div class="timeline">
+    <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Paid</strong><div class="small muted">12:35 EAT · MTN MoMo</div></div></div>
+    <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Cooking</strong><div class="small muted">12:36 EAT</div></div></div>
+    <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Collected</strong><div class="small muted">12:58 EAT · seal #0941</div></div></div>
+    <div class="timeline-step is-current"><span class="timeline-dot">4</span><div><strong>On the road</strong><div class="small muted">Arriving 13:02 EAT</div></div></div>
+    <div class="timeline-step"><span class="timeline-dot">5</span><div><strong>Delivered</strong><div class="small muted">PIN accepted</div></div></div>
+  </div>
+
+  <section class="card card-pad stack">
+    <div class="row-between"><h2>Total</h2><strong class="money" style="font-size:20px">USh 35,000</strong></div>
+    <div class="row-between small"><span class="muted">Items + modifiers</span><span class="money">USh 34,000</span></div>
+    <div class="row-between small"><span class="muted">Packaging</span><span class="money">USh 1,000</span></div>
+    <div class="row-between small"><span class="muted">Delivery · 1.562 km</span><span class="money">USh 0</span></div>
+    <div class="row-between small"><span class="muted">Cash to collect</span><span class="money">USh 0</span></div>
+  </section>
+
+  <div class="panel stack">
+    <a class="btn btn-secondary" href="tel:+256772000111">Call Juma</a>
+    <a class="btn btn-secondary" href="https://wa.me/256700882119">Message the restaurant</a>
+    <a class="btn btn-ghost" href="tracker-feedback.html">Rate after delivery</a>
+  </div>
+</main>
+<div class="bottom-dock"><a class="btn btn-secondary btn-block" href="https://wa.me/256700882119">Message the restaurant</a></div>
+</div>
+</body>
+</html>

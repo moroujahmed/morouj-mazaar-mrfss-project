@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rider handover PIN — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Rider handover PIN" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="rider" data-screen="Rider handover PIN">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="rider-pool.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Customer handover PIN</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>On the way</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="card card-pad stack" style="text-align:center">
+    <div class="row" style="justify-content:center"><span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>OUT FOR DELIVERY</span><span class="pill">#1042</span></div>
+    <h1 style="font-size:20px">Enter the customer PIN</h1>
+    <p class="small secondary">Ask Sarah to read the 4-digit code from her tracker after she checks the seal is intact.</p>
+    <div class="pin-display" aria-label="PIN digits entered">
+      <span class="pin-digit" aria-hidden="true">4</span>
+      <span class="pin-digit" aria-hidden="true">•</span>
+      <span class="pin-digit" aria-hidden="true">•</span>
+      <span class="pin-digit" aria-hidden="true">•</span>
+    </div>
+    <p class="small muted">Attempt 1 of 3 · 2 attempts remain after a wrong entry</p>
+  </div>
+
+  <div class="keypad" aria-label="PIN keypad">
+    <button type="button" aria-label="1">1</button><button type="button" aria-label="2">2</button><button type="button" aria-label="3">3</button><button type="button" aria-label="4">4</button><button type="button" aria-label="5">5</button><button type="button" aria-label="6">6</button><button type="button" aria-label="7">7</button><button type="button" aria-label="8">8</button><button type="button" aria-label="9">9</button>
+    <button type="button" aria-label="Clear">C</button>
+    <button type="button" aria-label="0">0</button>
+    <button type="button" aria-label="Delete digit"><span class="material-symbols-outlined" aria-hidden="true">backspace</span></button>
+  </div>
+
+  <div class="notice notice-danger" role="alert">
+    <span class="material-symbols-outlined" aria-hidden="true">error</span>
+    <div><strong>Three wrong entries lock the order</strong><p class="small" style="margin-top:2px">A locked order can only be reset by an admin. Dispatchers cannot bypass the lock; call the manager instead.</p></div>
+  </div>
+
+  <a class="btn btn-primary btn-block" href="rider-pool.html">Confirm and complete delivery</a>
+  <a class="btn btn-secondary btn-block" href="rider-pin-locked.html">Show the locked state</a>
+  <a class="btn btn-ghost btn-block" href="rider-active.html">Cancel</a>
+</main>
+</div>
+</body>
+</html>

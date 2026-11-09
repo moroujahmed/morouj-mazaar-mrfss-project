@@ -4,7 +4,7 @@ A static, dependency-free interface prototype for the three Morouj Mazaar portal
 
 - **Customer** — browse, customise, checkout, pay, track and give feedback.
 - **Admin** — overview, orders, inventory, menu, delivery dispatch and reports.
-- **Rider** — active delivery, cash handling, PIN handover and offline-safe completion.
+- **Rider** — active delivery, cash handling and PIN handover with connection-required completion.
 
 The prototype lives in [`site/`](../site/). It is intentionally not a Next.js application: it is a design and UX reference that can be opened directly in a browser, reviewed on a phone, and used to guide the production build.
 
@@ -35,27 +35,29 @@ There is no build step and no package installation. The only external request is
 
 ## 2. Palette
 
+The site prototype now uses the same palette as the normative design package (`docs/ACCESSIBILITY.md`). The legacy token names are kept so existing CSS keeps working; the values are terracotta and warm neutrals, not green and orange.
+
 | Token | Hex | Role | Contrast decision |
 | :--- | :--- | :--- | :--- |
-| `--green-800` | `#173F35` | Primary brand, headers, dark surfaces | White text = **11.67:1** |
-| `--green-900` | `#102E27` | Deepest surface, text on orange | White text = 14.4:1 |
-| `--green-700` | `#1D4F42` | Hover on dark surfaces | White text = 9.6:1 |
-| `--green-50` | `#F2F7F5` | Tinted cards and rows | Ink text = 13.8:1 |
-| `--orange-500` | `#F28C28` | Primary actions, highlights | Green-900 text = **4.76:1** |
-| `--orange-700` | `#A65A0F` | Orange text on light surfaces | White = **5.13:1** |
-| `--white` | `#FFFFFF` | Cards, sheets, reading surfaces | Ink text = 16.25:1 |
-| `--gray-100` | `#F2F4F3` | Secondary page background | Ink text = 15.2:1 |
-| `--gray-600` | `#52635D` | Muted text and metadata | White = **6.36:1** |
-| `--red-600` | `#C62828` | Errors and critical alerts | White = **5.62:1** |
-| `--success-700` | `#17603F` | Confirmed states | White = 7.2:1 |
-| `--warning-700` | `#8A4B00` | Attention states | White = 7.4:1 |
+| `--green-800` (brand action) | `#B83817` | Primary buttons, links, active state | White text = **5.81:1** |
+| `--green-700` (action hover) | `#A63312` | Hover / pressed action | White text = 6.77:1 |
+| `--orange-500` (decorative) | `#D84A26` | Borders, illustrations, large accents only | Not for normal text |
+| `--orange-700` (brand text) | `#B83817` | Terracotta text on light surfaces | 5.47:1 on linen |
+| `--gray-50` / `--surface-page` | `#F9F8F6` | Page ground (linen) | Ink text = 16.54:1 |
+| `--surface-card` | `#FFFFFF` | Cards, sheets, reading surfaces | Ink text = 17.56:1 |
+| `--gray-100` | `#EFECE6` | Inset and secondary surface | Ink text = 8.69:1 |
+| `--gray-600` | `#4A4744` | Secondary text and metadata | 8.69:1 on linen |
+| `--red-600` | `#B91C1C` | Errors and critical alerts | 6.47:1 on white |
+| `--success-700` | `#1B5E3B` | Paid / delivered / in stock | 7.75:1 on white |
+| `--warning-700` | `#92400E` | Attention states | 7.09:1 on white |
 
 ### Non-negotiable colour rules
 
-1. **Never place white text on `#F28C28`.** The ratio is 2.32:1. Use `--green-900` for text on orange.
-2. **Never use `#F28C28` as body text on white.** Use `--orange-700` instead.
-3. Red is reserved for errors, destructive actions and critical alerts. Do not use it for ordinary "busy" states.
-4. Status is never colour-only. Every badge and banner pairs colour with an icon and a word.
+1. **Primary actions use `#B83817` with white text.** Hover and pressed use `#A63312`.
+2. **Never use `#D84A26` as body text on `#F9F8F6`.** Use `#B83817` for terracotta text.
+3. Never place white text on `#D84A26` at normal size. Use it only for decorative fills, borders, icons, or text at 24 px / 18.66 px bold or larger.
+4. Red is reserved for errors, destructive actions and critical alerts. Do not use it for ordinary "busy" states.
+5. Status is never colour-only. Every badge and banner pairs colour with an icon and a word.
 
 ---
 
@@ -80,7 +82,7 @@ Headings use tight tracking (`-0.025em` to `-0.05em`). Use mono for anything a p
 
 ### Customer
 
-- Warm dark-green hero with food imagery and a clear "Browse the menu" action.
+- Warm linen hero with food imagery and a clear "Browse the menu" action.
 - Search and category filters with a result count announced politely.
 - Dish sheet for modifiers and quantity; basket total stays visible.
 - Checkout supports delivery and dine-in. Delivery areas use the canonical distances:
@@ -103,13 +105,13 @@ Headings use tight tracking (`-0.025em` to `-0.05em`). Use mono for anything a p
 - Header shows rider identity, vehicle plate and a persistent connection chip.
 - Active order card puts the ETA, cash due, route, customer contact and distance first.
 - Minimum touch target is **56px**; primary actions also appear in a sticky bottom bar on phones.
-- Handover requires the 4-digit PIN (`7310` in the demo) with a maximum of three attempts and a short lockout.
+- Handover requires the 4-digit customer PIN (`4821` in the canonical demo) with a maximum of three attempts and a short lockout.
 - Connection states:
-  - **Online** — completion verifies immediately.
+  - **Online** — PIN verification completes immediately.
   - **Weak** — verification takes longer and the UI says so.
-  - **Offline** — completion is queued on the device and shown as **Awaiting verification**. It is never reported as delivered.
-- Returning online exposes a **Sync now** action. The queued completion is only marked delivered after the sync step.
-- The delivery pool can queue one next job while the current delivery is active. Claiming needs a connection; completing the active job does not.
+  - **Offline** — completion is blocked. The screen says the connection is required and keeps the PIN form; it never queues a delivery or reports a false success.
+- There is no offline queue and no "sync now" action. A delivery can only be completed while the server can verify the PIN.
+- The rider pool allows one active delivery at a time. Claiming is disabled until the active order is completed or released.
 
 ---
 
@@ -135,22 +137,23 @@ The active story is consistent across the customer, admin and rider pages:
 
 | Fixture | Detail |
 | :--- | :--- |
-| Customer order A | Sarah Namukasa, Nakasero, MTN MoMo, **USh 35,000** |
-| Customer order B | Brian Kato, Ntinda, COD, **USh 38,000**, change from `USh 50,000` = `USh 12,000` |
-| Dine-in | Alex Wandera, Table 4, **USh 8,000** |
-| Rider active | Juma Mukasa, `#1043` Brian Kato, Ntinda `8.093 km`, COD `USh 38,000` |
-| Delivery pool | `#1045` Grace Achieng, Kololo, `USh 25,000` prepaid; `#1047` Miriam Nsubuga, Bugolobi, `USh 33,000` prepaid |
-| Admin statuses | `#1042` and `#1043` On the way; `#1044` Cooking; `#1045` and `#1047` Ready; `#1046` Delivered |
-| Dispatch queue | `#1045` and `#1047` are unassigned, matching the "2 waiting" badge |
+| Customer order A | Sarah Namukasa, `#1042`, Nakasero `1.562 km`, MTN MoMo, **USh 35,000** |
+| Customer order B | Brian Kato, `#1045`, Ntinda `8.093 km`, COD, **USh 38,000**, change from `USh 50,000` = `USh 12,000` |
+| Dine-in | Alex Wandera, `#1044`, Table 4, Airtel Money, **USh 8,000** |
+| Rider active | Juma Mukasa, `#1042` Sarah Nakasero `1.562 km`, prepaid `USh 35,000`, cash to collect `USh 0` |
+| Delivery pool | `#1045` Brian Kato, Ntinda `8.093 km`, COD `USh 38,000`, locked while `#1042` is active |
+| Completed cash ledger | `#1043` `USh 38,000` + `#1047` `USh 27,500` = **USh 65,500** due to the drawer |
+| Admin statuses | `#1044` PREPARING (dine-in); `#1045` PREPARING · unassigned; `#1042` CLAIMED by Juma |
+| Dispatch queue | `#1045` is the only unassigned delivery |
 
-All data is local. Refreshing the page resets the demo except for the rider connection, queue and pending-completion keys stored in `localStorage`.
+All data is local. Refreshing the page resets the demo. No delivery completion is stored offline; the prototype never reports a delivery that the server has not verified.
 
 ---
 
 ## 7. Accessibility checklist
 
 - WCAG 2.2 AA contrast for normal text and UI controls.
-- Visible 3px focus ring; orange on dark surfaces, green on light surfaces.
+- Visible 3px focus ring; ink on light surfaces, linen on dark surfaces.
 - Skip link on every page.
 - Semantic landmarks and one `h1` per page.
 - Minimum 48px targets on customer/admin screens, 56px on rider screens.
@@ -160,7 +163,7 @@ All data is local. Refreshing the page resets the demo except for the rider conn
 - Toasts use `aria-live` and `role="alert"` for errors.
 - `prefers-reduced-motion` collapses animation and smooth scrolling.
 - Rider PIN supports touch and physical keyboard input.
-- Rider offline completion never fakes success; it queues and exposes retry.
+- Rider offline completion is blocked with an explicit message; it never fakes success and never queues a delivery.
 
 The production verification rules remain in [`docs/ACCESSIBILITY.md`](ACCESSIBILITY.md).
 
@@ -179,7 +182,7 @@ Manual checks:
 
 1. Open each portal at 360px, 768px and 1280px widths.
 2. Tab through the page and confirm focus is always visible.
-3. In the rider app, switch to **Offline**, complete the PIN, confirm the queued state, reconnect, then use **Sync now**.
+3. In the rider app, switch to **Offline** and confirm completion is blocked with a clear message; reconnect and complete the PIN successfully.
 4. Confirm the admin "Ready for dispatch" count matches the unassigned Ready orders.
 5. Confirm the customer total remains `USh 35,000` for the preloaded Sarah basket and `USh 38,000` for the Brian COD demo.
 
@@ -189,8 +192,7 @@ Manual checks:
 
 - No production API, authentication, payment provider or map tiles.
 - Admin and rider data are separate local fixtures, not a shared database.
-- Images are static local assets; missing dish photos use the green/orange placeholder SVG.
+- Images are static local assets; missing dish photos use the terracotta/linen placeholder SVG.
 - CSV reports are generated in the browser.
-- The rider queue and pending completion are stored with `localStorage`; they are not encrypted or synced.
-- Order `#1047` uses `USh 33,000` prepaid on both the admin and rider screens so one order reads the same everywhere. [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md) still lists it as `USh 27,500` COD for Juma's `USh 65,500` ledger example; the prototype keeps its own fixture ledger of `USh 64,000` for Juma.
+- The prototype does not store delivery completion offline. Cash and order figures match [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md): `#1043` `USh 38,000` + `#1047` `USh 27,500` = `USh 65,500`.
 - Production must implement the security rules in [`README.md`](../README.md) and the API contracts in [`docs/API_CONTRACTS.md`](API_CONTRACTS.md).

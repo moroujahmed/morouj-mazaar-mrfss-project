@@ -476,7 +476,7 @@ The spec declares **WCAG 2.1 Level AAA for outdoor high-glare viewports**, but p
 - **`customer_rating VARCHAR(10)`** accepts arbitrary strings; use an enum or `CHECK`.
 - **`customer_notes` is reused for security alerts.** Add a dedicated `security_flag`/`admin_note` field.
 - **`heading` and telemetry coordinates lack bounds checks.**
-- **`app_settings` lacks `cod_max_radius_km`**, despite an 8 km COD ceiling in security docs.
+- **`app_settings` lacks `cod_max_radius_km`**, despite an 8.1 km COD ceiling in security docs.
 - **`cash_settlements` lacks a `UNIQUE (rider_id, date)` constraint.**
 - **No `updated_at` triggers** on `categories`, `order_items`, `rider_telemetry`, `cash_settlements` (lower priority).
 - **`is_settled` semantics undefined** for partially settled orders.
@@ -730,7 +730,7 @@ Add a compliance checklist:
 
 **`app_settings`**
 
-- `cod_max_radius_km DECIMAL(3,1) DEFAULT 8.0`
+- `cod_max_radius_km DECIMAL(3,1) DEFAULT 8.1`
 - `timezone TEXT DEFAULT 'Africa/Kampala'`
 - `currency TEXT DEFAULT 'UGX'`
 - `tax_rate_bps INTEGER DEFAULT 0`
@@ -775,7 +775,7 @@ To eliminate the numeric drift, adopt **one** fixture set and use it in every do
 | Free delivery radius | 5.0 km |
 | Excess rate | USh 1,500/km |
 | Max delivery radius | 15.0 km |
-| COD max radius | 8.0 km |
+| COD max radius | 8.1 km |
 | Minimum order value (delivery) | USh 20,000 |
 | Minimum order value (dine-in) | USh 0 |
 | Packaging fee (delivery) | USh 1,000 |

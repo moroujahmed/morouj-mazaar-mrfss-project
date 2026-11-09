@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KDS late ticket — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="KDS late ticket" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="kitchen" data-screen="KDS late ticket">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="kds.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <h1 style="font-size:17px">Cook ticket #1045</h1>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-danger"><span class="dot" aria-hidden="true"></span>24:10 late</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="notice notice-danger" role="alert">
+    <span class="material-symbols-outlined" aria-hidden="true">alarm</span>
+    <div><strong>Target breached by 12:10</strong><p class="small">Target is 12 minutes. This ticket is at 24:10. Sound is enabled for this shift.</p></div>
+  </div>
+
+  <div class="card card-pad stack">
+    <div class="row-between"><div><strong style="font-size:20px">#1045</strong><div class="tiny muted">Ntinda · COD · unassigned</div></div><span class="pill pill-danger"><span class="dot" aria-hidden="true"></span>CRITICAL</span></div>
+    <div class="row-between small"><span class="muted">Elapsed</span><strong class="money" style="font-size:20px;color:var(--status-danger)">24:10</strong></div>
+    <div class="row-between small"><span class="muted">Target</span><span>12:00</span></div>
+  </div>
+
+  <section class="card card-pad stack">
+    <h2>Items</h2>
+    <div class="row-between small"><span>1× Smoked Beef Luwombo</span><span class="pill pill-danger">Overdue</span></div>
+    <div class="row-between small"><span>1× Passion Juice (500 ml)</span><span class="pill pill-success">Ready</span></div>
+    <div class="row-between tiny muted"><span>Packaging</span><span>Seal #0945 not yet affixed</span></div>
+  </section>
+
+  <div class="panel stack">
+    <strong>Escalation</strong>
+    <p class="small secondary">A late ticket can be bumped when the food is genuinely ready, or escalated to the manager. The kitchen cannot mark an order ready before it is packed.</p>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn btn-primary">Bump to ready</button>
+      <button class="btn btn-secondary">Escalate to manager</button>
+    </div>
+    <a class="btn btn-ghost" href="#main">Report a delay reason</a>
+  </div>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>No shortcuts</strong><p class="small" style="margin-top:2px">There is no force-ready, snooze, pot-transfer or seal-sign action. If the ticket cannot be completed, escalate it; the manager decides whether to cancel or re-dispatch.</p></div>
+  </div>
+</main>
+<div class="bottom-dock"><a class="btn btn-primary btn-block" href="kds.html">Back to board</a></div>
+</div>
+</body>
+</html>

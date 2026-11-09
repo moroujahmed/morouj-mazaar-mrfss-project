@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin audit log — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Admin audit log" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="admin" data-screen="Admin audit log">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Operations console · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success">Store open</span>
+        <span class="pill">admin</span>
+      </div>
+    </div>
+  </header>
+  <div class="wrap" style="display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;padding-block:24px" data-layout="admin">
+    <aside>
+      <div class="card card-flat card-pad" style="margin-bottom:12px">
+        <div class="tiny muted">Signed in</div>
+        <strong>Amina N.</strong>
+        <div class="tiny muted">General manager · 12 h session</div>
+      </div>
+      <nav aria-label="Admin sections" class="stack" style="gap:4px">
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-orders.html"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>Orders</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-menu.html"><span class="material-symbols-outlined" aria-hidden="true">restaurant_menu</span>Menu</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-settings.html"><span class="material-symbols-outlined" aria-hidden="true">tune</span>Settings</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-ledger.html"><span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>Cash ledger</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-reports.html"><span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>Reports</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-staff.html"><span class="material-symbols-outlined" aria-hidden="true">badge</span>Staff</a>
+    <a class="btn btn-primary" style="justify-content:flex-start" href="admin-audit.html"><span class="material-symbols-outlined" aria-hidden="true">history</span>Audit log</a>
+  </nav>
+    </aside>
+    <main id="main" class="stack">
+      <div class="row-between">
+        <div><h1>Audit log</h1><p class="muted small">Who changed what, when and why.</p></div>
+      </div>
+      
+  <div class="row-between" style="flex-wrap:wrap">
+    <div class="row"><span class="pill">All actions</span><span class="pill">Today</span></div>
+    <input class="input" style="max-width:300px" type="search" placeholder="Filter by actor or order" aria-label="Filter audit log" />
+  </div>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Append-only</strong><p class="small" style="margin-top:2px">Audit entries cannot be edited or deleted from the app. Each row records who acted, what changed, and why.</p></div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <caption class="sr-only">Audit log</caption>
+      <thead><tr><th scope="col">Time (EAT)</th><th scope="col">Actor</th><th scope="col">Action</th><th scope="col">Subject</th><th scope="col">Reason / detail</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">13:09</td><td>Amina Nakato</td><td>Reset handover PIN</td><td class="mono">#1042</td><td>Customer could not read the tracker; PIN reissued.</td></tr>
+        <tr><td class="mono">12:58</td><td>Juma Mukasa</td><td>Claim delivery</td><td class="mono">#1042</td><td>Atomic claim won.</td></tr>
+        <tr><td class="mono">12:47</td><td>Peter Okello</td><td>Bump to ready</td><td class="mono">#1042</td><td>Seal #0941 affixed.</td></tr>
+        <tr><td class="mono">12:45</td><td>Peter Okello</td><td>Mark item 86</td><td>Smoked Pork Muchomo</td><td>Smoker batch exhausted.</td></tr>
+        <tr><td class="mono">12:36</td><td>Peter Okello</td><td>Accept order</td><td class="mono">#1042</td><td>Paid webhook received at 12:35.</td></tr>
+        <tr><td class="mono">12:35</td><td>System</td><td>Payment confirmed</td><td class="mono">#1042</td><td>MTN MoMo MOMO-94182 · USh 35,000.</td></tr>
+        <tr><td class="mono">11:48</td><td>Juma Mukasa</td><td>Delivery completed</td><td class="mono">#1043</td><td>PIN verified · USh 38,000 cash.</td></tr>
+        <tr><td class="mono">11:30</td><td>Amina Nakato</td><td>Settings change</td><td>COD maximum radius</td><td>8.1 km → 8.1 km (no change saved).</td></tr>
+        <tr><td class="mono">10:00</td><td>Juma Mukasa</td><td>Start shift</td><td>Rider shift</td><td>Vehicle UFD 342B.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="card card-pad stack">
+    <h2>Security-sensitive actions only</h2>
+    <div class="segmented"><a class="is-active" href="admin-audit.html">All</a><a href="admin-audit.html">PIN resets</a><a href="admin-audit.html">Overrides</a><a href="admin-audit.html">Settlements</a></div>
+    <p class="small secondary">Filtering by security-sensitive actions produces a signed export for the owner’s monthly review.</p>
+    <button class="btn btn-secondary btn-sm">Export CSV</button>
+  </section>
+
+    </main>
+  </div>
+</body>
+</html>

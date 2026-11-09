@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rider pool — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Rider pool with one active delivery, a locked second order and the canonical cash liability." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="rider" data-screen="Rider pool">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Rider portal · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success"><span class="dot"></span>On shift</span>
+        <span class="pill">rider</span>
+      </div>
+    </div>
+  </header>
+<main id="main" class="wrap stack" style="padding-block:20px;max-width:820px">
+  <div class="row-between" style="flex-wrap:wrap">
+    <div>
+      <h1>Juma Mukasa</h1>
+      <p class="muted small">UFD 342B · shift started 10:00 EAT</p>
+    </div>
+    <div class="row">
+      <a class="btn btn-sm btn-secondary" href="rider-earnings.html">Earnings</a>
+      <a class="btn btn-sm btn-secondary" href="rider-shift.html">Shift</a>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Active delivery</div><div class="kpi-value">1</div><div class="kpi-note">One at a time</div></div>
+    <div class="kpi"><div class="kpi-label">Cash liability</div><div class="kpi-value money">USh 65,500</div><div class="kpi-note">#1043 + #1047 · reconcile before clocking out</div></div>
+    <div class="kpi"><div class="kpi-label">Completed today</div><div class="kpi-value">4</div><div class="kpi-note">2 prepaid · 2 cash</div></div>
+  </div>
+
+  <section class="stack" aria-labelledby="active-heading">
+    <h2 id="active-heading">Active assigned delivery</h2>
+    <article class="card card-pad stack" aria-labelledby="active-title">
+  <div class="row-between">
+    <div><h2 id="active-title" style="font-size:18px">#1042 · Active delivery</h2><span class="tiny muted">Claimed 12:58 EAT · go to the kitchen pass</span></div>
+    <span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>CLAIMED</span>
+  </div>
+  <div class="inset stack" style="gap:4px">
+    <div class="row-between small"><span class="muted">Drop-off area</span><strong>Nakasero</strong></div>
+    <div class="row-between small"><span class="muted">Road distance</span><strong>1.562 km</strong></div>
+    <div class="row-between small"><span class="muted">Payment</span><strong>Prepaid · MTN MoMo</strong></div>
+    <div class="row-between small"><span class="muted">Cash to collect</span><strong class="money">USh 0</strong></div>
+  </div>
+  <p class="small secondary">Collect the sealed bag at the pass, check the seal number, then start the trip. Customer contact and the exact address are released after you start.</p>
+  <a class="btn btn-primary btn-block" href="rider-active.html">Start trip</a>
+  <a class="btn btn-secondary btn-block" href="rider-pool.html">Release back to pool</a>
+</article>
+  </section>
+
+  <section class="stack" aria-labelledby="pool-heading">
+    <div class="row-between"><h2 id="pool-heading">Available pool</h2><span class="pill">1 order</span></div>
+    <article class="card card-pad stack" aria-labelledby="pool-title">
+  <div class="row-between">
+    <div><h2 id="pool-title" style="font-size:18px">#1045 · Available</h2><span class="tiny muted">Packed 12:46 EAT · waiting for a rider</span></div>
+    <span class="pill pill-danger"><span class="dot" aria-hidden="true"></span>COD</span>
+  </div>
+  <div class="inset stack" style="gap:4px">
+    <div class="row-between small"><span class="muted">Drop-off area</span><strong>Ntinda</strong></div>
+    <div class="row-between small"><span class="muted">Road distance</span><strong>8.093 km</strong></div>
+    <div class="row-between small"><span class="muted">Order total</span><strong class="money">USh 38,000</strong></div>
+    <div class="row-between small"><span class="muted">Cash to collect</span><strong class="money">USh 38,000</strong></div>
+  </div>
+  <div class="notice notice-warning" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">lock</span>
+    <div><strong>One active delivery at a time</strong><p class="small">Finish #1042 before claiming another order. Claim buttons unlock when your active delivery is complete.</p></div>
+  </div>
+  <button class="btn btn-secondary btn-block" aria-disabled="true" disabled>Claim locked — finish #1042 first</button>
+  <p class="tiny muted">The pool shows area, distance and total only. Customer name, phone, address, notes and the handover PIN are never shown before a successful claim.</p>
+</article>
+  </section>
+
+  <section class="card card-pad stack" aria-labelledby="cash-heading">
+    <div class="row-between"><h2 id="cash-heading">Cash you are holding</h2><strong class="money">USh 65,500</strong></div>
+    <div class="table-wrap">
+      <table class="table">
+        <caption class="sr-only">Orders contributing to the rider cash liability</caption>
+        <thead><tr><th scope="col">Order</th><th scope="col">Payment</th><th scope="col" class="num">Amount</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">#1043</td><td>COD · delivered</td><td class="num money">USh 38,000</td></tr>
+          <tr><td class="mono">#1047</td><td>COD · delivered</td><td class="num money">USh 27,500</td></tr>
+          <tr><td colspan="2"><strong>Total due to the drawer</strong></td><td class="num money"><strong>USh 65,500</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tiny muted">Cash liability clears only when an admin records the physical handover in the ledger. It does not clear by itself at midnight.</p>
+  </section>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Foreground GPS only</strong><p class="small" style="margin-top:2px">Keep this screen open while delivering. The app does not promise background tracking; the Wake Lock keeps the screen on during a trip.</p></div>
+  </div>
+  <a class="btn btn-secondary" href="rider-no-orders.html">View the empty-pool state</a>
+  <a class="btn btn-ghost" href="rider-pin.html">Open the handover PIN screen</a>
+</main>
+</body>
+</html>

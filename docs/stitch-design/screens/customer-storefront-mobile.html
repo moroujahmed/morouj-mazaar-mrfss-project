@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen" data-portal="customer" data-screen="Customer storefront — mobile">
+<a class="skip-link" href="#main">Skip to main content</a><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container shadow-[0_2px_4px_-1px_rgba(15,23,42,0.06)]"><span class="material-symbols-outlined text-[22px]">local_fire_department</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary leading-none tracking-tight">BAZAAR</span><span class="font-label-badge text-label-badge text-on-surface-variant uppercase tracking-wider">Flame &amp; Grill • KLA</span></div></div><div class="flex items-center gap-space-xs"><a class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface relative transition-colors" data-path="cart-summary" href="customer-cart.html"><span class="material-symbols-outlined text-[24px]">shopping_bag</span><span class="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-on-primary font-label-badge text-[10px] flex items-center justify-center leading-none">2</span></a><a class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs" href="https://wa.me/256700882119" aria-label="Message the restaurant"><span class="material-symbols-outlined text-on-primary text-[18px]">call</span></a></div></div></header><main id="main" class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface">
+  <h1 class="sr-only">Customer storefront — mobile</h1><div class="flex flex-col w-full">
+<!-- Urgent Express Kampala Delivery Scrim Banner -->
+<div class="px-margin pt-space-xs pb-space-sm">
+<div class="bg-[#F3F0EA] border border-[#E5E0D8] text-[#1A1918] rounded-2xl p-space-sm shadow-sm flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs min-w-0"><div class="w-8 h-8 rounded-xl bg-[#B83817] text-white flex items-center justify-center shrink-0 shadow-sm"><span class="material-symbols-outlined text-[17px]">two_wheeler</span></div><div class="flex flex-col min-w-0"><span class="font-bold text-[11px] tracking-wider uppercase text-[#B83817]">Kampala delivery</span><span class="text-[12px] text-[#4A4744] truncate font-medium">Free delivery under 5 km · 16 min to Nakasero</span></div></div><span class="shrink-0 font-bold text-[11px] px-2.5 py-0.5 rounded-full bg-[#E9E4DB] text-[#1A1918]">TIER 1</span></div>
+</div>
+<!-- Search & Live Filter Bar -->
+<div class="px-margin pb-space-sm">
+<div class="relative flex items-center">
+<div class="absolute left-3.5 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full h-12 pl-10 pr-10 rounded-full bg-[#E9E4DB] border border-[#E5E0D8]/40 text-[#1A1918] text-[14px] placeholder-[#4A4744]/70 focus:outline-none focus:bg-white focus:border-[#B83817] transition-all shadow-sm" id="dish-search-input" placeholder="Search dishes, combos, rolex, luwombo..." type="text"/>
+<button aria-label="Clear search" class="hidden absolute right-2.5 w-7 h-7 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center active:scale-95 transition-transform" id="dish-clear-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+<!-- Horizontal Scrollable Category Pills -->
+<div class="pb-space-sm">
+<div class="flex items-center gap-2 overflow-x-auto px-margin no-scrollbar py-1" id="category-pills"><button class="cat-pill shrink-0 flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#B83817] text-white shadow-sm font-bold text-[12px] uppercase tracking-wider transition-all" data-cat="combos" type="button"><span>🔥</span><span>Combos</span></button><button class="cat-pill shrink-0 flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#EFECE6] border border-[#E5E0D8] text-[#4A4744] hover:text-[#1A1918] font-bold text-[12px] uppercase tracking-wider transition-all" data-cat="grills" type="button"><span>🍖</span><span>Charcoal Grills</span></button><button class="cat-pill shrink-0 flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#EFECE6] border border-[#E5E0D8] text-[#4A4744] hover:text-[#1A1918] font-bold text-[12px] uppercase tracking-wider transition-all" data-cat="luwombo" type="button"><span>🍌</span><span>Heritage Luwombo</span></button><button class="cat-pill shrink-0 flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#EFECE6] border border-[#E5E0D8] text-[#4A4744] hover:text-[#1A1918] font-bold text-[12px] uppercase tracking-wider transition-all" data-cat="rolex" type="button"><span>🌯</span><span>Rolex Corner</span></button><button class="cat-pill shrink-0 flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#EFECE6] border border-[#E5E0D8] text-[#4A4744] hover:text-[#1A1918] font-bold text-[12px] uppercase tracking-wider transition-all" data-cat="juices" type="button"><span>🥤</span><span>Cold Juices</span></button></div>
+</div>
+<!-- Dynamic Section Header -->
+<div class="px-margin pt-space-xs pb-space-sm flex items-center justify-between">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Hot from the Flame</span>
+<span class="font-label-badge text-label-badge text-primary" id="dish-count">4 PLATES</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">local_shipping</span>
+<span>Nakasero Hub</span>
+</div>
+</div>
+<!-- Dish Cards Stream (Vertical Mobile Optimized) -->
+<div class="px-margin flex flex-col gap-space-md pb-space-2xl" id="dishes-container"><!-- Card 1: Whole Tilapia Flame Combo --><article class="dish-card bg-white border border-[#E5E0D8]/80 rounded-2xl overflow-hidden shadow-sm flex flex-col transition-all hover:shadow-md" data-tags="tilapia flame combo fish chips fresh juice uganda food"><div class="relative w-full aspect-[4/3] bg-[#EFECE6]"><img class="w-full h-full object-cover" data-alt="A whole golden-crisped Lake Victoria Tilapia resting on hot charcoal grill with charred skin, paired with thick cut rustic chips, colorful shredded fresh slaw, and chilled passion juice in an urban Kampala food setting under warm cinematic lighting with saffron and amber glow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyqVjN6PNGhn0GetkxBCH0Y_EXeDs1Prei0h6f8Kut0Lt_O7Szezh4FIYO4cSUX1lqKhyX1y8n0MwD2kJJWmTddf_Lmm-xwlA_ZIEYIrU1Eq86xV3ZOasoRn8osSH5yEbUM-WTwU4eDqW16y3sPQh6VmYv40bTbJU_V6rxXSEu2dEQjWEZM9lsFUQfRK82nw2uHfqTA1JdfT80fwgghSjH59RxH6MlnNuYAbxUBUP1"/><div class="absolute inset-0 bg-gradient-to-t from-[#1A1918]/80 via-transparent to-transparent"></div><div class="absolute top-2.5 right-2.5 bg-[#1B5E3B] text-white px-2.5 py-1 rounded-full font-bold text-[11px] uppercase tracking-wide shadow-sm">Free delivery · Tier 1</div><div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 bg-[#1A1918]/85 text-white backdrop-blur-md px-2.5 py-1 rounded-xl"><span class="material-symbols-outlined text-[14px] text-[#F3C6BC]">timer</span><span class="text-[12px] font-semibold">12 min prep</span></div></div><div class="p-space-md flex flex-col gap-space-xs"><div class="flex items-start justify-between gap-space-sm"><h2 class="font-bold text-[18px] text-[#1A1918] leading-tight">Whole Tilapia Flame Combo</h2></div><p class="text-[13px] text-[#4A4744] line-clamp-2 leading-relaxed">Deep-fried or charcoal-grilled Victoria Tilapia + rustic hand-cut chips + tangy slaw + fresh cold-pressed juice.</p><div class="pt-space-xs flex items-center justify-between mt-auto"><div class="flex flex-col"><span class="text-[10px] text-[#6B6763] font-bold tracking-wider uppercase">Price</span><span class="font-bold text-[17px] text-[#B83817]">USh 32,000</span></div><button class="add-dish-btn h-11 px-5 rounded-xl bg-[#B83817] text-white font-bold text-[13px] flex items-center justify-center gap-1.5 hover:bg-[#A63312] active:scale-95 transition-all shadow-sm" data-dish-id="1" data-dish-name="Whole Tilapia Flame Combo" data-dish-price="32000" type="button"><span class="material-symbols-outlined text-[17px]">tune</span><span>Customize</span></button></div></div></article><!-- Card 2: Quarter Charcoal Grilled Chicken --><article class="dish-card bg-white border border-[#E5E0D8]/80 rounded-2xl overflow-hidden shadow-sm flex flex-col transition-all hover:shadow-md" data-tags="chicken charcoal grilled bugisu spices gonja bbq roast flame"><div class="relative w-full aspect-[4/3] bg-[#EFECE6]"><img class="w-full h-full object-cover" data-alt="Juicy quarter roast chicken with deep charred glaze from sweetwood charcoal, seasoned with aromatic red Bugisu mountain spices, served alongside grilled ripe caramelized gonja plantains in an authentic Kampala night grill atmosphere with golden embers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYGi6KLjVoaCs93WEh3X6TEbf1Mib26FKgWxCwHnOZIZqC7iPAIBsaKx31MQHolr87eprnKYToJUjWeCWEOGQn_lJIQilgV5dA5SXd7HCzZxjrUjFszWj3nMPlkdbWa-x5hmEhpI57dkjRh6jJls4Oy-xcRRAnOC0n69QDFaf87CN9X7dgXUu6ZJOszcgU7xX8h3ASRW0dtSYvBONwztJvpqiNnyjzA-cYIJCz2PhB"/><div class="absolute inset-0 bg-gradient-to-t from-[#1A1918]/80 via-transparent to-transparent"></div><div class="absolute top-2.5 right-2.5 bg-[#B83817] text-white px-2.5 py-1 rounded-full font-bold text-[11px] uppercase tracking-wide shadow-sm">Best Seller</div><div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 bg-[#1A1918]/85 text-white backdrop-blur-md px-2.5 py-1 rounded-xl"><span class="material-symbols-outlined text-[14px] text-[#F3C6BC]">local_fire_department</span><span class="text-[12px] font-semibold">Live Ember Grill</span></div></div><div class="p-space-md flex flex-col gap-space-xs"><div class="flex items-start justify-between gap-space-sm"><h2 class="font-bold text-[18px] text-[#1A1918] leading-tight">Quarter Charcoal Grilled Chicken</h2></div><p class="text-[13px] text-[#4A4744] line-clamp-2 leading-relaxed">Bugisu mountain spices marinade, roasted slowly on sweetwood coals, served with roasted sweet gonja.</p><div class="pt-space-xs flex items-center justify-between mt-auto"><div class="flex flex-col"><span class="text-[10px] text-[#6B6763] font-bold tracking-wider uppercase">Price</span><span class="font-bold text-[17px] text-[#B83817]">USh 18,000</span></div><button class="add-dish-btn h-11 px-5 rounded-xl bg-[#1A1918] text-white font-bold text-[13px] flex items-center justify-center gap-1.5 hover:bg-[#2A2724] active:scale-95 transition-all shadow-sm" data-dish-id="2" data-dish-name="Quarter Charcoal Grilled Chicken" data-dish-price="18000" type="button"><span class="material-symbols-outlined text-[17px]">add</span><span>Add</span></button></div></div></article><!-- Card 3: Special Bazaar Rolex (2 pcs) --><article class="dish-card bg-white border border-[#E5E0D8]/80 rounded-2xl overflow-hidden shadow-sm flex flex-col transition-all hover:shadow-md" data-tags="rolex chapati eggs omelette street food kampala special royale"><div class="relative w-full aspect-[4/3] bg-[#EFECE6]"><img class="w-full h-full object-cover" data-alt="Gourmet Ugandan Rolex street roll freshly prepared, showcasing steam rising from two layered flaky golden chapatis tightly rolled around a fluffy double-egg omelette packed with red spiced onions and crisp green cabbage, warm food truck lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj8wt4nfHYTUgv5rGQycwPDBOGRsA0swBQ72ogwf3ohZqEiaI1EKhWo1rR9K2N7pcdfMQiPnIlXi428R5pT6xbK4wblEQl8DXBoa6-B6c8KFSpi5K-FO9ckyDzEVFjAlzCpp8W6G-xXzuXOXnSEFRb_lIIYVGgPTHKmJcvfvLBSIBP8kuIuIYX1n-MhJjcRalORjqKf5Xt6bZ6JGC_JNNlaMyXRkGk_iRsJTOMdszg"/><div class="absolute inset-0 bg-gradient-to-t from-[#1A1918]/80 via-transparent to-transparent"></div><div class="absolute top-2.5 right-2.5 bg-[#92400E] text-white px-2.5 py-1 rounded-full font-bold text-[11px] uppercase tracking-wide shadow-sm">Street Icon</div><div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 bg-[#1A1918]/85 text-white backdrop-blur-md px-2.5 py-1 rounded-xl"><span class="material-symbols-outlined text-[14px] text-[#F3C6BC]">bolt</span><span class="text-[12px] font-semibold">10 min flash roll</span></div></div><div class="p-space-md flex flex-col gap-space-xs"><div class="flex items-start justify-between gap-space-sm"><h2 class="font-bold text-[18px] text-[#1A1918] leading-tight">Special Bazaar Rolex (2 pcs)</h2></div><p class="text-[13px] text-[#4A4744] line-clamp-2 leading-relaxed">Double egg omelette, spiced garden onions, crisp shredded cabbage wrapped in two layered buttery chapatis.</p><div class="pt-space-xs flex items-center justify-between mt-auto"><div class="flex flex-col"><span class="text-[10px] text-[#6B6763] font-bold tracking-wider uppercase">Price</span><span class="font-bold text-[17px] text-[#B83817]">USh 8,000</span></div><button class="add-dish-btn h-11 px-5 rounded-xl bg-[#1A1918] text-white font-bold text-[13px] flex items-center justify-center gap-1.5 hover:bg-[#2A2724] active:scale-95 transition-all shadow-sm" data-dish-id="3" data-dish-name="Special Bazaar Rolex (2 pcs)" data-dish-price="8000" type="button"><span class="material-symbols-outlined text-[17px]">add</span><span>Add</span></button></div></div></article><!-- Card 4: Smoked Beef Luwombo --><article class="dish-card bg-white border border-[#E5E0D8]/80 rounded-2xl overflow-hidden shadow-sm flex flex-col transition-all hover:shadow-md" data-tags="beef luwombo banana leaf peanut matooke traditional stew buganda"><div class="relative w-full aspect-[4/3] bg-[#EFECE6]"><img class="w-full h-full object-cover" data-alt="Traditional Ugandan beef Luwombo served unbundled inside a glossy smoked banana leaf pouch, revealing rich aromatic peanut groundnut sauce, tender beef chunks, steamed yellow matooke plantains, and roasted pumpkin under rich cultural feast ambiance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRnN__h7Bo83uv42ixRtPtYugCd5ULZxNMlgRsBZ8expMqSpHfJmbP_aoWHurxZ1B86jyX4tR2q-Yqpo1cLyqYN90eQbozCmVDeZquOOZCfOdeB_8kxun410TXGV_9WLH4UZMEr03vOgh-MrVXL18UwSdkR27FYsONFvjK6YwuIl27_D5gmA30HpyZCUKWyHcTIieHpncRzCzs5I_rNbZ_E4oSithfUDE7xQzHIrso"/><div class="absolute inset-0 bg-gradient-to-t from-[#1A1918]/80 via-transparent to-transparent"></div><div class="absolute top-2.5 right-2.5 bg-[#1B5E3B] text-white px-2.5 py-1 rounded-full font-bold text-[11px] uppercase tracking-wide shadow-sm">Heritage Stew</div><div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 bg-[#1A1918]/85 text-white backdrop-blur-md px-2.5 py-1 rounded-xl"><span class="material-symbols-outlined text-[14px] text-[#F3C6BC]">eco</span><span class="text-[12px] font-semibold">Slow Smoked</span></div></div><div class="p-space-md flex flex-col gap-space-xs"><div class="flex items-start justify-between gap-space-sm"><h2 class="font-bold text-[18px] text-[#1A1918] leading-tight">Smoked Beef Luwombo</h2></div><p class="text-[13px] text-[#4A4744] line-clamp-2 leading-relaxed">Steamed in smoked banana leaves with aromatic peanut essence, pumpkin wedges, and mashed hot matooke.</p><div class="pt-space-xs flex items-center justify-between mt-auto"><div class="flex flex-col"><span class="text-[10px] text-[#6B6763] font-bold tracking-wider uppercase">Price</span><span class="font-bold text-[17px] text-[#B83817]">USh 26,000</span></div><button class="add-dish-btn h-11 px-5 rounded-xl bg-[#1A1918] text-white font-bold text-[13px] flex items-center justify-center gap-1.5 hover:bg-[#2A2724] active:scale-95 transition-all shadow-sm" data-dish-id="4" data-dish-name="Smoked Beef Luwombo" data-dish-price="26000" type="button"><span class="material-symbols-outlined text-[17px]">add</span><span>Add</span></button></div></div></article></div>
+<!-- Empty Search Result State -->
+<div class="hidden px-margin py-space-xl flex-col items-center text-center" id="no-results">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant mb-space-sm">
+<span class="material-symbols-outlined text-[28px]">lunch_dining</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">No grills match your search</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[240px]">
+      Try searching for "Tilapia", "Rolex", or "Chicken" for instant flame specials.
+    </p>
+</div>
+<!-- Floating Bottom Cart Thumb Dock (Layer 2 Elevated, 56px high, pb-safe handled by offset) -->
+<div class="fixed bottom-20 inset-x-0 z-40 px-margin pointer-events-none">
+<div class="max-w-md mx-auto pointer-events-auto">
+<div class="h-14 bg-[#1A1918] border border-[#4A4744]/30 text-white rounded-2xl px-space-md flex items-center justify-between shadow-2xl transition-transform duration-200" id="cart-thumb-dock"><div class="flex items-center gap-space-sm min-w-0"><div class="relative flex items-center justify-center text-[#F3C6BC]"><span class="material-symbols-outlined text-[24px]">shopping_bag</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5 leading-none"><span class="font-bold text-[14px] text-[#F3C6BC]" id="dock-item-count">2 Items</span><span class="text-[#6B6763] text-xs">•</span><span class="font-bold text-[14px] text-white" id="dock-total-price">USh 35,000</span></div><span class="text-[11px] text-[#E5E0D8] truncate mt-0.5 font-medium">Boda ready · Flame &amp; Grill</span></div></div><a class="h-10 px-4 rounded-xl bg-[#B83817] hover:bg-[#A63312] text-white font-bold text-[13px] tracking-wide flex items-center justify-center gap-1 shadow-sm active:scale-95 transition-all shrink-0" href="customer-cart.html"><span>VIEW CART</span><span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div>
+</div>
+</div>
+</div>
+<script>
+  (function initStorefront() {
+    let cartTotal = 35000;
+    let cartCount = 2;
+
+    const searchInput = document.getElementById('dish-search-input');
+    const clearBtn = document.getElementById('dish-clear-btn');
+    const dishCards = document.querySelectorAll('.dish-card');
+    const noResults = document.getElementById('no-results');
+    const countDisplay = document.getElementById('dish-count');
+    const pills = document.querySelectorAll('.cat-pill');
+    const dockItemCount = document.getElementById('dock-item-count');
+    const dockTotalPrice = document.getElementById('dock-total-price');
+    const dock = document.getElementById('cart-thumb-dock');
+
+    function updateCartDisplay() {
+      if (dockItemCount && dockTotalPrice) {
+        dockItemCount.textContent = `${cartCount} ${cartCount === 1 ? 'Item' : 'Items'}`;
+        dockTotalPrice.textContent = `USh ${cartTotal.toLocaleString()}`;
+      }
+      if (dock) {
+        dock.classList.add('scale-[1.02]');
+        setTimeout(() => dock.classList.remove('scale-[1.02]'), 150);
+      }
+    }
+
+    // Add / Customize micro-interactions
+    document.querySelectorAll('.add-dish-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const price = parseInt(btn.dataset.dishPrice || '0', 10);
+        cartCount += 1;
+        cartTotal += price;
+        updateCartDisplay();
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span><span>Added</span>';
+        btn.classList.add('bg-tertiary-container', 'text-on-tertiary-container');
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.classList.remove('bg-tertiary-container', 'text-on-tertiary-container');
+        }, 900);
+      });
+    });
+
+    // Real-time Search Filter
+    function filterDishes(query) {
+      const q = query.trim().toLowerCase();
+      let visibleCount = 0;
+
+      dishCards.forEach(card => {
+        const text = (card.dataset.tags || '') + ' ' + card.innerText.toLowerCase();
+        if (!q || text.includes(q)) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      if (countDisplay) {
+        countDisplay.textContent = `${visibleCount} ${visibleCount === 1 ? 'PLATE' : 'PLATES'}`;
+      }
+
+      if (noResults) {
+        if (visibleCount === 0) {
+          noResults.classList.remove('hidden');
+          noResults.classList.add('flex');
+        } else {
+          noResults.classList.add('hidden');
+          noResults.classList.remove('flex');
+        }
+      }
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (clearBtn) {
+          if (val.length > 0) {
+            clearBtn.classList.remove('hidden');
+          } else {
+            clearBtn.classList.add('hidden');
+          }
+        }
+        filterDishes(val);
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.focus();
+        }
+        clearBtn.classList.add('hidden');
+        filterDishes('');
+      });
+    }
+
+    // Category Pill filtering
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pills.forEach(p => {
+          p.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+          p.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+        });
+        pill.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+        pill.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+
+        const cat = pill.dataset.cat;
+        if (searchInput) {
+          searchInput.value = '';
+          if (clearBtn) clearBtn.classList.add('hidden');
+        }
+
+        if (cat === 'combos') {
+          filterDishes('');
+        } else if (cat === 'grills') {
+          filterDishes('chicken');
+        } else if (cat === 'luwombo') {
+          filterDishes('luwombo');
+        } else if (cat === 'rolex') {
+          filterDishes('rolex');
+        } else if (cat === 'juices') {
+          filterDishes('juice');
+        }
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-[#F9F8F6]/95 border-t border-[#E5E0D8] backdrop-blur-xl shadow-[0_-1px_12px_rgba(34,26,24,0.05)]" data-active-classes="text-[#B83817] font-bold"><div class="flex justify-around items-center h-16 px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-12 transition-colors text-[#B83817] font-bold" data-path="storefront-menu" href="customer-storefront-mobile.html"><span class="material-symbols-outlined text-[22px]">restaurant_menu</span><span class="text-[12px]">Menu</span></a><a class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-12 text-[#4A4744] hover:text-[#1A1918] transition-colors" data-path="combos-and-rolex" href="customer-storefront-mobile.html"><span class="material-symbols-outlined text-[22px]">local_fire_department</span><span class="text-[12px]">Grill Specials</span></a><a class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-12 text-[#4A4744] hover:text-[#1A1918] transition-colors" data-path="track-order" href="tracker-invalid-token.html"><span class="material-symbols-outlined text-[22px]">receipt_long</span><span class="text-[12px]">Track</span></a><a class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] h-12 text-[#4A4744] hover:text-[#1A1918] transition-colors" data-path="dine-in" href="dine-in-table.html"><span class="material-symbols-outlined text-[22px]">table_restaurant</span><span class="text-[12px]">Dine-in</span></a></div></nav></body></html>

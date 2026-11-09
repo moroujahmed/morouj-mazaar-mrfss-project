@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin staff — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Admin staff" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="admin" data-screen="Admin staff">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Operations console · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success">Store open</span>
+        <span class="pill">admin</span>
+      </div>
+    </div>
+  </header>
+  <div class="wrap" style="display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;padding-block:24px" data-layout="admin">
+    <aside>
+      <div class="card card-flat card-pad" style="margin-bottom:12px">
+        <div class="tiny muted">Signed in</div>
+        <strong>Amina N.</strong>
+        <div class="tiny muted">General manager · 12 h session</div>
+      </div>
+      <nav aria-label="Admin sections" class="stack" style="gap:4px">
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-orders.html"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>Orders</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-menu.html"><span class="material-symbols-outlined" aria-hidden="true">restaurant_menu</span>Menu</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-settings.html"><span class="material-symbols-outlined" aria-hidden="true">tune</span>Settings</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-ledger.html"><span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>Cash ledger</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-reports.html"><span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>Reports</a>
+    <a class="btn btn-primary" style="justify-content:flex-start" href="admin-staff.html"><span class="material-symbols-outlined" aria-hidden="true">badge</span>Staff</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-audit.html"><span class="material-symbols-outlined" aria-hidden="true">history</span>Audit log</a>
+  </nav>
+    </aside>
+    <main id="main" class="stack">
+      <div class="row-between">
+        <div><h1>Staff</h1><p class="muted small">Accounts, roles, vehicle plates and lockouts.</p></div>
+      </div>
+      
+  <div class="row-between" style="flex-wrap:wrap">
+    <div class="row"><span class="pill pill-success"><span class="dot" aria-hidden="true"></span>4 active</span><span class="pill">1 admin</span><span class="pill">1 kitchen</span><span class="pill">2 riders</span></div>
+    <button class="btn btn-primary btn-sm">Add staff member</button>
+  </div>
+
+  <div class="notice notice-warning" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <div><strong>The last admin cannot be demoted</strong><p class="small" style="margin-top:2px">The system blocks removing or demoting the final ADMIN account. Every role change is audited.</p></div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <caption class="sr-only">Staff accounts</caption>
+      <thead><tr><th scope="col">Name</th><th scope="col">Phone</th><th scope="col">Role</th><th scope="col">Vehicle</th><th scope="col">Status</th><th scope="col">Last login</th><th scope="col"></th></tr></thead>
+      <tbody>
+        <tr><td><strong>Amina Nakato</strong><div class="tiny muted">You</div></td><td class="mono">+256 700 882 119</td><td><span class="pill pill-brand"><span class="dot" aria-hidden="true"></span>ADMIN</span></td><td class="muted">—</td><td><span class="pill pill-success"><span class="dot" aria-hidden="true"></span>Active</span></td><td>Today 09:12</td><td><button class="btn btn-sm btn-secondary">Edit</button></td></tr>
+        <tr><td><strong>Peter Okello</strong></td><td class="mono">+256 772 000 222</td><td><span class="pill "><span class="dot" aria-hidden="true"></span>KITCHEN</span></td><td class="muted">—</td><td><span class="pill pill-success"><span class="dot" aria-hidden="true"></span>Active</span></td><td>Today 10:00</td><td><button class="btn btn-sm btn-secondary">Edit</button></td></tr>
+        <tr><td><strong>Juma Mukasa</strong></td><td class="mono">+256 772 000 333</td><td><span class="pill "><span class="dot" aria-hidden="true"></span>RIDER</span></td><td class="mono">UFD 342B</td><td><span class="pill pill-success"><span class="dot" aria-hidden="true"></span>On shift</span></td><td>Today 10:00</td><td><button class="btn btn-sm btn-secondary">Edit</button></td></tr>
+        <tr><td><strong>Alex Wandera</strong></td><td class="mono">+256 772 000 444</td><td><span class="pill "><span class="dot" aria-hidden="true"></span>RIDER</span></td><td class="mono">UFD 881M</td><td><span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>Locked 14:32</span></td><td>Today 08:41</td><td><button class="btn btn-sm btn-secondary">Reset lock</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <section class="card card-pad stack">
+      <h2>Reset a staff PIN</h2>
+      <p class="small secondary">You set a new 6-digit PIN and hand it over in person. The staff member must change it at next login.</p>
+      <div class="field"><label>Staff member</label><select class="select"><option>Alex Wandera — Rider</option><option>Juma Mukasa — Rider</option><option>Peter Okello — Kitchen</option></select></div>
+      <div class="field"><label>New 6-digit PIN</label><input class="input" type="password" id="new-pin" name="new-pin" value="" placeholder="••••••" inputmode="numeric" maxlength="6" /><span class="help">Never send this by SMS or WhatsApp.</span></div>
+      <button class="btn btn-primary">Reset PIN</button>
+    </section>
+
+    <section class="card card-pad stack">
+      <h2>Lockouts</h2>
+      <div class="row-between small"><span>Alex Wandera</span><strong>Locked until 14:32</strong></div>
+      <div class="row-between small"><span>Failed attempts</span><strong>3 of 3</strong></div>
+      <p class="tiny muted">A dispatcher cannot bypass a lock. Only an admin can clear it, and the reset is logged with the admin’s account.</p>
+      <button class="btn btn-secondary">Clear Alex’s lockout</button>
+    </section>
+  </div>
+
+    </main>
+  </div>
+</body>
+</html>

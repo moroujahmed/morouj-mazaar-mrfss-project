@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Item customiser — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Item customiser" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="customer" data-screen="Item customiser">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="customer-storefront-mobile.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Whole Tilapia Flame Combo</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-success"><span class="dot" aria-hidden="true"></span>In stock</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="card card-flat" style="overflow:hidden">
+    <div style="height:170px;background:#e9e4db;display:flex;align-items:center;justify-content:center">
+      <span class="material-symbols-outlined" style="font-size:50px;color:var(--ink-muted)" aria-hidden="true">restaurant</span>
+    </div>
+    <div class="card-pad stack">
+      <h1 style="font-size:21px">Whole Tilapia Flame Combo</h1>
+      <p class="small secondary">Charcoal-grilled Lake Victoria tilapia, hand-cut chips, slaw and a passion juice.</p>
+      <div class="row-between"><strong class="money">USh 32,000</strong><span class="pill">Serves 1–2</span></div>
+    </div>
+  </div>
+
+  <fieldset class="card card-pad stack">
+    <legend class="label">Choose a side</legend>
+    <label class="row"><input type="radio" name="side" checked /> Hand-cut chips <span class="tiny muted">included</span></label>
+    <label class="row"><input type="radio" name="side" /> Steamed matooke <span class="tiny muted">included</span></label>
+    <label class="row"><input type="radio" name="side" /> Extra greens <span class="tiny muted">included</span></label>
+  </fieldset>
+
+  <fieldset class="card card-pad stack">
+    <legend class="label">Add extras</legend>
+    <label class="row"><input type="checkbox" checked /> Extra garlic pepper dip <span class="money" style="margin-left:auto">USh 2,000</span></label>
+    <label class="row"><input type="checkbox" /> Extra chapati <span class="money" style="margin-left:auto">USh 1,000</span></label>
+    <label class="row"><input type="checkbox" /> Upgrade juice to 1 litre <span class="money" style="margin-left:auto">USh 3,000</span></label>
+  </fieldset>
+
+  <fieldset class="card card-pad stack">
+    <legend class="label">Drink</legend>
+    <label class="row"><input type="radio" name="drink" checked /> Fresh passion juice <span class="tiny muted">included</span></label>
+    <label class="row"><input type="radio" name="drink" /> Bottled water <span class="tiny muted">included</span></label>
+    <label class="row"><input type="radio" name="drink" /> No drink <span class="tiny muted">−USh 5,000</span></label>
+  </fieldset>
+
+  <div class="notice notice-info" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div><strong>Allergens</strong><p class="small" style="margin-top:2px">Contains fish. Prepared in a kitchen that also handles peanuts, gluten and dairy. Ask a server before ordering if you have a severe allergy.</p></div>
+  </div>
+
+  <div class="card card-pad stack">
+    <div class="row-between"><span class="muted">Item total</span><strong class="money" style="font-size:20px">USh 34,000</strong></div>
+    <p class="tiny muted">Packaging (USh 1,000) and delivery are added in the basket. This is not the final order total.</p>
+    <div class="row">
+      <div class="row">
+        <button class="btn btn-sm btn-secondary" aria-label="Decrease quantity">−</button>
+        <strong class="money" style="min-width:28px;text-align:center">1</strong>
+        <button class="btn btn-sm btn-secondary" aria-label="Increase quantity">+</button>
+      </div>
+      <a class="btn btn-primary" href="customer-cart.html" style="margin-left:auto">Add to basket — USh 34,000</a>
+    </div>
+  </div>
+</main>
+</div>
+</body>
+</html>

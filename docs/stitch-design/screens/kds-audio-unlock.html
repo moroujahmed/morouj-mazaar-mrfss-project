@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KDS sound unlock — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="KDS sound unlock" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="kitchen" data-screen="KDS sound unlock">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--surface-ground)">
+    <main id="main" class="card card-pad stack" style="max-width:420px;text-align:center">
+      <div style="width:76px;height:76px;border-radius:999px;background:#fbe3de;color:var(--brand-action);display:flex;align-items:center;justify-content:center;margin:0 auto">
+        <span class="material-symbols-outlined" style="font-size:38px" aria-hidden="true">notifications_active</span>
+      </div>
+      <h1 style="font-size:24px">Tap to start the shift</h1>
+      <p class="small secondary">Browsers block sound until you interact with the page. Tapping once unlocks the dual-tone chime for incoming orders and starts your shift.</p>
+      <div class="inset stack" style="gap:6px;text-align:left">
+        <div class="row-between small"><span class="muted">Operator</span><strong>Peter O.</strong></div>
+        <div class="row-between small"><span class="muted">Station</span><strong>Nakawa hub · grill</strong></div>
+        <div class="row-between small"><span class="muted">Chime</span><strong>880 Hz → 1760 Hz, repeats every 15 s</strong></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="document.getElementById('unlocked').hidden=false;this.hidden=true">Enable sound &amp; start shift</button>
+      <div id="unlocked" class="notice notice-success" role="status" hidden>
+        <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
+        <div><strong>Sound enabled</strong><p class="small">You can now leave this screen. The chime stops when a ticket is acknowledged.</p></div>
+      </div>
+      <a class="btn btn-secondary btn-block" href="kds.html">Continue with sound off</a>
+      <p class="tiny muted">If the tablet reboots, this screen appears again. No order is accepted until the shift starts.</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

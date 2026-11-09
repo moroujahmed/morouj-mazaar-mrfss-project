@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin order detail — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Admin order detail" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="" data-portal="admin" data-screen="Admin order detail">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="appbar">
+    <div class="wrap appbar-inner">
+      <a class="brand" href="customer-storefront.html" aria-label="Bazaar Flame and Grill home">
+        <span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined" style="font-size:20px">local_fire_department</span></span>
+        <span>Bazaar Flame &amp; Grill<span class="brand-sub">Operations console · Kampala</span></span>
+      </a>
+      <div class="row">
+        <span class="pill pill-success">Store open</span>
+        <span class="pill">admin</span>
+      </div>
+    </div>
+  </header>
+  <div class="wrap" style="display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;padding-block:24px" data-layout="admin">
+    <aside>
+      <div class="card card-flat card-pad" style="margin-bottom:12px">
+        <div class="tiny muted">Signed in</div>
+        <strong>Amina N.</strong>
+        <div class="tiny muted">General manager · 12 h session</div>
+      </div>
+      <nav aria-label="Admin sections" class="stack" style="gap:4px">
+    <a class="btn btn-primary" style="justify-content:flex-start" href="admin-orders.html"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>Orders</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-menu.html"><span class="material-symbols-outlined" aria-hidden="true">restaurant_menu</span>Menu</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-settings.html"><span class="material-symbols-outlined" aria-hidden="true">tune</span>Settings</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-ledger.html"><span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>Cash ledger</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-reports.html"><span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>Reports</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-staff.html"><span class="material-symbols-outlined" aria-hidden="true">badge</span>Staff</a>
+    <a class="btn btn-secondary" style="justify-content:flex-start" href="admin-audit.html"><span class="material-symbols-outlined" aria-hidden="true">history</span>Audit log</a>
+  </nav>
+    </aside>
+    <main id="main" class="stack">
+      <div class="row-between">
+        <div><h1>Order #1042</h1><p class="muted small">Sarah Namukasa · Nakasero · prepaid delivery.</p></div>
+      </div>
+      
+  <div class="row-between" style="flex-wrap:wrap">
+    <div class="row"><span class="pill mono">#1042</span><span class="pill pill-warning"><span class="dot" aria-hidden="true"></span>CLAIMED</span><span class="pill">Delivery</span></div>
+    <div class="row"><a class="btn btn-sm btn-secondary" href="admin-orders.html">Back to orders</a><a class="btn btn-sm btn-secondary" href="tracker.html">Customer view</a></div>
+  </div>
+
+  <div class="grid-2">
+    <section class="card card-pad stack">
+      <h2>Customer and delivery</h2>
+      <div class="row-between small"><span class="muted">Name</span><strong>Sarah Namukasa</strong></div>
+      <div class="row-between small"><span class="muted">Phone</span><strong class="mono">+256 772 000 111</strong></div>
+      <div class="row-between small"><span class="muted">Address</span><strong>Plot 14 Lumumba Ave, Nakasero</strong></div>
+      <div class="row-between small"><span class="muted">Note</span><span>Gate 2, call on arrival</span></div>
+      <div class="row-between small"><span class="muted">Road distance</span><strong>1.562 km</strong></div>
+      <div class="row-between small"><span class="muted">Payment</span><strong>Prepaid · MTN MoMo</strong></div>
+      <hr class="divider" />
+      <a class="btn btn-secondary btn-sm" href="admin-orders.html">Edit contact or pin</a>
+    </section>
+
+    <section class="card card-pad stack">
+      <h2>Handover PIN</h2>
+      <div class="row-between"><span class="muted">PIN</span><strong class="mono">••••</strong></div>
+      <div class="row-between small"><span class="muted">Attempts used</span><strong>0 of 3</strong></div>
+      <div class="row-between small"><span class="muted">Locked</span><strong>No</strong></div>
+      <p class="small secondary">The PIN is shown only in the customer tracker. Admins can reset it, never read it aloud from this screen.</p>
+      <button class="btn btn-secondary btn-sm">Reset handover PIN</button>
+      <p class="tiny muted">A reset is recorded in the audit log with your account and a reason.</p>
+    </section>
+  </div>
+
+  <section class="card card-pad stack">
+    <h2>Order lines</h2>
+    <div class="row-between small"><span>1× Whole Tilapia Flame Combo</span><span class="money">USh 32,000</span></div>
+    <div class="row-between small"><span>1× Extra Garlic Pepper Dip</span><span class="money">USh 2,000</span></div>
+    <div class="row-between small"><span>Packaging</span><span class="money">USh 1,000</span></div>
+    <div class="row-between small"><span>Delivery · 1.562 km · Tier 1</span><span class="money">USh 0</span></div>
+    <hr class="divider" />
+    <div class="row-between"><strong>Total</strong><strong class="money" style="font-size:18px">USh 35,000</strong></div>
+    <div class="row-between tiny muted"><span>Payment reference</span><span class="mono">MOMO-94182</span></div>
+  </section>
+
+  <section class="card card-pad stack">
+    <h2>Fulfilment</h2>
+    <div class="timeline">
+      <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Paid</strong><div class="small muted">12:35 EAT · MTN MoMo webhook verified</div></div></div>
+      <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Preparing</strong><div class="small muted">12:36 EAT · accepted by kitchen</div></div></div>
+      <div class="timeline-step is-done"><span class="timeline-dot">✓</span><div><strong>Ready for pickup</strong><div class="small muted">12:47 EAT · seal #0941</div></div></div>
+      <div class="timeline-step is-current"><span class="timeline-dot">4</span><div><strong>Claimed by Juma M.</strong><div class="small muted">12:58 EAT · waiting for start trip</div></div></div>
+    </div>
+  </section>
+
+  <section class="card card-pad stack">
+    <h2>Admin overrides</h2>
+    <p class="small secondary">Every override requires a reason and is written to the audit log. Prefer the normal flow.</p>
+    <div class="grid-2">
+      <button class="btn btn-secondary">Reassign rider</button>
+      <button class="btn btn-danger">Cancel order</button>
+      <button class="btn btn-secondary">Force complete</button>
+      <button class="btn btn-secondary">Request refund</button>
+    </div>
+    <div class="notice notice-warning" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <div><strong>Force complete bypasses the PIN</strong><p class="small" style="margin-top:2px">Use only when the customer confirms receipt but the PIN cannot be entered. It raises a security flag for review.</p></div>
+  </div>
+  </section>
+
+    </main>
+  </div>
+</body>
+</html>

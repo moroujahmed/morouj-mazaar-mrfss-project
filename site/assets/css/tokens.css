@@ -1,65 +1,65 @@
 /* ==========================================================================
    MOROUJ MAZAAR — DESIGN TOKENS
-   Palette: deep green / flame orange / white / light gray / alert red
+   Palette: terracotta #B83817 / linen #F9F8F6 / white / warm neutrals / alert red
    All body-text pairs meet WCAG 2.2 AA (>= 4.5:1).
    ========================================================================== */
 
 :root {
-  /* Brand green ---------------------------------------------------------- */
-  --green-950: #0b241e;
-  --green-900: #102e27;
-  --green-800: #173f35; /* primary */
-  --green-700: #1d4f42;
-  --green-600: #276354;
-  --green-200: #c7d8d2;
-  --green-100: #e4edea;
-  --green-50: #f2f7f5;
+  /* Brand terracotta (normative ACCESSIBILITY.md palette) ----------------- */
+  --green-950: #1a1918;
+  --green-900: #1a1918;
+  --green-800: #b83817; /* primary action */
+  --green-700: #a63312; /* hover / pressed */
+  --green-600: #a63312;
+  --green-200: #e5e0d8;
+  --green-100: #efece6;
+  --green-50: #f9f8f6;
 
-  /* Flame orange --------------------------------------------------------- */
-  --orange-700: #a65a0f; /* orange as text on light surfaces: 5.13:1 */
-  --orange-600: #c96f12;
-  --orange-500: #f28c28; /* accent fills; use green text (4.76:1) */
-  --orange-400: #f5a04a;
-  --orange-200: #fbd6ad;
-  --orange-100: #fdebd7;
-  --orange-50: #fef6ec;
+  /* Decorative flame accent ---------------------------------------------- */
+  --orange-700: #b83817; /* terracotta text on light surfaces: 5.47:1 */
+  --orange-600: #b83817;
+  --orange-500: #d84a26; /* decorative fills only; never body text */
+  --orange-400: #d84a26;
+  --orange-200: #f3c6bc;
+  --orange-100: #fbe3de;
+  --orange-50: #fdf1ee;
 
   /* Neutrals ------------------------------------------------------------- */
   --white: #ffffff;
-  --gray-50: #f8faf9;
-  --gray-100: #f2f4f3; /* secondary background */
-  --gray-200: #e5eae8;
-  --gray-300: #d2dad7;
-  --gray-400: #a8b5b0;
-  --gray-500: #6b7b75; /* decorative only — 4.45:1 on white */
-  --gray-600: #52635d; /* muted text — 6.36:1 on white */
-  --gray-700: #3c4c46;
-  --ink: #0f241f; /* primary text — 16.25:1 on white */
+  --gray-50: #f9f8f6; /* linen page ground */
+  --gray-100: #efece6; /* inset / secondary background */
+  --gray-200: #e5e0d8;
+  --gray-300: #d9d3c9;
+  --gray-400: #a8a29a;
+  --gray-500: #6b6763; /* muted text: 5.28:1 on linen */
+  --gray-600: #4a4744; /* secondary text: 8.69:1 on linen */
+  --gray-700: #2e2a27;
+  --ink: #1a1918; /* primary text: 16.54:1 on linen */
 
   /* Semantic ------------------------------------------------------------- */
-  --red-700: #a51f1f;
-  --red-600: #c62828; /* errors / critical */
-  --red-100: #fad7d7;
-  --red-50: #fdecec;
+  --red-700: #b91c1c;
+  --red-600: #b91c1c; /* errors / critical */
+  --red-100: #fee2e2;
+  --red-50: #fdf1f1;
 
-  --success-700: #17603f;
-  --success-600: #1e6b4b;
-  --success-50: #e7f4ee;
+  --success-700: #1b5e3b;
+  --success-600: #1b5e3b;
+  --success-50: #e8f5e9;
 
-  --warning-700: #8a4b00;
-  --warning-50: #fff3e0;
+  --warning-700: #92400e;
+  --warning-50: #fef3c7;
 
-  --info-700: #1d4e89;
-  --info-50: #eaf2fb;
+  --info-700: #4a4744;
+  --info-50: #efece6;
 
   /* Surfaces & lines ----------------------------------------------------- */
-  --surface-page: var(--white);
+  --surface-page: #f9f8f6;
   --surface-subtle: var(--gray-100);
   --surface-card: var(--white);
-  --surface-dark: var(--green-800);
-  --border: #dfe6e3;
-  --border-strong: var(--green-200);
-  --border-dark: rgba(255, 255, 255, 0.16);
+  --surface-dark: var(--ink);
+  --border: #e5e0d8;
+  --border-strong: var(--gray-300);
+  --border-dark: rgba(255, 255, 255, 0.16)
 
   /* Type ----------------------------------------------------------------- */
   --font-heading: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -101,10 +101,10 @@
   --radius-pill: 999px;
 
   /* Elevation ------------------------------------------------------------ */
-  --shadow-xs: 0 1px 2px rgba(15, 36, 31, 0.06);
-  --shadow-sm: 0 2px 6px rgba(15, 36, 31, 0.06), 0 1px 2px rgba(15, 36, 31, 0.04);
-  --shadow-md: 0 10px 24px -12px rgba(15, 36, 31, 0.22), 0 2px 6px rgba(15, 36, 31, 0.05);
-  --shadow-lg: 0 24px 48px -20px rgba(15, 36, 31, 0.28), 0 8px 18px -12px rgba(15, 36, 31, 0.14);
+  --shadow-xs: 0 1px 2px rgba(26, 25, 24, 0.06);
+  --shadow-sm: 0 2px 6px rgba(26, 25, 24, 0.06), 0 1px 2px rgba(26, 25, 24, 0.04);
+  --shadow-md: 0 10px 24px -12px rgba(26, 25, 24, 0.22), 0 2px 6px rgba(26, 25, 24, 0.05);
+  --shadow-lg: 0 24px 48px -20px rgba(26, 25, 24, 0.28), 0 8px 18px -12px rgba(26, 25, 24, 0.14);
   --shadow-orange: 0 10px 22px -10px rgba(242, 140, 40, 0.55);
 
   /* Layout --------------------------------------------------------------- */
@@ -121,7 +121,7 @@
   --duration-slow: 320ms;
 
   /* Focus ---------------------------------------------------------------- */
-  --focus-color: var(--green-800);
+  --focus-color: var(--ink);
   --focus-width: 3px;
   --focus-offset: 3px;
 
@@ -138,7 +138,7 @@
   --ink: var(--white);
   --gray-600: #cfded9;
   --gray-700: #e4edea;
-  --focus-color: var(--orange-500);
+  --focus-color: var(--gray-50);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -160,7 +160,7 @@ erDiagram
 Singleton row (`id = 1`). Includes:
 
 - Restaurant name, coordinates, support WhatsApp.
-- `free_delivery_radius_km` (5.0), `rate_per_excess_km` (1,500), `max_delivery_radius_km` (15.0), `cod_max_radius_km` (8.0).
+- `free_delivery_radius_km` (5.0), `rate_per_excess_km` (1,500), `max_delivery_radius_km` (15.0), `cod_max_radius_km` (8.1).
 - `minimum_order_value` (20,000), `minimum_order_value_dine_in` (0).
 - `packaging_fee_default` (1,000), `packaging_fee_dine_in` (0).
 - `is_store_open`, `opening_time`, `closing_time`, `timezone`.

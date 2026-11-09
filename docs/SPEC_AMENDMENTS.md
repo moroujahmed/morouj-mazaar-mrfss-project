@@ -3,7 +3,7 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative. Supersedes conflicting text in the v1.0 specification set. |
-| **Version** | 1.1.0 |
+| **Version** | 1.1.1 |
 | **Date** | 2026-10-29 |
 | **Precedence** | `DECISIONS.md` → `CANONICAL_EXAMPLES.md` → `API_CONTRACTS.md` / `ERD.md` / `ACCESSIBILITY.md` → this file → the original 10 documents |
 
@@ -193,6 +193,13 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - Kitchen bump marks `DELIVERED`; no rider, no handover PIN gate, no delivery fee, no packaging fee.
 - Table QR token is an unguessable UUID validated by `validate_table_token`.
 
+### 4.9 COD radius ceiling (supersedes "8.0 km" in the v1.0 documents)
+
+- The COD maximum radius is **8.1 km**, stored as `app_settings.cod_max_radius_km`.
+- Reason: the verified canonical Ntinda COD fixture is **8.093 km**. A strict 8.0 km ceiling contradicts the canonical example and would force a valid COD order to be prepaid.
+- Eligibility rule: COD is offered when `road_distance_m <= 8100`. Prepaid delivery remains capped at 15.0 km.
+- All worked examples, settings screens, audit copy and mockups must use **8.1 km**. The old `8.0 km` figure is retired.
+
 ---
 
 ## 5. Document Control
@@ -211,3 +218,4 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 | Version | Date | Change |
 | :--- | :--- | :--- |
 | 1.1.0 | 2026-10-29 | Created; closes P0/P1 specification gaps and records technical amendments. |
+| 1.1.1 | 2026-11-07 | Aligns the COD radius ceiling to 8.1 km so the canonical 8.093 km Ntinda COD fixture is valid. |

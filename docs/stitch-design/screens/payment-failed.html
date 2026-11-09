@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment failed — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Payment failed" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="customer" data-screen="Payment failed">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="customer-storefront-mobile.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Payment failed</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="notice notice-danger" role="alert">
+    <span class="material-symbols-outlined" aria-hidden="true">error</span>
+    <div><strong>Payment was not completed</strong><p class="small" style="margin-top:2px">The mobile money provider declined the request. Your order has not been sent to the kitchen and you have not been charged.</p></div>
+  </div>
+  <div class="card card-pad stack">
+    <h1 style="font-size:22px">Try again</h1>
+    <div class="row-between small"><span class="muted">Reason</span><strong>Insufficient funds</strong></div>
+    <div class="row-between small"><span class="muted">Reference</span><strong class="mono">MOMO-94182</strong></div>
+    <div class="row-between"><strong>Amount</strong><strong class="money">USh 35,000</strong></div>
+    <hr class="divider" />
+    <p class="small secondary">You can retry with the same method, or choose a different payment method. The basket is unchanged.</p>
+  </div>
+  <div class="card card-pad stack">
+  <div class="row-between"><h2>Order summary</h2><span class="pill">#1042</span></div>
+  <div class="row-between small"><span>Whole Tilapia Flame Combo</span><span class="money">USh 32,000</span></div>
+  <div class="row-between small"><span>Extra Garlic Pepper Dip</span><span class="money">USh 2,000</span></div>
+  <div class="row-between small"><span>Packaging</span><span class="money">USh 1,000</span></div>
+  <div class="row-between small"><span>Delivery · 1.562 km · Tier 1</span><strong class="money">USh 0</strong></div>
+  <hr class="divider" />
+  <div class="row-between"><strong>Total due</strong><strong class="money" style="font-size:20px">USh 35,000</strong></div>
+</div>
+</main>
+<div class="bottom-dock">
+  <a class="btn btn-primary btn-block" href="payment-pending.html" >Retry MTN MoMo payment</a>
+  <a class="btn btn-secondary btn-block" style="margin-top:8px" href="checkout.html">Change payment method</a>
+</div>
+</div>
+</body>
+</html>

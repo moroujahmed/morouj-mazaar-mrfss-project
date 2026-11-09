@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rider — delivery failed — Bazaar Flame &amp; Grill</title>
+  <meta name="description" content="Rider — delivery failed" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/tailwind.css" />
+  <link rel="stylesheet" href="../assets/app.css" />
+</head>
+<body class="phone-page" data-portal="rider" data-screen="Rider — delivery failed">
+  <a class="skip-link" href="#main">Skip to main content</a>
+<div class="phone">
+  <header class="phone-bar">
+    <div class="row-between" style="padding:12px 16px">
+      <div class="row">
+        <a class="btn btn-icon btn-secondary" href="rider-pool.html" aria-label="Back"><span class="material-symbols-outlined">arrow_back</span></a>
+        <div>
+          <span style="display:block;font-size:17px">Report a problem</span>
+          <span class="tiny muted">Bazaar Flame &amp; Grill</span>
+        </div>
+      </div>
+      <span class="pill pill-danger"><span class="dot" aria-hidden="true"></span>Report</span>
+    </div>
+  </header>
+<main id="main" class="stack" style="padding:16px 16px 120px">
+  <div class="notice notice-warning" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <div><strong>Only report after you have tried to hand over</strong><p class="small" style="margin-top:2px">The manager is notified immediately and the order returns to the kitchen. False reports are visible in the audit log.</p></div>
+  </div>
+  <div class="card card-pad stack">
+    <h1 style="font-size:20px">#1042 · Sarah N.</h1>
+    <div class="row-between small"><span class="muted">Address</span><strong>Plot 14 Lumumba Ave, Nakasero</strong></div>
+    <div class="row-between small"><span class="muted">Attempts</span><strong>2 calls · 1 gate wait</strong></div>
+  </div>
+
+  <fieldset class="card card-pad stack">
+    <legend class="label">What happened?</legend>
+    <label class="row"><input type="radio" name="reason" checked /> Customer unreachable</label>
+    <label class="row"><input type="radio" name="reason" /> Wrong or incomplete address</label>
+    <label class="row"><input type="radio" name="reason" /> Customer refused the order</label>
+    <label class="row"><input type="radio" name="reason" /> Safety issue at the location</label>
+    <label class="row"><input type="radio" name="reason" /> Other</label>
+  </fieldset>
+
+  <div class="field"><label>Notes for the manager</label><textarea class="textarea" placeholder="Gate was locked, called twice, security confirmed nobody home…"></textarea><span class="help">Do not include the customer PIN.</span></div>
+
+  <div class="panel stack">
+    <strong>What happens next</strong>
+    <p class="small secondary">The order becomes DELIVERY_FAILED. The manager calls the customer and decides whether to re-dispatch or refund. Return the sealed bag to the kitchen.</p>
+  </div>
+</main>
+</div>
+</body>
+</html>
