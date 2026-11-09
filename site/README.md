@@ -6,7 +6,7 @@
 | [`customer.html`](customer.html) | Menu, basket, checkout, payment and tracking |
 | [`kitchen.html`](kitchen.html) | Ticket queue, COD accept, bump, 86 toggles and print |
 | [`admin.html`](admin.html) | Analytics, orders, inventory, menu, delivery and reports |
-| [`rider.html`](rider.html) | Active delivery, PIN handover and offline-safe sync |
+| [`rider.html`](rider.html) | Active delivery, PIN handover and connection-required completion |
 | [`design-system.html`](design-system.html) | Tokens, components and contrast rules |
 
 Open `index.html` directly, or serve the folder:
