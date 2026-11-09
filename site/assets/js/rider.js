@@ -21,7 +21,6 @@
 
   const CONNECTION_KEY = "mm-rider-connection-v2";
   const PENDING_KEY = "mm-rider-pending-v2";
-  const QUEUE_KEY = "mm-rider-queue-v2";
   const PIN_CODE = "7310";
   const PIN_MAX_ATTEMPTS = 3;
   const PIN_LOCK_SECONDS = 20;
@@ -67,16 +66,16 @@
       arrive: "13:27",
       placed: "13:12",
       status: "Ready for pickup",
-      payment: "Airtel Money",
-      cod: false,
-      total: 33000,
+      payment: "Cash on delivery",
+      cod: true,
+      total: 27500,
       items: [
-        { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "" },
-        { name: "Special Bazaar Rolex", qty: 1, price: 8000, mods: "Extra chilli on the side" }
+        { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "Extra chilli on the side" },
+        { name: "Extra chilli", qty: 1, price: 1000, mods: "" }
       ],
       packaging: 1000,
-      delivery: 0,
-      note: "Extra chilli on the side."
+      delivery: 1500,
+      note: "Cash on delivery · Extra chilli on the side."
     }
   ];
 
@@ -113,7 +112,6 @@
   let state = {
     connection: storageGet(CONNECTION_KEY, "online"),
     pending: storageGet(PENDING_KEY, null),
-    queue: storageGet(QUEUE_KEY, []),
     onShift: true,
     delivered: false,
     delivery: null,
@@ -123,7 +121,6 @@
   };
 
   if (["online", "weak", "offline"].indexOf(state.connection) === -1) state.connection = "online";
-  if (!Array.isArray(state.queue)) state.queue = [];
   if (state.pending && state.pending.id !== currentOrder.id) state.pending = null;
 
   /* ---------------------------------------------------------------------
@@ -152,7 +149,7 @@
     shiftDeliveries: document.getElementById("shiftDeliveries"),
     shiftCash: document.getElementById("shiftCash"),
     shiftCashLabel: document.getElementById("shiftCashLabel"),
-    shiftQueue: document.getElementById("shiftQueue"),
+    shiftActive: document.getElementById("shiftActive"),
     shiftNote: document.getElementById("shiftNote"),
     riderSticky: document.getElementById("riderSticky"),
     pinSheet: document.getElementById("pinSheet"),
@@ -189,10 +186,6 @@
 
   function savePending() {
     storageSet(PENDING_KEY, state.pending);
-  }
-
-  function saveQueue() {
-    storageSet(QUEUE_KEY, state.queue);
   }
 
   function totalUnits(order) {
@@ -375,12 +368,15 @@
      --------------------------------------------------------------------- */
   function renderPool() {
     const openOrders = deliveryPool.filter(function (order) {
-      return order.id !== currentOrder.id && state.queue.indexOf(order.id) === -1;
+      return order.id !== currentOrder.id;
     });
+    const canClaim = state.onShift && state.delivered;
 
-    els.poolSub.textContent = state.onShift
-      ? "Ready for pickup · held for 10 minutes"
-      : "You are off shift. Go on shift to claim deliveries.";
+    els.poolSub.textContent = !state.onShift
+      ? "You are off shift. Go on shift to claim deliveries."
+      : state.delivered
+        ? "Ready for pickup · held for 10 minutes"
+        : "Finish your active delivery before claiming another.";
     els.poolCount.textContent = openOrders.length + " open";
 
     if (!deliveryPool.length) {
@@ -393,14 +389,11 @@
     els.poolList.innerHTML = deliveryPool
       .filter(function (order) { return order.id !== currentOrder.id; })
       .map(function (order) {
-        const queued = state.queue.indexOf(order.id) !== -1;
-        const claimLabel = queued ? "Up next in queue" : state.onShift ? "Claim delivery" : "Off shift";
+        const claimLabel = !state.onShift ? "Off shift" : state.delivered ? "Claim delivery" : "Finish active delivery";
         return (
-          '<article class="pool-card' + (queued ? " is-claimed" : "") + '">' +
+          '<article class="pool-card">' +
             '<div class="pool-top">' +
-              '<span class="badge ' + (queued ? "badge-success" : "badge-orange") + '">' +
-                icon(queued ? "check-circle" : "clock") + (queued ? "Claimed" : "Ready") +
-              "</span>" +
+              '<span class="badge badge-orange">' + icon("clock") + "Ready</span>" +
               '<span class="tiny muted">Ready ' + escapeHtml(order.placed) + "</span>" +
             "</div>" +
             "<h3>" + escapeHtml(order.area) + " · #" + escapeHtml(order.id) + "</h3>" +
@@ -412,9 +405,9 @@
               "<span>" + icon("banknote") + money(order.total) + "</span>" +
             "</div>" +
             '<p class="pool-note">' + icon("pin") + "<span>" + escapeHtml(order.note) + "</span></p>" +
-            '<button class="btn ' + (queued ? "btn-secondary" : "btn-primary") + '" type="button" data-claim="' +
-              escapeHtml(order.id) + '"' + (queued || !state.onShift ? " disabled" : "") + ">" +
-              icon(queued ? "check" : "plus") + claimLabel +
+            '<button class="btn btn-primary" type="button" data-claim="' +
+              escapeHtml(order.id) + '"' + (canClaim ? "" : " disabled") + ">" +
+              icon("plus") + claimLabel +
             "</button>" +
           "</article>"
         );
@@ -428,17 +421,15 @@
   function renderShift() {
     const pending = isPending();
     const activeCash = !state.delivered && currentOrder.cod ? currentOrder.total : 0;
-    const queuedCash = pending && state.pending.cod ? state.pending.amount : 0;
-    const cash = state.cashHeld + activeCash + queuedCash;
+    const pendingCash = pending && state.pending.cod ? state.pending.amount : 0;
+    const cash = state.cashHeld + activeCash + pendingCash;
     const cashLabel = pending || (!state.delivered && currentOrder.cod) ? "COD due" : "Cash held";
 
     els.shiftDeliveries.textContent = String(7 + state.deliveriesDone);
     els.shiftCashLabel.textContent = cashLabel;
     els.shiftCash.textContent = money(cash);
-    els.shiftQueue.textContent = String(state.queue.length);
-    els.shiftNote.textContent = state.queue.length
-      ? "Your next claimed delivery is waiting in the queue."
-      : "Cash handover is due at the end of your shift.";
+    els.shiftActive.textContent = state.delivered ? "None" : "#" + currentOrder.id;
+    els.shiftNote.textContent = "One active delivery at a time. Cash handover is due at the end of your shift.";
   }
 
   /* ---------------------------------------------------------------------
@@ -451,8 +442,6 @@
     }
 
     const delivery = state.delivery || {};
-    const nextId = state.queue.length ? state.queue[0] : null;
-    const nextOrder = nextId ? deliveryPool.find(function (item) { return item.id === nextId; }) : null;
 
     els.deliveredPanel.hidden = false;
     els.deliveredPanel.innerHTML =
@@ -470,12 +459,7 @@
         "<div><span>Amount</span><strong>" + money(delivery.amount || 0) + "</strong></div>" +
       "</div>" +
       '<div class="cluster cluster-3" style="justify-content:center;margin-top:18px">' +
-        (nextOrder
-          ? '<button class="btn btn-primary" type="button" data-start-next="' + escapeHtml(nextOrder.id) + '">' +
-              icon("arrow-right") + "Start #" + escapeHtml(nextOrder.id) + " · " + escapeHtml(nextOrder.area) +
-            "</button>"
-          : "") +
-        '<button class="btn btn-secondary" type="button" data-view-pool>View delivery pool</button>' +
+        '<button class="btn btn-primary" type="button" data-view-pool>View delivery pool</button>' +
       "</div>";
   }
 
@@ -812,27 +796,12 @@
     const order = deliveryPool.find(function (item) { return item.id === id; });
     if (!order) return;
 
-    if (state.delivered) {
-      startOrder(order);
+    if (!state.delivered) {
+      toast("Finish delivery #" + currentOrder.id + " before claiming another.", "error");
       return;
     }
 
-    if (state.queue.indexOf(id) !== -1) {
-      toast("Order #" + id + " is already in your queue.");
-      return;
-    }
-
-    if (state.queue.length >= 2) {
-      toast("Your queue is full. Finish a delivery before claiming another.", "error");
-      return;
-    }
-
-    state.queue.push(id);
-    saveQueue();
-    renderPool();
-    renderShift();
-    toast("Order #" + id + " added to your queue. Finish #" + currentOrder.id + " first.", "success");
-    haptic([20, 40, 20]);
+    startOrder(order);
   }
 
   function startOrder(order) {
@@ -841,18 +810,11 @@
     state.delivery = null;
     state.pending = null;
     state.status = "Assigned";
-    state.queue = state.queue.filter(function (id) { return id !== order.id; });
     savePending();
-    saveQueue();
     renderAll();
     toast("Delivery #" + order.id + " started. Navigate when you are ready.", "success");
     haptic([20, 40, 20]);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function startNextDelivery(id) {
-    const order = deliveryPool.find(function (item) { return item.id === id; });
-    if (order) startOrder(order);
   }
 
   function viewPool() {
@@ -901,12 +863,6 @@
     if (action) {
       if (action.getAttribute("data-pin-action") === "clear") clearPin();
       else deletePinDigit();
-      return;
-    }
-
-    const startNext = event.target.closest("[data-start-next]");
-    if (startNext) {
-      startNextDelivery(startNext.getAttribute("data-start-next"));
       return;
     }
 

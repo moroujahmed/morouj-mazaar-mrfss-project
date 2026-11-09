@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Approved v1.1 data model |
-| **Version** | 1.1.0 |
-| **Date** | 2026-10-29 |
+| **Status** | Normative data model |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
 | **Source of truth** | `supabase/migrations/20261029000000_initial_schema.sql` |
 
 ---
@@ -115,7 +115,7 @@ erDiagram
 | Column | Type | Notes |
 | :--- | :--- | :--- |
 | `id` | UUID PK | `gen_random_uuid()`. |
-| `order_number` | SERIAL UNIQUE | Human display (`#1042`). |
+| `order_number` | BIGINT identity UNIQUE | Human display (`#1042`). |
 | `order_token` | UUID UNIQUE | Public capability token. |
 | `order_type` | `order_type` | `DELIVERY` or `DINE_IN`. |
 | `source` | `order_source` | `WEB`, `TABLE_QR`, `ADMIN`. |
@@ -160,7 +160,7 @@ erDiagram
 Singleton row (`id = 1`). Includes:
 
 - Restaurant name, coordinates, support WhatsApp.
-- `free_delivery_radius_km` (5.0), `rate_per_excess_km` (1,500), `max_delivery_radius_km` (15.0), `cod_max_radius_km` (8.0).
+- `free_delivery_radius_km` (5.0), `rate_per_excess_km` (1,500), `max_delivery_radius_km` (15.0), `cod_max_radius_km` (8.1).
 - `minimum_order_value` (20,000), `minimum_order_value_dine_in` (0).
 - `packaging_fee_default` (1,000), `packaging_fee_dine_in` (0).
 - `is_store_open`, `opening_time`, `closing_time`, `timezone`.
@@ -244,4 +244,5 @@ stateDiagram-v2
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Aligned COD radius, order-number type, and version metadata with the migration. |
 | 1.1.0 | 2026-10-29 | Created as the v1.1 ERD/data dictionary. |

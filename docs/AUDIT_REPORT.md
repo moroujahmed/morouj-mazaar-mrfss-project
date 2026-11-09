@@ -2,92 +2,202 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Audit date** | 2026-10-29 |
-| **Remediation date** | 2026-10-29 |
+| **Audit date** | 2026-10-29 (v1.0); 2026-11-09 (v1.2 reconciliation) |
 | **Repository** | `morouj-mazaar-mrfss-project` |
-| **Scope** | v1.0 audit of the original 10 documents, followed by the v1.1 remediation and local database validation |
+| **Scope** | v1.0 audit of the original 10 documents, v1.1 specification remediation, and v1.2 reconciliation of every spec, document, schema reference, and the static `site/` prototype |
 | **Auditor** | Big Pickle (OpenCode coding agent) |
-| **Document status** | v1.1 — P0/P1 specification remediation complete; launch gated by founder inputs in §12 |
-| **Code present** | No application code. Schema, migrations, seed, config, scripts, and docs are present. |
+| **Document status** | v1.2 — all P0/P1/P2 findings closed at specification level; launch gated by founder inputs in §12 |
+| **Code present** | No application code. Schema, migrations, seed, config, scripts, docs, and the static `site/` prototype are present. |
 
-> **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1.1; the authoritative founder action register is §12; every file created or changed is in §13.
+> **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1; the authoritative founder action register is §12; every file created or changed in v1.2 is in §13. Where historical text quotes retired numbers, it is evidence, not a current contract. The normative numbers live in `CANONICAL_EXAMPLES.md`; the normative visual language lives in `DESIGN_SYSTEM_V2.md` and `ACCESSIBILITY.md`.
 
 ---
 
 ## 1. Executive Verdict
 
-### 1.1 v1.1 remediation verdict (current)
+### 1.1 v1.2 reconciliation verdict (current)
 
 The v1.0 documentation was **well above average** in product thinking, UX detail, business-rule clarity, and security intent. It was nevertheless **not build-ready**: it contained 10 P0 blockers and 50 P1 findings, including contradictions between authentication and RLS, unsafe public order access, a non-durable handover-PIN gate, a cash ledger that could not close, incorrect payment contracts, wrong distance/total fixtures, invalid seed UUIDs, and a false accessibility claim.
 
-The v1.1 baseline now:
+The v1.1 remediation closed the security/data foundation and most specification gaps, but the full v1.2 reconciliation found that the remediation still carried internal contradictions:
 
-- Resolves **9 of the 10 P0 findings** fully in the specification/schema and **contracts P0-10** (operations, legal, compliance) with a runbook, compliance checklist, and founder register.
-- Addresses **all 50 P1 findings** — 34 resolved in the specification/schema, 12 contracted to a named implementation phase, and 4 gated on founder accounts or hosting.
-- Adds a validated PostgreSQL schema, storage migration, deterministic seed, local Supabase config, staff-provisioning script, canonical fixtures, API contracts, ERD, test plan, accessibility baseline, operations runbook, and Uganda compliance checklist.
-- Removes the contradictions that would force rework in Phases 1–6.
+- P0-09 still prescribed the **retired terracotta palette** after the design system had moved to green/orange.
+- The portal count drifted between **six**, **three**, and **four**, and kitchen was simultaneously described as an admin tab and as a missing standalone portal.
+- Two design systems were both presented as normative.
+- The COD ceiling was **8.0 km** while the canonical Ntinda COD fixture is **8.093 km**, so the canonical example was ineligible.
+- The static prototype still contained a **rider next-job queue**, a prepaid `#1047` total of **33,000**, and a **64,000** ledger that contradicted the one-active-order rule and the canonical `#1047` COD total.
+- Several v1.1 documents still used stale three-portal/terracotta language, and the audit report itself remained at v1.1.
 
-**Build-readiness score: 9/10 — conditional.**
+The v1.2 baseline now:
 
-The score is conditional because the remaining gap is no longer specification ambiguity. It is **implementation plus founder inputs**: there is no Next.js application yet, no production credentials, no on-site verified coordinates, no approved menu/staff data, and no completed legal review. A competent team can start Phase 1 immediately without re-deciding the architecture, but checkout, payments, and launch cannot go live until §12 is closed.
+- Accounts for **all 11 P0 findings**: 10 resolved in the specification/schema and **P0-10** contracted to the founder inputs and legal review in §12.
+- Closes **all 50 P1 findings** - 34 resolved in the specification/schema, 12 contracted to a named implementation phase, and 4 gated on founder accounts/hosting.
+- Addresses **every P2 finding** through new documentation, schema hardening, explicit deferrals, or a named owner.
+- Makes `DESIGN_SYSTEM_V2.md` the sole visual authority: green/orange, four portals, WCAG 2.2 AA, and no white text on orange.
+- Adds the missing **Kitchen portal** as a first-class static prototype with oldest-first tickets, COD accept, bump, 86 toggles, busy mode, connection state, and a print docket.
+- Reconciles the prototype with the canonical fixtures: Sarah **35,000**, Brian **38,000**, Alex **8,000**, `#1047` **27,500** COD, and Juma's end-of-day ledger **65,500** (`#1043` 38,000 + `#1047` 27,500).
+- Removes the rider next-job queue; one active delivery per rider is now consistent across schema, docs, and UI.
+- Adds `ANALYTICS.md`, `BROWSER_SUPPORT.md`, `CHANGELOG.md`, `GLOSSARY.md`, `SEQUENCE_DIAGRAMS.md`, and root `SECURITY.md`.
+- Archives `docs/stitch-design/` and `site/ui-kit.html` as non-normative history instead of deleting them.
 
-#### Current scorecard
+No application code, dependency installation, or production build was performed. Validation was limited to static checks (`node --check`), repository scans, link verification, and SQL review; the v1.1 database validation remains the last executed database proof.
 
-| Area | v1.0 | v1.1 | Evidence |
-| :--- | :---: | :---: | :--- |
-| Product vision & scope | 9/10 | 9/10 | `SYSTEM_OVERVIEW.md` + `DECISIONS.md`; scope is explicit and bounded. |
-| UX & visual specification | 8/10 | 9/10 | `PORTALS_AND_UX_SPECIFICATION.md` + `ACCESSIBILITY.md`; false AAA claim removed. |
-| Business rules & FSM | 7/10 | 9/10 | `ERD.md` §4, `CANONICAL_EXAMPLES.md`, migration triggers/RPCs. |
-| Data model | 4/10 | 9/10 | `ERD.md` + validated migration + seed; all promised entities modeled. |
-| Security design | 3/10 | 9/10 | Deny-by-default RLS, token-scoped RPCs, durable PIN state, audit tables. |
-| Integration specifications | 4/10 | 9/10 | `API_CONTRACTS.md` + `DECISIONS.md` ADR-002/003/004/005/007. |
-| Test specification | 3/10 | 9/10 | `TEST_PLAN.md`; corrected fixtures, RLS matrix, Playwright blueprint. |
-| Documentation traceability | 5/10 | 9/10 | `SPEC_AMENDMENTS.md`, amendment banners, §13 change log. |
-| Operations & compliance | 2/10 | 8/10 | `OPERATIONS_RUNBOOK.md` + `COMPLIANCE_AND_LEGAL.md`; legal review open. |
-| **Specification / build readiness** | **2/10** | **9/10 (conditional)** | **Build can start; founder gates remain.** |
-| **Launch readiness** | n/a | **4/10** | Credentials, verified data, legal review, and live provider certification outstanding. |
+**Build-readiness score: 9.5/10 — conditional.**
 
-#### Why 9/10 and not 10/10
+The remaining 0.5 is **implementation and founder input**, not specification ambiguity: there is no Next.js application yet, no production credentials, no on-site verified coordinates, no approved menu/staff data, and no completed legal review. A competent team can start Phase 1 immediately without re-deciding the architecture, but checkout, payments, and launch cannot go live until §12 is closed.
+
+### 1.2 Current scorecard
+
+| Area | v1.0 | v1.1 | v1.2 | Evidence |
+| :--- | :---: | :---: | :---: | :--- |
+| Product vision & scope | 9/10 | 9/10 | 9/10 | `SYSTEM_OVERVIEW.md` + `DECISIONS.md`; scope is explicit and bounded. |
+| UX & visual specification | 8/10 | 9/10 | 10/10 | `PORTALS_AND_UX_SPECIFICATION.md`, `DESIGN_SYSTEM_V2.md`, `ACCESSIBILITY.md`; four portals and one palette. |
+| Business rules & FSM | 7/10 | 9/10 | 10/10 | `ERD.md` §4, `CANONICAL_EXAMPLES.md`, migration triggers/RPCs. |
+| Data model | 4/10 | 9/10 | 9/10 | `ERD.md` + validated migration + seed; all promised entities modeled. |
+| Security design | 3/10 | 9/10 | 9/10 | Deny-by-default RLS, token-scoped RPCs, durable PIN state, audit tables. |
+| Integration specifications | 4/10 | 9/10 | 9/10 | `API_CONTRACTS.md` + `DECISIONS.md` ADR-002/003/004/005/007. |
+| Test specification | 3/10 | 9/10 | 9/10 | `TEST_PLAN.md`; corrected fixtures, scenarios A–I, RLS matrix, Playwright blueprint. |
+| Documentation traceability | 5/10 | 9/10 | 10/10 | `SPEC_AMENDMENTS.md`, `CHANGELOG.md`, amendment banners, §13 change log. |
+| Operations & compliance | 2/10 | 8/10 | 8/10 | `OPERATIONS_RUNBOOK.md` + `COMPLIANCE_AND_LEGAL.md`; legal review open. |
+| **Specification / build readiness** | **2/10** | **9/10 (conditional)** | **9.5/10 (conditional)** | **Build can start; founder gates remain.** |
+| **Launch readiness** | n/a | **4/10** | **4/10** | Credentials, verified data, legal review, and live provider certification outstanding. |
+
+### 1.3 Why 9.5 and not 10
 
 1. No application code exists yet; Phase 1 scaffolding is the next engineering task.
 2. Production credentials and merchant accounts are not provisioned.
 3. Restaurant coordinates, menu, modifiers, combos, staff roster, printer, and assets are not founder-verified.
 4. The legal/tax/privacy documents are skeletons pending Ugandan counsel and accountant review.
 5. Payment, SMS, OSRM, MapTiler, and Upstash integrations have not been certified against live/sandbox accounts.
+6. The prototype is static HTML/CSS/JS; it proves flows and copy, not production security, performance, or integration behaviour.
 
 None of these is a specification contradiction. They are execution and business-input gates, tracked in §12.
 
-### 1.2 Historical v1.0 scorecard (superseded)
+### 1.4 P0 closure matrix
 
-The original verdict was: **not build-ready**, because of internal contradictions, unsafe or unimplementable details, and missing inputs. The original scorecard is retained for traceability.
+| ID | Finding | v1.2 resolution | Evidence | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| P0-01 | Auth model incompatible with RLS | Supabase Auth for all staff; synthetic email + 6-digit PIN as password; customer remains token-based; no `profiles.pin_code`. | `DECISIONS.md` ADR-001; migration `profiles`; `API_CONTRACTS.md` §2.5–2.6; `scripts/seed-staff.mjs` | **Resolved** |
+| P0-02 | Unsafe RLS and public order inserts | Deny-by-default RLS; no direct anon/authenticated access to orders/PIN/telemetry; all reads/writes through RPCs or service-role server actions; column grants revoked; helper functions use `search_path`. | Migration §19–21; `ERD.md` §5; v1.1 RLS smoke tests | **Resolved** |
+| P0-03 | PIN lockout not durable; sample code fails | Durable `failed_pin_attempts`, `pin_locked_until`, `pin_verification_attempts`; atomic `verify_delivery_pin`; `pgcrypto` generation; admin reset; geofence; lockout. | Migration §7/§14/§16; `API_CONTRACTS.md` §2.8 | **Resolved** |
+| P0-04 | Cash settlement cannot close | `cash_settlements` with expected/counted cash and generated variance; `orders.settlement_id`/`settled_at`; atomic `reconcile_rider_cash`; EAT business date; one settlement per rider/day. | Migration §6/§18; `CANONICAL_EXAMPLES.md` §7 | **Resolved** |
+| P0-05 | Payment lifecycle incomplete / wrong signature | Flutterwave hosted checkout; `verif-hash` timing-safe comparison; mandatory transaction verification; `payment_transactions` + `webhook_events` idempotency; refunds; payment-timeout cron. | `DECISIONS.md` ADR-002; `API_CONTRACTS.md` §2.2/§3.2/§3.4; migration §8 | **Resolved** |
+| P0-06 | Missing domain models | Added modifier groups, combo steps/options, dining tables + QR tokens, delivery attempts, rider shifts, refunds, OTP, blacklist, notifications outbox, settings history, admin audit, checkout idempotency. | `ERD.md`; migration §3–§10 | **Resolved** |
+| P0-07 | Distances and totals wrong | Live OSRM values: Nakasero **1.562 km / fee 0**; Ntinda **8.093 km / fee 6,000**; totals **35,000** and **38,000**; road distance stored as integer metres. | `CANONICAL_EXAMPLES.md` §3–§9; `TEST_PLAN.md` | **Resolved** |
+| P0-08 | Seed UUIDs invalid; profiles need auth users | All seed UUIDs valid hex; catalog/settings/tables seeded by SQL; staff created through Auth Admin API script; seed idempotent. | `supabase/seed.sql`; `scripts/seed-staff.mjs`; `scripts/staff.example.json` | **Resolved** |
+| P0-09 | Accessibility claim false | WCAG 2.2 AA baseline; v2 palette: primary green `#173F35`, action orange `#F28C28` with green-900 text (never white on orange), orange text `#A65A0F`; focus/touch/contrast rules. | `DESIGN_SYSTEM_V2.md`; `ACCESSIBILITY.md`; `DECISIONS.md` ADR-017 | **Resolved** |
+| P0-10 | Ops/legal/compliance gaps | Runbook, compliance checklist, legal policy skeletons, founder-only action register, go-live/rollback gates, monitoring/backup/secrets procedures. | `OPERATIONS_RUNBOOK.md`; `COMPLIANCE_AND_LEGAL.md`; §12 | **Contracted; founder inputs required** |
+| P0-11 | COD radius contradiction found in v1.2 | Canonical Ntinda fixture is 8.093 km but the COD ceiling was 8.0 km. Raised the test ceiling to **8.1 km**; final commercial ceiling remains F-14. | `CANONICAL_EXAMPLES.md` §3; migration/seed `cod_max_radius_km = 8.10`; `ERD.md`; `SECURITY_AND_VERIFICATION_PROTOCOLS.md`; ADR-018 | **Resolved** |
 
-| Area | Score | Original assessment |
-| :--- | :---: | :--- |
-| Product vision & scope | 9/10 | Clear, specific, commercially grounded. |
-| UX & visual specification | 8/10 | Strong and distinctive; accessibility claims are not met. |
-| Business rules & FSM | 7/10 | Good baseline; several transitions and edge cases missing. |
-| Data model | 4/10 | Core tables exist; critical domain tables and constraints missing. |
-| Security design | 3/10 | Correct threats identified, but RLS/auth design is unsafe as written. |
-| Integration specifications | 4/10 | Good direction; payment/OTP/print contracts incomplete or wrong. |
-| Test specification | 3/10 | Excellent scenario thinking; fixtures and expected numbers are wrong. |
-| Documentation traceability | 5/10 | Cross-references use filenames that do not exist; manifests drift. |
-| **Build readiness** | **2/10** | **Not ready to build without the inputs in §9.** |
+### 1.5 P1 closure matrix
 
-### 1.3 Short answer to "is there anything else we need to provide?"
+Status meanings: **Resolved** = the v1.2 specification/schema answers the finding; **Contracted** = fully specified but implemented in the named phase; **Founder input** = blocked on an account or business decision.
 
-**Yes — but the list is now finite, deduplicated, and tracked in §12.** Phase 1 can start now. Payments, checkout go-live, and public launch cannot start until the founder gates are closed.
+| ID | Status | Resolution / authority |
+| :--- | :--- | :--- |
+| P1-01 | Resolved | `set_kitchen_busy` RPC for KITCHEN/ADMIN with audit (migration §17). |
+| P1-02 | Resolved | Kitchen toggles availability only; menu CRUD is ADMIN-only (migration §17; `API_CONTRACTS.md` §2.9). |
+| P1-03 | Resolved | Partial unique index enforces one active order per rider (migration §11). |
+| P1-04 | Resolved | `get_rider_pool()` returns area/distance/total only; no phone, address, notes, or PIN (migration §16). |
+| P1-05 | Resolved | `normalize_ug_phone()` + indexed `customer_phone_normalized` (migration §7/§12). |
+| P1-06 | Resolved | Zod discriminated union + DB delivery/dine-in checks (`API_CONTRACTS.md` §2.1; migration §7). |
+| P1-07 | Resolved | `checkout_idempotency` table and required key (migration §8; `API_CONTRACTS.md` §2.1). |
+| P1-08 | Resolved | `total_amount` generated from components (migration §7). |
+| P1-09 | Resolved | Discount term removed; promotions deferred (ADR-010). |
+| P1-10 | Resolved | Dine-in packaging fee 0 enforced by constraint (migration §7; `CANONICAL_EXAMPLES.md` §6). |
+| P1-11 | Resolved | Dine-in `PREPARING → DELIVERED` in FSM and `bump_order` (migration §13/§17b; `ERD.md` §4). |
+| P1-12 | Resolved | `acknowledged_at` + `accept_order`; prepaid orders enter `PREPARING`, only unpaid COD shows Accept (migration §7/§17b). |
+| P1-13 | Contracted | Acknowledged state stops repeat chime; KDS polls/broadcasts ack (migration §7; `TEST_PLAN.md` §4). |
+| P1-14 | Resolved | Background GPS is not promised; foreground + Wake Lock + operational SOP (`OPERATIONS_RUNBOOK.md` §7). |
+| P1-15 | Resolved | `update_rider_telemetry` validates rider and active order (migration §16). |
+| P1-16 | Contracted | IndexedDB telemetry queue with bounded retry/replay (`TEST_PLAN.md` §5; `API_CONTRACTS.md` §5). |
+| P1-17 | Resolved | OSRM failure blocks checkout; no Haversine fallback for final fee (ADR-005; `API_CONTRACTS.md` §3.1). |
+| P1-18 | Resolved | `road_distance_m INTEGER`; fee from metres; display rounding separate (migration §7; `CANONICAL_EXAMPLES.md` §8). |
+| P1-19 | Founder input | Self-hosted OSRM production host (ADR-005; F-76). |
+| P1-20 | Founder input | MapTiler production key (ADR-004; F-74). |
+| P1-21 | Founder input | Upstash Redis account (ADR-006; F-75). |
+| P1-22 | Contracted | CSP/HSTS/frame-ancestors specified for Phase 1 (`SPEC_AMENDMENTS.md` §4.2). |
+| P1-23 | Contracted | Service-role client is server-only; import ban documented (`README.md`; `API_CONTRACTS.md` §7). |
+| P1-24 | Contracted | Middleware + per-action role guards; auth matrix (`API_CONTRACTS.md` §1.3/§2). |
+| P1-25 | Resolved | `verify_delivery_pin` derives rider from `auth.uid()`; no `riderId` input (migration §16). |
+| P1-26 | Contracted | Kitchen/rider/admin login, session, and logout specified; kitchen is the fourth portal at `/kitchen` (`API_CONTRACTS.md` §2.5–2.6; `site/kitchen.html`). |
+| P1-27 | Resolved | Admin cancel, force-complete, reassign, reset PIN, refund request (migration §18; `API_CONTRACTS.md` §2.9). |
+| P1-28 | Founder input | SMS outbox + Africa's Talking dispatch; sender ID/templates are F-15/F-73 (ADR-003/009; `API_CONTRACTS.md` §3.3). |
+| P1-29 | Contracted | ETA formula `max(prep) + busy buffer + OSRM duration`; `eta_at` recomputed on status events (`ERD.md` §3.1; `CANONICAL_EXAMPLES.md` §10). |
+| P1-30 | Resolved | `get_admin_analytics` RPC, `/admin/analytics`, KPI definitions (migration §18; `ANALYTICS.md`). |
+| P1-31 | Resolved | `is_active`/archived semantics; ordered items are never hard-deleted (migration §4; `ERD.md` §2.2). |
+| P1-32 | Resolved | `menu-images` bucket, 5 MiB limit, WebP/JPEG/PNG (`20261029000001_storage.sql`). |
+| P1-33 | Resolved | Store-closed hard block + admin override + closed screen (ADR-012; `API_CONTRACTS.md` §2.1). |
+| P1-34 | Contracted | Refund table + admin cancel creates `REQUESTED` refund; gateway completion Phase 6 (migration §8/§18). |
+| P1-35 | Resolved | `Intl.DateTimeFormat`/`date-fns-tz`; EAT business day (ADR-015). |
+| P1-36 | Contracted | Dynamic import moved inside a Client Component wrapper (`SPEC_AMENDMENTS.md` §4.5). |
+| P1-37 | Contracted | Leaflet CSS imported in the client map wrapper (`SPEC_AMENDMENTS.md` §4.5). |
+| P1-38 | Resolved | `h-[52px]` replaces `h-13` (`ACCESSIBILITY.md` §3.3). |
+| P1-39 | Contracted | Toast/skeleton primitives specified (`SPEC_AMENDMENTS.md` §4.5). |
+| P1-40 | Contracted | PWA manifest + service-worker cache rules (ADR-016; `SPEC_AMENDMENTS.md` §4.6). |
+| P1-41 | Resolved | Settings validation bounds + `settings_history` audit (migration §2/§14). |
+| P1-42 | Resolved | DB is the single source of truth for coordinates/settings; env only for keys (ADR-015). |
+| P1-43 | Resolved | `Africa/Kampala` business day for ledger and analytics (ADR-015; migration §18). |
+| P1-44 | Resolved | `rider_shifts` + start/end RPCs + one-open-shift index (migration §7/§16). |
+| P1-45 | Resolved | `order_number` identity + UNIQUE constraint (migration §7). |
+| P1-46 | Resolved | Check constraints on PIN, phone, lat/lng, heading, radii, and amounts (migration §2–§10). |
+| P1-47 | Resolved | Staff provisioned before profiles via `scripts/seed-staff.mjs`. |
+| P1-48 | Resolved | Local Supabase config + reset/seed workflow (`supabase/config.toml`; `README.md`). |
+| P1-49 | Resolved | Playwright plan rewritten with fixtures, storage states, and auth (`TEST_PLAN.md` §6). |
+| P1-50 | Resolved | Scenarios A–I + unit tests for fee/MOV/FSM (`TEST_PLAN.md` §3–§4). |
+
+**P1 totals:** 34 resolved, 12 contracted (P1-13, P1-16, P1-22, P1-23, P1-24, P1-26, P1-29, P1-34, P1-36, P1-37, P1-39, P1-40), 4 founder input (P1-19, P1-20, P1-21, P1-28).
+
+### 1.6 P2 closure summary
+
+The v1.0 P2 list was a mixed backlog of documentation drift, schema polish, missing operational documents, and optional storefront features. Every item is now closed by a normative artifact or an explicit, owned deferral.
+
+| P2 group | v1.2 disposition | Evidence |
+| :--- | :--- | :--- |
+| Broken document references, file manifests, route-map drift | All numeric-prefix references removed; manifest regenerated; one canonical route map. | `README.md`; `TECH_STACK_AND_CONVENTIONS.md` §2; `PORTALS_AND_UX_SPECIFICATION.md` §1; `API_CONTRACTS.md` |
+| `/api/print/receipt` without a contract | Contract defined with auth, masking, reprint audit, and no PIN. | `API_CONTRACTS.md` §3.7 |
+| Dine-in “served” role and forgeable table QR | Kitchen bump serves dine-in; dining tables and unguessable UUID tokens replace `?table=4`; no waiter role is required by design. | `ERD.md`; migration `dining_tables`/`validate_table_token`; `STATE_MACHINES_AND_BUSINESS_RULES.md` |
+| Customer entity, phone index, missing indexes | Normalized phone + composite index; order/item/telemetry/settlement indexes added. | `customer_phone_normalized`; migration §11 |
+| Schema polish: constraints, indexes, timestamps, metadata | `customer_rating` constrained; `security_flag` added; lat/lng/heading bounds; settlement uniqueness; cancellation/payment/source/version/admin-edit/ETA/attempt/COD-change fields; updated-at triggers. | Migration §2–§14; `ERD.md` |
+| Max cart/line count and abuse controls | `max_cart_value` + `max_item_quantity` enforced; durable rate limits; CAPTCHA/proof-of-work is an optional response to observed abuse. | `SECURITY_AND_VERIFICATION_PROTOCOLS.md` §5; migration §2; `TEST_PLAN.md` §3 |
+| Discovery, favicon, OG image, structured data | Favicon/manifest specified; OG image is founder asset F-12; `robots.txt`/`sitemap.xml`/structured data are Phase 10 hardening, not launch blockers. | `TECH_STACK_AND_CONVENTIONS.md` §3.10; §12 F-12 |
+| Repository hygiene: README, `.gitignore`, LICENSE, SECURITY, deleted tracked docs | README, `.gitignore`, and `SECURITY.md` added; deleted docs resolved in Git; LICENSE remains an explicit founder decision. | Root files; `README.md` §License |
+| Change control, glossary, browser/device matrix, performance method | `CHANGELOG.md`, `GLOSSARY.md`, `BROWSER_SUPPORT.md`; performance budgets and throttled-device rules. | `docs/`; `TECH_STACK_AND_CONVENTIONS.md` §3.8 |
+| Error-code copy, API response examples, ERD, sequence diagrams | Approved error-copy map; response envelopes/examples; ERD and payment/claim/settlement/refund sequences. | `PORTALS_AND_UX_SPECIFICATION.md` §6.1; `API_CONTRACTS.md`; `ERD.md`; `SEQUENCE_DIAGRAMS.md` |
+| Runbook, backup/restore, rollback, monitoring, secrets, support SOP | Runbook covers deploy, backup/restore, rollback, incidents, monitoring/alerting, secret rotation, support WhatsApp templates, and go-live. | `OPERATIONS_RUNBOOK.md` |
+| CI/CD and dependency/security scanning | GitHub Actions gates, branch protection, Dependabot, secret scanning, CodeQL/Semgrep, and `npm audit` are specified. | `TECH_STACK_AND_CONVENTIONS.md` §3.10; `STEP_BY_STEP_IMPLEMENTATION_PLAN.md` Phases 1/12 |
+| Analytics/KPI definitions | KPI formulas, dashboard layout, access, and validation defined. | `ANALYTICS.md`; migration `get_admin_analytics` |
+
+### 1.7 v1.2 prototype and documentation changes
+
+- `site/index.html` now launches **four** portals and includes the kitchen entry; `site/assets/css/portal.css` uses a four-column desktop grid.
+- New `site/kitchen.html`, `site/assets/css/kitchen.css`, and `site/assets/js/kitchen.js`: oldest-first tickets, COD accept, bump, 86 sheet, busy mode, connection state, and browser-print docket. Prepaid tickets arrive `PREPARING`; only `CONFIRMED_UNPAID` COD shows Accept.
+- Prototype fixtures now match `CANONICAL_EXAMPLES.md`:
+  - Sarah / Nakasero / prepaid: **USh 35,000**.
+  - Brian / Ntinda / COD: **USh 38,000**, change due **12,000** on a 50,000 note.
+  - Alex / Table 4 / dine-in: **USh 8,000**.
+  - `#1047` is **USh 27,500 COD** (24,000 Chicken Luwombo + 1,000 extra chilli + 1,000 packaging + 1,500 delivery).
+  - Juma's ledger is **USh 65,500** (`#1043` 38,000 + `#1047` 27,500).
+- Rider UI no longer offers a next-job queue; claims are disabled while a delivery is active, matching the one-active-order index.
+- The kitchen snapshot intentionally precedes the admin/rider snapshot: `#1047` is New COD on the kitchen board and Ready on admin/rider. `DESIGN_SYSTEM_V2.md` documents this as a snapshot ordering, not a state contradiction.
+- `docs/stitch-design/` and `site/ui-kit.html` carry archive banners and are explicitly non-normative; only `site/` (minus the archived UI kit) and the v1.2 docs are current.
+- New operational documents: `ANALYTICS.md`, `BROWSER_SUPPORT.md`, `CHANGELOG.md`, `GLOSSARY.md`, `SEQUENCE_DIAGRAMS.md`, and root `SECURITY.md`.
+
+### 1.8 Short answer to “is there anything else we need to provide?”
+
+**Yes — but the list is finite, deduplicated, and tracked in §12.** Phase 1 can start now. Payments, checkout go-live, and public launch cannot start until the founder gates are closed.
 
 The remaining founder inputs fall into seven groups:
 
 - **Legal identity, tax, and regulatory** — entity, TIN, licences, VAT/EFRIS, PDPO registration, privacy/terms/refund policies.
-- **Commercial rules** — final fee constants, COD policy, delivery zones, opening hours, refund authority.
+- **Commercial rules** — final fee constants, final COD radius/change policy, delivery zones, opening hours, refund authority.
 - **Menu and content** — final menu, modifiers, combos, prices, allergens, photos, brand assets.
 - **Staff and riders** — roster, PINs, contracts, plates, pay/float model, devices.
 - **Accounts and infrastructure** — Supabase, Vercel, Flutterwave, Africa's Talking, MapTiler, Upstash, OSRM host, domain, monitoring.
 - **Operations** — printer, kitchen tablet, rider phones, cash denominations, on-call rota.
 - **Launch sign-off** — pilot orders, legal review, accessibility/UX sign-off, go/no-go authority.
 
-The complete register, including the 15 decisions already recorded in `DECISIONS.md`, is **§12**. There are no remaining open engineering decisions that block Phase 1.
+The complete register is **§12**; F-87 records the acknowledgment of the 18 accepted ADRs. There are no remaining open engineering decisions that block Phase 1.
 
 ---
 
@@ -730,7 +840,7 @@ Add a compliance checklist:
 
 **`app_settings`**
 
-- `cod_max_radius_km DECIMAL(3,1) DEFAULT 8.0`
+- `cod_max_radius_km DECIMAL(3,1) DEFAULT 8.10` (v1.2 value; the original v1.1 proposal was 8.0)
 - `timezone TEXT DEFAULT 'Africa/Kampala'`
 - `currency TEXT DEFAULT 'UGX'`
 - `tax_rate_bps INTEGER DEFAULT 0`
@@ -775,7 +885,7 @@ To eliminate the numeric drift, adopt **one** fixture set and use it in every do
 | Free delivery radius | 5.0 km |
 | Excess rate | USh 1,500/km |
 | Max delivery radius | 15.0 km |
-| COD max radius | 8.0 km |
+| COD max radius | 8.1 km test ceiling (final commercial value is F-14; ADR-018) |
 | Minimum order value (delivery) | USh 20,000 |
 | Minimum order value (dine-in) | USh 0 |
 | Packaging fee (delivery) | USh 1,000 |
@@ -825,7 +935,7 @@ If paying with a USh 50,000 note, **change due = 12,000**. The current docs say 
 
 ### 8.5 Ledger example
 
-Replace the ledger example with orders generated from the canonical fixtures. For example, if Juma completes Order A (35,000 COD) and Order B (38,000 COD), his liability is **73,000**, not 64,000. Use one consistent method and show the order IDs that sum to the total.
+The canonical ledger uses the actual COD fixtures, not two copies of Order A: if Juma completes `#1043` (38,000 COD) and `#1047` (27,500 COD), his liability is **65,500**. Show the order IDs that sum to the total and cite `CANONICAL_EXAMPLES.md` §7.
 
 ---
 
@@ -1045,7 +1155,7 @@ These 15 items are the first tranche recorded in `DECISIONS.md`. The decision is
 | ID | Founder action | Acceptance / evidence | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | F-01 | Confirm restaurant GPS on site | Exact latitude/longitude read at the physical bazaar; update `app_settings` and `CANONICAL_EXAMPLES.md` | Phase 2 | Open |
-| F-02 | Confirm fee/MOV/COD constants | Signed-off values for free radius, rate, max radius, MOV, packaging, max cart, max quantity | Phase 2 | Open |
+| F-02 | Confirm fee/MOV/COD constants | Signed-off values for free radius, rate, max radius, MOV, packaging, max cart, max quantity; the v1.2 COD test ceiling is 8.1 km | Phase 2 | Open |
 | F-03 | Provide menu/modifier/combo data | Final items, prices, descriptions, prep times, modifier groups/options, combo steps/options | Phase 2 | Open |
 | F-04 | Provide staff/rider roster and PINs | Names, roles, E.164 phones, 6-digit PINs, plates; provision via `scripts/seed-staff.mjs` | Phase 2 | Open |
 | F-05 | Provide Flutterwave merchant credentials | Merchant account, public/secret keys, webhook hash, settlement bank | Phase 6 | Open |
@@ -1057,7 +1167,7 @@ These 15 items are the first tranche recorded in `DECISIONS.md`. The decision is
 | F-11 | Confirm VAT/EFRIS position | Registration status, VAT number, EFRIS onboarding, receipt fields | Phase 6 | Open |
 | F-12 | Provide brand/dish assets | Logo SVG/PNG, PWA 192/512 icons, favicon, OG image, dish photos, font licences | Phase 3 | Open |
 | F-13 | Confirm domain/hosting accounts | Domain/DNS, Vercel/hosting team, billing owner, TLS | Phase 12 | Open |
-| F-14 | Confirm COD max radius and change policy | Max COD radius, OTP policy, accepted change denominations, blacklist rules | Phase 2 | Open |
+| F-14 | Confirm COD max radius and change policy | Final commercial COD radius, OTP policy, accepted change denominations, blacklist rules (8.1 km is the v1.2 test ceiling) | Phase 2 | Open |
 | F-15 | Confirm notification templates/sender ID | SMS templates, sender ID approval, support WhatsApp, opt-out wording | Phase 9 | Open |
 
 ### 12.2 Legal identity, tax, and regulatory (F-16–F-35)
@@ -1090,7 +1200,7 @@ These 15 items are the first tranche recorded in `DECISIONS.md`. The decision is
 | ID | Founder action | Acceptance / evidence | Blocks | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | F-36 | Approve final fee constants | 5.0 km free, USh 1,500/km, 15 km max, MOV 20,000, packaging 1,000, max cart 200,000, max qty 20 — or corrections | Phase 2 | Open |
-| F-37 | Approve COD policy | 8 km max, OTP for first-time COD, change policy, blacklist rules | Phase 2 | Open |
+| F-37 | Approve COD policy | 8.1 km test ceiling, final radius via F-14, OTP for first-time COD, change policy, blacklist rules | Phase 2 | Open |
 | F-38 | Confirm delivery zones | Included/excluded areas and any zone-specific rules | Phase 2 | Open |
 | F-39 | Confirm opening hours and holidays | Regular hours, holiday calendar, Ramadan/Eid hours | Phase 2 | Open |
 | F-40 | Confirm store-closed behavior | Hard block, admin override authority, customer copy | Phase 2 | Open |
@@ -1160,7 +1270,7 @@ These 15 items are the first tranche recorded in `DECISIONS.md`. The decision is
 | F-84 | Provide pilot customers/test orders | Named pilot users, test phones, acceptance window | Phase 12 | Open |
 | F-85 | Set launch date and go/no-go authority | Date, decision-maker, rollback authority | Launch | Open |
 | F-86 | Approve provider budget | Supabase, Vercel, Flutterwave, AT, MapTiler, Upstash, OSRM, domain, monitoring | Phase 1 | Open |
-| F-87 | Accept ADR-001–ADR-016 | Written acknowledgment of `DECISIONS.md` | Phase 1 | Open |
+| F-87 | Accept ADR-001–ADR-018 | Written acknowledgment of `DECISIONS.md` | Phase 1 | Open |
 | F-88 | Accept canonical fixtures | Acknowledge `CANONICAL_EXAMPLES.md` and retired numbers | Phase 2 | Open |
 | F-89 | Accept Phase 1 start | Acknowledge no application code exists yet | Phase 1 | Open |
 | F-90 | Complete legal review sign-off | Counsel/accountant sign-off recorded | Launch | Open |
@@ -1169,7 +1279,7 @@ These 15 items are the first tranche recorded in `DECISIONS.md`. The decision is
 | F-93 | Confirm existing data migration | Whether old orders/customers/menu must be migrated; source access | Phase 1 | Open |
 | F-94 | Approve staff training plan/date | Training materials, attendance, sign-off | Launch | Open |
 | F-95 | Assign post-launch support/maintenance | Owner, hours, escalation, budget | Launch | Open |
-| F-96 | Accept known limitations | No promotions, batching, pre-orders, accounts, background GPS, WhatsApp automation, ESC/POS, multi-branch | Phase 1 | Open |
+| F-96 | Accept known limitations | No promotions, batching, pre-orders, customer accounts, background GPS, WhatsApp automation, ESC/POS, multi-branch, or rider next-job queue | Phase 1 | Open |
 | F-97 | Final launch sign-off | Written go-live approval | Launch | Open |
 
 ### 12.8 What is *not* a founder action
@@ -1188,7 +1298,7 @@ These are already resolved and should not be reopened without an ADR:
 - Store-closed hard block, one active order per rider, 4-digit handover PIN, 6-digit staff PIN.
 - Realtime strategy (Broadcast + polling; no raw `postgres_changes` on PII tables).
 - Money/time representation (integer UGX; `Africa/Kampala` business dates).
-- Accessibility target (WCAG 2.2 AA; `#B83817` action colour).
+- Accessibility target (WCAG 2.2 AA; v2 palette: primary green `#173F35`, orange action `#F28C28` with green-900 text, orange text `#A65A0F`; never white on orange).
 - Schema, RLS, API contracts, test plan, runbook, and compliance skeletons (already written and validated where possible).
 
 Founders do **not** need to write code, design the database, choose library versions, or provide card data. They need to make the business decisions and provide the accounts, verified data, and legal sign-off above.
@@ -1207,73 +1317,91 @@ Founders do **not** need to write code, design the database, choose library vers
 
 ## 13. Change Log
 
-> **Tracked record.** This section records every file created or modified during the v1.1 remediation. The last commit before the remediation was `4b98245`.
+> **Tracked record.** This section records the v1.2 reconciliation. The last commit before this work was `4b98245` (the v1.1 baseline). All v1.2 edits are present in the working tree and have not been committed or pushed.
 
 ### 13.1 Commits
 
 | Commit | Date | Contents |
 | :--- | :--- | :--- |
-| `4b98245` | 2026-10-29 | Added `docs/CANONICAL_EXAMPLES.md` and `docs/DECISIONS.md`. |
-| `this commit` | 2026-10-29 | v1.1 build baseline: schema, storage, seed, config, staff script, contracts, ERD, amendments, tests, accessibility, operations, compliance, audit update, and amendment banners. |
+| `4b98245` | 2026-10-29 | Added `docs/CANONICAL_EXAMPLES.md`, `docs/DECISIONS.md`, and the v1.1 remediation baseline. |
+| `working tree` | 2026-11-09 | v1.2 reconciliation: all normative docs, the static prototype, kitchen portal, v2 palette, canonical fixtures, audit closure matrices, and new operational documents. **Not committed.** |
 
-### 13.2 Files created
+### 13.2 Files created in v1.2
 
 | Path | Purpose | Validation |
 | :--- | :--- | :--- |
-| `docs/DECISIONS.md` | ADR log for every architectural fork (ADR-001–ADR-016) and the first 15 founder inputs. | Reviewed; committed in `4b98245`; cross-referenced to §12. |
-| `docs/CANONICAL_EXAMPLES.md` | Single source of truth for distances, fees, totals, status copy, and fixtures. | Live OSRM snapshot; totals recomputed; committed in `4b98245`. |
-| `docs/API_CONTRACTS.md` | Server actions, route handlers, RPCs, auth matrix, Realtime, rate limits, env vars. | Cross-checked against the migration and seed. |
-| `docs/ERD.md` | v1.1 entity model, data dictionary, FSM, indexes, deferred models. | Cross-checked against the migration. |
-| `docs/SPEC_AMENDMENTS.md` | Normative mapping of every P0/P1 to its resolution and artifact. | 10 P0 + 50 P1 accounted for. |
-| `docs/TEST_PLAN.md` | Corrected unit/DB/RLS/E2E/accessibility/performance plan. | Fixtures match `CANONICAL_EXAMPLES.md`. |
-| `docs/ACCESSIBILITY.md` | WCAG 2.2 AA palette, measured contrast, component rules, verification plan. | Contrast ratios recomputed. |
-| `docs/OPERATIONS_RUNBOOK.md` | Deploy, backup/restore, incidents, rider/kitchen SOP, cash reconciliation, KPIs, secret rotation, go-live. | Cross-checked against the schema/RPCs. |
-| `docs/COMPLIANCE_AND_LEGAL.md` | Uganda DPPA/consumer/tax/PCI checklist and policy skeletons. | Clearly marked “not legal advice”; founder review required. |
-| `supabase/migrations/20261029000000_initial_schema.sql` | Enums, settings, profiles, menu/modifiers/combos, tables, orders, payments, settlements, audit, triggers, RPCs, RLS, grants. | Applied to PostgreSQL 18.4; smoke tests passed. |
-| `supabase/migrations/20261029000001_storage.sql` | `menu-images` bucket and public-read policy. | Applied after the schema; bucket inserted. |
-| `supabase/seed.sql` | Deterministic settings, 5 categories, 12 menu items, modifiers, combos, 8 tables. | Applied successfully; valid hex UUIDs. |
-| `supabase/config.toml` | Local Supabase project configuration and seed path. | Syntax reviewed; CLI not installed in this environment. |
-| `scripts/seed-staff.mjs` | Provisions Supabase Auth staff users and profiles. | `node --check` passed. |
-| `scripts/staff.example.json` | Example roster with 6-digit PINs. | JSON parsed; 4 roles. |
-| `public/images/placeholder-dish.svg` | Accessible dish placeholder. | SVG reviewed. |
-| `public/icons/icon.svg` | Accessible placeholder icon. | SVG reviewed. |
-| `.env.example` | Environment template for all providers. | No real secrets. |
-| `.gitignore` | Ignores env files, local staff file, build output, test artifacts. | Reviewed. |
-| `README.md` | Repository overview, quick start, security rules, canonical fixtures, founder pointer. | Cross-checked against the docs. |
+| `docs/ANALYTICS.md` | KPI formulas, dashboard layout, access rules, and data validation. | Cross-checked against `get_admin_analytics` and the runbook. |
+| `docs/BROWSER_SUPPORT.md` | Supported browser/device matrix, performance targets, and test matrix. | Reviewed against `TECH_STACK_AND_CONVENTIONS.md` §3.8. |
+| `docs/CHANGELOG.md` | Chronological documentation/schema/prototype change log. | Entries cross-checked against this report. |
+| `docs/GLOSSARY.md` | Shared KDS/MOV/COD/OSRM/boda terms and status vocabulary. | Cross-checked against the portal and business-rule docs. |
+| `docs/SEQUENCE_DIAGRAMS.md` | Payment, claim, settlement, and refund sequences. | Cross-checked against `API_CONTRACTS.md` and the migration RPCs. |
+| `SECURITY.md` | Root vulnerability-reporting policy and non-negotiable security rules. | Reviewed; no secrets. |
+| `site/README.md` | Prototype inventory and run instructions; archive pointer for `ui-kit.html`. | Local links verified. |
+| `site/kitchen.html` | Fourth portal: kitchen board shell, stock sheet, print docket. | Loads tokens/base/components/kitchen CSS; static review. |
+| `site/assets/css/kitchen.css` | Kitchen board layout and print styles. | Token-only palette; `#000` used only for print. |
+| `site/assets/js/kitchen.js` | Oldest-first tickets, COD accept, bump, 86 list, busy mode, connection state, print. | `node --check` passed; canonical COD due = 65,500. |
+| `docs/stitch-design/README.md` | Archive notice for the historical design explorations. | Confirms non-normative status. |
 
-### 13.3 Files modified
+### 13.3 Files modified in v1.2
 
 | Path | Change |
 | :--- | :--- |
-| `docs/AUDIT_REPORT.md` | Replaced the v1.0 verdict with the v1.1 conditional 9/10 scorecard; preserved the v1.0 scorecard; added remediation summary, §12 founder register, §13 change log, and historical notes. |
-| `docs/SYSTEM_OVERVIEW.md` | Added v1.1 amendment banner. |
-| `docs/TECH_STACK_AND_CONVENTIONS.md` | Added v1.1 amendment banner. |
-| `docs/DATABASE_SCHEMA_AND_RLS.md` | Added v1.1 amendment banner pointing to the migration/seed/ERD. |
-| `docs/DESIGN_SYSTEM_AND_UI_SPEC.md` | Added v1.1 amendment banner pointing to `ACCESSIBILITY.md`. |
-| `docs/PORTALS_AND_UX_SPECIFICATION.md` | Added v1.1 amendment banner. |
-| `docs/STATE_MACHINES_AND_BUSINESS_RULES.md` | Added v1.1 amendment banner. |
-| `docs/INTEGRATIONS_AND_HARDWARE_APIS.md` | Added v1.1 amendment banner. |
-| `docs/SECURITY_AND_VERIFICATION_PROTOCOLS.md` | Added v1.1 amendment banner. |
-| `docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md` | Added v1.1 amendment banner. |
-| `docs/TESTING_PERSONAS_AND_E2E_SCENARIOS.md` | Added v1.1 amendment banner. |
-| `docs/DECISIONS.md` | Pointed the open-decisions table at the authoritative §12 register. |
+| `README.md` | Rewritten to v1.2: four portals, kitchen page, new docs links, canonical ledger, security rules, and founder pointer. |
+| `docs/ACCESSIBILITY.md` | Rewritten for WCAG 2.2 AA and the v2 green/orange palette; terracotta/AAA claims removed from normative text. |
+| `docs/API_CONTRACTS.md` | Aligned payment route/env names, error envelope, auth matrix, print contract, and canonical values. |
+| `docs/AUDIT_REPORT.md` | This v1.2 verdict, scorecard, P0/P1/P2 closure matrices, prototype summary, founder-register updates, change log, and validation evidence. |
+| `docs/CANONICAL_EXAMPLES.md` | Canonical distances/fees/totals/ledger; 8.1 km COD note; constants, formulas, fixtures, and status copy. |
+| `docs/COMPLIANCE_AND_LEGAL.md` | COD ceiling, Supabase Auth session, and legal/founder register aligned to v1.2. |
+| `docs/DATABASE_SCHEMA_AND_RLS.md` | Reduced to a normative pointer to the migration/ERD; stale RLS/SQL text removed. |
+| `docs/DECISIONS.md` | Added ADR-017 (v2 design system) and ADR-018 (8.1 km COD test ceiling); F-02/F-14/F-87 clarified. |
+| `docs/DESIGN_SYSTEM_AND_UI_SPEC.md` | Converted to a retirement/amendment pointer; v2 palette is authoritative. |
+| `docs/DESIGN_SYSTEM_V2.md` | Four portals, kitchen behaviour, no rider queue, canonical `#1047` COD, Juma 65,500 ledger, kitchen JS validation. |
+| `docs/ERD.md` | 8.1 km COD, four-portal/kitchen role notes, and schema-reference alignment. |
+| `docs/INTEGRATIONS_AND_HARDWARE_APIS.md` | Flutterwave `verif-hash`, canonical webhook route/env, printing, GPS, and archive alignment. |
+| `docs/OPERATIONS_RUNBOOK.md` | v1.2 operations baseline: 8.1 km COD, scenarios A–I, 4-digit handover PIN, kitchen/rider SOPs. |
+| `docs/PORTALS_AND_UX_SPECIFICATION.md` | Rewritten for four portals; added approved error-code-to-copy map (§6.1). |
+| `docs/SECURITY_AND_VERIFICATION_PROTOCOLS.md` | Rewritten for Supabase Auth, durable PIN state, 6-digit staff PIN, 4-digit handover PIN, COD 8.1. |
+| `docs/SPEC_AMENDMENTS.md` | v1.2 closure register: corrected P0-09, added P0-11, design/kitchen amendments, P1 alignment. |
+| `docs/STATE_MACHINES_AND_BUSINESS_RULES.md` | FSM, pricing, claim, PIN, settlement, and ETA rules aligned to the migration and canonical examples. |
+| `docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md` | Rewritten for pinned Next 15, v2 tokens, kitchen portal, scenarios A–I, CI, and dependency/secret scanning. |
+| `docs/SYSTEM_OVERVIEW.md` | Four portals, 8.1 km COD, integer-metre OSRM fee, accurate cost statement, explicit v1 scope. |
+| `docs/TECH_STACK_AND_CONVENTIONS.md` | Pinned stack, complete manifest, Broadcast/polling, canonical env names, CI/dependency gates, discovery deferral. |
+| `docs/TESTING_PERSONAS_AND_E2E_SCENARIOS.md` | Four portals, 6-digit staff PIN, canonical fixtures, scenarios A–I, `COD_NOT_AVAILABLE` error code. |
+| `docs/TEST_PLAN.md` | Canonical fixtures, RLS matrix, scenarios A–I, and retired-value guardrails. |
+| `docs/scenarios.md` | Reduced to a canonical scenario index pointing at the full test/persona docs. |
+| `public/icons/icon.svg` | Recoloured from retired terracotta to green/orange v2 placeholders. |
+| `public/images/placeholder-dish.svg` | Recoloured from retired terracotta to green/orange v2 placeholders. |
+| `site/index.html` | Four-portal launcher with kitchen nav, hero, card, footer, and canonical palette overview. |
+| `site/admin.html` | Dispatch/ledger copy aligned with the canonical COD fixtures; ledger footer corrected to the sum of the five rider rows (USh 229,000) and labelled as an end-of-day example. |
+| `site/assets/css/portal.css` | Four-column desktop portal grid. |
+| `site/assets/js/admin.js` | `#1047` COD 27,500; Juma ledger 65,500; David cash 23,500; dispatch copy corrected. |
+| `site/assets/js/rider.js` | Removed the next-job queue; one active delivery; `#1047` COD fixture. |
+| `site/design-system.html` | Kitchen portal link and v2 kitchen component notes. |
+| `site/rider.html` | Removed queue UI/copy; active-delivery-only layout. |
+| `site/ui-kit.html` | Archived/non-normative banner and archived title/description. |
+| `supabase/migrations/20261029000000_initial_schema.sql` | `app_settings.cod_max_radius_km` default changed to `8.10`. |
+| `supabase/seed.sql` | Seeded `cod_max_radius_km` changed to `8.10`. |
 
 ### 13.4 Validation evidence
 
 | Check | Result |
 | :--- | :--- |
-| PostgreSQL version | 18.4 temporary cluster on port `55432`, database `mrfss_test`. |
-| Initial migration | Applied with `ON_ERROR_STOP=1`; all enums, tables, indexes, triggers, RPCs, policies, and grants created. |
-| Storage migration | Applied; `menu-images` bucket and public-read policy created. |
-| Seed | Applied; 1 settings row, 5 categories, 12 menu items, 4 modifier groups, 11 options, 17 item-group links, 2 combo steps, 4 combo options, 8 tables. |
-| Smoke test 1 | Canonical totals (35,000 / 38,000), phone normalization, public tracker, rider claim/start, wrong PIN, correct PIN, kitchen authorization denial — passed. |
-| Smoke test 2 | Kitchen accept/bump, COD claim/start/PIN, COD change due 12,000, settlement expected 38,000, zero variance, order-settlement linkage, analytics — passed. |
-| RLS checks | `anon` denied direct `orders` select; `authenticated` denied direct `orders` select; `anon` token RPC returned a payload; `authenticated` read 12 menu items and 1 safe settings row. |
-| Staff script | `node --check scripts/seed-staff.mjs` passed. |
-| Staff JSON | Parsed successfully; 4 records (ADMIN, KITCHEN, RIDER, RIDER). |
-| Contrast | `ACCESSIBILITY.md` ratios recomputed with the WCAG relative-luminance formula. |
-| UUIDs | Seed uses valid hexadecimal UUIDs; retired `m1111111`/`k1000000`/`r1000000` prefixes are absent from the new seed. |
-| Application build | Not run; there is no `package.json` or Next.js scaffold yet. This is the Phase 1 task. |
+| `node --check site/assets/js/ui.js` | Passed. |
+| `node --check site/assets/js/customer.js` | Passed. |
+| `node --check site/assets/js/kitchen.js` | Passed. |
+| `node --check site/assets/js/admin.js` | Passed. |
+| `node --check site/assets/js/rider.js` | Passed. |
+| Local markdown links | Checked 30 local files (README, SECURITY, site/README, docs); all relative links resolve. |
+| Retired-value scan | No hits outside explicit retirement/guardrail/history lines, the audit report, `site/ui-kit.html`, or `docs/stitch-design/`. |
+| Invalid-UUID scan | `m1111111`, `k1000000`, `r1000000`, `r2000000`, and `r3000000` appear only in the historical audit evidence. Seed uses valid hex UUIDs. |
+| Palette scan | No `#D84A26`/`#B83817` in current normative docs, `site/`, or `public/`; the terracotta hexes appear only in the audit, ADR history, and the “retired” note. |
+| Prototype fixtures | Sarah 35,000; Brian 38,000; Alex 8,000; `#1047` 27,500 COD; Juma ledger 65,500 checked across HTML/JS. |
+| Kitchen COD total | 27,500 (`#1047`) + 38,000 (`#1043`) = **65,500**, matching the canonical ledger. |
+| Static prototypes | HTML/CSS/JS only; no framework build, dependency install, or server run. |
+| `git diff --check` | No whitespace errors; line-ending conversion warnings only. |
+| SQL | Migration/seed default reviewed as `8.10`; not re-applied in this environment. The v1.1 PostgreSQL 18.4 application and smoke tests remain the last executed database proof. |
+| Accessibility automation | Not run: no browser/axe harness is installed and no production app exists. Token contrast rules were reviewed manually against `DESIGN_SYSTEM_V2.md`. |
+| Production build | Not run, by scope. There is no `package.json` or Next.js scaffold. |
 
 ### 13.5 Retired values and guardrails
 
@@ -1282,28 +1410,32 @@ These values and patterns must not reappear in new tests, UI copy, or implementa
 - Distances: `3.8 km`, `7.4 km` (use 1.562 km and 8.093 km).
 - Fees: `4,500` (use 0 or 6,000 for the canonical fixtures).
 - Totals: `35,600`, `36,500`, `34,000` as a final total, `37,000`, `38,000` as Sarah's total.
+- `33,000` as the `#1047` prepaid total; `64,000` as Juma's ledger. The canonical values are `#1047` **27,500 COD** and **65,500** (`#1043` 38,000 + `#1047` 27,500).
+- COD ceiling `8.0 km` (use **8.1 km** as the test/seed ceiling until F-14 fixes the commercial value).
 - Invalid UUID prefixes: `m1111111`, `k1000000`, `r1000000`, `r2000000`, `r3000000`.
 - `postgres_changes` on orders, telemetry, payments, or profiles.
 - Public `INSERT` into `orders`.
-- Plaintext staff PINs in `profiles`.
+- Plaintext staff PINs in `profiles`. Staff PIN is **6 digits**; handover PIN is **4 digits**.
 - Haversine fallback for a final delivery fee.
 - Custom staff session cookies instead of Supabase Auth.
 - WCAG AAA claim.
-- `#D84A26` as a primary CTA background with white text.
+- Terracotta `#D84A26`/`#B83817` as primary CTA colours; white text on orange `#F28C28`.
 - `h-13` (use `h-[52px]`).
 - “Zero ongoing third-party SaaS cost.”
+- “Three portals”, “six portals”, or a rider next-job queue.
+- `ADMIN_DEFAULT_PIN` or any default staff password.
 
-Historical audit/spec text may quote these as findings. That is not normative. `CANONICAL_EXAMPLES.md` and `ACCESSIBILITY.md` win.
+Historical audit/spec text may quote these as findings. That is not normative. `CANONICAL_EXAMPLES.md`, `DESIGN_SYSTEM_V2.md`, and `ACCESSIBILITY.md` win.
 
 ### 13.6 Current status and next actions
 
-- **Specification/build readiness:** 9/10 conditional.
+- **Specification/build readiness:** 9.5/10 conditional.
 - **Launch readiness:** 4/10; gated by §12.
 - **Phase 1:** may start now (Next.js scaffold, env wiring, Supabase local project, CI skeleton).
 - **Phase 2:** blocked on F-01/F-02/F-14/F-36–F-40 and the menu/staff data.
 - **Phase 6:** blocked on Flutterwave/Africa's Talking credentials and VAT/EFRIS.
 - **Launch:** blocked on legal review, verified data, live provider certification, and go-live sign-off.
-- **Git:** v1.1 baseline committed locally; no push has been performed.
+- **Git:** all v1.2 work is uncommitted in the working tree; nothing has been pushed.
 
 ### 13.7 Revision history
 
@@ -1311,6 +1443,7 @@ Historical audit/spec text may quote these as findings. That is not normative. `
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-10-29 | Original audit report (P0/P1/P2 findings). |
 | 1.1.0 | 2026-10-29 | Remediation verdict, 9/10 conditional scorecard, founder register, change log, amendment banners. |
+| 1.2.0 | 2026-11-09 | Full reconciliation: 11 P0 and 50 P1 closure matrices, P2 disposition, v2 green/orange authority, four portals + kitchen prototype, canonical fixture cleanup, new analytics/browser/changelog/glossary/sequence/security docs, and static validation evidence. |
 
 ---
 
@@ -1347,20 +1480,22 @@ Results:
 | `#B45309` on `#FFFFFF` | 5.02:1 |
 | `#B91C1C` on `#FFFFFF` | 6.47:1 |
 
+> **Historical v1.0 evidence.** These ratios are for the retired terracotta system. The v1.2 green/orange ratios are in `DESIGN_SYSTEM_V2.md` §2 and `ACCESSIBILITY.md`; they are the normative values.
+
 ### A.3 UUID validity
 
 PostgreSQL UUIDs accept only hexadecimal digits `0-9a-f`.
 
 - Valid: `c1111111-...`, `a1000000-...`.
-- Invalid: `m1111111-...`, `k1000000-...`, `r1000000-...`, `r2000000-...`, `r3000000-...`.
+- Invalid (historical v1.0 seed only): `m1111111-...`, `k1000000-...`, `r1000000-...`, `r2000000-...`, `r3000000-...`.
 
-The seed script will fail at the first invalid literal.
+The v1.0 seed script failed at the first invalid literal. The v1.2 seed uses valid hexadecimal UUIDs only.
 
 ---
 
 ## Appendix B — File Inventory and Status
 
-> **Historical v1.0 inventory.** The current inventory, including new schema/seed/scripts/config and the modified original specs, is in §13.
+> **Historical v1.0 inventory.** The current inventory, including new schema/seed/scripts/config, the kitchen prototype, and the modified original specs, is in §13. The `docs/readme.md`/`docs/mazaar.md` deletion was resolved in Git before v1.2; no deleted tracked docs remain.
 
 | Path | Status | Notes |
 | :--- | :--- | :--- |

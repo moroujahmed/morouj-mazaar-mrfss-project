@@ -1,300 +1,267 @@
-# STATE_MACHINES_AND_BUSINESS_RULES.md
+# STATE MACHINES AND BUSINESS RULES
 
-> **v1.1 normative amendment:** FSM transitions, fee formula, claim RPC, PIN logic, and settlement linkage are superseded by [`ERD.md`](ERD.md) §4, [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md), and the migration. Use integer metres and `Africa/Kampala`.
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **Supersedes** | v1.0 transition matrix, Haversine fallback, coarse distance, claim signature, settlement prose |
+| **Authority** | Migration, `ERD.md`, `CANONICAL_EXAMPLES.md`, `DECISIONS.md` ADR-005/010/011/012/013/015 |
 
-## Document Control & Metadata
-* **Document Version:** 1.0.0
-* **Status:** Approved Core Engine Specification
-* **Target Audience:** Backend Engineers, Full-Stack Developers & Antigravity Agentic Builders
-* **Scope:** Deterministic State Transitions, Pricing Pipelines, Mathematical Formulas, and Concurrency Control
-* **Currency Standard:** Ugandan Shillings (`UGX` / `USh`) — Whole Integers
-* **Distance Metric:** Kilometers (`km`) — Road Network Calculation via OSRM
-
----
-
-## 1. Master Order Lifecycle State Machine (FSM)
-
-The lifecycle of an order is governed by a strict Finite State Machine. State transitions must occur through explicit server actions or database triggers. **Direct updates that bypass transition guards are strictly prohibited.**
-
-### 1.1 State Transition Diagram
-
-```
-                             [ Customer Initiates Checkout ]
-                                            │
-                     ┌──────────────────────┴──────────────────────┐
-                     ▼                                             ▼
-            (Digital Payment)                             (Cash on Delivery)
-                     │                                             │
-                     ▼                                             ▼
-           [ PENDING_PAYMENT ]                            [ CONFIRMED_UNPAID ]
-                     │                                             │
-      (MoMo / Card Webhook Success)                                │
-                     │                                             │
-                     └──────────────────────┬──────────────────────┘
-                                            │
-                                            ▼
-                                      [ PREPARING ] ◄── (Ticket enters KDS Queue)
-                                            │
-                                    (Cook Bumps Ticket)
-                                            │
-                                            ▼
-                                   [ READY_FOR_PICKUP ] ◄── (Enters Rider Claim Pool)
-                                            │
-                                    (Rider Claims Order)
-                                            │
-                                            ▼
-                                        [ CLAIMED ] ◄── (Rider at Kitchen Pickup)
-                                            │
-                                   (Rider Taps "Start Trip")
-                                            │
-                                            ▼
-                                   [ OUT_FOR_DELIVERY ] ◄── (GPS Telemetry Active)
-                                            │
-                                (Valid 4-Digit PIN Entered)
-                                            │
-                                            ▼
-                                      [ DELIVERED ] ◄── (Terminal Success State)
-                                            ▲
-                                            │
-    [ CANCELLED ] ◄─────────────────────────┴──────── (Terminal Failure State)
-```
+All rules in this document are server-enforced. The UI may preview prices but never authorizes a financial value or a status transition.
 
 ---
 
-### 1.2 State Transition Matrix & Permissions
+## 1. Order Lifecycle
 
-| Current State | Next State | Permitted Actor | Trigger / Condition | Side Effects |
+```text
+                         checkout
+                            |
+          +-----------------+------------------+
+          |                                    |
+   digital payment                      cash on delivery
+          v                                    v
+  PENDING_PAYMENT                       CONFIRMED_UNPAID
+          |  verified webhook                  | kitchen accept
+          +-----------------+------------------+
+                            v
+                        PREPARING
+                            |
+              +-------------+-------------+
+              | dine-in                   | delivery
+              v                           v
+          DELIVERED                READY_FOR_PICKUP
+                                          | rider claim
+                                          v
+                                       CLAIMED
+                                          | start trip
+                                          v
+                                  OUT_FOR_DELIVERY
+                                     |           |
+                              PIN verified   failure reported
+                                     v           v
+                                 DELIVERED   DELIVERY_FAILED
+
+  PENDING_PAYMENT --timeout--> CANCELLED
+  CONFIRMED_UNPAID/PREPARING/READY/CLAIMED/OUT_FOR_DELIVERY --admin--> CANCELLED
+  DELIVERY_FAILED --admin resolution--> CANCELLED or redelivery
+```
+
+`DELIVERED`, `DELIVERY_FAILED`, and `CANCELLED` are terminal for the normal rider flow. Admin recovery is audited.
+
+### 1.1 Transition Matrix
+
+| From | To | Actor | Path / guard | Side effects |
 | :--- | :--- | :--- | :--- | :--- |
-| `NULL` | `PENDING_PAYMENT` | Customer | Customer initiates MoMo / Card checkout. | Generates `order_token` and `handover_pin`. Triggers USSD Push. |
-| `NULL` | `CONFIRMED_UNPAID` | Customer | Customer selects COD with valid phone verification. | Generates `order_token` and `handover_pin`. Kitchen ticket created. |
-| `PENDING_PAYMENT` | `PREPARING` | System (Webhook) | Webhook receives confirmed `PAID` event. | Updates `payment_status = 'PAID'`. Plays audio alert on `/kitchen`. |
-| `PENDING_PAYMENT` | `CANCELLED` | System (Timeout) | No payment confirmed within 10 minutes. | Voids transaction; notifies customer via UI. |
-| `CONFIRMED_UNPAID` | `PREPARING` | Kitchen Cook | Cook acknowledges ticket on KDS. | Shifts ticket from New to Active cooking queue. |
-| `PREPARING` | `READY_FOR_PICKUP` | Kitchen Cook | Cook taps `[ Ready for Pickup ]`. | Packages food; order appears in `/rider` unclaimed pool. |
-| `READY_FOR_PICKUP` | `CLAIMED` | Boda Rider | Rider taps `[ Claim Delivery ]` in `/rider`. | Locks `rider_id = auth.uid()` via atomic transaction. |
-| `CLAIMED` | `OUT_FOR_DELIVERY` | Assigned Rider | Rider taps `[ Start Trip ]` after picking up food. | Sets `dispatched_at = now()`. Begins HTML5 GPS streaming. |
-| `OUT_FOR_DELIVERY` | `DELIVERED` | Assigned Rider | Rider submits matching 4-digit `handover_pin`. | Sets `delivered_at = now()`. If COD, marks `payment_status = 'PAID'`. |
-| `PREPARING` | `CANCELLED` | Admin | Customer cancels or severe kitchen emergency. | Alerts cook to stop; triggers refund if paid online. |
-| `CLAIMED` | `READY_FOR_PICKUP` | Admin / Rider | Motorcycle breakdown / flat tire before dispatch. | Resets `rider_id = NULL`; returns order to unclaimed pool. |
+| — | `PENDING_PAYMENT` | Customer | Checkout server action, digital method | Generates token + PIN, starts payment |
+| — | `CONFIRMED_UNPAID` | Customer | Checkout server action, COD + OTP/returning rule | Generates token + PIN, enters kitchen queue |
+| `PENDING_PAYMENT` | `PREPARING` | Payment webhook | Verified Flutterwave event only | `payment_status = PAID`, `acknowledged_at`, kitchen alert |
+| `PENDING_PAYMENT` | `CANCELLED` | Cron | `expire_pending_orders()` after 10 minutes | Payment marked failed/expired |
+| `CONFIRMED_UNPAID` | `PREPARING` | Kitchen | `accept_order(p_order_id)` | `acknowledged_at` |
+| `PREPARING` | `READY_FOR_PICKUP` | Kitchen | `bump_order(p_order_id)` for delivery | Enters rider pool |
+| `PREPARING` | `DELIVERED` | Kitchen | `bump_order(p_order_id)` for dine-in | `delivered_at`; no rider, PIN, packaging, or delivery fee |
+| `READY_FOR_PICKUP` | `CLAIMED` | Rider | `claim_order_atomic(p_order_id)` | Sets `rider_id = auth.uid()` under row lock |
+| `CLAIMED` | `READY_FOR_PICKUP` | Rider/Admin | `release_order(p_order_id, reason)` | Clears rider, returns to pool |
+| `CLAIMED` | `OUT_FOR_DELIVERY` | Assigned rider | `start_delivery(p_order_id)` | `dispatched_at`; telemetry may start |
+| `OUT_FOR_DELIVERY` | `DELIVERED` | Assigned rider | `verify_delivery_pin(...)` | Valid PIN, geofence, COD paid, attempts cleared |
+| `OUT_FOR_DELIVERY` | `DELIVERY_FAILED` | Assigned rider | `report_delivery_failed(...)` | `delivery_attempts` row and security flag |
+| any non-terminal | `CANCELLED` | Admin | `admin_cancel_order(order_id, reason)` | Cancel fields, audit, refund request if paid |
+| `CLAIMED`/`OUT_FOR_DELIVERY`/`READY_FOR_PICKUP` | `DELIVERED` | Admin | `admin_complete_order(order_id, reason)` | PIN override, audit, COD paid |
+| `CLAIMED`/`OUT_FOR_DELIVERY` | `CLAIMED` | Admin | `admin_reassign_order(order_id, rider_id)` | New rider, audit |
+
+Illegal transitions are rejected by the `enforce_order_transition` trigger even if a caller bypasses the RPC.
+
+### 1.2 Status Copy
+
+Use `CANONICAL_EXAMPLES.md` §10. Do not invent customer-facing status names in UI code.
 
 ---
 
-## 2. Distance & Delivery Fee Calculation Engine
+## 2. Delivery Fee
 
-Delivery fees are determined strictly by **road network driving distance** (not straight-line Euclidean distance) between the restaurant coordinates and the customer's pinned coordinates.
+### 2.1 Inputs
 
-### 2.1 Restaurant Reference Coordinates
-* **Latitude:** `0.3136000`
-* **Longitude:** `32.5811000`
-* **Location:** Central Bazaar Hub, Kampala, Uganda
+- Restaurant pin from `app_settings` (founder-verified; currently unverified `0.3136, 32.5811`).
+- Destination pin from the customer map.
+- `road_distance_m` from OSRM driving route, stored as **integer metres**.
 
----
+### 2.2 Formula
 
-### 2.2 Mathematical Formula Specification
-
-$$\text{Delivery Fee (UGX)} = \begin{cases} 0 & \text{if } d_{\text{road}} \le 5.0\text{ km} \\ \lceil d_{\text{road}} - 5.0 \rceil \times \text{Rate}_{\text{per\_km}} & \text{if } 5.0\text{ km} < d_{\text{road}} \le 15.0\text{ km} \\ \text{ORDER\_BLOCKED} & \text{if } d_{\text{road}} > 15.0\text{ km} \end{cases}$$
-
-#### Step-by-Step Rule Engine:
-1. **Tier 1 ($0.0\text{ km} \le d \le 5.0\text{ km}$):**
-   * The fee is **`USh 0` (Free Delivery)**.
-2. **Tier 2 ($5.01\text{ km} \le d \le 15.0\text{ km}$):**
-   * Subtract the 5.0 km free allowance: $d_{\text{excess}} = d_{\text{road}} - 5.0$.
-   * Apply ceiling rounding to the excess distance: $d_{\text{billable}} = \lceil d_{\text{excess}} \rceil$.
-   * Multiply by the configured rate (Default: `USh 1,500` per km):
-     $$\text{Fee} = d_{\text{billable}} \times 1,500$$
-3. **Tier 3 ($d > 15.0\text{ km}$):**
-   * The delivery engine throws a `DISTANCE_OUT_OF_BOUNDS` error. Order creation is blocked.
-
-#### Concrete Calculation Examples:
-
-| Pinned Road Distance ($d_{\text{road}}$) | Excess Distance ($d - 5.0$) | Billable Km ($\lceil d - 5 \rceil$) | Rate per Km | Final Delivery Fee |
-| :--- | :--- | :--- | :--- | :--- |
-| **3.8 km** (Nakasero) | $0.0\text{ km}$ | $0\text{ km}$ | USh 1,500 | **USh 0** (Free) |
-| **5.0 km** (Kololo Border) | $0.0\text{ km}$ | $0\text{ km}$ | USh 1,500 | **USh 0** (Free) |
-| **5.2 km** (Kamwokya) | $0.2\text{ km}$ | $1\text{ km}$ | USh 1,500 | **USh 1,500** |
-| **7.4 km** (Ntinda) | $2.4\text{ km}$ | $3\text{ km}$ | USh 1,500 | **USh 4,500** |
-| **11.1 km** (Kyanja) | $6.1\text{ km}$ | $7\text{ km}$ | USh 1,500 | **USh 10,500** |
-| **15.2 km** (Entebbe Rd Exit) | $10.2\text{ km}$ | N/A | N/A | **BLOCKED (> 15 km)** |
-
----
-
-### 2.3 OSRM Routing Integration & Fallback Protocol
-
-Distance calculations are executed through an internal API route (`/api/distance`) that queries the Open Source Routing Machine (OSRM) driving profile.
-
-```
-[ Customer Pin Drop: (lat, lng) ]
-               │
-               ▼
-   [ Query OSRM Driving API ] 
-   router.project-osrm.org/route/v1/driving/32.5811,0.3136;lng,lat
-               │
-       ┌───────┴───────┐
-       ▼               ▼
-   (Success)       (Timeout > 3s or Network Failure)
-       │               │
-       │               ▼
-       │      [ Fallback: Haversine Formula ]
-       │      d_straight = Haversine(rest_coords, user_coords)
-       │      d_road = d_straight * 1.35 (Urban Curvature Factor)
-       │               │
-       └───────┬───────┘
-               ▼
-   [ Apply 5 km Tier Formula ]
+```text
+if road_distance_m <= 5000:
+    fee = 0
+elif road_distance_m <= 15000:
+    billable_km = ceil((road_distance_m - 5000) / 1000)
+    fee = billable_km * rate_per_excess_km   # default 1,500 UGX
+else:
+    reject DISTANCE_OUT_OF_BOUNDS
 ```
 
-* **Urban Curvature Factor:** If the external OSRM service is unreachable, the system falls back to the Haversine equation multiplied by an urban road winding factor of **`1.35`** (calibrated for Kampala's road topology).
+Never store a one-decimal kilometre value and then apply `ceil`. `5,001 m` is billable; `15,001 m` is blocked.
+
+### 2.3 Canonical Results
+
+| Destination | Metres | Fee |
+| :--- | ---: | ---: |
+| Nakasero | 1,562 | **USh 0** |
+| Ntinda | 8,093 | **USh 6,000** |
+
+The v1.0 `3.8 km`, `7.4 km`, and `USh 4,500` values are retired. They may appear only in historical audit text.
+
+### 2.4 OSRM Failure
+
+If OSRM is unavailable and no valid cached route exists, checkout is **blocked** with `DISTANCE_UNAVAILABLE`. There is no Haversine or straight-line substitute for a final fee. A cached route for the same quantised coordinates may be reused for 24 hours.
 
 ---
 
-## 3. Minimum Order Value (MOV) & Cart Guardrails
+## 3. Cart, MOV, and Packaging
 
-To prevent financial loss on free or subsidized delivery runs, the system enforces strict order value minimums:
+| Rule | Delivery | Dine-in |
+| :--- | :--- | :--- |
+| MOV against items + modifiers | USh 20,000 | USh 0 |
+| Packaging fee | USh 1,000 | USh 0 |
+| Delivery fee | Formula above | USh 0 |
+| Max line quantity | 20 | 20 |
+| Max cart value | USh 200,000 | USh 200,000 |
+| Max distinct lines | 30 | 30 |
 
-### 3.1 MOV Business Rules
-1. **Global Delivery MOV:** Set to **`USh 20,000`** in `app_settings.minimum_order_value`.
-2. **Evaluation Point:** Evaluated strictly against `items_subtotal + modifiers_total` (delivery fees and packaging fees do **not** count toward fulfilling the MOV).
-3. **Dine-In Exception:** If `order_type == 'DINE_IN'` (Table QR scan), the MOV requirement is **bypassed completely (`MOV = USh 0`)**.
+Under-MOV copy: “Add USh [deficit] more to unlock delivery.” At or above MOV: “Delivery threshold reached.” Dine-in never shows a delivery threshold.
 
-### 3.2 Dynamic Cart Math & UI States
-* **Under MOV:**
-  $$\text{Deficit} = \text{MOV} - (\text{items\_subtotal} + \text{modifiers\_total})$$
-  * `is_checkout_allowed = false`
-  * Cart Progress: $\text{Percent} = \frac{\text{Subtotal}}{\text{MOV}} \times 100$
-  * Visual Display: *"Add USh [Deficit] more to unlock delivery."*
-* **At or Above MOV:**
-  * `is_checkout_allowed = true`
-  * Visual Display: *"Delivery threshold reached!"*
+Promotions and discount codes are **not** part of v1. The pricing formula is:
+
+```text
+total = items_subtotal + modifiers_total + packaging_fee + delivery_fee
+```
 
 ---
 
-## 4. Master Order Pricing Pipeline (Server-Side Recalculation)
+## 4. Server Pricing Pipeline
 
-Clients submit selected item IDs, quantities, modifier IDs, and target coordinates. **The client never dictates the final price.** The server executes this immutable recalculation pipeline:
+1. Validate the discriminated checkout input and normalize the phone.
+2. Enforce store-open and rate limits.
+3. Read item and modifier prices from the database; ignore any client price.
+4. Validate availability, modifier applicability, selection min/max, and combo steps.
+5. Compute `items_subtotal` and `modifiers_total` in integer UGX.
+6. Enforce MOV, cart limits, and COD radius/method rules.
+7. Resolve OSRM metres; block on failure or > 15 km.
+8. Compute packaging and delivery fees.
+9. Insert the order, items, modifiers, token, PIN, idempotency record, and status history in one transaction.
+10. For digital payment, initiate Flutterwave and return the hosted-checkout URL; for COD, return the confirmed order and tracker token.
 
-```
-[ Incoming Checkout Payload ]
-               │
-               ▼
- 1. Fetch current menu item prices from DB (Ignore client-submitted prices)
- 2. Fetch current modifier prices from DB
- 3. Compute items_subtotal = Sum(item.base_price * qty)
- 4. Compute modifiers_total = Sum(modifier.price_delta * qty)
- 5. Validate: (items_subtotal + modifiers_total) >= app_settings.minimum_order_value
- 6. Compute road_distance_km via OSRM
- 7. Compute delivery_fee based on distance tier
- 8. Fetch app_settings.packaging_fee_default (e.g., USh 1,000)
- 9. Compute total_amount = Subtotal + Modifiers + Packaging + DeliveryFee
-               │
-               ▼
-[ Commit to DB with order_status = PENDING_PAYMENT or CONFIRMED_UNPAID ]
-```
-
-$$\text{total\_amount} = \text{items\_subtotal} + \text{modifiers\_total} + \text{packaging\_fee} + \text{delivery\_fee}$$
+`total_amount` is a generated column and a trigger rejects direct component changes that would desync it.
 
 ---
 
-## 5. Concurrency Control: The Rider Claim Lock
+## 5. Rider Claim Concurrency
 
-When an order enters `READY_FOR_PICKUP`, all 5 motorcycle riders see the order appear in their `/rider` pool simultaneously. 
+`claim_order_atomic(p_order_id UUID)` is the only claim path:
 
-To eliminate race conditions where two riders tap `[ Claim Delivery ]` at the exact same millisecond, the system enforces **atomic row-level locking**:
+- derives the rider from `auth.uid()`;
+- rejects a rider who already has an active `CLAIMED`/`OUT_FOR_DELIVERY` order;
+- updates only `READY_FOR_PICKUP` rows with `rider_id IS NULL`;
+- uses a partial unique index as the final race guard;
+- returns `ORDER_ALREADY_CLAIMED` if another rider won;
+- returns the safe active-order payload.
 
-### 5.1 Atomic Claim Procedure (SQL)
+Client handling:
 
-```sql
--- Secure atomic claim executed via Next.js Server Action
-CREATE OR REPLACE FUNCTION public.claim_order_atomic(
-  p_order_id UUID,
-  p_rider_id UUID
-)
-RETURNS BOOLEAN AS $$
-DECLARE
-  v_updated_rows INTEGER;
-BEGIN
-  -- Attempt atomic update: must be READY_FOR_PICKUP and rider_id must be NULL
-  UPDATE public.orders
-  SET 
-    rider_id = p_rider_id,
-    order_status = 'CLAIMED',
-    claimed_at = timezone('utc'::text, now())
-  WHERE id = p_order_id 
-    AND order_status = 'READY_FOR_PICKUP' 
-    AND rider_id IS NULL;
+- success: show the active delivery, enable navigation/telemetry;
+- failure: remove the card and show “Order was just claimed by another rider.”
 
-  GET DIAGNOSTICS v_updated_rows = ROW_COUNT;
-
-  -- Returns true if this rider won the lock, false if another rider claimed first
-  RETURN v_updated_rows > 0;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-```
-
-### 5.2 Client-Side Concurrency Handling
-* If `claim_order_atomic` returns `true`:
-  * Rider UI immediately transitions to active navigation and GPS broadcasting.
-* If `claim_order_atomic` returns `false`:
-  * Rider UI displays a high-contrast toast: *"Order was just claimed by another rider."*
-  * The order is removed from their available pool view without a page reload.
+No rider id is accepted from the client.
 
 ---
 
-## 6. Proof-of-Delivery: The 4-Digit Handover PIN Gate
+## 6. Handover Gate
 
-To prevent false claims of delivery or dropping food at an incorrect location, trip completion is gated by a **cryptographic proof-of-handover challenge**.
-
-```
-[ Customer Screen: /orders/[token] ]                [ Rider Screen: /rider ]
-Displays PIN: [ 4 8 2 1 ]                            Requests: "Enter 4-Digit Customer PIN"
-            │                                                         │
-            └──────────(Customer verbally shares PIN)─────────────────┘
-                                      │
-                                      ▼
-                      [ Server Action: verify_delivery_pin ]
-                                      │
-                  ┌───────────────────┴───────────────────┐
-                  ▼                                       ▼
-             (PIN Matches)                           (PIN Mismatches)
-                  │                                       │
-                  ▼                                       ▼
-       • order_status = 'DELIVERED'           • Increment failed_attempts
-       • delivered_at = now()                 • If attempts >= 3: Lock verification
-       • If COD: payment_status = 'PAID'        and flag order for Admin intervention
-       • Stop GPS broadcast                   • Return: "Invalid PIN. 2 attempts left."
-```
-
-### 6.1 PIN Security Constraints
-1. **No Frontend Exposure:** The `handover_pin` column is **never** sent to the rider’s device in the `/rider` payload. The rider's client only submits an attempt to the server.
-2. **Verification Server Action Logic:**
-   ```typescript
-   // Pseudo-logic for server-side PIN verification
-   if (order.handover_pin !== submittedPin) {
-     await incrementFailedPinAttempts(order.id);
-     throw new Error("INVALID_HANDOVER_PIN");
-   }
-   // Transition to DELIVERED atomically
-   await markOrderDelivered(order.id, riderId);
-   ```
+The PIN is 4 digits, per order, generated with `pgcrypto`, and verified only by `verify_delivery_pin` as defined in `SECURITY_AND_VERIFICATION_PROTOCOLS.md` §3. The rider UI never receives the PIN.
 
 ---
 
-## 7. End-of-Day Rider Cash Settlement Engine
+## 7. Cash Ledger and Settlement
 
-When riders collect Cash on Delivery (COD), they hold physical cash. The system tracks this liability continuously until verified by the restaurant manager at closing.
+### 7.1 Liability
 
-### 7.1 Rider Cash Balance Equation
-At any point during a shift, a rider's outstanding cash liability is calculated as:
+A rider's expected cash is the sum of `total_amount` for orders that are:
 
-$$\text{Rider Cash Liability} = \sum_{i \in \text{Delivered Orders}} \text{orders}[i].\text{total\_amount}$$
-$$\text{where } \text{payment\_method} = \text{'CASH\_ON\_DELIVERY'} \land \text{order\_status} = \text{'DELIVERED'} \land \text{is\_settled} = \text{false}$$
+- `payment_method = CASH_ON_DELIVERY`;
+- `payment_status = PAID`;
+- `order_status = DELIVERED`;
+- delivered on the selected `Africa/Kampala` business date;
+- not already linked to a closed settlement.
 
-### 7.2 Settlement Procedure
-1. At shift end, the manager navigates to `/admin/ledger`.
-2. The system computes the exact cash total for each of the 5 motorcycle plates.
-3. The rider presents physical paper money to the manager.
-4. The manager confirms the count and clicks `[ Reconcile & Clear Rider ]`.
-5. The system creates a record in `cash_settlements` and marks all included orders as settled:
-   ```sql
-   INSERT INTO public.cash_settlements (rider_id, admin_id, total_cash_collected, is_settled, settled_at)
-   VALUES (p_rider_id, auth.uid(), v_cash_liability, true, now());
-   ```
+### 7.2 Reconciliation
+
+`reconcile_rider_cash(p_rider_id, p_counted_cash, p_notes, p_business_date)`:
+
+1. Requires ADMIN.
+2. Defaults the business date to `(now() AT TIME ZONE 'Africa/Kampala')::date`.
+3. Computes expected cash from qualifying orders.
+4. Inserts or updates the unique `(rider_id, business_date)` settlement with `expected_cash`, `counted_cash`, generated `variance`, status `SETTLED` or `PARTIAL`, `settled_by`, and notes.
+5. Links every included order through `orders.settlement_id` and `settled_at`.
+6. Writes an audit row.
+
+The ledger UI must show the linked order IDs and the sum that produces the total. A settlement total is never typed independently of its orders.
+
+### 7.3 Canonical Ledger
+
+| Rider | Order | Payment | Amount |
+| :--- | :--- | :--- | ---: |
+| Juma | #1043 | COD | 38,000 |
+| Juma | #1047 | COD | 27,500 |
+| **Total** | | | **USh 65,500** |
+
+The retired `USh 64,000` ledger must not appear in current fixtures.
+
+### 7.4 Floats and Shifts
+
+`rider_shifts` records `opening_float`, start/end, and status. A shift may have one open row per rider. Settlement may be per shift or per business date; the v1 canonical report is per rider per business date. Physical change denominations are a founder policy (`F-67`); the app records the requested change (`cod_change_due`) but does not model individual banknotes.
+
+---
+
+## 8. ETA
+
+For delivery:
+
+```text
+eta_at = acknowledged_at
+       + max(item prep minutes)
+       + busy_buffer_minutes
+       + OSRM travel duration
+```
+
+- Store `estimated_travel_minutes` from OSRM.
+- Recompute when the kitchen accepts, when the rider claims, and when the rider starts.
+- Show a clock time plus “N minutes remaining”; never rely on a countdown colour alone.
+- If the kitchen is busy, add the configured buffer and disclose “Kitchen is busy” to the customer.
+- Dine-in shows preparation status, not a rider ETA.
+
+---
+
+## 9. Store-Closed and Failure Rules
+
+- Checkout is blocked when `is_store_open = false` or EAT time is outside opening/closing hours.
+- The storefront shows the closed screen with opening hours and WhatsApp support.
+- Admin may open the store explicitly; the action is audited in `settings_history` and `admin_audit_log`.
+- Delivery failure outcomes: `CUSTOMER_UNAVAILABLE`, `WRONG_ADDRESS`, `REFUSED`, `RETURNED`, `OTHER`.
+- Failed deliveries remain visible to admin with reason, rider, coordinates, timestamp, and any note. They do not silently become `DELIVERED`.
+- Admin may cancel/refund, arrange redelivery, or blacklist the phone after review.
+
+---
+
+## 10. Business Day and Money
+
+- All money is integer UGX.
+- All timestamps are stored in UTC and rendered in `Africa/Kampala`.
+- All financial reports, shifts, and settlements use the `Africa/Kampala` date.
+- No floating point arithmetic is allowed for money or distance.
+
+---
+
+## 11. Revision History
+
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.0.0 | 2026-10-29 | Original FSM and pricing draft. |
+| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.2.0 | 2026-11-09 | Rewrote transitions, integer-metre pricing, OSRM blocking, claim RPC, settlement linkage, ETA, and store-closed rules. |

@@ -3,11 +3,11 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Approved baseline |
-| **Version** | 1.1.0 |
-| **Date** | 2026-10-29 |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
 | **Rule** | If any document, test, screenshot, or fixture disagrees with this file, this file wins. |
 
-This file exists because the v1.0 documents used four different totals for the same order (`USh 34,000`, `35,000`, `37,000`, `38,000`) and two different distances for the same coordinates (`3.8 km` vs. a real `1.56 km`).
+This file exists because the v1.0 documents used conflicting totals for the same order and a road distance that did not match the real OSRM route. The verified values below replace them.
 
 ---
 
@@ -20,7 +20,7 @@ This file exists because the v1.0 documents used four different totals for the s
 | Free delivery radius | **5.0 km** | `app_settings.free_delivery_radius_km` |
 | Excess rate | **USh 1,500 / km** | `app_settings.rate_per_excess_km` |
 | Maximum delivery radius | **15.0 km** | `app_settings.max_delivery_radius_km` |
-| COD maximum radius | **8.0 km** | `app_settings.cod_max_radius_km` |
+| COD maximum radius | **8.1 km** | `app_settings.cod_max_radius_km` |
 | Minimum order value (delivery) | **USh 20,000** | `app_settings.minimum_order_value` |
 | Minimum order value (dine-in) | **USh 0** | `app_settings.minimum_order_value_dine_in` |
 | Packaging fee (delivery) | **USh 1,000** | `app_settings.packaging_fee_default` |
@@ -64,20 +64,9 @@ Verified against the public OSRM demo server on **2026-10-29**:
 | Nakasero | 1.562 km | 0 | 0 | **USh 0** |
 | Ntinda | 8.093 km | 3.093 km | 4 km | **USh 6,000** |
 
-The old values (`3.8 km`, `7.4 km`, `4,500`) are **retired**. They must not appear in tests or UI copy.
+The retired v1.0 distances and fee must not appear in tests or UI copy. Test mocks must reproduce the verified values in this table, clearly labelled `MOCK`; they must not reintroduce the old fixtures.
 
-### 3.2 If you need the old illustrative values
-
-If the product wants a demo at `3.8 km` / `7.4 km`, create **mocked OSRM fixtures** in the test adapter:
-
-```json
-[
-  { "name": "nakasero-demo", "lat": 0.3245, "lng": 32.5782, "distance_m": 3800, "source": "MOCK" },
-  { "name": "ntinda-demo", "lat": 0.3542, "lng": 32.6120, "distance_m": 7400, "source": "MOCK" }
-]
-```
-
-Label them `MOCK` in test output. Never use them to validate production pricing.
+> **COD radius note:** the canonical Ntinda COD fixture is 8.093 km. The seeded `cod_max_radius_km` is therefore **8.1 km**, not 8.0 km, so the fixture is eligible. The final commercial ceiling remains founder gate F-14.
 
 ---
 
@@ -94,7 +83,7 @@ Label them `MOCK` in test output. Never use them to validate production pricing.
 | Delivery (1.562 km) | | | 0 |
 | **TOTAL DUE** | | | **USh 35,000** |
 
-Use **USh 35,000** everywhere for this order. The old `34,000`, `37,000`, and `38,000` examples are retired.
+Use **USh 35,000** everywhere for this order. All v1.0 variants are retired.
 
 ---
 
@@ -119,7 +108,7 @@ Total due:            USh 38,000
 Change due:           USh 12,000
 ```
 
-The old `USh 35,600` and `USh 36,500` examples are retired.
+All v1.0 variants of this total are retired.
 
 ---
 
@@ -149,9 +138,7 @@ Use orders generated from the canonical fixtures. Do not invent totals.
 | Juma | #1047 | COD | 27,500 |
 | **Juma total** | | | **USh 65,500** |
 
-If you prefer the old `64,000` ledger example, replace the second order with a **USh 26,000** COD order and update every reference. Do not mix the two.
-
-**Rule:** a settlement total must equal the sum of the linked `orders.total_amount` rows. The ledger UI must show the order IDs.
+**Rule:** a settlement total must equal the sum of the linked `orders.total_amount` rows. The ledger UI must show the order IDs. Do not substitute a different second order or a lump-sum total; change this file first if the fixture set changes.
 
 ---
 
@@ -221,4 +208,5 @@ For unit tests of the fee function, use fixed metres (not network calls):
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
-| 1.1.0 | 2026-10-29 | Created; retired 3.8/7.4 km, 35,600/36,500, 34,000/37,000/38,000 contradictions. |
+| 1.2.0 | 2026-11-09 | Aligned COD radius with the canonical Ntinda fixture; removed optional legacy mocks and the alternate ledger total. |
+| 1.1.0 | 2026-10-29 | Created; retired the v1.0 distance, fee, total, and ledger contradictions. |

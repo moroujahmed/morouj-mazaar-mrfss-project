@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Approved baseline for build |
-| **Version** | 1.1.0 |
-| **Date** | 2026-10-29 |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
 | **Supersedes** | Implicit/ambiguous decisions in the v1.0 specification set |
 
 This document is the **single source of truth for architectural forks**. If another document conflicts with a decision here, this document wins until the conflict is corrected.
@@ -150,7 +150,7 @@ This resolves the v1.0 contradiction between "strictly road distance" and the Ha
 
 ## ADR-008 — Next.js and dependency pinning
 
-**Status:** Accepted
+**Status:** Accepted; exact versions to be recorded at Phase 1
 
 **Decision**
 
@@ -299,6 +299,49 @@ Supabase Realtime `postgres_changes` cannot do column redaction and cannot authe
 
 ---
 
+## ADR-017 — Design system v2 (green/orange) supersedes “Bazaar Warmth”
+
+**Status:** Accepted
+
+**Decision**
+
+- `DESIGN_SYSTEM_V2.md` and the current `site/` prototype are the normative visual language.
+- Primary green `#173F35`, deep green `#102E27`, action orange `#F28C28`, orange text `#A65A0F`, red `#C62828`, success `#17603F`, warning `#8A4B00`.
+- Orange CTAs use green-900 (`#102E27`) text. White text on orange is prohibited.
+- The previous terracotta “Bazaar Warmth” palette (`#B83817`, `#D84A26`, cream/sand) is retired and non-normative.
+- Four portals: Customer, Kitchen, Rider, Admin. Dine-in is a customer mode/tracker subroute, not a separate portal.
+- `docs/stitch-design/` and `site/ui-kit.html` are archived design explorations; they are not build references.
+
+**Rationale**
+
+The current prototype and `DESIGN_SYSTEM_V2.md` already use the green/orange system with measured WCAG 2.2 AA contrast. Keeping the old terracotta specification created two competing design authorities and an accessibility claim that failed at the specified CTA sizes.
+
+**Consequences**
+
+- All screens and docs use the v2 tokens.
+- Design review checks contrast against `ACCESSIBILITY.md`, not the retired terracotta pair.
+- New visual concepts must not reintroduce the retired palette.
+
+---
+
+## ADR-018 — COD test ceiling is 8.1 km; commercial ceiling is a founder gate
+
+**Status:** Accepted; final commercial ceiling pending F-14
+
+**Decision**
+
+- The canonical Ntinda COD fixture is 8.093 km, so the test/seed `cod_max_radius_km` ceiling is **8.1 km**.
+- 8.1 km is the engineering default and test ceiling, not a commercial promise.
+- The founder confirms the final COD radius and change policy under F-14 before launch; changing it requires a canonical-example and seed update.
+
+**Rationale**
+
+The previous 8.0 km ceiling made the canonical 8.093 km COD example ineligible — a direct contradiction between the fixture and the settings default.
+
+**Founder dependency:** F-14.
+
+---
+
 ## Open founder decisions
 
 These are recorded here so they are not lost. **The authoritative, complete register — including F-16 onward, status, and blocking phase — is `AUDIT_REPORT.md` §12.** This table is the first tranche of that register.
@@ -306,7 +349,7 @@ These are recorded here so they are not lost. **The authoritative, complete regi
 | ID | Decision | Needed by |
 | :--- | :--- | :--- |
 | F-01 | Confirm restaurant GPS on site | Phase 2 |
-| F-02 | Confirm fee/MOV/COD constants | Phase 2 |
+| F-02 | Confirm commercial fee/MOV/COD constants (canonical test values: fee formula in `CANONICAL_EXAMPLES.md`; COD seed ceiling 8.1 km) | Phase 2 |
 | F-03 | Provide menu/modifier/combo data | Phase 2 |
 | F-04 | Provide staff/rider roster and PINs | Phase 2 |
 | F-05 | Provide Flutterwave merchant credentials | Phase 6 |
@@ -318,7 +361,7 @@ These are recorded here so they are not lost. **The authoritative, complete regi
 | F-11 | Confirm VAT/EFRIS position | Phase 6 |
 | F-12 | Provide brand/dish assets | Phase 3 |
 | F-13 | Confirm domain/hosting accounts | Phase 12 |
-| F-14 | Confirm COD max radius and change policy | Phase 2 |
+| F-14 | Confirm final commercial COD max radius and change policy (8.1 km is the v1.2 test ceiling) | Phase 2 |
 | F-15 | Confirm notification templates/sender ID | Phase 9 |
 
 ---
@@ -327,4 +370,6 @@ These are recorded here so they are not lost. **The authoritative, complete regi
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Added ADR-017 (v2 green/orange design system) and ADR-018 (8.1 km COD test ceiling); clarified F-02/F-14 and ADR-008 status. |
+| 1.1.0 | 2026-10-29 | Added ADRs 001–016 from the audit remediation. |
 | 1.0.0 | 2026-10-29 | Initial ADR baseline created during the readiness upgrade. |

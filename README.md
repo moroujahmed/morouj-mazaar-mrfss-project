@@ -4,14 +4,15 @@ Direct-to-consumer ordering, kitchen display, rider dispatch, and cash reconcili
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.1 + static interface prototype |
+| **Status** | Specification baseline v1.2 + static interface prototype |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | UGX, whole integers |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
-| **Prototype** | [`site/index.html`](site/index.html) — customer, admin and rider interfaces |
+| **Prototype** | [`site/index.html`](site/index.html) — customer, kitchen, admin and rider interfaces |
 | **Audit** | [`docs/AUDIT_REPORT.md`](docs/AUDIT_REPORT.md) |
 | **Decisions** | [`docs/DECISIONS.md`](docs/DECISIONS.md) |
 | **Canonical numbers** | [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) |
+| **Security policy** | [`SECURITY.md`](SECURITY.md) |
 
 ---
 
@@ -21,8 +22,8 @@ The repository currently contains the **specification, database baseline, seed d
 
 ```
 .
-├── docs/                       # 10 original specs + v1.1 build artifacts
-├── site/                       # static customer, admin, rider and design-system prototype
+├── docs/                       # normative v1.2 specs, ADRs, audit, test and ops artifacts
+├── site/                       # static customer, kitchen, admin, rider and design-system prototype
 ├── supabase/
 │   ├── migrations/             # schema + storage migrations
 │   ├── seed.sql                # menu, settings, tables
@@ -32,6 +33,7 @@ The repository currently contains the **specification, database baseline, seed d
 │   └── staff.example.json      # template roster (replace PINs)
 ├── .env.example
 ├── .gitignore
+├── SECURITY.md
 └── README.md
 ```
 
@@ -42,18 +44,24 @@ The repository currently contains the **specification, database baseline, seed d
 3. [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) — the only approved distances, totals, and fixtures.
 4. [`docs/ERD.md`](docs/ERD.md) — entity model and data dictionary.
 5. [`docs/API_CONTRACTS.md`](docs/API_CONTRACTS.md) — server actions, route handlers, RPCs, auth matrix.
-6. [`docs/SPEC_AMENDMENTS.md`](docs/SPEC_AMENDMENTS.md) — normative amendments to the original 10 specs.
-7. [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) — corrected unit/integration/E2E plan.
+6. [`docs/SPEC_AMENDMENTS.md`](docs/SPEC_AMENDMENTS.md) — the v1.2 closure matrix for every audit finding.
+7. [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) — unit, integration and E2E plan.
 8. [`docs/OPERATIONS_RUNBOOK.md`](docs/OPERATIONS_RUNBOOK.md) — deploy, backup, incident, and go-live procedures.
 9. [`docs/COMPLIANCE_AND_LEGAL.md`](docs/COMPLIANCE_AND_LEGAL.md) — Uganda compliance checklist and policy skeletons.
 10. [`docs/ACCESSIBILITY.md`](docs/ACCESSIBILITY.md) — WCAG 2.2 AA palette and verification rules.
-11. [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) — the static prototype's palette, components, portal behaviour and accessibility checklist.
+11. [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) — palette, components, portal behaviour and accessibility checklist.
+12. [`docs/ANALYTICS.md`](docs/ANALYTICS.md) — KPI definitions, dashboard and data rules.
+13. [`docs/GLOSSARY.md`](docs/GLOSSARY.md) — shared terms for the team and new contributors.
+14. [`docs/SEQUENCE_DIAGRAMS.md`](docs/SEQUENCE_DIAGRAMS.md) — payment, claim, settlement and refund flows.
+15. [`docs/BROWSER_SUPPORT.md`](docs/BROWSER_SUPPORT.md) — supported browser and device matrix.
+16. [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — documentation and schema change history.
+17. [`SECURITY.md`](SECURITY.md) — vulnerability reporting and security rules.
 
 ---
 
 ## Interface prototype
 
-The [`site/`](site/) folder contains a dependency-free, multi-page prototype of the customer, admin and rider experiences. Open [`site/index.html`](site/index.html) directly, or serve it locally:
+The [`site/`](site/) folder contains a dependency-free, multi-page prototype of the customer, kitchen, admin and rider experiences. Open [`site/index.html`](site/index.html) directly, or serve it locally:
 
 ```bash
 cd site
@@ -64,11 +72,12 @@ python -m http.server 8000
 | :--- | :--- |
 | [`site/index.html`](site/index.html) | Portal launcher and palette overview |
 | [`site/customer.html`](site/customer.html) | Menu, basket, checkout, payment and tracking |
+| [`site/kitchen.html`](site/kitchen.html) | Oldest-first tickets, COD accept, bump, 86 toggles and print |
 | [`site/admin.html`](site/admin.html) | Analytics, orders, inventory, menu, delivery and reports |
 | [`site/rider.html`](site/rider.html) | Active delivery, PIN handover and offline-safe sync |
 | [`site/design-system.html`](site/design-system.html) | Tokens, components, status language and contrast rules |
 
-The prototype reuses the canonical totals and distances from [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md), with the `#1047` fixture exception noted in the design-system doc. It is a design reference, not the production app; see [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) for scope and limitations.
+The prototype reuses the canonical totals, distances and ledger from [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md), including Juma's **USh 65,500** settlement (`#1043` 38,000 + `#1047` 27,500). It is a design reference, not the production app; see [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) for scope and limitations. The older [`site/ui-kit.html`](site/ui-kit.html) and [`docs/stitch-design/`](docs/stitch-design/) are archived, non-normative explorations.
 
 ---
 
@@ -118,7 +127,7 @@ The test plan is in [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md). Canonical fixtures
 | Brian / Ntinda / COD | 8.093 km | 6,000 | **USh 38,000** |
 | Alex / Table 4 / dine-in | 0 | 0 | **USh 8,000** |
 
-Do not use the retired 3.8 km / 7.4 km / 4,500 / 35,600 / 36,500 values in tests or UI copy.
+Do not use retired distances, fees or totals in tests or UI copy. The canonical values above and in [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) are the only approved fixtures.
 
 ---
 

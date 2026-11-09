@@ -112,16 +112,16 @@
       address: "Plot 5 Spring Road, Bugolobi",
       notes: "Extra chilli on the side",
       status: "Ready",
-      payment: "Airtel Money",
-      paid: true,
+      payment: "Cash on delivery",
+      paid: false,
       rider: "",
       time: "13:12",
       items: [
-        { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "" },
-        { name: "Special Bazaar Rolex", qty: 1, price: 8000, mods: "" }
+        { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "Extra chilli on the side" },
+        { name: "Extra chilli", qty: 1, price: 1000, mods: "" }
       ],
       packaging: 1000,
-      delivery: 0
+      delivery: 1500
     }
   ];
 
@@ -141,8 +141,8 @@
   ];
 
   let riders = [
-    { name: "Juma Mukasa", plate: "UFD 342B", status: "On delivery", order: "#1043", cash: 64000, deliveries: 7, phone: "+256 772 100 201" },
-    { name: "David Ochieng", plate: "UEX 119A", status: "On delivery", order: "#1042", cash: 35600, deliveries: 5, phone: "+256 701 300 118" },
+    { name: "Juma Mukasa", plate: "UFD 342B", status: "On delivery", order: "#1043", cash: 65500, cashOrders: "#1043 · #1047", deliveries: 7, phone: "+256 772 100 201" },
+    { name: "David Ochieng", plate: "UEX 119A", status: "On delivery", order: "#1042", cash: 23500, deliveries: 5, phone: "+256 701 300 118" },
     { name: "Brian Kato", plate: "UEE 902C", status: "Available", order: "", cash: 112000, deliveries: 8, phone: "+256 782 900 332" },
     { name: "Samuel Ssebo", plate: "UFA 450P", status: "Available", order: "", cash: 0, deliveries: 6, phone: "+256 705 440 900" },
     { name: "Alex Wandera", plate: "UFD 881M", status: "Offline", order: "", cash: 28000, deliveries: 4, phone: "+256 774 881 004" }
@@ -913,7 +913,9 @@
         const cleared = rider.cash === 0;
         return (
           "<tr>" +
-            "<td><strong>" + escapeHtml(rider.name) + "</strong></td>" +
+            "<td><strong>" + escapeHtml(rider.name) + "</strong>" +
+              (rider.cashOrders ? '<span class="sub mono">' + escapeHtml(rider.cashOrders) + "</span>" : "") +
+            "</td>" +
             '<td><span class="mono">' + escapeHtml(rider.plate) + "</span></td>" +
             '<td class="num">' + rider.deliveries + "</td>" +
             '<td class="num">' + money(rider.cash) + "</td>" +

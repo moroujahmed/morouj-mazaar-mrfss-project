@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Approved build contract |
-| **Version** | 1.1.0 |
-| **Date** | 2026-10-29 |
+| **Status** | Normative build contract |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
 | **Rule** | Every public mutation must appear here before implementation. |
 
 ---
@@ -56,7 +56,7 @@ export type ApiResponse<T> =
 | `/kitchen` | Supabase Auth, `KITCHEN` or `ADMIN` | Middleware + server guard. |
 | `/rider` | Supabase Auth, `RIDER` | Middleware + server guard. |
 | `/admin` | Supabase Auth, `ADMIN` | Middleware + server guard. |
-| `/api/webhooks/payment` | provider signature | No user session. |
+| `/api/webhooks/flutterwave` | provider signature | No user session. |
 | `/api/notifications/dispatch` | `CRON_SECRET` | Cron only. |
 | `/api/distance` | anon + rate limit | No PII. |
 
@@ -110,7 +110,7 @@ export type ApiResponse<T> =
 11. Compute delivery fee from metres.
 12. Packaging fee: delivery 1,000; dine-in 0.
 13. Compute `total_amount`.
-14. COD checks: radius <= 8 km, phone not blacklisted, OTP verified if first-time.
+14. COD checks: radius <= `app_settings.cod_max_radius_km` (8.1 km), phone not blacklisted, OTP verified if first-time.
 15. Insert order + items + modifier snapshots in one transaction.
 16. Generate `order_token` and `handover_pin` in DB.
 17. Insert status history row.
@@ -179,7 +179,7 @@ export type ApiResponse<T> =
 
 | Action | Auth | Input | Rules |
 | :--- | :--- | :--- | :--- |
-| `acceptOrderAction` | KITCHEN/ADMIN | `{ orderId }` | `CONFIRMED_UNPAID`/`PENDING_PAYMENT` → `PREPARING`; sets `acknowledged_at` (add column if needed). |
+| `acceptOrderAction` | KITCHEN/ADMIN | `{ orderId }` | `CONFIRMED_UNPAID` → `PREPARING`; sets `acknowledged_at`. Paid orders arrive already `PREPARING` from the verified webhook and do not use accept. |
 | `bumpOrderAction` | KITCHEN/ADMIN | `{ orderId }` | `PREPARING` → `READY_FOR_PICKUP` (delivery) or `DELIVERED` (dine-in). |
 | `setItemAvailabilityAction` | KITCHEN/ADMIN | `{ itemId, available }` | Calls `set_menu_item_availability` RPC; audited. |
 | `setBusyModeAction` | KITCHEN/ADMIN | `{ busy, bufferMinutes }` | Calls `set_kitchen_busy` RPC; buffer 0..60. |
@@ -193,7 +193,7 @@ export type ApiResponse<T> =
 | `claimOrderAction` | RIDER | `{ orderId }` | Calls `claim_order_atomic`; one active order. |
 | `startDeliveryAction` | RIDER | `{ orderId }` | Calls `start_delivery`; `CLAIMED` → `OUT_FOR_DELIVERY`. |
 | `releaseOrderAction` | RIDER/ADMIN | `{ orderId, reason }` | `CLAIMED` → `READY_FOR_PICKUP`; clears rider. |
-| `verifyPinAction` | RIDER | `{ orderId, pin }` | Calls `verify_delivery_pin`; returns remaining attempts/change due. |
+| `verifyPinAction` | RIDER | `{ orderId, pin, lat?, lng? }` | Calls `verify_delivery_pin(order_id, pin, lat, lng, ip_hash, user_agent)`; returns remaining attempts/change due. |
 | `reportDeliveryFailedAction` | RIDER | `{ orderId, outcome, reason }` | `OUT_FOR_DELIVERY` → `DELIVERY_FAILED`; writes `delivery_attempts`. |
 
 ---
@@ -226,7 +226,7 @@ export type ApiResponse<T> =
 **Errors:** `DISTANCE_UNAVAILABLE`, `DISTANCE_OUT_OF_BOUNDS`, `RATE_LIMITED`.
 **Rules:** quantize coordinates to 5 decimals for cache key; cache 24 h; never return a Haversine estimate as final.
 
-### 3.2 `POST /api/webhooks/payment`
+### 3.2 `POST /api/webhooks/flutterwave`
 
 **Auth:** Flutterwave `verif-hash` (timing-safe)
 **Flow:**
@@ -288,14 +288,20 @@ All RPCs are `SECURITY DEFINER` with `SET search_path = public, pg_temp`.
 | `claim_order_atomic(p_order_id uuid)` | RIDER | Atomic claim; one active order. |
 | `start_delivery(p_order_id uuid)` | RIDER | `CLAIMED` → `OUT_FOR_DELIVERY`. |
 | `release_order(p_order_id uuid, p_reason text)` | RIDER/ADMIN | Return to pool. |
-| `verify_delivery_pin(p_order_id uuid, p_pin text)` | RIDER | Atomic PIN check, attempts, geofence, completion. |
-| `report_delivery_failed(p_order_id uuid, p_outcome text, p_reason text)` | RIDER | Terminal failure. |
+| `verify_delivery_pin(p_order_id uuid, p_pin text, p_lat numeric, p_lng numeric, p_ip_hash text, p_user_agent text)` | RIDER | Atomic PIN check, attempts, geofence, completion. |
+| `report_delivery_failed(p_order_id uuid, p_outcome public.delivery_outcome, p_reason text, p_lat numeric, p_lng numeric)` | RIDER | Terminal failure. |
 | `admin_complete_order(p_order_id uuid, p_reason text)` | ADMIN | PIN override with audit. |
+| `admin_cancel_order(p_order_id uuid, p_reason text)` | ADMIN | Cancel + refund request if paid. |
+| `admin_reassign_order(p_order_id uuid, p_rider_id uuid, p_reason text)` | ADMIN | Reassign with audit. |
+| `admin_reset_handover_pin(p_order_id uuid, p_reason text)` | ADMIN | New PIN, clear lock, audit. |
 | `set_kitchen_busy(p_busy boolean, p_buffer_minutes int)` | KITCHEN/ADMIN | Busy mode. |
 | `set_menu_item_availability(p_item_id uuid, p_available boolean)` | KITCHEN/ADMIN | 86 toggle. |
-| `reconcile_rider_cash(p_rider_id uuid, p_counted_cash int, p_notes text)` | ADMIN | Settlement + order linkage. |
+| `reconcile_rider_cash(p_rider_id uuid, p_counted_cash int, p_notes text, p_business_date date)` | ADMIN | Settlement + order linkage. |
 | `get_rider_cash_summary(p_rider_id uuid)` | RIDER self/ADMIN | Expected vs. settled. |
+| `get_admin_ledger(p_business_date date)` | ADMIN | Ledger rows. |
+| `get_admin_analytics(p_from date, p_to date)` | ADMIN | KPIs. |
 | `validate_table_token(p_token uuid)` | anon | Table lookup for dine-in. |
+| `update_rider_telemetry(p_order_id uuid, p_lat numeric, p_lng numeric, p_accuracy numeric, p_heading numeric, p_speed numeric)` | RIDER | Scoped telemetry. |
 | `expire_pending_orders()` | service role | Payment timeout. |
 | `admin_get_order(p_order_id uuid)` | ADMIN | Full order incl. PIN/attempts/audit. |
 
@@ -366,4 +372,5 @@ All variables are validated at startup by `src/lib/env.ts` with Zod.
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Canonical Flutterwave route, 8.1 km COD ceiling, corrected accept/verify/RPC signatures, admin reset/reassign/refund/analytics entries. |
 | 1.1.0 | 2026-10-29 | Created; replaces the ambiguous v1.0 route/action descriptions. |

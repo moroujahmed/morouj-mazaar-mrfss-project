@@ -1,330 +1,301 @@
-# TECH_STACK_AND_CONVENTIONS.md
+# TECH STACK AND CONVENTIONS
 
-> **v1.1 normative amendment:** The version matrix, Realtime strategy, tiles, directory manifest, and environment variables are superseded by [`SPEC_AMENDMENTS.md`](SPEC_AMENDMENTS.md) §4 and [`API_CONTRACTS.md`](API_CONTRACTS.md) §7. Pin Next.js 15.x, React 19, and Tailwind 3.4.x; do not use `postgres_changes`.
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative |
+| **Version** | 1.2.0 |
+| **Date** | 2026-11-09 |
+| **Supersedes** | v1.0 version drift, `postgres_changes`, OSM production tiles, Haversine fallback, `ADMIN_DEFAULT_PIN`, and the incomplete file manifest |
+| **Authority** | [`DECISIONS.md`](DECISIONS.md) ADR-001–017, [`API_CONTRACTS.md`](API_CONTRACTS.md), [`../.env.example`](../.env.example) |
 
-## Document Control & Metadata
-* **Document Version:** 1.0.0
-* **Status:** Approved Technical Architecture
-* **Target Environment:** Production / Antigravity Agentic Builder Specification
-* **Repository Architecture:** Single-Codebase Monolith (Next.js App Router)
-* **Performance Budget:** First Contentful Paint (FCP) $< 1.2\text{s}$ on 3G networks; Initial JS Bundle $< 150\text{ KB}$ (compressed)
-
----
-
-## 1. Core Technology Stack Matrix
-
-To satisfy the zero-ongoing-cost requirement while ensuring operational reliability across low-end mobile devices in high-temperature outdoor environments, the system must adhere strictly to the following framework and library selections. 
-
-**Substitutions or additional runtime dependencies require explicit architectural approval.**
-
-| Architectural Layer | Selected Technology | Exact Version / Spec | Justification & Architectural Boundary |
-| :--- | :--- | :--- | :--- |
-| **Framework & Runtime** | Next.js (App Router) | `14.2.x` or `15.x` | Server Components reduce client-side JavaScript execution on budget smartphones. Native API route handlers eliminate the need for a secondary backend server. |
-| **Language** | TypeScript | `^5.4.x` | Strict typing enforced across the entire stack. Zero tolerance for untyped `any` or implicit type coercion. |
-| **Database & Auth** | Supabase (PostgreSQL) | PostgreSQL 15+ | Enterprise PostgreSQL with built-in Row Level Security (RLS) and real-time Change Data Capture (CDC) via WebSockets. |
-| **Realtime Engine** | `@supabase/supabase-js` | `^2.43.x` | Subscribes directly to PostgreSQL table changes (`postgres_changes`) for kitchen tickets, rider dispatches, and GPS telemetry. |
-| **Styling & Design System** | Tailwind CSS | `^3.4.x` | Utility-first compilation. Eliminates runtime CSS overhead and guarantees atomic, zero-runtime styling payloads. |
-| **CSS Utility Helpers** | `clsx` + `tailwind-merge` | `clsx ^2.1.x`, `tw-merge ^2.3.x` | Safe, deterministic conditional class merging via a unified `cn()` utility. |
-| **Icons** | `lucide-react` | `^0.390.x` | Tree-shakeable SVG icons. Only bundle icons actually rendered. |
-| **Map Rendering** | Leaflet.js | `^1.9.x` (`leaflet`) | **100% Free and open-source.** Zero runtime API keys or billable tile quotas. Dynamically imported on the client side only. |
-| **Map Tiles** | OpenStreetMap (OSM) | Standard Tile CDN | Tile URLs: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`. Zero subscription or account configuration required. |
-| **Road Routing Engine** | OSRM Public API | Car/Motorcycle Profile | Public routing endpoint: `https://router.project-osrm.org/route/v1/driving/...`. Computes precise road-network distances at zero cost. |
-| **Client State (Cart)** | Zustand | `^4.5.x` | Ultra-lightweight ($< 1.2\text{ KB}$) client-side state with `persist` middleware configured for `localStorage`. |
-| **Schema Validation** | Zod | `^3.23.x` | Single source of truth for runtime validation across Server Actions, form inputs, and incoming payment webhooks. |
-| **Audio Processing** | Web Audio API | Browser Native | Programmatic chime synthesizer using oscillators. Zero external audio asset downloads required. |
-| **Date & Time** | `date-fns` | `^3.6.x` | Modular, tree-shakeable date formatting locked to `Africa/Kampala` (EAT / UTC+3). |
-
-### Explicitly Excluded Technologies (Prohibited)
-* **NO Google Maps JavaScript SDK or Places API:** Prohibited due to pay-per-load pricing risks.
-* **NO Heavy Component Libraries (Material UI, Ant Design, Chakra UI):** Prohibited due to excessive bundle size ($> 300\text{ KB}$) and slow mobile hydration.
-* **NO Prisma / Heavy ORMs:** Supabase native client and typed SQL interfaces are utilized directly to keep serverless cold starts under $50\text{ms}$.
-* **NO Complex Native Wrappers (Cordova/Capacitor):** The entire application operates strictly within standard mobile web viewports (PWA-compliant).
+The repository is a single Next.js application. Substitutions or additional runtime dependencies require an ADR.
 
 ---
 
-## 2. Monolith Directory Architecture
+## 1. Stack Matrix
 
-The repository is organized under a single Next.js project. Route groups `(group-name)` are utilized to isolate layout logic and visual contexts without altering the public URL paths.
+| Layer | Choice | Version / boundary |
+| :--- | :--- | :--- |
+| Framework | Next.js App Router | 15.x; exact patch pinned in `package-lock.json`; do **not** run `create-next-app@latest` |
+| UI runtime | React | 19.x |
+| Language | TypeScript | 5.x, `strict: true`, no `any` |
+| Styling | Tailwind CSS | 3.4.x; do not install Tailwind 4 |
+| Class merging | `clsx` + `tailwind-merge` | Pinned; one `cn()` helper |
+| Icons | `lucide-react` | Named imports only |
+| Database/Auth/Storage | Supabase | Postgres 15+, Auth, Storage, RLS |
+| Supabase clients | `@supabase/supabase-js`, `@supabase/ssr` | Exact versions pinned at Phase 1 |
+| Realtime | Supabase Broadcast + polling | No raw `postgres_changes` on orders/telemetry/payments/profiles |
+| Maps | Leaflet | 1.9.x; CSS imported in a client wrapper |
+| Tiles | MapTiler production; OSM development | Restricted key; attribution always visible |
+| Routing | Self-hosted OSRM production; mock/public dev | Integer metres; block on failure |
+| Client state | Zustand | Cart only, `persist` to `localStorage` |
+| Validation | Zod | All Server Actions, route handlers, webhooks, env |
+| Dates | `date-fns` + `date-fns-tz` or `Intl.DateTimeFormat` | Business day `Africa/Kampala` |
+| Rate limits/cache | Upstash Redis REST | Durable; in-memory only for local tests |
+| Payments | Flutterwave | Hosted checkout + `verif-hash` + transaction verification |
+| SMS/OTP | Africa's Talking | 6-digit OTP, hashed at rest |
+| Audio | Web Audio API | Programmatic chime; gesture unlock |
+| Printing | Browser print | 58/80 mm thermal; CSS `@media print` |
+| Tests | Vitest, Playwright, axe-core | Unit, DB, E2E, accessibility |
+| Error tracking | Sentry or equivalent | Founder decision; no PII |
+
+### Prohibited
+
+- Google Maps JavaScript/Places SDK.
+- Material UI, Ant Design, Chakra, or another heavy component library.
+- Prisma or a heavy ORM.
+- Cordova/Capacitor native wrappers.
+- `postgres_changes` subscriptions on sensitive tables.
+- Haversine or any straight-line estimate as a final delivery fee.
+- A production default admin PIN or any hard-coded staff credential.
+- OSM standard tiles as the production tile CDN.
+
+---
+
+## 2. Directory Manifest
 
 ```
 project-root/
-├── .env.example                       # Environment template with dummy variables
-├── .env.local                         # Local secrets (never committed)
-├── next.config.mjs                    # Next.js optimization & PWA configuration
-├── package.json                       # Locked dependencies
-├── postcss.config.mjs                 # PostCSS setup for Tailwind
-├── tailwind.config.ts                 # Extended theme, tokens, and thumb-zone spacing
-├── tsconfig.json                      # Strict TypeScript compiler options
-├── public/                            # Static assets
+├── .env.example
+├── .gitignore
+├── README.md
+├── SECURITY.md
+├── next.config.mjs                 # headers, CSP, images, PWA
+├── package.json
+├── package-lock.json
+├── postcss.config.mjs
+├── tailwind.config.ts              # v2 tokens
+├── tsconfig.json
+├── playwright.config.ts
+├── vitest.config.ts
+├── public/
 │   ├── favicon.ico
-│   ├── manifest.json                  # PWA Web App Manifest
-│   ├── icons/                         # PWA icons (192x192, 512x512)
+│   ├── manifest.webmanifest
+│   ├── sw.js
+│   ├── icons/                      # 192/512 PWA icons
 │   └── images/
-│       └── placeholder-food.webp      # Fallback compressed dish asset
+│       └── placeholder-dish.svg
 ├── src/
-│   ├── app/                           # Next.js App Router root
-│   │   ├── layout.tsx                 # Root layout (Fonts, viewport metadata, toaster)
-│   │   ├── globals.css                # Tailwind imports, custom resets & print styles
-│   │   │
-│   │   ├── (storefront)/              # Customer Facing Domain
-│   │   │   ├── page.tsx               # Storefront: Menu, Category Tabs, Cart Dock
-│   │   │   ├── checkout/              # Address picker, Leaflet Pin-drop, MoMo/Cash flow
-│   │   │   │   └── page.tsx
-│   │   │   └── orders/                # Living Order Tracker
-│   │   │       └── [token]/
-│   │   │           └── page.tsx       # Real-time tracking timeline & moving rider map
-│   │   │
-│   │   ├── (operations)/              # Internal Operational Interfaces
-│   │   │   ├── kitchen/               # Kitchen Display System (KDS)
-│   │   │   │   └── page.tsx           # Ticket grid, Audio unlock, 86 toggles, Busy mode
-│   │   │   ├── rider/                 # Rider Fleet Portal
-│   │   │   │   └── page.tsx           # Claim pool, Active delivery, 1-tap nav, PIN gate
-│   │   │   └── admin/                 # Restaurant Management Hub
-│   │   │       ├── page.tsx           # Operational overview & active orders
-│   │   │       ├── menu/page.tsx      # Menu items, categories & modifier CRUD
-│   │   │       ├── ledger/page.tsx    # End-of-day rider cash settlement ledger
-│   │   │       └── settings/page.tsx  # Dynamic distance rates, MOV, open hours
-│   │   │
-│   │   └── api/                       # Edge & Serverless Route Handlers
-│   │       ├── distance/route.ts      # Server-side OSRM routing proxy & calculator
-│   │       ├── webhooks/
-│   │       │   └── payment/route.ts   # Mobile Money (MTN/Airtel) & Card callbacks
-│   │       └── print/
-│   │           └── receipt/route.ts   # ESC/POS or raw print format renderer
-│   │
-│   ├── components/                    # Reusable React Components
-│   │   ├── ui/                        # Low-level primitive design tokens
-│   │   │   ├── button.tsx             # High-contrast thumb-accessible buttons
-│   │   │   ├── badge.tsx              # Status pills (Paid, COD, Cooking, Delivered)
-│   │   │   ├── input.tsx              # High-glance inputs with large touch targets
-│   │   │   ├── bottom-sheet.tsx       # Native-feeling mobile drawers for cart/modifiers
-│   │   │   └── modal.tsx              # Accessible dialog overlays
-│   │   ├── map/                       # Mapping Subsystem (Leaflet)
-│   │   │   ├── dynamic-map.tsx        # Client-only dynamic wrapper (SSR disabled)
-│   │   │   ├── location-picker.tsx    # Customer pin-drop interface with crosshairs
-│   │   │   └── live-tracker-map.tsx   # Moving motorcycle telemetry visualization
-│   │   ├── storefront/                # Storefront specific UI
-│   │   │   ├── menu-card.tsx          # Dish card with image, price, and add button
-│   │   │   ├── modifier-modal.tsx     # Cooking styles, omissions, paid add-ons
-│   │   │   ├── combo-builder.tsx      # 3-step meal bundle configurator
-│   │   │   └── cart-dock.tsx          # Floating bottom sticky cart drawer
-│   │   ├── kitchen/                   # KDS specific UI
-│   │   │   ├── kds-ticket.tsx         # Physical-style ticket docket with timer
-│   │   │   └── audio-banner.tsx       # "Tap to Enable Sound" browser audio banner
-│   │   └── rider/                     # Rider specific UI
-│   │       ├── claim-card.tsx         # Available delivery card in pool
-│   │       └── pin-modal.tsx          # 4-digit handover proof verification gate
-│   │
-│   ├── lib/                           # Core Utilities, Clients & Helpers
-│   │   ├── supabase/                  # Supabase clients
-│   │   │   ├── client.ts              # Browser client (`createBrowserClient`)
-│   │   │   ├── server.ts              # Server component client (`createServerClient`)
-│   │   │   └── admin.ts               # Service-role bypass client (webhooks only)
-│   │   ├── audio/                     # Web Audio API Sound Synthesizer
-│   │   │   └── chimes.ts              # Programmatic order bell & urgent alert chimes
-│   │   ├── utils.ts                   # `cn()` helper and string formatting
-│   │   ├── currency.ts                # UGX currency formatters (e.g., `USh 25,000`)
-│   │   ├── distance.ts                # Haversine fallback & OSRM response parsers
-│   │   └── print-formatter.ts         # Plain text ESC/POS thermal slip generator
-│   │
-│   ├── hooks/                         # Custom React Hooks
-│   │   ├── use-cart.ts                # Zustand cart hook with local persistence
-│   │   ├── use-geolocation.ts         # HTML5 `watchPosition` rider telemetry tracker
-│   │   ├── use-sound-alerts.ts        # KDS audio alert hook with user-gesture unlock
-│   │   └── use-realtime-orders.ts     # Supabase Realtime channel subscription hook
-│   │
-│   ├── types/                         # Global TypeScript Definitions
-│   │   ├── database.types.ts          # Auto-generated Supabase PostgreSQL types
-│   │   ├── orders.ts                  # Order, OrderItem, and Modifier domain models
-│   │   ├── menu.ts                    # MenuItem, Category, and Option interfaces
-│   │   └── telemetry.ts               # Rider GPS payload & coordinate interfaces
-│   │
-│   └── actions/                       # Next.js Server Actions
-│       ├── checkout.ts                # Server-validated order creation pipeline
-│       ├── kitchen.ts                 # Order status progression & 86 toggling
-│       ├── rider.ts                   # Concurrency-safe order claiming & PIN verification
-│       └── admin.ts                   # Rate adjustments & cash ledger closing
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   ├── globals.css
+│   │   ├── (storefront)/
+│   │   │   ├── page.tsx
+│   │   │   ├── checkout/page.tsx
+│   │   │   └── orders/[token]/page.tsx
+│   │   ├── (operations)/
+│   │   │   ├── kitchen/login/page.tsx
+│   │   │   ├── kitchen/page.tsx
+│   │   │   ├── rider/login/page.tsx
+│   │   │   ├── rider/page.tsx
+│   │   │   └── admin/
+│   │   │       ├── login/page.tsx
+│   │   │       ├── page.tsx
+│   │   │       ├── orders/page.tsx
+│   │   │       ├── menu/page.tsx
+│   │   │       ├── settings/page.tsx
+│   │   │       ├── ledger/page.tsx
+│   │   │       ├── analytics/page.tsx
+│   │   │       ├── audit/page.tsx
+│   │   │       ├── staff/page.tsx
+│   │   │       └── tables/page.tsx
+│   │   └── api/
+│   │       ├── distance/route.ts
+│   │       ├── webhooks/flutterwave/route.ts
+│   │       ├── notifications/dispatch/route.ts
+│   │       ├── cron/expire-orders/route.ts
+│   │       ├── cron/close-shifts/route.ts
+│   │       └── health/route.ts
+│   ├── components/
+│   │   ├── ui/                     # button, badge, input, sheet, modal, toast, skeleton, table
+│   │   ├── map/                    # dynamic-map, location-picker, live-tracker-map
+│   │   ├── storefront/             # menu-card, modifier-modal, combo-builder, cart-dock, category-bar, instant-search
+│   │   ├── tracker/                # milestone-bar, pin-display-box, feedback-modal, living-docket
+│   │   ├── kitchen/                # kds-ticket, audio-banner, stock-out-drawer, busy-toggle
+│   │   ├── rider/                  # claim-card, pin-modal, cash-summary, offline-banner
+│   │   └── admin/                  # order-drawer, ledger-table, settings-form, analytics-cards, audit-table
+│   ├── lib/
+│   │   ├── supabase/               # client.ts, server.ts, admin.ts (server-only)
+│   │   ├── env.ts                  # Zod-validated environment
+│   │   ├── auth/                   # staff session helpers and role guards
+│   │   ├── payments/               # Flutterwave adapter + mock adapter
+│   │   ├── sms/                    # Africa's Talking adapter + mock
+│   │   ├── routing/                # OSRM adapter, metres, cache
+│   │   ├── rate-limit/             # Upstash adapter + local
+│   │   ├── audio/chimes.ts
+│   │   ├── currency.ts
+│   │   ├── time.ts                 # Africa/Kampala helpers
+│   │   └── utils.ts
+│   ├── hooks/
+│   │   ├── use-cart.ts
+│   │   ├── use-geolocation.ts      # foreground + IndexedDB queue + Wake Lock
+│   │   ├── use-sound-alerts.ts
+│   │   └── use-realtime-orders.ts  # Broadcast + polling fallback
+│   ├── types/                      # database.types.ts and domain types
+│   ├── actions/                    # checkout, payments, otp, auth, kitchen, rider, admin
+│   └── middleware.ts               # deny-by-default route guards
+├── supabase/
+│   ├── migrations/
+│   ├── seed.sql
+│   └── config.toml
+├── scripts/
+│   ├── seed-staff.mjs
+│   └── staff.example.json
+├── tests/
+│   ├── e2e/
+│   ├── db/
+│   └── unit/
+└── site/                           # static design prototype (non-production)
 ```
 
 ---
 
-## 3. Strict Coding Conventions & Quality Standards
+## 3. Conventions
 
-To eliminate AI-generated anti-patterns, sloppy formatting, or non-deterministic code, builders must adhere to the following rules:
+### 3.1 TypeScript
 
-### 3.1 TypeScript & Type Safety
-* **Strict Mode Active:** `strict: true` enabled in `tsconfig.json`.
-* **Zero `any` Policy:** Explicit interfaces or types must be declared for all data structures. If a dynamic payload is returned (e.g., webhook body), it must be validated via a Zod schema before consumption:
-  ```typescript
-  // CORRECT: Schema-validated payload
-  const payload = WebhookPayloadSchema.parse(await req.json());
-  
-  // PROHIBITED: Untyped bypass
-  const payload = (await req.json()) as any;
-  ```
-* **Database Types Source of Truth:** Never manually write raw database row types. Types must strictly extend or match `database.types.ts` generated from PostgreSQL.
+- `strict: true`; no implicit `any`; no non-null assertions in new code without a comment.
+- Webhook and form payloads are parsed with Zod before use.
+- Database row types come from generated `database.types.ts`, not hand-written duplicates.
+- Prefer discriminated unions for order type, payment method, and API results.
 
-### 3.2 Server vs. Client Component Boundaries
-* **Default to Server Components:** Every component in `src/app` must be a Server Component unless interactive state or browser APIs are required.
-* **Granular `'use client'` Directives:** Do not mark entire pages as client components if only a single button or modal requires state. Isolate interactivity to dedicated leaf components:
-  ```
-  // CORRECT ARCHITECTURE:
-  page.tsx (Server Component - fetches menu data directly from DB)
-    └── MenuCategoryList.tsx (Server Component)
-          └── AddToCartButton.tsx (Client Component - handles local click & Zustand store)
-  ```
-* **Client-Side Only Modules (Leaflet Dynamic Import):** Leaflet requires the browser `window` object. It must **never** be imported directly on the server. Always import using `next/dynamic` with SSR disabled:
-  ```typescript
-  import dynamic from "next/dynamic";
+### 3.2 Server/client boundaries
 
-  export const DynamicLocationPicker = dynamic(
-    () => import("@/components/map/location-picker"),
-    { ssr: false, loading: () => <MapLoadingSkeleton /> }
-  );
-  ```
+- Default to Server Components.
+- Isolate interactivity in leaf Client Components.
+- A Server Component cannot use `next/dynamic` with `ssr: false`. Put the dynamic import inside a `"use client"` wrapper.
+- Leaflet CSS is imported in the client map wrapper or `globals.css`.
+- `src/lib/supabase/admin.ts` starts with `import "server-only"`.
+- Never pass the service-role key, PIN, or raw order row to a Client Component.
 
-### 3.3 State Management & Data Fetching Patterns
-* **Persistent Client State:** The shopping cart is managed via Zustand with `localStorage` synchronization so customer cart contents survive accidental page reloads.
-* **Server Mutations:** All database mutations (order creation, status changes, claiming) must be executed via **Next.js Server Actions** (`actions/*.ts`) with atomic transactions.
-* **Optimistic UI Updates:** Kitchen and rider status changes must use React's `useOptimistic` hook to render immediate visual confirmation while the background database write resolves over 3G/4G.
+### 3.3 Mutations
 
-### 3.4 Currency & Formatting Standard
-* All financial transactions and calculations occur as **integers** in Ugandan Shillings (`UGX`). There are no fractional cents.
-* Standardized UI display helper:
-  ```typescript
-  // src/lib/currency.ts
-  export function formatUGX(amount: number): string {
-    return `USh ${new Intl.NumberFormat("en-UG").format(amount)}`;
-  }
-  ```
+- All writes go through Server Actions or documented RPCs.
+- Order creation is idempotent and recomputes every price server-side.
+- State changes call the RPC that owns the transition; do not `UPDATE orders` directly.
+- Use `useOptimistic` only for reversible UI; confirm with the server response.
+- Audit every admin mutation with actor, reason, before/after.
 
----
+### 3.4 Money and time
 
-## 4. Realtime & Network Resilience Protocols
+- Money is integer UGX; no floats or decimals.
+- Distance is integer metres; fee uses `ceil((metres - 5000) / 1000)` when metres > 5000.
+- Display may round, but calculation never uses the rounded value.
+- Timestamps are UTC; business dates and display are `Africa/Kampala`.
+- Use one `formatUGX` helper; no ad-hoc currency strings.
 
-Given the network variability in outdoor urban markets, all data-fetching layers must implement automated resilience patterns:
+### 3.5 Realtime
 
-```
-[ Active Network Connection ]
-             │
-             ├──(Connection Lost)──> [ Local Queue / Cached View ]
-             │                             │
-             │                      (Exponential Backoff: 1s, 2s, 4s...)
-             │                             │
-             └──(Connection Restored)──────┴──> [ Instant Sync & State Reconciliation ]
-```
+- Customer: Broadcast `order:{order_token}` + poll `get_order_by_token` every 10 s while visible.
+- Kitchen: Broadcast `kitchen` + poll `get_kitchen_orders` every 10 s.
+- Rider pool: Broadcast `rider-pool` + poll `get_rider_pool` every 15 s.
+- Assigned rider: Broadcast `rider:{rider_id}` + poll `get_rider_active_order` every 10 s.
+- Never broadcast PIN, phone, exact address, or payment reference.
+- Unsubscribe on unmount; reconnect with backoff.
 
-### 4.1 Supabase Realtime Channel Lifecycle
-Real-time listeners (Kitchen KDS, Rider Pool, Customer Tracker) must implement clean subscription lifecycles to prevent memory leaks and zombie WebSocket connections:
-```typescript
-// Standard Realtime Hook Pattern
-useEffect(() => {
-  const channel = supabase
-    .channel("public:orders")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "orders" },
-      (payload) => handleOrderUpdate(payload)
-    )
-    .subscribe((status) => {
-      if (status === "CHANNEL_ERROR") {
-        console.warn("Realtime disconnected. Retrying in 2s...");
-      }
-    });
+### 3.6 Errors
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [supabase]);
-```
+Use the envelope from `API_CONTRACTS.md` §1.1. Map database/RPC errors to documented codes; never expose SQL text or stack traces. UI copy for every code lives in the portal spec.
 
-### 4.2 Rider Background Telemetry Fallback
-* When a rider is streaming coordinates, cellular signals may drop temporarily in basements or dense market alleys.
-* The rider hook (`use-geolocation.ts`) must store the last known coordinate locally and dispatch batched updates the instant the network re-establishes connection.
+### 3.7 Code style
+
+- ESLint + Prettier; no unused exports.
+- Named exports for components; default exports only where Next.js requires them.
+- Comments explain *why*, not *what*.
+- No `console.log` in production paths; use a structured logger.
+- No secrets in client bundles, source maps, or logs.
+
+### 3.8 Performance
+
+- Storefront FCP < 1.5 s on throttled 3G.
+- Initial compressed JS < 150 KB.
+- Menu API p95 < 300 ms; checkout p95 < 800 ms excluding redirect.
+- Dish images WebP/AVIF, ≤60 KB each, responsive sizes.
+- Import icons individually.
+- Charts and maps are lazy-loaded.
+- Test on a 2 GB Android device, not only a desktop.
+
+### 3.9 Git and review
+
+- Small commits with a clear scope.
+- A PR cannot merge with failing lint, typecheck, unit, DB, E2E, or a11y gates.
+- Do not commit `.env.local`, `scripts/staff.local.json`, screenshots with PII, or real customer data.
+- Update `docs/AUDIT_REPORT.md` and `docs/CHANGELOG.md` for behavior changes.
+
+### 3.10 CI/CD and dependency security
+
+- GitHub Actions runs on every pull request: `npm ci`, lint, typecheck, unit, DB/RLS, Playwright smoke, axe, and `npm audit --omit=dev --audit-level=high`.
+- A pull request cannot merge with a failing required check; branch protection enforces review.
+- Dependabot (or equivalent) opens weekly grouped updates for npm and GitHub Actions; security updates are triaged within two business days.
+- Enable provider secret scanning and push protection; run CodeQL or Semgrep on changed code once the Phase 1 scaffold exists.
+- Production deploys use the same gates plus manual approval; migrations run only after a recorded backup (`OPERATIONS_RUNBOOK.md` §3).
+- `robots.txt`, `sitemap.xml`, and Restaurant/Menu structured data are Phase 10 storefront-hardening items. They are optional for launch and never block checkout.
 
 ---
 
-## 5. Performance Budgets & Asset Optimization
+## 4. Environment
 
-The application must operate smoothly on budget Android devices (e.g., 2 GB RAM, MediaTek processors) running mobile browsers under bright ambient sunlight.
-
-### 5.1 Image Optimization Matrix
-* **Format:** 100% of dish images must be converted to **WebP** format.
-* **Maximum File Size:** No dish image may exceed **`60 KB`**.
-* **Dimensions:** Maximum rendered dimension on mobile is $600 \times 400\text{px}$ (displaying at $300 \times 200\text{px}$ on 2x retina viewports).
-* **Next.js Config Enforcement:**
-  ```javascript
-  // next.config.mjs
-  /** @type {import('next').NextConfig} */
-  const nextConfig = {
-    images: {
-      formats: ['image/avif', 'image/webp'],
-      deviceSizes: [360, 480, 768, 1024],
-      imageSizes: [64, 128, 256],
-      minimumCacheTTL: 60 * 60 * 24 * 30, // 30-day edge cache
-    },
-  };
-  export default nextConfig;
-  ```
-
-### 5.2 Bundle Size Limits
-* Main application bundle (uncompressed): $< 500\text{ KB}$.
-* Gzipped transfer bundle on initial page load: $< 150\text{ KB}$.
-* Lucide icons must be imported as individual named imports; never import the full icon library:
-  ```typescript
-  // CORRECT: Tree-shaken import
-  import { Bike, Clock, CheckCircle } from "lucide-react";
-
-  // PROHIBITED: Full library import
-  import * as Icons from "lucide-react";
-  ```
-
----
-
-## 6. Standardized Error Handling Architecture
-
-All API routes and Server Actions must return a deterministic, structured error envelope. Never throw unhandled exceptions to the client:
-
-```typescript
-// Standard Unified Response Envelope
-export type ApiResponse<T> = 
-  | { success: true; data: T }
-  | { success: false; error: { code: string; message: string; details?: unknown } };
-```
-
-### Standard Error Codes
-* `AUTH_UNAUTHORIZED`: Staff or rider entered an invalid PIN.
-* `MOV_NOT_MET`: Cart subtotal is below the required Minimum Order Value.
-* `DISTANCE_OUT_OF_BOUNDS`: Pinned address exceeds the 15.0 km delivery ceiling.
-* `ORDER_ALREADY_CLAIMED`: Concurrency lock failed; another rider claimed the delivery first.
-* `INVALID_HANDOVER_PIN`: Rider input does not match customer's 4-digit verification token.
-* `ITEM_OUT_OF_STOCK`: An item in the cart was 86'd while the customer was checking out.
-
----
-
-## 7. Environment Variables & Secret Configuration
-
-The application requires strict separation between public client variables and protected server secrets.
+Canonical template: [`../.env.example`](../.env.example). Validate with Zod in `src/lib/env.ts` at startup.
 
 ```bash
-# ==============================================================================
-# CLIENT-ACCESSIBLE VARIABLES (Exposed to browser via NEXT_PUBLIC_)
-# ==============================================================================
-NEXT_PUBLIC_APP_URL="https://bazaar-eats.com"
-NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsIn..."
-NEXT_PUBLIC_RESTAURANT_NAME="Bazaar Flame & Grill"
-NEXT_PUBLIC_RESTAURANT_LAT="0.3136"
-NEXT_PUBLIC_RESTAURANT_LNG="32.5811"
-NEXT_PUBLIC_SUPPORT_WHATSAPP="+256700000000"
+# App
+NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_SUPPORT_WHATSAPP=
 
-# ==============================================================================
-# SECURE SERVER-ONLY VARIABLES (Never exposed to client)
-# ==============================================================================
-SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsIn..."
-PAYMENT_GATEWAY_SECRET="sec_key_live_..."
-PAYMENT_WEBHOOK_SECRET="whsec_..."
-ADMIN_DEFAULT_PIN="9988"
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+STAFF_EMAIL_DOMAIN=staff.bazaareats.com
+
+# Flutterwave
+FLW_PUBLIC_KEY=
+FLW_SECRET_KEY=
+FLW_WEBHOOK_HASH=
+FLW_BASE_URL=https://api.flutterwave.com/v3
+
+# Africa's Talking
+AFRICASTALKING_API_KEY=
+AFRICASTALKING_USERNAME=
+AFRICASTALKING_SENDER_ID=
+
+# Upstash
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+
+# Maps/routing
+NEXT_PUBLIC_MAPTILER_KEY=
+OSRM_BASE_URL=
+
+# Cron
+CRON_SECRET=
 ```
 
-All environment variables must be validated at application startup using a strict `env.mjs` schema to fail early during deployment if any keys are missing.
+Rules:
+
+- Only `NEXT_PUBLIC_*` values may reach the browser.
+- Restaurant coordinates, hours, fees, and statuses live in `app_settings`, not env.
+- `PAYMENTS_MODE=mock` is allowed only outside production and must fail startup in production.
+- No `ADMIN_DEFAULT_PIN`, no default staff password, no committed webhook secret.
+- Rotate secrets per `OPERATIONS_RUNBOOK.md`; never log them.
+
+---
+
+## 5. Security Headers
+
+Configure at Phase 1 (see `SPEC_AMENDMENTS.md` §4.2):
+
+- HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options: DENY`.
+- `Permissions-Policy` with geolocation self-only.
+- CSP allowing Supabase, Flutterwave checkout, MapTiler, and self; no `unsafe-eval`.
+- Tighten `script-src` with nonces once the shell is stable.
+
+---
+
+## 6. Revision History
+
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.2.0 | 2026-11-09 | Rewritten: pinned stack, no `postgres_changes`, MapTiler/OSRM production rules, complete manifest, IndexedDB telemetry queue, canonical env names, no default PIN, CI/dependency gates, storefront discovery deferral. |
+| 1.1.0 | 2026-10-29 | Amendment banner. |
+| 1.0.0 | 2026-10-27 | Original stack draft. |
