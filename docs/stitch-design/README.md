@@ -10,7 +10,7 @@ All numbers, order IDs, states and business rules come from the project specific
 docs/stitch-design/
 ├── README.md                 ← this file
 ├── AUDIT_RESOLUTION.md       ← how every audit finding was resolved
-├── screens/                  ← 54 canonical screens (HTML + exported PNG previews)
+├── screens/                  ← 54 canonical HTML screens (20 also have exported PNG previews)
 ├── assets/
 │   ├── tailwind.css          ← compiled Tailwind 3.4.17, generated from screens/**/*.html
 │   └── app.css               ← shared semantic components and responsive layout rules
@@ -30,7 +30,7 @@ python -m http.server 8000
 # then open http://localhost:8000/screens/customer-storefront.html
 ```
 
-The PNG files next to the HTML are static previews of the same screens. They are not used by the HTML pages.
+The 20 PNG files next to the HTML are static previews of selected screens; the HTML is the source of truth and the other 34 screens have no PNG export.
 
 ## Canonical scenarios
 
@@ -148,7 +148,7 @@ Rules reflected in the screens:
 - **No dead links.** Every `href` points to an existing screen or an approved external destination.
 - Semantic components from `app.css` are preferred for new work: `.card`, `.card-pad`, `.btn`, `.pill`, `.notice`, `.table`, `.kpi`, `.phone`, `.timeline-step`.
 - Status is never colour-only. Every pill pairs colour with a label.
-- Touch targets are at least 48 × 48 px, and focus rings are visible.
+- Touch targets are at least 44 × 44 px; customer/admin controls are 48 px, kitchen primary actions 52 px, and rider primary actions 56 px. Focus rings are visible (3 px).
 - Currency is written as `USh` with an integer and thousands separators, for example `USh 35,000`.
 
 ## Colour and accessibility

@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Supersedes** | v1.0 custom auth, terracotta palette, six-portal count, 4-digit staff PIN, background GPS, and stale fixtures |
 | **Design authority** | [`DESIGN_SYSTEM_V2.md`](DESIGN_SYSTEM_V2.md) and [`ACCESSIBILITY.md`](ACCESSIBILITY.md) |
 | **Behaviour authority** | [`STATE_MACHINES_AND_BUSINESS_RULES.md`](STATE_MACHINES_AND_BUSINESS_RULES.md), [`API_CONTRACTS.md`](API_CONTRACTS.md) |
@@ -17,27 +17,26 @@ The product has **four portals**: Customer, Kitchen, Rider, Admin. Dine-in is a 
 
 ```
 src/app/
-├── (customer)/
+├── (storefront)/
 │   ├── page.tsx                     /                  Storefront + dine-in mode
 │   ├── checkout/page.tsx            /checkout          Pin-drop, fees, payment
 │   └── orders/[token]/page.tsx      /orders/[token]    Tracker + PIN + feedback
-├── (kitchen)/
-│   ├── kitchen/login/page.tsx       /kitchen/login     Staff login
-│   └── kitchen/page.tsx             /kitchen           KDS
-├── (rider)/
-│   ├── rider/login/page.tsx         /rider/login       Staff login
-│   └── rider/page.tsx               /rider             Pool + active delivery
-└── (admin)/
-    ├── admin/login/page.tsx         /admin/login       Staff login
-    ├── admin/page.tsx               /admin             Live orders
-    ├── admin/orders/page.tsx        /admin/orders      History + order actions
-    ├── admin/menu/page.tsx          /admin/menu        Menu/modifiers/combos
-    ├── admin/settings/page.tsx      /admin/settings    Commercial settings
-    ├── admin/ledger/page.tsx        /admin/ledger      Cash reconciliation
-    ├── admin/analytics/page.tsx     /admin/analytics   KPIs
-    ├── admin/audit/page.tsx         /admin/audit       Audit + settings history
-    ├── admin/staff/page.tsx         /admin/staff       Staff roster
-    └── admin/tables/page.tsx        /admin/tables      Table QR tokens
+└── (operations)/
+    ├── kitchen/login/page.tsx       /kitchen/login     Staff login
+    ├── kitchen/page.tsx             /kitchen           KDS
+    ├── rider/login/page.tsx         /rider/login       Staff login
+    ├── rider/page.tsx               /rider             Pool + active delivery
+    └── admin/
+        ├── login/page.tsx           /admin/login       Staff login
+        ├── page.tsx                 /admin             Live orders
+        ├── orders/page.tsx          /admin/orders      History + order actions
+        ├── menu/page.tsx            /admin/menu        Menu/modifiers/combos
+        ├── settings/page.tsx        /admin/settings    Commercial settings
+        ├── ledger/page.tsx          /admin/ledger      Cash reconciliation
+        ├── analytics/page.tsx       /admin/analytics   KPIs
+        ├── audit/page.tsx           /admin/audit       Audit + settings history
+        ├── staff/page.tsx           /admin/staff       Staff roster
+        └── tables/page.tsx          /admin/tables      Table QR tokens
 ```
 
 Canonical route handlers:
@@ -49,6 +48,7 @@ Canonical route handlers:
 | `POST /api/notifications/dispatch` | Cron-only SMS outbox worker |
 | `POST /api/cron/expire-orders` | Cron-only payment timeout |
 | `POST /api/cron/close-shifts` | Cron-only shift close |
+| `GET /api/print/receipt/[orderId]` | KITCHEN/ADMIN browser-printable receipt HTML; reprint audited |
 | `GET /api/health` | Liveness; no secrets |
 
 All mutations use Server Actions or the documented RPCs. There is no second route naming convention.
@@ -91,6 +91,7 @@ All mutations use Server Actions or the documented RPCs. There is no second rout
 States that must exist:
 
 - **Store closed:** `STORE_CLOSED`, no order is created.
+- **Kitchen paused:** `KITCHEN_PAUSED`, checkout disabled while existing orders continue.
 - **Outside zone:** `DISTANCE_OUT_OF_BOUNDS`, checkout disabled.
 - **Routing down:** `DISTANCE_UNAVAILABLE`, retry action.
 - **Item sold out:** `ITEM_OUT_OF_STOCK`, item named, cart editable.
@@ -143,7 +144,8 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
   - **Bump** for `PREPARING`: delivery → `READY_FOR_PICKUP`; dine-in → `DELIVERED`.
   - **Served to table** is the dine-in bump label.
   - **86** toggles item availability through `set_menu_item_availability`.
-  - **Busy mode** sets `is_kitchen_busy` and a 0–60 minute buffer through `set_kitchen_busy`.
+  - **Busy mode** sets `is_kitchen_busy` and a 0-60 minute buffer through `set_kitchen_busy`.
+  - **Pause intake** sets `is_kitchen_paused` through `set_kitchen_paused`; new orders receive `KITCHEN_PAUSED` while queued orders continue.
   - **Print docket** uses browser print; a reprint is audited.
 - Audio repeats every 15 seconds until `acknowledged_at` is set; stop on accept, cancel, or when the ticket leaves the new queue. Multiple tablets may chime; the shared state stops repeats.
 - Offline banner: the KDS requires connectivity; do not imply tickets are syncing.
@@ -157,6 +159,7 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
 - Late ticket.
 - 86 confirmation and undo.
 - Busy mode on/off with buffer.
+- Kitchen intake paused/resumed.
 - Printer failure with handwritten-docket fallback.
 - Auth expired → login.
 
@@ -228,7 +231,7 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
 
 ### 5.4 `/admin/settings`
 
-- Free radius, excess rate, max radius, COD radius, delivery/dine-in MOV, packaging fees, cart limits, opening/closing hours, store open, kitchen busy, PIN attempts/lock/geofence, staff session hours.
+- Free radius, excess rate, max radius, COD radius, delivery/dine-in MOV, packaging fees, cart limits, opening/closing hours, store open, kitchen busy, kitchen paused, PIN attempts/lock/geofence, staff session hours.
 - Validation bounds and friendly errors.
 - Every save writes `settings_history` and `admin_audit_log`.
 - The store-open toggle explains that it overrides hours and is audited.
@@ -266,7 +269,7 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
 - Every destructive action names the object and requires a reason.
 - Money is `USh` + grouped integer; time is EAT.
 - Focus is visible; dialogs trap focus and restore it; Escape closes.
-- Touch targets are at least 44×44 px; rider/kitchen primary actions are at least 52 px tall.
+- Touch targets are at least 44×44 px; customer/admin controls are 48 px; kitchen primary actions are 52 px; rider primary actions are 56 px.
 - No colour-only status; pair colour with text and icon.
 - Reduced motion is respected.
 - The v2 palette is mandatory: primary green `#173F35`, deep green `#102E27`, orange action `#F28C28` with green-900 text, orange text `#A65A0F`, red `#C62828`, success `#17603F`, warning `#8A4B00`.
@@ -284,7 +287,8 @@ Every API error code has one approved human message. Components render the copy 
 | `MOV_NOT_MET` | Checkout | “Add USh {amount} more to reach the USh 20,000 minimum order.” |
 | `DISTANCE_OUT_OF_BOUNDS` | Checkout | “This address is outside our 15 km delivery area. Choose another pin or dine in.” |
 | `DISTANCE_UNAVAILABLE` | Checkout | “We cannot calculate the route right now. Retry in a moment.” |
-| `STORE_CLOSED` | Storefront / checkout | “We are closed. Orders open at {opening time} EAT.” |
+| `STORE_CLOSED` | Storefront / checkout | "We are closed. Orders open at {opening time} EAT." |
+| `KITCHEN_PAUSED` | Storefront / checkout | "The kitchen has paused new orders. Please try again in a few minutes." |
 | `ITEM_OUT_OF_STOCK` | Menu / cart | “{Item} just ran out. Remove it to continue.” |
 | `PAYMENT_METHOD_UNAVAILABLE` | Checkout | “That payment method is unavailable. Choose another.” |
 | `COD_NOT_AVAILABLE` | Checkout | “Cash on delivery is not available for this address. Pay online or choose another pin.” |
@@ -318,7 +322,7 @@ The dependency-free prototype in `site/` is a design reference, not the producti
 | `site/admin.html` | Orders, menu, settings, ledger, analytics, audit |
 | `site/design-system.html` | Tokens and components |
 
-Legacy mockups under `docs/stitch-design/` and `site/ui-kit.html` are non-normative and archived.
+The canonical screen reference is `docs/stitch-design/screens/`. The original exports in `docs/stitch-design/_archive/` and `site/ui-kit.html` are non-normative and archived.
 
 ---
 
@@ -326,6 +330,7 @@ Legacy mockups under `docs/stitch-design/` and `site/ui-kit.html` are non-normat
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Aligned route groups with the stack manifest, clarified Stitch status, added kitchen-pause and `KITCHEN_PAUSED`, and unified touch targets. |
 | 1.2.0 | 2026-11-09 | Rewritten for four portals, Supabase Auth gates, schema-authoritative actions, canonical fixtures, v2 palette, and missing error/empty/destructive states. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |
 | 1.0.0 | 2026-10-27 | Original UX draft with six-portal count and terracotta palette. |

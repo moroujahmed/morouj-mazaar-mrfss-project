@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Supersedes** | v1.0 seed SQL, 4-digit staff PINs, retired distances/totals, and the unrunnable Playwright blueprint |
 | **Canonical data** | [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md) |
 | **Runnable tests** | [`TEST_PLAN.md`](TEST_PLAN.md) — unit, database, RLS, E2E, accessibility |
@@ -325,7 +325,7 @@ These scenarios are the acceptance narrative. The executable versions, selectors
 2. The order remains `PENDING_PAYMENT`; the customer sees a retry action and the payment status, not a false “confirmed” state.
 3. Retrying with the same idempotency key and unchanged payload returns the same order; changing the payload returns `IDEMPOTENCY_CONFLICT`.
 4. A successful retry moves the order to `PREPARING` through the verified webhook path.
-5. If the retry window expires, `expire_pending_orders` cancels the order and releases any reserved stock.
+5. If the retry window expires, `expire_pending_orders` cancels the order and marks the payment failed/expired.
 
 ---
 
@@ -352,7 +352,7 @@ These scenarios are the acceptance narrative. The executable versions, selectors
 | F | Juma / Kasule | 3 attempts, 15-minute lock, geofence, admin reset | `TEST_PLAN.md` §2.5, §4 Scenario F |
 | G | Kasule / Juma | 65,500 expected, linked orders, `SETTLED`, `PARTIAL`, variance | `TEST_PLAN.md` §2.6, §4 Scenario G |
 | H | Sarah | failed payment, idempotent retry, expiry | `TEST_PLAN.md` §2.7 |
-| I | Sarah / Kasule | `STORE_CLOSED`, `KITCHEN_PAUSED`, no order creation | `TEST_PLAN.md` §2.2 |
+| I | Sarah / Kasule | `STORE_CLOSED`, `KITCHEN_PAUSED`, no order creation | `TEST_PLAN.md` §2.8, §4 Scenario I |
 
 ### 4.1 Required data-testids
 
@@ -373,5 +373,6 @@ Use the IDs defined in `TEST_PLAN.md` §6.4. Do not introduce selector names tha
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Aligned Scenarios H/I traceability with `TEST_PLAN.md` §2.7–§2.8 and §4. |
 | 1.2.0 | 2026-11-09 | Rewritten to canonical fixtures, Supabase Auth staff identities, schema-authoritative RPCs, and references to `TEST_PLAN.md`; added payment-retry and store-closed scenarios; removed duplicate seed SQL and unrunnable Playwright code. |
 | 1.0.0 | 2026-10-27 | Initial personas and E2E narrative. |

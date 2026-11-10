@@ -2,10 +2,10 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.2 |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
-| **Related** | All v1.2 specifications |
+| **Status** | Normative v1.3 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
+| **Related** | All v1.3 specifications |
 
 Shared vocabulary for the team, testers, and new contributors. If a document uses a term differently, the definition here wins and the document should be corrected.
 
@@ -22,6 +22,8 @@ Shared vocabulary for the team, testers, and new contributors. If a document use
 | **EFRIS** | Uganda Revenue Authority’s Electronic Fiscal Receipting and Invoicing Solution. Required only if the business is VAT-registered and onboarded; confirm with the tax adviser. |
 | **Float** | Physical change a rider carries at the start of a shift; tracked separately from customer cash. |
 | **KDS** | Kitchen display system. In this project, the `/kitchen` portal and its ticket board. |
+| **Kitchen pause** | `app_settings.is_kitchen_paused`; blocks new checkout with `KITCHEN_PAUSED` while existing orders continue. |
+| **Busy mode** | `app_settings.is_kitchen_busy` plus a 0–60 minute buffer; adds ETA buffer without blocking checkout. |
 | **MOV** | Minimum order value for delivery. Dine-in has MOV 0. |
 | **MRO / MRFSS** | Morouj Mazaar restaurant food service system; the repository/project shorthand. |
 | **86 (eighty-six)** | An item is unavailable. Toggled by kitchen/admin through the availability RPC; the storefront hides it. |
@@ -79,4 +81,5 @@ Shared vocabulary for the team, testers, and new contributors. If a document use
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added kitchen pause and busy mode terms. |
 | 1.2.0 | 2026-11-09 | Created; closes the P2 “no glossary” finding. |

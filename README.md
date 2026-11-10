@@ -4,12 +4,12 @@ Direct-to-consumer ordering, kitchen display, rider dispatch, and cash reconcili
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.2 + canonical Stitch design package + static interface prototype |
+| **Status** | Specification baseline v1.3 + canonical Stitch design package + static interface prototype |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | `USh`, whole integers with thousands separators |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
 | **Prototype** | [`site/index.html`](site/index.html) — customer, kitchen, admin and rider interfaces |
-| **Design package** | [`docs/stitch-design/README.md`](docs/stitch-design/README.md) — 54 canonical screens, assets and audit resolution |
+| **Design package** | [`docs/stitch-design/README.md`](docs/stitch-design/README.md) — 54 canonical HTML screens, 20 exported PNG previews, assets and audit resolution |
 | **Audit** | [`docs/AUDIT_REPORT.md`](docs/AUDIT_REPORT.md) |
 | **Decisions** | [`docs/DECISIONS.md`](docs/DECISIONS.md) |
 | **Canonical numbers** | [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) |
@@ -23,8 +23,8 @@ The repository currently contains the **specification, database baseline, seed d
 
 ```
 .
-├── docs/                       # normative v1.2 specs, ADRs, audit, test and ops artifacts
-│   └── stitch-design/          # 54 canonical HTML screens, compiled CSS, audit resolution
+├── docs/                       # normative v1.3 specs, ADRs, audit, test and ops artifacts
+│   └── stitch-design/          # 54 canonical HTML screens, 20 PNG previews, compiled CSS, audit resolution
 ├── site/                       # static customer, kitchen, admin, rider and design-system prototype
 ├── supabase/
 │   ├── migrations/             # schema + storage migrations
@@ -46,7 +46,7 @@ The repository currently contains the **specification, database baseline, seed d
 3. [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) — the only approved distances, totals, and fixtures.
 4. [`docs/ERD.md`](docs/ERD.md) — entity model and data dictionary.
 5. [`docs/API_CONTRACTS.md`](docs/API_CONTRACTS.md) — server actions, route handlers, RPCs, auth matrix.
-6. [`docs/SPEC_AMENDMENTS.md`](docs/SPEC_AMENDMENTS.md) — the v1.2 closure matrix for every audit finding.
+6. [`docs/SPEC_AMENDMENTS.md`](docs/SPEC_AMENDMENTS.md) — the amendment and closure register for every audit finding.
 7. [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) — unit, integration and E2E plan.
 8. [`docs/OPERATIONS_RUNBOOK.md`](docs/OPERATIONS_RUNBOOK.md) — deploy, backup, incident, and go-live procedures.
 9. [`docs/COMPLIANCE_AND_LEGAL.md`](docs/COMPLIANCE_AND_LEGAL.md) — Uganda compliance checklist and policy skeletons.
@@ -85,7 +85,7 @@ The prototype reuses the canonical totals, distances and ledger from [`docs/CANO
 
 ### Canonical Stitch design package
 
-[`docs/stitch-design/`](docs/stitch-design/) is the reviewed mockup set for handoff. It contains 54 HTML screens across customer, kitchen, rider, admin and shared flows, plus locally compiled Tailwind CSS and shared components. Open [`docs/stitch-design/screens/customer-storefront.html`](docs/stitch-design/screens/customer-storefront.html) directly to start.
+[`docs/stitch-design/`](docs/stitch-design/) is the reviewed mockup set for handoff. It contains 54 HTML screens across customer, kitchen, rider, admin and shared flows, plus locally compiled Tailwind CSS and shared components. Twenty screens also include exported PNG previews; the HTML is the source of truth. Open [`docs/stitch-design/screens/customer-storefront.html`](docs/stitch-design/screens/customer-storefront.html) directly to start.
 
 The package is independent of `site/`: `site/` is an interactive prototype, while `stitch-design/` is the screen-by-screen visual reference with canonical data. Both follow the palette and rules in [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) and [`docs/ACCESSIBILITY.md`](docs/ACCESSIBILITY.md). Duplicate original exports are retained only in [`docs/stitch-design/_archive/`](docs/stitch-design/_archive/) for provenance.
 

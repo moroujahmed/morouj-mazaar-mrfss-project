@@ -15,7 +15,7 @@ INSERT INTO public.app_settings (
   packaging_fee_default, packaging_fee_dine_in,
   max_cart_value, max_item_quantity,
   is_store_open, opening_time, closing_time,
-  is_kitchen_busy, busy_buffer_minutes,
+  is_kitchen_busy, busy_buffer_minutes, is_kitchen_paused,
   pin_max_attempts, pin_lock_minutes, pin_geofence_m, staff_session_hours
 ) VALUES (
   1, 'Bazaar Flame & Grill', 0.3136000, 32.5811000, '+256700000000',
@@ -24,8 +24,8 @@ INSERT INTO public.app_settings (
   20000, 0,
   1000, 0,
   200000, 20,
-  true, '10:00:00', '22:30:00',
-  false, 20,
+  true, '10:00:00', '22:00:00',
+  false, 20, false,
   3, 15, 300, 12
 )
 ON CONFLICT (id) DO UPDATE SET
@@ -50,6 +50,7 @@ ON CONFLICT (id) DO UPDATE SET
   closing_time = EXCLUDED.closing_time,
   is_kitchen_busy = EXCLUDED.is_kitchen_busy,
   busy_buffer_minutes = EXCLUDED.busy_buffer_minutes,
+  is_kitchen_paused = EXCLUDED.is_kitchen_paused,
   pin_max_attempts = EXCLUDED.pin_max_attempts,
   pin_lock_minutes = EXCLUDED.pin_lock_minutes,
   pin_geofence_m = EXCLUDED.pin_geofence_m,

@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Supersedes** | v1.0 generic HMAC contract, OTP prose, OSM tiles, ESC/POS assumptions, background-GPS promise |
 | **Authority** | `DECISIONS.md` ADR-002/003/004/005/007/009/014/016, `API_CONTRACTS.md`, migration |
 
@@ -103,6 +103,7 @@ Webhook/callback authentication for delivery receipts must be verified before up
 - Production uses a self-hosted OSRM instance with a Uganda/OSM extract.
 - Development uses a mock adapter or the public demo server.
 - `/api/distance` accepts only validated coordinates, quantizes them for the cache key, and returns integer metres plus duration.
+- Distance is measured from the restaurant coordinates to the destination. Prepaid delivery accepts routes up to `max_delivery_radius_km` (15.0 km); COD checkout additionally enforces `cod_max_radius_km` (8.1 km).
 - Cache identical routes for 24 hours.
 - If OSRM fails and no valid cache exists, return `DISTANCE_UNAVAILABLE` and block checkout. Never return a Haversine estimate as the final fee.
 - Rate limit: 30 requests/minute/IP in production.
@@ -115,14 +116,18 @@ GET /api/distance?lat=0.3245&lng=32.5782
 
 ```json
 {
-  "distanceM": 1562,
-  "durationSeconds": 212,
-  "source": "OSRM",
-  "cached": false
+  "success": true,
+  "data": {
+    "distanceM": 1562,
+    "distanceKm": 1.562,
+    "durationSeconds": 212,
+    "source": "OSRM",
+    "cached": false
+  }
 }
 ```
 
-Errors use `{ "code": "DISTANCE_UNAVAILABLE" | "DISTANCE_OUT_OF_BOUNDS" | "VALIDATION_ERROR", "message": "..." }`.
+Errors use `{ "success": false, "error": { "code": "DISTANCE_UNAVAILABLE" | "DISTANCE_OUT_OF_BOUNDS" | "VALIDATION_ERROR", "message": "..." } }`.
 
 ### 4.3 Map Tiles and Leaflet
 
@@ -152,8 +157,8 @@ Errors use `{ "code": "DISTANCE_UNAVAILABLE" | "DISTANCE_OUT_OF_BOUNDS" | "VALID
 
 - Send at most one point every 15 seconds or every 20 metres, whichever is later.
 - Batch up to 10 points.
-- Store unsent points in IndexedDB (not `localStorage`) with a bounded queue (e.g., 500 points / 30 minutes).
-- Retry with exponential backoff and jitter. Drop the oldest points only after the bound is reached.
+- Store unsent points in IndexedDB (not `localStorage`) with a bounded queue: at most 50 points or 10 minutes of history.
+- Retry with exponential backoff and jitter. Drop the oldest points once the bound is reached.
 - When reconnecting, replay in timestamp order; the server rejects points for a completed order.
 - Show a visible “GPS paused/offline” state. Do not show a moving map when data is stale.
 
@@ -168,12 +173,14 @@ Errors use `{ "code": "DISTANCE_UNAVAILABLE" | "DISTANCE_OUT_OF_BOUNDS" | "VALID
 ## 6. Printing and Receipts
 
 - MVP uses browser print (`window.print()` + `@media print`) to a 58 mm or 80 mm thermal printer.
+- `GET /api/print/receipt/[orderId]` returns `text/html; charset=utf-8` docket markup for kitchen/admin, ready for the browser print dialog. ESC/POS is deferred per ADR-007.
 - The print stylesheet defines roll width, margins, font size, and page breaks.
 - Kitchen dockets show order number, time, type, items/modifiers, notes, and payment status. They never show the handover PIN.
 - Customer receipts show masked phone, item totals, fees, total, order token/QR, and the legal footer from the founder-approved content.
 - A reprint button is available to kitchen/admin and writes an audit row.
 - ESC/POS over Web Bluetooth/USB is a future enhancement, not a launch dependency.
 - If printing fails, the kitchen can use a handwritten docket; the order remains visible on the KDS.
+- The HTML docket and print CSS must use the same totals as `CANONICAL_EXAMPLES.md`; the route never prints the handover PIN.
 
 Canonical receipt totals must match `CANONICAL_EXAMPLES.md`; do not hardcode old values in templates.
 
@@ -199,9 +206,9 @@ Canonical receipt totals must match `CANONICAL_EXAMPLES.md`; do not hardcode old
 
 | Device | Requirement |
 | :--- | :--- |
-| Kitchen tablet/PC | Current Chrome/Edge, stable power, printer installed, sound enabled once per session |
-| Rider phone | Android Chrome 120+ or iOS Safari 17+, GPS, data plan, mount, power bank |
-| Admin laptop | Current Chrome/Edge/Firefox/Safari |
+| Kitchen tablet/PC | Chrome 110+ or Edge 110+, stable power, printer installed, sound enabled once per session |
+| Rider phone | Android Chrome 110+ or iOS Safari 16+, GPS, data plan, mount, power bank |
+| Admin laptop | Chrome 110+, Edge 110+, Firefox 110+, or Safari 16+ |
 | Printer | 58 mm or 80 mm thermal, OS driver installed; browser print is the fallback |
 
 KDS audio:
@@ -235,4 +242,5 @@ KDS audio:
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-10-29 | Original integration draft. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.3.0 | 2026-11-10 | Aligned distance envelope and response, telemetry queue bounds, browser minimums, and HTML print route. |
 | 1.2.0 | 2026-11-09 | Corrected Flutterwave, OTP, OSRM, telemetry, printing, deep-link, and failure contracts. |

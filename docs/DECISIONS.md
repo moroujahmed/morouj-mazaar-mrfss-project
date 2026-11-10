@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Approved baseline for build |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Supersedes** | Implicit/ambiguous decisions in the v1.0 specification set |
 
 This document is the **single source of truth for architectural forks**. If another document conflicts with a decision here, this document wins until the conflict is corrected.
@@ -310,7 +310,7 @@ Supabase Realtime `postgres_changes` cannot do column redaction and cannot authe
 - Orange CTAs use green-900 (`#102E27`) text. White text on orange is prohibited.
 - The previous terracotta “Bazaar Warmth” palette (`#B83817`, `#D84A26`, cream/sand) is retired and non-normative.
 - Four portals: Customer, Kitchen, Rider, Admin. Dine-in is a customer mode/tracker subroute, not a separate portal.
-- `docs/stitch-design/` and `site/ui-kit.html` are archived design explorations; they are not build references.
+- `docs/stitch-design/screens/` is the canonical screen-by-screen visual reference for this contract. The `docs/stitch-design/_archive/` exports and `site/ui-kit.html` are archived design explorations; they are not build references. If a mockup and a normative specification disagree, the specification wins.
 
 **Rationale**
 
@@ -370,6 +370,7 @@ These are recorded here so they are not lost. **The authoritative, complete regi
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Clarified ADR-017: `docs/stitch-design/screens/` is canonical; `_archive/` and `site/ui-kit.html` are non-normative. |
 | 1.2.0 | 2026-11-09 | Added ADR-017 (v2 green/orange design system) and ADR-018 (8.1 km COD test ceiling); clarified F-02/F-14 and ADR-008 status. |
 | 1.1.0 | 2026-10-29 | Added ADRs 001–016 from the audit remediation. |
 | 1.0.0 | 2026-10-29 | Initial ADR baseline created during the readiness upgrade. |

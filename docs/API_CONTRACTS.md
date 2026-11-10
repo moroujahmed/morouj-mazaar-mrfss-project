@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative build contract |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Rule** | Every public mutation must appear here before implementation. |
 
 ---
@@ -30,6 +30,7 @@ export type ApiResponse<T> =
 | `DISTANCE_OUT_OF_BOUNDS` | 422 | Beyond 15 km delivery ceiling. |
 | `DISTANCE_UNAVAILABLE` | 503 | OSRM unavailable and no cached route. |
 | `STORE_CLOSED` | 409 | Store is outside opening hours. |
+| `KITCHEN_PAUSED` | 409 | Kitchen has paused new orders. |
 | `ITEM_OUT_OF_STOCK` | 409 | Item was 86'd during checkout. |
 | `PAYMENT_METHOD_UNAVAILABLE` | 409 | Provider or COD is disabled. |
 | `COD_NOT_AVAILABLE` | 409 | COD outside radius or phone blacklisted. |
@@ -100,21 +101,22 @@ export type ApiResponse<T> =
 1. Validate Zod discriminated union.
 2. Normalize phone to E.164.
 3. Check store open (EAT hours + `is_store_open`).
-4. Check idempotency key; return existing order if same payload.
-5. Fetch authoritative menu prices, active/available flags, modifier groups.
-6. Reject any item that is 86'd or inactive.
-7. Compute `items_subtotal` and `modifiers_total`.
-8. Enforce MOV (delivery) or bypass (dine-in).
-9. Resolve table token for dine-in; reject invalid/inactive table.
-10. Compute road distance via OSRM adapter (metres). Block on out-of-bounds or unavailable.
-11. Compute delivery fee from metres.
-12. Packaging fee: delivery 1,000; dine-in 0.
-13. Compute `total_amount`.
-14. COD checks: radius <= `app_settings.cod_max_radius_km` (8.1 km), phone not blacklisted, OTP verified if first-time.
-15. Insert order + items + modifier snapshots in one transaction.
-16. Generate `order_token` and `handover_pin` in DB.
-17. Insert status history row.
-18. Return `{ orderToken, orderNumber, totalAmount }`.
+4. Check kitchen intake (`app_settings.is_kitchen_paused`); return `KITCHEN_PAUSED` if paused.
+5. Check idempotency key; return existing order if same payload.
+6. Fetch authoritative menu prices, active/available flags, modifier groups.
+7. Reject any item that is 86'd or inactive.
+8. Compute `items_subtotal` and `modifiers_total`.
+9. Enforce MOV (delivery) or bypass (dine-in).
+10. Resolve table token for dine-in; reject invalid/inactive table.
+11. Compute road distance via OSRM adapter (metres). Block on out-of-bounds or unavailable.
+12. Compute delivery fee from metres.
+13. Packaging fee: delivery 1,000; dine-in 0.
+14. Compute `total_amount`.
+15. COD checks: radius <= `app_settings.cod_max_radius_km` (8.1 km), phone not blacklisted, OTP verified if first-time.
+16. Insert order + items + modifier snapshots in one transaction.
+17. Generate `order_token` and `handover_pin` in DB.
+18. Insert status history row.
+19. Return `{ orderToken, orderNumber, totalAmount }`.
 
 **Output**
 
@@ -122,7 +124,7 @@ export type ApiResponse<T> =
 { orderToken: string; orderNumber: number; totalAmount: number }
 ```
 
-**Errors:** `VALIDATION_ERROR`, `STORE_CLOSED`, `ITEM_OUT_OF_STOCK`, `MOV_NOT_MET`, `DISTANCE_OUT_OF_BOUNDS`, `DISTANCE_UNAVAILABLE`, `COD_NOT_AVAILABLE`, `OTP_REQUIRED`, `OTP_INVALID`, `IDEMPOTENCY_CONFLICT`, `RATE_LIMITED`.
+**Errors:** `VALIDATION_ERROR`, `STORE_CLOSED`, `KITCHEN_PAUSED`, `ITEM_OUT_OF_STOCK`, `MOV_NOT_MET`, `DISTANCE_OUT_OF_BOUNDS`, `DISTANCE_UNAVAILABLE`, `COD_NOT_AVAILABLE`, `OTP_REQUIRED`, `OTP_INVALID`, `IDEMPOTENCY_CONFLICT`, `RATE_LIMITED`.
 
 ---
 
@@ -183,6 +185,7 @@ export type ApiResponse<T> =
 | `bumpOrderAction` | KITCHEN/ADMIN | `{ orderId }` | `PREPARING` → `READY_FOR_PICKUP` (delivery) or `DELIVERED` (dine-in). |
 | `setItemAvailabilityAction` | KITCHEN/ADMIN | `{ itemId, available }` | Calls `set_menu_item_availability` RPC; audited. |
 | `setBusyModeAction` | KITCHEN/ADMIN | `{ busy, bufferMinutes }` | Calls `set_kitchen_busy` RPC; buffer 0..60. |
+| `setKitchenPausedAction` | KITCHEN/ADMIN | `{ paused }` | Calls `set_kitchen_paused` RPC; blocks new checkout with `KITCHEN_PAUSED`; audited. |
 
 ---
 
@@ -222,7 +225,7 @@ export type ApiResponse<T> =
 **Query:** `lat`, `lng`
 **Auth:** anon
 **Rate limit:** 30/min/IP
-**Response:** `{ distanceM: number; distanceKm: number; source: "OSRM" | "CACHE"; durationSeconds?: number }`
+**Response:** `{ distanceM: number; distanceKm: number; source: "OSRM" | "CACHE" | "MOCK"; durationSeconds?: number; cached?: boolean }`
 **Errors:** `DISTANCE_UNAVAILABLE`, `DISTANCE_OUT_OF_BOUNDS`, `RATE_LIMITED`.
 **Rules:** quantize coordinates to 5 decimals for cache key; cache 24 h; never return a Haversine estimate as final.
 
@@ -271,7 +274,7 @@ export type ApiResponse<T> =
 ### 3.7 `GET /api/print/receipt/[orderId]`
 
 **Auth:** KITCHEN/ADMIN
-**Response:** `text/plain; charset=utf-8` ESC/POS-ready text.
+**Response:** `text/html; charset=utf-8` browser-printable docket (58 mm/80 mm print stylesheet, `window.print()`-ready). ESC/POS is deferred per ADR-007.
 **Rules:** mask customer phone; never include handover PIN on kitchen docket; reprint is audited.
 
 ---
@@ -295,6 +298,7 @@ All RPCs are `SECURITY DEFINER` with `SET search_path = public, pg_temp`.
 | `admin_reassign_order(p_order_id uuid, p_rider_id uuid, p_reason text)` | ADMIN | Reassign with audit. |
 | `admin_reset_handover_pin(p_order_id uuid, p_reason text)` | ADMIN | New PIN, clear lock, audit. |
 | `set_kitchen_busy(p_busy boolean, p_buffer_minutes int)` | KITCHEN/ADMIN | Busy mode. |
+| `set_kitchen_paused(p_paused boolean)` | KITCHEN/ADMIN | Pause/resume new-order intake; audited. |
 | `set_menu_item_availability(p_item_id uuid, p_available boolean)` | KITCHEN/ADMIN | 86 toggle. |
 | `reconcile_rider_cash(p_rider_id uuid, p_counted_cash int, p_notes text, p_business_date date)` | ADMIN | Settlement + order linkage. |
 | `get_rider_cash_summary(p_rider_id uuid)` | RIDER self/ADMIN | Expected vs. settled. |
@@ -353,6 +357,7 @@ FLW_PUBLIC_KEY=
 FLW_SECRET_KEY=
 FLW_WEBHOOK_HASH=
 FLW_BASE_URL=https://api.flutterwave.com/v3
+PAYMENTS_MODE=mock
 AFRICASTALKING_API_KEY=
 AFRICASTALKING_USERNAME=
 AFRICASTALKING_SENDER_ID=
@@ -372,5 +377,6 @@ All variables are validated at startup by `src/lib/env.ts` with Zod.
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added `KITCHEN_PAUSED`, `setKitchenPausedAction`/`set_kitchen_paused`, and aligned the print route with browser-print HTML. |
 | 1.2.0 | 2026-11-09 | Canonical Flutterwave route, 8.1 km COD ceiling, corrected accept/verify/RPC signatures, admin reset/reassign/refund/analytics entries. |
 | 1.1.0 | 2026-10-29 | Created; replaces the ambiguous v1.0 route/action descriptions. |

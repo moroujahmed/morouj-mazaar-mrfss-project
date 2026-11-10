@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative data model |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Source of truth** | `supabase/migrations/20261029000000_initial_schema.sql` |
 
 ---
@@ -129,7 +129,7 @@ erDiagram
 | `modifiers_total` | INTEGER | Sum of modifier deltas × qty. |
 | `delivery_fee` | INTEGER | Calculated from metres. |
 | `packaging_fee` | INTEGER | Delivery 1,000; dine-in 0. |
-| `total_amount` | INTEGER | Enforced by trigger. |
+| `total_amount` | INTEGER | Generated column: `items_subtotal + modifiers_total + delivery_fee + packaging_fee`. |
 | `payment_method` | `payment_method` | MoMo, Airtel, COD, card. |
 | `payment_status` | `payment_status` | PENDING/PAID/FAILED/REFUNDED. |
 | `payment_reference` | TEXT | Gateway reference. |
@@ -153,6 +153,7 @@ erDiagram
 | `admin_edited_at` / `admin_edited_by` | | Admin edit audit. |
 | `version` | INTEGER | Optimistic concurrency. |
 | `acknowledged_at` | TIMESTAMPTZ | Kitchen acknowledgement. |
+| `ready_at` | TIMESTAMPTZ | Set on `READY_FOR_PICKUP`, or on `PREPARING → DELIVERED` for dine-in; prep/delivery KPI boundary. |
 | `created_at` / `claimed_at` / `dispatched_at` / `delivered_at` / `updated_at` | TIMESTAMPTZ | Lifecycle. |
 
 ### 3.2 `app_settings`
@@ -164,7 +165,7 @@ Singleton row (`id = 1`). Includes:
 - `minimum_order_value` (20,000), `minimum_order_value_dine_in` (0).
 - `packaging_fee_default` (1,000), `packaging_fee_dine_in` (0).
 - `is_store_open`, `opening_time`, `closing_time`, `timezone`.
-- `is_kitchen_busy`, `busy_buffer_minutes`.
+- `is_kitchen_busy`, `busy_buffer_minutes`, `is_kitchen_paused`.
 - `pin_max_attempts`, `pin_lock_minutes`, `pin_geofence_m`.
 - `staff_session_hours`, `max_cart_value`, `max_item_quantity`.
 - `updated_by`, `updated_at`.
@@ -244,5 +245,6 @@ stateDiagram-v2
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added `orders.ready_at` and `app_settings.is_kitchen_paused`; corrected `total_amount` to a generated column. |
 | 1.2.0 | 2026-11-09 | Aligned COD radius, order-number type, and version metadata with the migration. |
 | 1.1.0 | 2026-10-29 | Created as the v1.1 ERD/data dictionary. |

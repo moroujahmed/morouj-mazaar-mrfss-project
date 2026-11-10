@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative v1.2 |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Owner** | Founders + engineer |
 | **Related** | `API_CONTRACTS.md` §2.9, `CANONICAL_EXAMPLES.md`, `OPERATIONS_RUNBOOK.md` §9, migration `get_admin_analytics` |
 
@@ -35,11 +35,11 @@ All business dates use **`Africa/Kampala`** (EAT, UTC+3). Money is integer UGX. 
 | Delivered orders | Count where `order_status='DELIVERED'` | `orders` | Fulfilment denominator. |
 | Cancelled orders | Count where `order_status='CANCELLED'` | `orders` | Reason is audited. |
 | Gross revenue | `sum(total_amount)` where `payment_status='PAID'` and `DELIVERED` | `orders` | Excludes unpaid COD and failed payments. |
-| COD collected | `sum(total_amount)` where `payment_method='COD'`, `payment_status='PAID'`, `DELIVERED` | `orders` | Cash actually collected. |
+| COD collected | `sum(total_amount)` where `payment_method='CASH_ON_DELIVERY'`, `payment_status='PAID'`, `order_status='DELIVERED'` | `orders` | Cash actually collected. |
 | Digital collected | Gross revenue − COD collected | `orders` | Provider fees are not netted here. |
 | Average order value | Gross revenue ÷ delivered orders | `orders` | `0` when no delivered orders. |
-| Average prep time | Mean `(ready_at − acknowledged_at)` for delivery orders | `orders` | Prepaid starts at webhook confirmation; COD starts at accept. |
-| Average delivery time | Mean `(delivered_at − ready_at)` for delivery orders | `orders` | Dine-in excluded. |
+| Average prep time | Mean `(ready_at - acknowledged_at)` for delivery orders | `orders` | `ready_at` set on `READY_FOR_PICKUP`; prepaid starts at webhook confirmation, COD at accept. |
+| Average delivery time | Mean `(delivered_at - ready_at)` for delivery orders | `orders` | `ready_at` set on `READY_FOR_PICKUP`; dine-in excluded. |
 | Repeat customer rate | Phones with ≥ 2 delivered orders ÷ phones with ≥ 1 delivered order | `orders.customer_phone_normalized` | No account required. |
 | Settlement variance | `sum(counted_cash − expected_cash)` | `cash_settlements` | Positive = over, negative = short. |
 | 86 frequency | Count of `SET_ITEM_AVAILABILITY` audit actions per item per day | `admin_audit_log` | Uses the audit action name. |
@@ -109,4 +109,5 @@ The `admin_audit_log`, `order_status_history`, `settings_history`, and `cash_set
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Corrected COD enum value and defined `ready_at` for prep/delivery KPIs. |
 | 1.2.0 | 2026-11-09 | Created; closes P1-30 and the P2 analytics/KPI gap. |

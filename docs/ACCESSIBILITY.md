@@ -3,9 +3,9 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
-| **Standard** | WCAG 2.2 Level AA for all text and controls; AAA for body copy and critical status text where the palette permits |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
+| **Standard** | WCAG 2.2 Level AA for all text and controls; body copy targets AAA where the palette permits |
 | **Design authority** | [`DESIGN_SYSTEM_V2.md`](DESIGN_SYSTEM_V2.md) |
 | **Verification** | axe-core, Playwright, manual keyboard/screen-reader/high-glare checks |
 
@@ -16,12 +16,12 @@ The v1.0 claim of WCAG 2.1 AAA with terracotta CTAs was false. The v2 palette re
 ## 1. Target and non-negotiables
 
 - **AA is the release gate** for every screen in all four portals.
-- AAA is required for normal body text, prices, and critical statuses where the token pair meets 7:1.
+- Body text and critical status text target AAA (7:1) where the palette permits; they are not required to exceed AA.
 - No text, control, status, or error may rely on colour alone.
 - The primary action token is orange `#F28C28` with **green-900 `#102E27` text**. White on orange is forbidden.
 - Body text is at least 16 px; critical prices and CTA labels are at least 18 px semibold.
-- Minimum target size is 44×44 px; customer/admin controls are 48 px; rider/kitchen primary actions are 52–56 px.
-- Focus is always visible with a 2 px ring and 2 px offset.
+- Minimum target size is 44×44 px; customer/admin controls are 48 px; kitchen primary actions are 52 px; rider primary actions are 56 px.
+- Focus is always visible with a 3 px ring and 2 px offset.
 - `prefers-reduced-motion` is respected; no essential information is conveyed by motion.
 
 ---
@@ -61,7 +61,7 @@ Measured against the v2 tokens:
 ### 3.1 Primary action
 
 ```tsx
-<button className="min-h-12 rounded-xl bg-[#F28C28] px-5 text-lg font-semibold text-[#102E27] hover:bg-[#E07D1F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#173F35] focus-visible:ring-offset-2 disabled:opacity-50">
+<button className="min-h-12 rounded-xl bg-[#F28C28] px-5 text-lg font-semibold text-[#102E27] hover:bg-[#E07D1F] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[#173F35] focus-visible:ring-offset-2 disabled:opacity-50">
   Pay USh 35,000
 </button>
 ```
@@ -127,7 +127,7 @@ Measured against the v2 tokens:
 | Screen reader | NVDA/VoiceOver | Controls named; status changes announced; PIN not read on staff screens |
 | Reduced motion | Playwright `emulateMedia` | No essential animation |
 | High-glare | Actual kitchen tablet and budget Android phone | PIN, price, and CTA remain legible |
-| Touch targets | Script + manual | 44 px minimum; 48/56 px portal targets |
+| Touch targets | Script + manual | 44 px minimum; 48/52/56 px portal targets |
 
 `npm run test:a11y` is a merge gate.
 
@@ -149,5 +149,6 @@ Measured against the v2 tokens:
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Unified touch targets and 3 px focus ring; clarified AA release gate with AAA only where the palette permits. |
 | 1.2.0 | 2026-11-09 | Replaced terracotta palette with v2 green/orange tokens; corrected contrast evidence; added KDS/rider/dialog/chart rules and a manual script. |
 | 1.1.0 | 2026-10-29 | Initial AA correction. |

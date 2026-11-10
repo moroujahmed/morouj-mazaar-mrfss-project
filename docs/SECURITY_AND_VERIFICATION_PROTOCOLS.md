@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Supersedes** | v1.0 custom sessions, plaintext PINs, in-memory lockout, and OTP prose |
 | **Authority** | `supabase/migrations/20261029000000_initial_schema.sql`, `API_CONTRACTS.md`, `DECISIONS.md` ADR-001/002/003/013 |
 
@@ -151,11 +151,11 @@ Validation requirements:
 - Delivery requires coordinates and an address; dine-in requires a valid table token.
 - Payment method in the approved enum.
 - `idempotency_key` required and unique per customer/session; a replay returns the existing order.
-- Store-open gate checked server-side in `Africa/Kampala`.
+- Store-open gate checked server-side in `Africa/Kampala`; kitchen-pause gate checked against `app_settings.is_kitchen_paused` and returns `KITCHEN_PAUSED`.
 - MOV checked against items + modifiers only; dine-in MOV is 0.
 - Packaging is 1,000 for delivery and 0 for dine-in.
 - Delivery fee is computed from integer `road_distance_m`; food totals never come from the client.
-- `total_amount` is generated from its components and protected by a trigger.
+- `total_amount` is a generated column; direct writes to it are rejected by PostgreSQL.
 - Promotions are not part of v1.
 
 ---
@@ -188,12 +188,14 @@ While pre-paid orders (MTN MoMo, Card) can be delivered up to the global ceiling
 A dedicated database table tracks phone numbers associated with abandoned deliveries:
 ```sql
 CREATE TABLE public.blacklisted_phones (
-  phone_number TEXT PRIMARY KEY,
-  reason TEXT NOT NULL,
-  blacklisted_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+  phone TEXT PRIMARY KEY,
+  reason TEXT NOT NULL CHECK (length(trim(reason)) BETWEEN 2 AND 500),
+  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc', now())
 );
 ```
-* If a delivery is marked `CANCELLED` due to the customer refusing payment or disappearing upon rider arrival, the phone number is added to `blacklisted_phones`.
+* Rows are written by admin/service-role code only; RLS is enabled and no client role receives direct INSERT/UPDATE.
+* If a confirmed COD delivery fails or is refused (`delivery_attempts.outcome` in `REFUSED`, `CUSTOMER_UNAVAILABLE`, `WRONG_ADDRESS`, `RETURNED`), an admin may add the normalized phone to `blacklisted_phones`.
 * Future checkout attempts from this number automatically disable Cash on Delivery, requiring 100% upfront digital payment via MTN MoMo or Airtel Money.
 
 No production limiter may rely on process memory. CAPTCHA or a proof-of-work challenge may be added to public checkout if abuse is observed; it is not a substitute for server validation.
@@ -235,4 +237,5 @@ No production limiter may rely on process memory. CAPTCHA or a proof-of-work cha
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-10-29 | Original custom-session draft. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.3.0 | 2026-11-10 | Corrected blacklist DDL/columns and `total_amount` protection; added the kitchen-pause checkout gate. |
 | 1.2.0 | 2026-11-09 | Replaced with Supabase Auth, durable PIN RPC, RLS boundary, OTP, rate limits, and verification checklist. |

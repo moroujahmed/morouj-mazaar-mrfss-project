@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative pointer |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Schema authority** | [`supabase/migrations/20261029000000_initial_schema.sql`](../supabase/migrations/20261029000000_initial_schema.sql) |
 | **Seed authority** | [`supabase/seed.sql`](../supabase/seed.sql) |
 | **Model reference** | [`ERD.md`](ERD.md) |
@@ -37,7 +37,7 @@ Rules:
 
 ### 2.1 Settings and identity
 
-- `app_settings` (one row, `id = 1`): store state, hours, radii, rates, MOV, packaging, COD cap, PIN policy, geofence, timezone, currency, tax placeholders, kitchen busy buffer.
+- `app_settings` (one row, `id = 1`): store state, hours, radii, rates, MOV, packaging, COD cap, PIN policy, geofence, timezone, currency, tax placeholders, kitchen busy buffer, kitchen intake pause.
 - `profiles`: one row per Auth staff user; role, phone, plate, active flag, normalized phone. **No PIN column.**
 - `settings_history`: before/after snapshots for settings changes.
 
@@ -50,7 +50,7 @@ Rules:
 
 ### 2.3 Orders
 
-- `orders`: token, order number, type, source, status, payment method/status, phone + normalized phone, coordinates, distance metres, fee components, generated total, PIN and durable attempt state, ETA, cancellation/refund/settlement links, admin edit/version fields.
+- `orders`: token, order number, type, source, status, payment method/status, phone + normalized phone, coordinates, distance metres, fee components, generated total, PIN and durable attempt state, ETA, acknowledgment/ready/delivery timestamps, cancellation/refund/settlement links, admin edit/version fields.
 - `order_items` and `order_item_modifiers`: immutable price/name snapshots so menu edits cannot rewrite history.
 - `order_status_history`: every transition with actor, role, reason, and timestamp.
 - `pin_verification_attempts`: order, rider, success flag, IP hash, user agent.
@@ -96,6 +96,7 @@ Use the enum values in code generation; do not duplicate string unions in the ap
 
 ## 4. Invariants Enforced in PostgreSQL
 
+- `orders.ready_at` is set by the transition trigger when an order enters `READY_FOR_PICKUP` or when a dine-in order moves `PREPARING → DELIVERED`.
 - `orders.total_amount` is generated from `items_subtotal + modifiers_total + packaging_fee + delivery_fee`.
 - Delivery requires coordinates; dine-in requires a table and has zero packaging/delivery.
 - `handover_pin` matches `^[0-9]{4}$`; `failed_pin_attempts >= 0`; lock timestamps are nullable.
@@ -137,7 +138,7 @@ See `SECURITY_AND_VERIFICATION_PROTOCOLS.md` §4 for the full boundary.
 | :--- | :--- |
 | Public/customer | `get_public_settings`, `get_order_by_token`, `get_order_telemetry`, `validate_table_token`, `submit_feedback` |
 | Rider | `get_rider_pool`, `get_rider_active_order`, `claim_order_atomic`, `start_delivery`, `release_order`, `verify_delivery_pin`, `report_delivery_failed`, `update_rider_telemetry`, `start_rider_shift`, `end_rider_shift`, `get_rider_cash_summary` |
-| Kitchen | `get_kitchen_orders`, `accept_order`, `bump_order`, `set_kitchen_busy`, `set_menu_item_availability` |
+| Kitchen | `get_kitchen_orders`, `accept_order`, `bump_order`, `set_kitchen_busy`, `set_kitchen_paused`, `set_menu_item_availability` |
 | Admin | `admin_get_order`, `admin_complete_order`, `admin_cancel_order`, `admin_reassign_order`, `admin_reset_handover_pin`, `reconcile_rider_cash`, `get_admin_ledger`, `get_admin_analytics` |
 | System | `expire_pending_orders` (cron/service role) |
 
@@ -162,14 +163,16 @@ Menu images live in the storage bucket `menu-images`; missing images use the loc
 
 ## 8. Local Validation
 
-The v1.1 baseline was applied to PostgreSQL 18.4 and smoke-tested:
+The v1.3 initial schema and seed were applied to a fresh PostgreSQL 18 cluster with `ON_ERROR_STOP=1` (the storage migration was excluded because Supabase Storage provides that schema):
 
-- initial schema, storage migration, and seed applied with `ON_ERROR_STOP=1`;
-- canonical totals `35,000` and `38,000` verified;
-- phone normalization, token tracker, claim/start, wrong PIN, correct PIN, kitchen authorization, settlement linkage, and analytics verified;
-- `anon` denied direct `orders`; token RPC returned a safe payload.
+- all enums, tables, indexes, triggers, RPCs, views, grants, and policies created cleanly;
+- canonical total `35,000` was generated from its components, and a direct write to `total_amount` was rejected;
+- `ready_at` was set on `PREPARING → READY_FOR_PICKUP`;
+- `set_kitchen_paused(true/false)` updated `is_kitchen_paused` and wrote two `SET_KITCHEN_PAUSED` audit rows;
+- `get_admin_analytics` returned the new prep/delivery KPI keys;
+- earlier v1.1 smoke tests also covered phone normalization, token tracking, claim/start, PIN success/failure, kitchen authorization, settlement linkage, and `anon` denial of direct `orders`.
 
-Re-run locally with the Supabase CLI once available:
+Re-run locally with the Supabase CLI:
 
 ```bash
 supabase start
@@ -187,4 +190,5 @@ Do not run a production build as part of documentation validation.
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-10-29 | Unsafe draft schema. |
 | 1.1.0 | 2026-10-29 | Amendment banner only; stale SQL retained. |
+| 1.3.0 | 2026-11-10 | Documented `ready_at`, kitchen intake pause, and the `set_kitchen_paused` RPC. |
 | 1.2.0 | 2026-11-09 | Removed duplicate/unsafe SQL and invalid UUIDs; migration is the sole schema authority. |

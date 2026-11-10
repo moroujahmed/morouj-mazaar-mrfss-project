@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **System code** | `PROJECT-BAZAAR-D2C` / MRFSS |
 | **Environment** | Mobile-first responsive web application (installable PWA) |
 | **Locale** | Kampala, Uganda — `Africa/Kampala` (EAT, UTC+3) |
@@ -97,7 +97,7 @@ There are no promotions or discount terms in v1 (ADR-010). Totals are computed s
 
 ### 2.4 Store hours
 
-Checkout is blocked when `is_store_open = false` or EAT time is outside `opening_time`–`closing_time`. The storefront shows a closed state with the next opening time and WhatsApp support. Staff can still work; pre-orders are out of scope.
+Checkout is blocked when `is_store_open = false` or EAT time is outside `opening_time`–`closing_time`. Checkout is also blocked with `KITCHEN_PAUSED` while `app_settings.is_kitchen_paused = true`; existing orders continue. The storefront shows a closed or paused state with the next opening time and WhatsApp support. Staff can still work; pre-orders are out of scope.
 
 ### 2.5 COD policy
 
@@ -215,6 +215,7 @@ Detailed journeys and acceptance scenarios are in [`TESTING_PERSONAS_AND_E2E_SCE
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added the kitchen-pause checkout state. |
 | 1.2.0 | 2026-11-09 | Rewritten: four-portal model, integer-metre fee, 8.1 km COD alignment, no Haversine fallback, accurate cost statement, token-scoped RPC/Broadcast architecture, explicit v1 scope. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |
 | 1.0.0 | 2026-10-27 | Original architecture draft. |

@@ -128,10 +128,11 @@ CREATE TABLE public.app_settings (
 
   is_store_open BOOLEAN NOT NULL DEFAULT true,
   opening_time TIME NOT NULL DEFAULT '10:00:00',
-  closing_time TIME NOT NULL DEFAULT '22:30:00',
+  closing_time TIME NOT NULL DEFAULT '22:00:00',
   is_kitchen_busy BOOLEAN NOT NULL DEFAULT false,
   busy_buffer_minutes INTEGER NOT NULL DEFAULT 20
     CHECK (busy_buffer_minutes BETWEEN 0 AND 60),
+  is_kitchen_paused BOOLEAN NOT NULL DEFAULT false,
 
   pin_max_attempts INTEGER NOT NULL DEFAULT 3
     CHECK (pin_max_attempts BETWEEN 1 AND 10),
@@ -367,6 +368,7 @@ CREATE TABLE public.orders (
   kitchen_busy_buffer_applied INTEGER NOT NULL DEFAULT 0
     CHECK (kitchen_busy_buffer_applied BETWEEN 0 AND 60),
   acknowledged_at TIMESTAMPTZ,
+  ready_at TIMESTAMPTZ,
 
   customer_rating public.feedback_rating,
   customer_feedback_notes TEXT CHECK (customer_feedback_notes IS NULL OR length(customer_feedback_notes) <= 1000),
@@ -887,6 +889,12 @@ BEGIN
 
   v_pair := OLD.order_status::text || '->' || NEW.order_status::text;
 
+  -- First transition into a ready/served state is the kitchen prep boundary.
+  IF NEW.order_status = 'READY_FOR_PICKUP'
+     OR (OLD.order_status = 'PREPARING' AND NEW.order_status = 'DELIVERED') THEN
+    NEW.ready_at := coalesce(NEW.ready_at, now());
+  END IF;
+
   IF v_pair IN (
     'PENDING_PAYMENT->PREPARING',
     'PENDING_PAYMENT->CANCELLED',
@@ -1079,7 +1087,8 @@ AS $$
     'openingTime', opening_time,
     'closingTime', closing_time,
     'isKitchenBusy', is_kitchen_busy,
-    'busyBufferMinutes', busy_buffer_minutes
+    'busyBufferMinutes', busy_buffer_minutes,
+    'isKitchenPaused', is_kitchen_paused
   )
   FROM public.app_settings
   WHERE id = 1;
@@ -1119,6 +1128,7 @@ BEGIN
     'handoverPin', o.handover_pin,
     'etaAt', o.eta_at,
     'createdAt', o.created_at,
+    'readyAt', o.ready_at,
     'deliveredAt', o.delivered_at,
     'canRate', (o.order_status = 'DELIVERED' AND o.customer_rating IS NULL),
     'feedback', CASE
@@ -1854,6 +1864,7 @@ BEGIN
         'totalAmount', o.total_amount,
         'createdAt', o.created_at,
         'acknowledgedAt', o.acknowledged_at,
+        'readyAt', o.ready_at,
         'kitchenBusyBufferApplied', o.kitchen_busy_buffer_applied,
         'items', coalesce((
           SELECT jsonb_agg(
@@ -1921,6 +1932,42 @@ BEGIN
     'success', true,
     'isKitchenBusy', p_busy,
     'busyBufferMinutes', (v_after->>'busy_buffer_minutes')::integer
+  );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.set_kitchen_paused(
+  p_paused BOOLEAN
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_before JSONB;
+  v_after JSONB;
+BEGIN
+  IF NOT public.is_kitchen() THEN
+    RAISE EXCEPTION 'AUTH_UNAUTHORIZED'
+      USING ERRCODE = 'P0001';
+  END IF;
+
+  SELECT to_jsonb(s) INTO v_before FROM public.app_settings s WHERE id = 1;
+
+  UPDATE public.app_settings
+  SET is_kitchen_paused = p_paused,
+      updated_by = auth.uid()
+  WHERE id = 1;
+
+  SELECT to_jsonb(s) INTO v_after FROM public.app_settings s WHERE id = 1;
+
+  INSERT INTO public.admin_audit_log (actor_id, action, entity_type, entity_id, before_state, after_state)
+  VALUES (auth.uid(), 'SET_KITCHEN_PAUSED', 'app_settings', '1', v_before, v_after);
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'isKitchenPaused', p_paused
   );
 END;
 $$;
@@ -2019,6 +2066,7 @@ BEGIN
     'createdAt', o.created_at,
     'claimedAt', o.claimed_at,
     'dispatchedAt', o.dispatched_at,
+    'readyAt', o.ready_at,
     'deliveredAt', o.delivered_at,
     'cancelledAt', o.cancelled_at,
     'cancellationReason', o.cancellation_reason,
@@ -2486,8 +2534,21 @@ BEGIN
         WHERE payment_status = 'PAID' AND order_status = 'DELIVERED'
       ), 0), 0),
       'averagePrepMinutes', coalesce(round(avg(
-        extract(epoch FROM (delivered_at - created_at)) / 60
-      ) FILTER (WHERE order_status = 'DELIVERED'), 1), 0),
+        extract(epoch FROM (ready_at - acknowledged_at)) / 60
+      ) FILTER (
+        WHERE order_status = 'DELIVERED'
+          AND order_type = 'DELIVERY'
+          AND ready_at IS NOT NULL
+          AND acknowledged_at IS NOT NULL
+      ), 1), 0),
+      'averageDeliveryMinutes', coalesce(round(avg(
+        extract(epoch FROM (delivered_at - ready_at)) / 60
+      ) FILTER (
+        WHERE order_status = 'DELIVERED'
+          AND order_type = 'DELIVERY'
+          AND delivered_at IS NOT NULL
+          AND ready_at IS NOT NULL
+      ), 1), 0),
       'topItems', coalesce((
         SELECT jsonb_agg(jsonb_build_object('name', item_name, 'quantity', qty) ORDER BY qty DESC)
         FROM (
@@ -2806,7 +2867,8 @@ SELECT
   opening_time,
   closing_time,
   is_kitchen_busy,
-  busy_buffer_minutes
+  busy_buffer_minutes,
+  is_kitchen_paused
 FROM public.app_settings
 WHERE id = 1;
 
@@ -2870,6 +2932,7 @@ GRANT EXECUTE ON FUNCTION public.get_kitchen_orders() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.accept_order(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.bump_order(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.set_kitchen_busy(BOOLEAN, INTEGER) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.set_kitchen_paused(BOOLEAN) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.set_menu_item_availability(UUID, BOOLEAN) TO authenticated;
 
 -- Admin RPCs.

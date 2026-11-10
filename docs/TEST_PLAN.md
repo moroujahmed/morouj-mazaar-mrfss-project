@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative; executable test authority |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Canonical data** | `CANONICAL_EXAMPLES.md` |
 | **Test runner** | Vitest (unit/integration), Playwright (E2E), axe-core (a11y), k6 (load, optional) |
 
@@ -122,6 +122,14 @@ Also test:
 - Duplicate Flutterwave webhook event is ignored.
 - Expired idempotency key can be reused.
 
+### 2.8 Store and kitchen availability
+
+- Checkout rejects order creation with `STORE_CLOSED` when the EAT clock is outside `opening_time`–`closing_time` or `is_store_open = false`, even if the client submits directly.
+- Checkout rejects order creation with `KITCHEN_PAUSED` when `app_settings.is_kitchen_paused = true`.
+- `set_kitchen_paused` is callable only by `KITCHEN`/`ADMIN`; it writes a `SET_KITCHEN_PAUSED` audit row.
+- Pausing intake does not change the state of existing orders; they continue through the FSM.
+- `get_public_settings` exposes `isKitchenPaused` so the storefront can disable checkout before submission.
+
 ---
 
 ## 3. Database and RLS tests
@@ -233,6 +241,22 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 3. Reconcile 65,500; status `SETTLED`, variance 0.
 4. Reconcile a second time with 60,000; status `PARTIAL`, variance **-5,500**.
 5. Orders remain linked to the same settlement; no duplicate settlement row.
+
+### Scenario H — Payment failure and retry
+
+1. Sarah starts checkout but the Flutterwave payment fails or is abandoned.
+2. The order remains `PENDING_PAYMENT`; the tracker shows the retry action and payment status, never a false “confirmed” state.
+3. Retrying with the same idempotency key and unchanged payload returns the same order; changing the payload returns `IDEMPOTENCY_CONFLICT`.
+4. A successful retry moves the order to `PREPARING` through the verified webhook path.
+5. When the retry window expires, `expire_pending_orders` cancels the order and marks the payment failed/expired.
+
+### Scenario I — Store closed and kitchen paused
+
+1. Outside `opening_time`–`closing_time` in `Africa/Kampala`, the storefront shows **Closed** with the next opening time.
+2. Checkout is disabled and the server rejects order creation with `STORE_CLOSED` even if the client is bypassed.
+3. Staff can still sign in, review history, and reconcile cash.
+4. If the kitchen pauses intake, new orders are blocked with `KITCHEN_PAUSED`; existing orders continue through the FSM.
+5. Resuming intake restores checkout without a redeploy.
 
 ---
 
@@ -406,7 +430,7 @@ A PR cannot merge if any gate fails. `test:db` and `test:e2e` require a migrated
 
 ## 10. Exit criteria for Phase 12
 
-- Scenarios A–G pass on desktop Chrome and a Pixel 7 viewport.
+- Scenarios A–I pass on desktop Chrome and a Pixel 7 viewport.
 - RLS matrix passes.
 - No critical/serious axe violations.
 - No retired numbers in fixtures or UI copy.
@@ -420,4 +444,6 @@ A PR cannot merge if any gate fails. `test:db` and `test:e2e` require a migrated
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added missing Scenarios H (payment retry) and I (store closed/kitchen paused); aligned exit criteria to A–I. |
+| 1.2.0 | 2026-11-09 | Rewritten with corrected fixtures, A–G scenarios, RLS matrix, and runnable Playwright blueprint. |
 | 1.1.0 | 2026-10-29 | Created; replaces wrong fixtures and the unrunnable Playwright blueprint. |

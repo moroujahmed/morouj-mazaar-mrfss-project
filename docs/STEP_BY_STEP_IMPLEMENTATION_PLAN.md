@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Execution model** | Phased, test-driven, contract-verified |
 | **Start condition** | Founder gates in [`AUDIT_REPORT.md`](AUDIT_REPORT.md) §12 that block the phase must be acknowledged before that phase starts |
 
@@ -136,13 +136,14 @@ Agents complete phases in order and run every gate before moving on. This plan d
 **Directives:**
 
 1. Zod discriminated union for delivery/dine-in; normalize phone.
-2. Idempotency key required; recompute all totals; insert order/items/modifiers in one transaction.
-3. Digital: create `payment_transactions`, call Flutterwave hosted checkout; webhook validates `verif-hash`, verifies transaction, checks amount/currency, stores event, moves `PENDING_PAYMENT → PREPARING`.
-4. COD: enforce radius, OTP when required, store change due, create `CONFIRMED_UNPAID`.
-5. Duplicate/late events never resurrect a terminal order.
-6. Expire unpaid digital orders after 10 minutes.
+2. Enforce `STORE_CLOSED` and `KITCHEN_PAUSED` server-side before order creation.
+3. Idempotency key required; recompute all totals; insert order/items/modifiers in one transaction.
+4. Digital: create `payment_transactions`, call Flutterwave hosted checkout; webhook validates `verif-hash`, verifies transaction, checks amount/currency, stores event, moves `PENDING_PAYMENT → PREPARING`.
+5. COD: enforce radius, OTP when required, store change due, create `CONFIRMED_UNPAID`.
+6. Duplicate/late events never resurrect a terminal order.
+7. Expire unpaid digital orders after 10 minutes.
 
-**Gate:** webhook signature/replay/amount tests; idempotency tests; canonical totals 35,000 / 38,000 / 8,000; no client-supplied price accepted.
+**Gate:** webhook signature/replay/amount tests; idempotency tests; store/kitchen gates; canonical totals 35,000 / 38,000 / 8,000; no client-supplied price accepted.
 
 ---
 
@@ -168,9 +169,9 @@ Agents complete phases in order and run every gate before moving on. This plan d
 
 ## Phase 8 — Kitchen Display
 
-**Objective:** reliable KDS with audio, accept/bump, 86, and busy mode.
+**Objective:** reliable KDS with audio, accept/bump, 86, busy mode, and intake pause.
 
-**Files:** `src/lib/audio/chimes.ts`, `src/components/kitchen/*`, `src/actions/kitchen.ts`, `src/app/(operations)/kitchen/{login,page}.tsx`, `src/app/(operations)/kitchen/layout.tsx`.
+**Files:** `src/lib/audio/chimes.ts`, `src/components/kitchen/*`, `src/actions/kitchen.ts`, `src/app/(operations)/kitchen/{login,page}.tsx`, `src/app/(operations)/kitchen/layout.tsx`, `src/app/api/print/receipt/[orderId]/route.ts`.
 
 **Directives:**
 
@@ -178,11 +179,11 @@ Agents complete phases in order and run every gate before moving on. This plan d
 2. Shift-start gesture unlocks Web Audio; repeated chime stops on `acknowledged_at`.
 3. Prepaid orders arrive `PREPARING`; **Accept** applies only to `CONFIRMED_UNPAID`.
 4. Bump: delivery → `READY_FOR_PICKUP`; dine-in → `DELIVERED`.
-5. 86 via RPC; busy mode via RPC; both audited.
+5. 86 via RPC; busy mode and intake pause via RPC; all audited.
 6. Late timers show text, not colour alone.
-7. Print docket; no PIN/phone.
+7. Browser-print docket through `GET /api/print/receipt/[orderId]`; no PIN/phone.
 
-**Gate:** audio test after gesture; accept/bump state tests; 86 propagation; busy buffer does not change existing orders.
+**Gate:** audio test after gesture; accept/bump state tests; 86 propagation; busy buffer and pause do not change existing orders.
 
 ---
 
@@ -279,6 +280,7 @@ Agents complete phases in order and run every gate before moving on. This plan d
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added store/kitchen-pause gates to Phase 6, intake pause and browser-print route to Phase 8. |
 | 1.2.0 | 2026-11-09 | Rewritten for pinned Next 15, Supabase Auth, integer-metre OSRM, canonical fixtures, v2 palette, kitchen portal, payment/refund/audit, scenarios A–I, CI and dependency/secret scanning. |
 | 1.1.0 | 2026-10-29 | Amendment banner. |
 | 1.0.0 | 2026-10-27 | Original 12-phase plan. |

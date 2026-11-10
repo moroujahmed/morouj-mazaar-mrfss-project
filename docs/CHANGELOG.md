@@ -6,6 +6,36 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## [1.3.0] — 2026-11-10
+
+### Added
+
+- `orders.ready_at` with trigger population on `READY_FOR_PICKUP` and dine-in `PREPARING → DELIVERED`; analytics uses it for prep/delivery KPIs.
+- `app_settings.is_kitchen_paused`, `set_kitchen_paused(boolean)`, `isKitchenPaused` in public settings, and `KITCHEN_PAUSED` across API/UX/tests.
+- Missing test scenarios H (payment failure/retry) and I (store closed/kitchen paused); exit criteria are now A–I.
+- `src/lib/schemas/order.ts` and `src/app/api/print/receipt/[orderId]/route.ts` in the stack manifest.
+
+### Changed
+
+- ADR-017 clarified: `docs/stitch-design/screens/` is canonical; `docs/stitch-design/_archive/` and `site/ui-kit.html` are non-normative.
+- Route groups standardized as `(storefront)` and `(operations)` across the portal spec and stack manifest.
+- Canonical touch targets unified: 44 px absolute minimum, 48 px customer/admin, 52 px kitchen, 56 px rider; 3 px focus ring.
+- Analytics COD KPI uses `CASH_ON_DELIVERY`, not `COD`.
+- Integrations aligned: 15.0 km prepaid / 8.1 km COD distance envelope, 50-point/10-minute rider telemetry queue, Chrome 110+/Safari 16+ minimums, and HTML browser-print route.
+- `total_amount` documented as a generated column; `blacklisted_phones` DDL aligned with the migration.
+
+### Fixed
+
+- `TEST_PLAN.md` scenario coverage and traceability now match `TESTING_PERSONAS_AND_E2E_SCENARIOS.md`.
+- Stale audit statements that treated the entire Stitch package as archived.
+- Prep-time KPI references that used nonexistent fields or the wrong boundary.
+
+### Removed
+
+- No files deleted. Historical v1.0/v1.2 text remains under its existing historical banners.
+
+---
+
 ## [1.2.0] — 2026-11-09
 
 ### Added

@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative closure record. All catalogued v1.0 documents have been rewritten to v1.2. |
-| **Version** | 1.2.1 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Precedence** | `DECISIONS.md` → `CANONICAL_EXAMPLES.md` → `DESIGN_SYSTEM_V2.md` / `ACCESSIBILITY.md` / `API_CONTRACTS.md` / `ERD.md` → this file → historical v1.0 text in `AUDIT_REPORT.md` |
 
 This file records how each audit finding was closed and the technical amendments that remain binding. The v1.2 documents are now the build contract; the original v1.0 wording is historical context only and is not authoritative where it conflicts with v1.2.
@@ -207,7 +207,7 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - Primary green `#173F35`; deep green `#102E27`; action orange `#F28C28` with green-900 text; orange text `#A65A0F`; red `#C62828`; success `#17603F`; warning `#8A4B00`.
 - Never use white text on orange. Orange is an action/accent color, not a large background.
 - Four portals: Customer, Kitchen, Rider, Admin. Dine-in is a customer mode and tracker subroute, not a separate portal.
-- `site/` is the static prototype of record. `docs/stitch-design/screens/` is the canonical screen-by-screen visual reference for the same v1.2 contract; its `_archive/` folder and `site/ui-kit.html` are archived, non-normative design explorations.
+- `site/` is the static prototype of record. `docs/stitch-design/screens/` is the canonical screen-by-screen visual reference for the current contract; its `_archive/` folder and `site/ui-kit.html` are archived, non-normative design explorations.
 
 ### 4.11 Kitchen portal (supersedes “kitchen is an admin tab”)
 
@@ -216,6 +216,15 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - Prepaid orders arrive already `PREPARING`; only `CONFIRMED_UNPAID` COD orders show an Accept action.
 - Kitchen cannot edit prices, menu records, refunds, settlements, or delivery data.
 - The static prototype is `site/kitchen.html` with `site/assets/js/kitchen.js`.
+
+### 4.12 v1.3 schema and contract corrections
+
+- `orders.ready_at` is populated by the transition trigger on `READY_FOR_PICKUP` and dine-in `PREPARING → DELIVERED`; analytics and the runbook use it instead of `delivered_at - created_at`.
+- `app_settings.is_kitchen_paused` plus `set_kitchen_paused(boolean)` make `KITCHEN_PAUSED` a real checkout gate; existing orders continue through the FSM.
+- `total_amount` is documented and implemented as a PostgreSQL generated column, not a trigger-maintained field.
+- `blacklisted_phones` uses `phone`, `reason`, `created_by`, and `created_at`, matching the migration.
+- Test scenarios are A–I in `TEST_PLAN.md`; §2.8 covers store/kitchen availability.
+- Printing is browser-print HTML at `GET /api/print/receipt/[orderId]`; ESC/POS remains deferred.
 
 ---
 
@@ -234,6 +243,7 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added §4.12 for `ready_at`, kitchen pause, generated totals, blacklist columns, A–I tests, and browser-print. |
 | 1.2.0 | 2026-11-09 | Rewritten as the v1.2 closure register: corrected P0-09 palette, added P0-11 COD radius, added design-system and kitchen-portal amendments, scenarios A–I. |
 | 1.1.0 | 2026-10-29 | Created; closes P0/P1 specification gaps and records technical amendments. |
 | 1.1.1 | 2026-11-07 | Aligns the COD radius ceiling to 8.1 km so the canonical 8.093 km Ntinda COD fixture is valid. |

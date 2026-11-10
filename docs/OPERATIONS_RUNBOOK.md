@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative v1.2 operations baseline |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Owner** | Founders + on-call engineer |
 | **Scope** | Supabase, Vercel/Next.js, Flutterwave, Africa's Talking, MapTiler, OSRM, Upstash |
 
@@ -237,12 +237,13 @@ All cron endpoints require `Authorization: Bearer ${CRON_SECRET}` and are idempo
 
 - Confirm `is_store_open` and opening hours.
 - Confirm printer/tablet, KDS audio, and rider phones.
-- Check 86'd items and busy mode.
+- Check 86'd items, busy mode, and kitchen intake pause.
 - Confirm today's rider roster and opening floats.
 
 ### 7.2 During service
 
 - Kitchen accepts every COD ticket; digital paid tickets enter `PREPARING` automatically.
+- Pause intake through `set_kitchen_paused` if the kitchen cannot accept new orders; queued orders continue.
 - Bump only when the food is packed and sealed.
 - Riders claim one order at a time.
 - Rider starts the trip only after pickup.
@@ -292,10 +293,11 @@ Mobile browsers suspend location when backgrounded or locked. The rider app must
 | Delivered orders | Count where `order_status='DELIVERED'` | `orders` |
 | Cancelled orders | Count where `order_status='CANCELLED'` | `orders` |
 | Gross revenue | Sum `total_amount` where `payment_status='PAID'` and `DELIVERED` | `orders` |
-| COD collected | Sum `total_amount` where COD, `PAID`, `DELIVERED` | `orders` |
+| COD collected | Sum `total_amount` where `payment_method='CASH_ON_DELIVERY'`, `PAID`, `DELIVERED` | `orders` |
 | Digital collected | Gross revenue − COD collected | `orders` |
 | Average order value | Gross revenue ÷ delivered orders | `orders` |
-| Average prep time | Mean `(delivered_at − created_at)` in minutes for delivered orders | `orders` |
+| Average prep time | Mean `(ready_at - acknowledged_at)` in minutes for delivered delivery orders | `orders` |
+| Average delivery time | Mean `(delivered_at - ready_at)` in minutes for delivered delivery orders | `orders` |
 | Repeat customer rate | Phones with ≥ 2 delivered orders ÷ phones with ≥ 1 | `orders.customer_phone_normalized` |
 | Settlement variance | `counted_cash − expected_cash` | `cash_settlements` |
 | 86 frequency | Count of `SET_ITEM_AVAILABILITY` audit actions per item per day | `admin_audit_log` |
@@ -399,5 +401,6 @@ These are deliberate. Do not add them mid-build without an ADR and a test plan u
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Aligned prep-time KPI with `ready_at`; added kitchen intake pause to the SOP. |
 | 1.2.0 | 2026-11-09 | Aligned to v1.2: COD test ceiling 8.1 km and scenarios A–I. |
 | 1.1.0 | 2026-10-29 | Created; deploy, backup, incident, SOP, KPI, and go-live baseline. |

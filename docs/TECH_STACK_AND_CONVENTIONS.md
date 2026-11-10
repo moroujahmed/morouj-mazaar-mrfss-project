@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Supersedes** | v1.0 version drift, `postgres_changes`, OSM production tiles, Haversine fallback, `ADMIN_DEFAULT_PIN`, and the incomplete file manifest |
 | **Authority** | [`DECISIONS.md`](DECISIONS.md) ADR-001–017, [`API_CONTRACTS.md`](API_CONTRACTS.md), [`../.env.example`](../.env.example) |
 
@@ -105,6 +105,7 @@ project-root/
 │   │       ├── notifications/dispatch/route.ts
 │   │       ├── cron/expire-orders/route.ts
 │   │       ├── cron/close-shifts/route.ts
+│   │       ├── print/receipt/[orderId]/route.ts
 │   │       └── health/route.ts
 │   ├── components/
 │   │   ├── ui/                     # button, badge, input, sheet, modal, toast, skeleton, table
@@ -122,6 +123,7 @@ project-root/
 │   │   ├── sms/                    # Africa's Talking adapter + mock
 │   │   ├── routing/                # OSRM adapter, metres, cache
 │   │   ├── rate-limit/             # Upstash adapter + local
+│   │   ├── schemas/order.ts        # checkout, tracker, and action payload schemas
 │   │   ├── audio/chimes.ts
 │   │   ├── currency.ts
 │   │   ├── time.ts                 # Africa/Kampala helpers
@@ -253,6 +255,7 @@ FLW_PUBLIC_KEY=
 FLW_SECRET_KEY=
 FLW_WEBHOOK_HASH=
 FLW_BASE_URL=https://api.flutterwave.com/v3
+PAYMENTS_MODE=mock
 
 # Africa's Talking
 AFRICASTALKING_API_KEY=
@@ -296,6 +299,7 @@ Configure at Phase 1 (see `SPEC_AMENDMENTS.md` §4.2):
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Added `src/lib/schemas/order.ts` and the browser-print receipt route to the manifest. |
 | 1.2.0 | 2026-11-09 | Rewritten: pinned stack, no `postgres_changes`, MapTiler/OSRM production rules, complete manifest, IndexedDB telemetry queue, canonical env names, no default PIN, CI/dependency gates, storefront discovery deferral. |
 | 1.1.0 | 2026-10-29 | Amendment banner. |
 | 1.0.0 | 2026-10-27 | Original stack draft. |

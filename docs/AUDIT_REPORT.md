@@ -2,14 +2,14 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Audit date** | 2026-10-29 (v1.0); 2026-11-09 (v1.2 reconciliation) |
+| **Audit date** | 2026-10-29 (v1.0); 2026-11-09 (v1.2 reconciliation); 2026-11-10 (v1.3 build-readiness reconciliation) |
 | **Repository** | `morouj-mazaar-mrfss-project` |
-| **Scope** | v1.0 audit of the original 10 documents, v1.1 specification remediation, and v1.2 reconciliation of every spec, document, schema reference, and the static `site/` prototype |
+| **Scope** | v1.0 audit of the original 10 documents, v1.1 specification remediation, v1.2 reconciliation, and v1.3 end-to-end document/schema/API/test/design consistency pass |
 | **Auditor** | Big Pickle (OpenCode coding agent) |
-| **Document status** | v1.2 — all P0/P1/P2 findings closed at specification level; launch gated by founder inputs in §12 |
+| **Document status** | v1.3 — all P0/P1/P2 findings closed at specification level; launch gated by founder inputs in §12 |
 | **Code present** | No application code. Schema, migrations, seed, config, scripts, docs, and the static `site/` prototype are present. |
 
-> **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1; the authoritative founder action register is §12; every file created or changed in v1.2 is in §13. Where historical text quotes retired numbers, it is evidence, not a current contract. The normative numbers live in `CANONICAL_EXAMPLES.md`; the normative visual language lives in `DESIGN_SYSTEM_V2.md` and `ACCESSIBILITY.md`.
+> **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1; the authoritative founder action register is §12; every file created or changed in v1.2 is in §13, and the v1.3 reconciliation is recorded in §13.8. Where historical text quotes retired numbers, it is evidence, not a current contract. The normative numbers live in `CANONICAL_EXAMPLES.md`; the normative visual language lives in `DESIGN_SYSTEM_V2.md` and `ACCESSIBILITY.md`.
 
 ---
 
@@ -40,7 +40,9 @@ The v1.2 baseline now:
 - Adds `ANALYTICS.md`, `BROWSER_SUPPORT.md`, `CHANGELOG.md`, `GLOSSARY.md`, `SEQUENCE_DIAGRAMS.md`, and root `SECURITY.md`.
 - Archives `docs/stitch-design/` and `site/ui-kit.html` as non-normative history instead of deleting them.
 
-No application code, dependency installation, or production build was performed. Validation was limited to static checks (`node --check`), repository scans, link verification, and SQL review; the v1.1 database validation remains the last executed database proof.
+**v1.3 correction:** `docs/stitch-design/screens/` is the canonical screen-by-screen visual reference. Only `docs/stitch-design/_archive/` and `site/ui-kit.html` are non-normative. The v1.3 pass also reconciled `ready_at`, kitchen-pause state, generated totals, scenario coverage A–I, browser minimums, telemetry queue bounds, and the browser-print contract across the schema and normative docs.
+
+No application code, dependency installation, or production build was performed. Validation included static checks (`node --check`), repository scans, link verification, and a fresh PostgreSQL 18 application of the migration and seed plus targeted smoke tests for the v1.3 schema changes.
 
 **Build-readiness score: 9.5/10 — conditional.**
 
@@ -180,7 +182,7 @@ The v1.0 P2 list was a mixed backlog of documentation drift, schema polish, miss
   - Juma's ledger is **USh 65,500** (`#1043` 38,000 + `#1047` 27,500).
 - Rider UI no longer offers a next-job queue; claims are disabled while a delivery is active, matching the one-active-order index.
 - The kitchen snapshot intentionally precedes the admin/rider snapshot: `#1047` is New COD on the kitchen board and Ready on admin/rider. `DESIGN_SYSTEM_V2.md` documents this as a snapshot ordering, not a state contradiction.
-- `docs/stitch-design/` and `site/ui-kit.html` carry archive banners and are explicitly non-normative; only `site/` (minus the archived UI kit) and the v1.2 docs are current.
+- **v1.3 correction:** `docs/stitch-design/screens/` is the canonical screen reference; `docs/stitch-design/_archive/` and `site/ui-kit.html` carry archive banners and are explicitly non-normative.
 - New operational documents: `ANALYTICS.md`, `BROWSER_SUPPORT.md`, `CHANGELOG.md`, `GLOSSARY.md`, `SEQUENCE_DIAGRAMS.md`, and root `SECURITY.md`.
 
 ### 1.8 Short answer to “is there anything else we need to provide?”
@@ -1340,7 +1342,7 @@ Founders do **not** need to write code, design the database, choose library vers
 | `site/kitchen.html` | Fourth portal: kitchen board shell, stock sheet, print docket. | Loads tokens/base/components/kitchen CSS; static review. |
 | `site/assets/css/kitchen.css` | Kitchen board layout and print styles. | Token-only palette; `#000` used only for print. |
 | `site/assets/js/kitchen.js` | Oldest-first tickets, COD accept, bump, 86 list, busy mode, connection state, print. | `node --check` passed; canonical COD due = 65,500. |
-| `docs/stitch-design/README.md` | Archive notice for the historical design explorations. | Confirms non-normative status. |
+| `docs/stitch-design/README.md` | Inventory for the canonical `screens/` package and the non-normative `_archive/` exports. | Confirms canonical/archive split. |
 
 ### 13.3 Files modified in v1.2
 
@@ -1392,14 +1394,14 @@ Founders do **not** need to write code, design the database, choose library vers
 | `node --check site/assets/js/admin.js` | Passed. |
 | `node --check site/assets/js/rider.js` | Passed. |
 | Local markdown links | Checked 30 local files (README, SECURITY, site/README, docs); all relative links resolve. |
-| Retired-value scan | No hits outside explicit retirement/guardrail/history lines, the audit report, `site/ui-kit.html`, or `docs/stitch-design/`. |
+| Retired-value scan | No hits outside explicit retirement/guardrail/history lines, the audit report, `site/ui-kit.html`, or `docs/stitch-design/_archive/`. |
 | Invalid-UUID scan | `m1111111`, `k1000000`, `r1000000`, `r2000000`, and `r3000000` appear only in the historical audit evidence. Seed uses valid hex UUIDs. |
 | Palette scan | No `#D84A26`/`#B83817` in current normative docs, `site/`, or `public/`; the terracotta hexes appear only in the audit, ADR history, and the “retired” note. |
 | Prototype fixtures | Sarah 35,000; Brian 38,000; Alex 8,000; `#1047` 27,500 COD; Juma ledger 65,500 checked across HTML/JS. |
 | Kitchen COD total | 27,500 (`#1047`) + 38,000 (`#1043`) = **65,500**, matching the canonical ledger. |
 | Static prototypes | HTML/CSS/JS only; no framework build, dependency install, or server run. |
 | `git diff --check` | No whitespace errors; line-ending conversion warnings only. |
-| SQL | Migration/seed default reviewed as `8.10`; not re-applied in this environment. The v1.1 PostgreSQL 18.4 application and smoke tests remain the last executed database proof. |
+| SQL | Migration/seed default reviewed as `8.10`; not re-applied for v1.2. **Superseded by §13.9**, which applies the v1.3 migration/seed to PostgreSQL 18. |
 | Accessibility automation | Not run: no browser/axe harness is installed and no production app exists. Token contrast rules were reviewed manually against `DESIGN_SYSTEM_V2.md`. |
 | Production build | Not run, by scope. There is no `package.json` or Next.js scaffold. |
 
@@ -1444,6 +1446,39 @@ Historical audit/spec text may quote these as findings. That is not normative. `
 | 1.0.0 | 2026-10-29 | Original audit report (P0/P1/P2 findings). |
 | 1.1.0 | 2026-10-29 | Remediation verdict, 9/10 conditional scorecard, founder register, change log, amendment banners. |
 | 1.2.0 | 2026-11-09 | Full reconciliation: 11 P0 and 50 P1 closure matrices, P2 disposition, v2 green/orange authority, four portals + kitchen prototype, canonical fixture cleanup, new analytics/browser/changelog/glossary/sequence/security docs, and static validation evidence. |
+| 1.3.0 | 2026-11-10 | Build-readiness reconciliation: canonical Stitch `screens/`, complete A–I test coverage, `ready_at` + kitchen-pause schema/API alignment, generated-total and blacklist corrections, browser/telemetry/print consistency, and updated manifest. |
+
+---
+
+### 13.8 v1.3 build-readiness reconciliation
+
+> This section records the 2026-11-10 pass. All edits remain uncommitted in the working tree; no application code, dependency install, build, commit, or push was performed.
+
+| Area | Change | Evidence |
+| :--- | :--- | :--- |
+| Design authority | `docs/stitch-design/screens/` is canonical; `_archive/` and `site/ui-kit.html` remain archived/non-normative. | `DECISIONS.md` ADR-017 revision; `PORTALS_AND_UX_SPECIFICATION.md` §7; `docs/stitch-design/README.md` |
+| Tests | Added missing Scenarios H (payment retry) and I (store closed/kitchen paused); exit criteria updated to A–I. | `TEST_PLAN.md` §2.8, §4, §10; `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` §4 |
+| Order timing | Added `orders.ready_at`, set on `READY_FOR_PICKUP` and dine-in `PREPARING → DELIVERED`; KPI formulas use it. | migration `enforce_order_transition`; `ERD.md`; `ANALYTICS.md`; `OPERATIONS_RUNBOOK.md` |
+| Kitchen pause | Added `app_settings.is_kitchen_paused`, `set_kitchen_paused`, `isKitchenPaused`, and `KITCHEN_PAUSED` across schema, API, UX, and tests. | migration; `API_CONTRACTS.md`; `STATE_MACHINES_AND_BUSINESS_RULES.md`; `PORTALS_AND_UX_SPECIFICATION.md` |
+| Integrity wording | Corrected `total_amount` to a generated column and aligned `blacklisted_phones` DDL with the migration. | `ERD.md`; `SECURITY_AND_VERIFICATION_PROTOCOLS.md`; `DATABASE_SCHEMA_AND_RLS.md` |
+| Integrations | Aligned the 15 km / 8.1 km distance envelope, 50-point/10-minute telemetry queue, Chrome 110+/Safari 16+ minimums, and HTML print route. | `INTEGRATIONS_AND_HARDWARE_APIS.md`; `BROWSER_SUPPORT.md`; `API_CONTRACTS.md` |
+| Manifest | Added `src/lib/schemas/order.ts` and `src/app/api/print/receipt/[orderId]/route.ts`. | `TECH_STACK_AND_CONVENTIONS.md` §2 |
+| Validation | Stitch validator, local-link check, JS syntax checks, SQL review, retired-value and enum scans. | §13.9 |
+
+---
+
+### 13.9 v1.3 validation evidence
+
+| Check | Result |
+| :--- | :--- |
+| `node docs/stitch-design/validate.js` | 54 screens, 0 issues; 20 PNG previews intentionally partial. |
+| Local markdown/HTML links | All current links resolve; only two archived Stitch export links remain broken and are out of scope. |
+| `node --check` | Site JS and `scripts/seed-staff.mjs` pass. |
+| SQL application | Migration and seed applied cleanly to a fresh PostgreSQL 18 cluster with `ON_ERROR_STOP=1`; generated totals, `ready_at`, kitchen pause/resume + audit, and analytics RPC smoke-tested. |
+| SQL review | Migration/seed edited consistently for `ready_at`, `is_kitchen_paused`, generated totals, and analytics; Supabase Auth/storage specifics stubbed only for the local proof. |
+| Retired-value scan | No stale distances/fees/totals in current normative files. |
+| Enum scan | Analytics uses `CASH_ON_DELIVERY`, not `COD`. |
+| Scenario scan | All normative references are A–I. |
 
 ---
 

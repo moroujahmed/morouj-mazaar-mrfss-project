@@ -3,7 +3,7 @@
 A static, dependency-free interface prototype for the four Morouj Mazaar portals:
 
 - **Customer** — browse, customise, checkout, pay, track and give feedback; dine-in is a customer mode.
-- **Kitchen** — live ticket queue, age/SLA, modifiers, 86 toggles, busy mode and bump.
+- **Kitchen** - live ticket queue, age/SLA, modifiers, 86 toggles, busy mode, intake pause and bump.
 - **Admin** — overview, orders, inventory, menu, delivery dispatch and reports.
 - **Rider** — active delivery, cash handling and PIN handover with connection-required completion.
 
@@ -101,7 +101,7 @@ Headings use tight tracking (`-0.025em` to `-0.05em`). Use mono for anything a p
 - Ticket shows order number, type, placed time, age, items, modifiers and notes; it never shows the handover PIN, customer phone or payment reference.
 - Prepaid tickets arrive in `PREPARING` with no Accept step; `CONFIRMED_UNPAID` COD tickets show **Accept**.
 - **Bump** moves delivery orders to `READY_FOR_PICKUP` and dine-in orders directly to `DELIVERED`.
-- Busy mode and per-item 86 toggles are scoped RPC actions, not menu edits.
+- Busy mode, kitchen-pause intake, and per-item 86 toggles are scoped RPC actions, not menu edits.
 - A browser-print docket is available per ticket; the screen remains usable if printing fails.
 
 ### Admin
@@ -117,7 +117,7 @@ Headings use tight tracking (`-0.025em` to `-0.05em`). Use mono for anything a p
 
 - Header shows rider identity, vehicle plate and a persistent connection chip.
 - Active order card puts the ETA, cash due, route, customer contact and distance first.
-- Minimum touch target is **56px**; primary actions also appear in a sticky bottom bar on phones.
+- Minimum touch target is **48px**; rider primary actions are **56px**; the absolute WCAG floor is 44px. Primary actions also appear in a sticky bottom bar on phones.
 - Handover requires the 4-digit customer PIN (`4821` in the canonical demo) with a maximum of three attempts and a short lockout.
 - Connection states:
   - **Online** — PIN verification completes immediately.
@@ -210,3 +210,13 @@ Manual checks:
 - CSV reports are generated in the browser.
 - The prototype does not store delivery completion offline. Cash and order figures match [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md): `#1043` `USh 38,000` + `#1047` `USh 27,500` = `USh 65,500`.
 - Production must implement the security rules in [`README.md`](../README.md) and the API contracts in [`docs/API_CONTRACTS.md`](API_CONTRACTS.md).
+
+---
+
+## 10. Revision History
+
+| Version | Date | Change |
+| :--- | :--- | :--- |
+| 1.3.0 | 2026-11-10 | Unified touch-target wording and added kitchen intake pause. |
+| 1.2.0 | 2026-11-09 | Four portals, kitchen behaviour, no rider queue, canonical `#1047` COD, Juma 65,500 ledger. |
+

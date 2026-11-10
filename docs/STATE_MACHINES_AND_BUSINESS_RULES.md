@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-10 |
 | **Supersedes** | v1.0 transition matrix, Haversine fallback, coarse distance, claim signature, settlement prose |
 | **Authority** | Migration, `ERD.md`, `CANONICAL_EXAMPLES.md`, `DECISIONS.md` ADR-005/010/011/012/013/015 |
 
@@ -58,8 +58,8 @@ All rules in this document are server-enforced. The UI may preview prices but ne
 | `PENDING_PAYMENT` | `PREPARING` | Payment webhook | Verified Flutterwave event only | `payment_status = PAID`, `acknowledged_at`, kitchen alert |
 | `PENDING_PAYMENT` | `CANCELLED` | Cron | `expire_pending_orders()` after 10 minutes | Payment marked failed/expired |
 | `CONFIRMED_UNPAID` | `PREPARING` | Kitchen | `accept_order(p_order_id)` | `acknowledged_at` |
-| `PREPARING` | `READY_FOR_PICKUP` | Kitchen | `bump_order(p_order_id)` for delivery | Enters rider pool |
-| `PREPARING` | `DELIVERED` | Kitchen | `bump_order(p_order_id)` for dine-in | `delivered_at`; no rider, PIN, packaging, or delivery fee |
+| `PREPARING` | `READY_FOR_PICKUP` | Kitchen | `bump_order(p_order_id)` for delivery | `ready_at`; enters rider pool |
+| `PREPARING` | `DELIVERED` | Kitchen | `bump_order(p_order_id)` for dine-in | `ready_at` + `delivered_at`; no rider, PIN, packaging, or delivery fee |
 | `READY_FOR_PICKUP` | `CLAIMED` | Rider | `claim_order_atomic(p_order_id)` | Sets `rider_id = auth.uid()` under row lock |
 | `CLAIMED` | `READY_FOR_PICKUP` | Rider/Admin | `release_order(p_order_id, reason)` | Clears rider, returns to pool |
 | `CLAIMED` | `OUT_FOR_DELIVERY` | Assigned rider | `start_delivery(p_order_id)` | `dispatched_at`; telemetry may start |
@@ -148,7 +148,7 @@ total = items_subtotal + modifiers_total + packaging_fee + delivery_fee
 9. Insert the order, items, modifiers, token, PIN, idempotency record, and status history in one transaction.
 10. For digital payment, initiate Flutterwave and return the hosted-checkout URL; for COD, return the confirmed order and tracker token.
 
-`total_amount` is a generated column and a trigger rejects direct component changes that would desync it.
+`total_amount` is a generated column. Components are written at insert/update time and the total is computed by PostgreSQL; direct writes to `total_amount` fail.
 
 ---
 
@@ -241,6 +241,8 @@ eta_at = acknowledged_at
 ## 9. Store-Closed and Failure Rules
 
 - Checkout is blocked when `is_store_open = false` or EAT time is outside opening/closing hours.
+- Checkout is blocked with `KITCHEN_PAUSED` when `app_settings.is_kitchen_paused = true`; existing orders continue through the FSM.
+- Kitchen/admin pause or resume intake through `set_kitchen_paused`; each change is audited.
 - The storefront shows the closed screen with opening hours and WhatsApp support.
 - Admin may open the store explicitly; the action is audited in `settings_history` and `admin_audit_log`.
 - Delivery failure outcomes: `CUSTOMER_UNAVAILABLE`, `WRONG_ADDRESS`, `REFUSED`, `RETURNED`, `OTHER`.
@@ -264,4 +266,5 @@ eta_at = acknowledged_at
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-10-29 | Original FSM and pricing draft. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.3.0 | 2026-11-10 | Added `ready_at` side effects and kitchen-pause intake rules; corrected `total_amount` generated-column wording. |
 | 1.2.0 | 2026-11-09 | Rewrote transitions, integer-metre pricing, OSRM blocking, claim RPC, settlement linkage, ETA, and store-closed rules. |
