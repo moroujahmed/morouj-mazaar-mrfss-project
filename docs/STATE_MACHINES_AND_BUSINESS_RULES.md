@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.4.0 |
+| **Date** | 2026-11-12 |
 | **Supersedes** | v1.0 transition matrix, Haversine fallback, coarse distance, claim signature, settlement prose |
 | **Authority** | Migration, `ERD.md`, `CANONICAL_EXAMPLES.md`, `DECISIONS.md` ADR-005/010/011/012/013/015 |
 
@@ -44,10 +44,10 @@ All rules in this document are server-enforced. The UI may preview prices but ne
 
   PENDING_PAYMENT --timeout--> CANCELLED
   CONFIRMED_UNPAID/PREPARING/READY/CLAIMED/OUT_FOR_DELIVERY --admin--> CANCELLED
-  DELIVERY_FAILED --admin resolution--> CANCELLED or redelivery
+  DELIVERY_FAILED --admin resolution--> CANCELLED or READY_FOR_PICKUP (redelivery)
 ```
 
-`DELIVERED`, `DELIVERY_FAILED`, and `CANCELLED` are terminal for the normal rider flow. Admin recovery is audited.
+`DELIVERED` and `CANCELLED` are terminal. `DELIVERY_FAILED` is terminal for the rider flow; only an audited admin resolution may cancel it or return it to `READY_FOR_PICKUP` for redelivery.
 
 ### 1.1 Transition Matrix
 
@@ -56,7 +56,7 @@ All rules in this document are server-enforced. The UI may preview prices but ne
 | — | `PENDING_PAYMENT` | Customer | Checkout server action, digital method | Generates token + PIN, starts payment |
 | — | `CONFIRMED_UNPAID` | Customer | Checkout server action, COD + OTP/returning rule | Generates token + PIN, enters kitchen queue |
 | `PENDING_PAYMENT` | `PREPARING` | Payment webhook | Verified Flutterwave event only | `payment_status = PAID`, `acknowledged_at`, kitchen alert |
-| `PENDING_PAYMENT` | `CANCELLED` | Cron | `expire_pending_orders()` after 10 minutes | Payment marked failed/expired |
+| `PENDING_PAYMENT` | `CANCELLED` | Cron | `expire_pending_orders()` after 10 minutes | Order `payment_status = FAILED`; open transactions `FAILED` |
 | `CONFIRMED_UNPAID` | `PREPARING` | Kitchen | `accept_order(p_order_id)` | `acknowledged_at` |
 | `PREPARING` | `READY_FOR_PICKUP` | Kitchen | `bump_order(p_order_id)` for delivery | `ready_at`; enters rider pool |
 | `PREPARING` | `DELIVERED` | Kitchen | `bump_order(p_order_id)` for dine-in | `ready_at` + `delivered_at`; no rider, PIN, packaging, or delivery fee |
@@ -65,11 +65,13 @@ All rules in this document are server-enforced. The UI may preview prices but ne
 | `CLAIMED` | `OUT_FOR_DELIVERY` | Assigned rider | `start_delivery(p_order_id)` | `dispatched_at`; telemetry may start |
 | `OUT_FOR_DELIVERY` | `DELIVERED` | Assigned rider | `verify_delivery_pin(...)` | Valid PIN, geofence, COD paid, attempts cleared |
 | `OUT_FOR_DELIVERY` | `DELIVERY_FAILED` | Assigned rider | `report_delivery_failed(...)` | `delivery_attempts` row and security flag |
+| `DELIVERY_FAILED` | `READY_FOR_PICKUP` | Admin | Admin redelivery resolution | Clears failure flag, returns to pool; audited |
+| `DELIVERY_FAILED` | `CANCELLED` | Admin | `admin_cancel_order(order_id, reason)` | Cancel fields, audit, refund request if paid |
 | any non-terminal | `CANCELLED` | Admin | `admin_cancel_order(order_id, reason)` | Cancel fields, audit, refund request if paid |
 | `CLAIMED`/`OUT_FOR_DELIVERY`/`READY_FOR_PICKUP` | `DELIVERED` | Admin | `admin_complete_order(order_id, reason)` | PIN override, audit, COD paid |
-| `CLAIMED`/`OUT_FOR_DELIVERY` | `CLAIMED` | Admin | `admin_reassign_order(order_id, rider_id)` | New rider, audit |
+| `CLAIMED`/`OUT_FOR_DELIVERY` | `CLAIMED` | Admin | `admin_reassign_order(order_id, rider_id, reason)` | New rider, `dispatched_at` cleared, audit |
 
-Illegal transitions are rejected by the `enforce_order_transition` trigger even if a caller bypasses the RPC.
+Illegal transitions are rejected by the `enforce_order_transition` trigger even if a caller bypasses the RPC. Every transition into `PREPARING` sets `acknowledged_at`, and the first transition into `READY_FOR_PICKUP` (or `PREPARING → DELIVERED` for dine-in) sets `ready_at`. Each status change writes `order_status_history` with actor, role, and the caller-supplied reason where applicable.
 
 ### 1.2 Status Copy
 
@@ -197,9 +199,11 @@ A rider's expected cash is the sum of `total_amount` for orders that are:
 1. Requires ADMIN.
 2. Defaults the business date to `(now() AT TIME ZONE 'Africa/Kampala')::date`.
 3. Computes expected cash from qualifying orders.
-4. Inserts or updates the unique `(rider_id, business_date)` settlement with `expected_cash`, `counted_cash`, generated `variance`, status `SETTLED` or `PARTIAL`, `settled_by`, and notes.
+4. Inserts or updates the unique `(rider_id, business_date)` settlement with `expected_cash`, `counted_cash`, generated `variance`, status `SETTLED` (no shortfall) or `PARTIAL` (counted below expected), `settled_by`, and notes.
 5. Links every included order through `orders.settlement_id` and `settled_at`.
 6. Writes an audit row.
+
+A `PARTIAL` or `DISPUTED` settlement keeps `expected_cash - counted_cash` as outstanding rider cash. `get_rider_cash_summary` reports that carried shortfall in addition to unsettled orders, so a short count is never silently written off.
 
 The ledger UI must show the linked order IDs and the sum that produces the total. A settlement total is never typed independently of its orders.
 
@@ -266,5 +270,6 @@ eta_at = acknowledged_at
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-10-29 | Original FSM and pricing draft. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.4.0 | 2026-11-12 | Added `DELIVERY_FAILED` recovery transitions, `RETURNED` outcome, 3-arg reassign, timeout payment failure, deterministic timestamps/history, and carried partial-settlement shortfall. |
 | 1.3.0 | 2026-11-10 | Added `ready_at` side effects and kitchen-pause intake rules; corrected `total_amount` generated-column wording. |
 | 1.2.0 | 2026-11-09 | Rewrote transitions, integer-metre pricing, OSRM blocking, claim RPC, settlement linkage, ETA, and store-closed rules. |

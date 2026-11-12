@@ -49,6 +49,13 @@
   </header>
 
   <main id="main">
+    <div class="container">
+      <div class="alert alert-danger" id="storeStatusBanner" role="status" hidden style="margin-top:16px">
+        <svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+        <div><strong id="storeStatusTitle">We are closed</strong><span id="storeStatusText">Orders open at 09:00 EAT.</span></div>
+      </div>
+    </div>
+
     <!-- ==================================================================
          BROWSE VIEW
          ================================================================== -->
@@ -149,6 +156,15 @@
         </div>
         <p class="sr-only" id="menuStatus" aria-live="polite"></p>
         <noscript><p class="small muted" style="margin-top:20px">Enable JavaScript to browse and order. You can call the kitchen on +256 772 000 111.</p></noscript>
+
+        <details class="demo-toolbar" style="margin-top:24px">
+          <summary>Demo controls · storefront states</summary>
+          <div class="demo-body">
+            <button class="btn btn-secondary btn-sm" type="button" data-store-state="open">Store open</button>
+            <button class="btn btn-secondary btn-sm" type="button" data-store-state="closed">Store closed</button>
+            <button class="btn btn-secondary btn-sm" type="button" data-store-state="paused">Kitchen paused</button>
+          </div>
+        </details>
       </section>
 
       <section class="steps-band" aria-labelledby="howTitle">
@@ -357,6 +373,7 @@
                     <option value="50000" selected>Change for USh 50,000</option>
                     <option value="100000">Change for USh 100,000</option>
                   </select>
+                  <p class="field-error" id="cashChangeError" hidden><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg><span></span></p>
                 </div>
               </div>
 
@@ -391,6 +408,10 @@
             <div class="summary-total">
               <span>Total</span>
               <span id="summaryTotal" aria-live="polite">USh 0</span>
+            </div>
+            <div class="alert alert-orange" id="movNote" hidden style="margin-top:14px">
+              <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+              <div><strong>Minimum order</strong><span id="movNoteText"></span></div>
             </div>
             <button class="btn btn-primary btn-lg btn-block" type="submit" form="checkoutForm" id="placeOrderBtn">
               <span id="placeOrderLabel">Pay with MTN MoMo</span>

@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative closure record. All catalogued v1.0 documents have been rewritten to v1.2. |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.4.0 |
+| **Date** | 2026-11-12 |
 | **Precedence** | `DECISIONS.md` → `CANONICAL_EXAMPLES.md` → `DESIGN_SYSTEM_V2.md` / `ACCESSIBILITY.md` / `API_CONTRACTS.md` / `ERD.md` → this file → historical v1.0 text in `AUDIT_REPORT.md` |
 
 This file records how each audit finding was closed and the technical amendments that remain binding. The v1.2 documents are now the build contract; the original v1.0 wording is historical context only and is not authoritative where it conflicts with v1.2.
@@ -168,7 +168,7 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - A Server Component cannot use `next/dynamic` with `ssr: false`. Put the dynamic import inside a `"use client"` wrapper.
 - Import `leaflet/dist/leaflet.css` in the client map wrapper or `globals.css`.
 - Use `h-[52px]` for the KDS bump button.
-- Toast: use a small local primitive or `sonner` (decision required at Phase 1); do not add a heavy component library.
+- Toast: use a small local primitive (a portal-rendered live region with a 5-second dismiss); do not add `sonner` or another component library.
 - Skeleton: local `animate-pulse` blocks that match final dimensions; no layout shift.
 - Map loading skeleton must have a text fallback and `aria-busy`.
 
@@ -226,6 +226,19 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - Test scenarios are A–I in `TEST_PLAN.md`; §2.8 covers store/kitchen availability.
 - Printing is browser-print HTML at `GET /api/print/receipt/[orderId]`; ESC/POS remains deferred.
 
+### 4.13 v1.4 remediation corrections
+
+- `delivery_outcome` gains `RETURNED`; failed COD deliveries may be blacklisted after admin review.
+- `app_settings.max_cart_lines` (default 30) is enforced at checkout and exposed by `get_public_settings`.
+- `refunds` gains `approved_by`, `approved_at`, and `approval_notes`; `admin_audit_log` gains `reason`.
+- `blacklisted_phones.phone` is normalized on write and constrained to E.164.
+- The last active admin cannot be demoted, deactivated, or deleted.
+- FSM additions: `READY_FOR_PICKUP → DELIVERED`, `OUT_FOR_DELIVERY → CLAIMED`, `DELIVERY_FAILED → READY_FOR_PICKUP`, `DELIVERY_FAILED → CANCELLED`.
+- `admin_reassign_order` is `(uuid, uuid, text)`; `admin_list_orders`, `admin_get_audit_feed`, and `close_open_rider_shifts` are documented.
+- `verify_delivery_pin` returns `AUTH_UNAUTHORIZED` for another rider; terminal orders hide the PIN.
+- Partial settlements carry their shortfall forward in `get_rider_cash_summary`.
+- Test scenarios are A–K; the toast primitive is a local live region, not a library decision.
+
 ---
 
 ## 5. Document Control
@@ -243,6 +256,7 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.4.0 | 2026-11-12 | Added §4.13 remediation register and resolved the toast primitive decision. |
 | 1.3.0 | 2026-11-10 | Added §4.12 for `ready_at`, kitchen pause, generated totals, blacklist columns, A–I tests, and browser-print. |
 | 1.2.0 | 2026-11-09 | Rewritten as the v1.2 closure register: corrected P0-09 palette, added P0-11 COD radius, added design-system and kitchen-portal amendments, scenarios A–I. |
 | 1.1.0 | 2026-10-29 | Created; closes P0/P1 specification gaps and records technical amendments. |

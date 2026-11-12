@@ -59,7 +59,8 @@
       prep: 30,
       badge: "Traditional",
       kcal: 470,
-      serves: "Serves 1"
+      serves: "Serves 1",
+      available: false
     },
     {
       id: "rolex",
@@ -98,7 +99,8 @@
       prep: 20,
       badge: "",
       kcal: 360,
-      serves: "Serves 1"
+      serves: "Serves 1",
+      available: false
     },
     {
       id: "juice",
@@ -189,6 +191,29 @@
     card: "Visa / Mastercard"
   };
 
+  const RIDER_PHONE = "+256 772 100 201";
+  const MOV_DELIVERY = 20000;
+
+  const storeStates = {
+    open: null,
+    closed: {
+      tone: "alert-danger",
+      title: "We are closed",
+      text: "Orders open at 09:00 EAT. You can browse the menu, but checkout is disabled."
+    },
+    paused: {
+      tone: "alert-warning",
+      title: "The kitchen has paused new orders",
+      text: "Please try again in a few minutes. Existing orders are still being prepared."
+    }
+  };
+
+  function readStoreState() {
+    const fromUrl = new URLSearchParams(window.location.search).get("store");
+    const value = (fromUrl || "open").toLowerCase();
+    return storeStates[value] ? value : "open";
+  }
+
   /* ---------------------------------------------------------------------
      State
      --------------------------------------------------------------------- */
@@ -221,6 +246,7 @@
   let order = storageGet("mm_order_v1", null);
   let orderStatus = 3;
   let rideFeedback = null;
+  let storeState = readStoreState();
 
   const els = {
     grid: document.getElementById("dishGrid"),
@@ -252,6 +278,12 @@
     checkoutForm: document.getElementById("checkoutForm"),
     checkoutErrors: document.getElementById("checkoutErrors"),
     checkoutErrorsText: document.getElementById("checkoutErrorsText"),
+    storeStatusBanner: document.getElementById("storeStatusBanner"),
+    storeStatusTitle: document.getElementById("storeStatusTitle"),
+    storeStatusText: document.getElementById("storeStatusText"),
+    movNote: document.getElementById("movNote"),
+    movNoteText: document.getElementById("movNoteText"),
+    cashChangeError: document.getElementById("cashChangeError"),
     addressField: document.getElementById("addressField"),
     customerName: document.getElementById("customerName"),
     customerPhone: document.getElementById("customerPhone"),
@@ -319,19 +351,92 @@
     return parts.join(" · ");
   }
 
+  function isDishAvailable(dish) {
+    return Boolean(dish) && dish.available !== false;
+  }
+
+  function cartSoldOutLines() {
+    return cart.filter(function (line) {
+      const dish = menu.find(function (item) { return item.id === line.id; });
+      return dish && !isDishAvailable(dish);
+    });
+  }
+
+  function movShortfall() {
+    if (selectedArea === "table4") return 0;
+    return Math.max(0, MOV_DELIVERY - subtotal());
+  }
+
+  function cashChangeTendered() {
+    const select = document.getElementById("cashChange");
+    if (!select || select.value === "exact") return totals().total;
+    return Number(select.value) || 0;
+  }
+
+  function cashChangeInvalid() {
+    return selectedPayment === "cod" && cashChangeTendered() < totals().total;
+  }
+
+  function canPlaceOrder() {
+    return (
+      cart.length > 0 &&
+      storeState === "open" &&
+      cartSoldOutLines().length === 0 &&
+      movShortfall() === 0 &&
+      !cashChangeInvalid()
+    );
+  }
+
+  function renderStoreState() {
+    const config = storeStates[storeState];
+    document.body.dataset.storeState = storeState;
+    if (!els.storeStatusBanner) return;
+    els.storeStatusBanner.hidden = !config;
+    if (!config) return;
+    els.storeStatusBanner.className = "alert " + config.tone;
+    if (els.storeStatusTitle) els.storeStatusTitle.textContent = config.title;
+    if (els.storeStatusText) els.storeStatusText.textContent = config.text;
+  }
+
+  function renderCheckoutGuards() {
+    const shortfall = movShortfall();
+    if (els.movNote) {
+      els.movNote.hidden = shortfall === 0;
+      if (els.movNoteText) {
+        els.movNoteText.textContent =
+          "Add " + money(shortfall) + " more to reach the " + money(MOV_DELIVERY) + " delivery minimum. Dine-in has no minimum.";
+      }
+    }
+
+    const invalidChange = cashChangeInvalid();
+    if (els.cashChangeError) {
+      els.cashChangeError.hidden = !invalidChange;
+      if (invalidChange) {
+        els.cashChangeError.querySelector("span").textContent =
+          "Change for " + money(cashChangeTendered()) + " does not cover the " + money(totals().total) +
+          " total. Choose exact cash or a higher amount.";
+      }
+    }
+
+    if (els.placeOrderBtn) els.placeOrderBtn.disabled = !canPlaceOrder();
+  }
+
   function saveCart() {
     storageSet("mm_cart_v1", cart);
     storageSet("mm_area_v1", selectedArea);
   }
 
   function lineMarkup(line) {
+    const dish = menu.find(function (item) { return item.id === line.id; });
+    const soldOut = dish && !isDishAvailable(dish);
+    const mods = (modsText(line) || "Standard preparation") + (soldOut ? " · Sold out" : "");
     return (
-      '<div class="cart-line" data-line="' + escapeHtml(line.key) + '">' +
+      '<div class="cart-line' + (soldOut ? " is-sold-out" : "") + '" data-line="' + escapeHtml(line.key) + '">' +
         '<img class="cart-line-img" src="' + escapeHtml(line.img) + '" alt="" width="74" height="74" loading="lazy">' +
         '<div>' +
           '<div class="cart-line-head">' +
             '<div><div class="cart-line-name">' + escapeHtml(line.name) + "</div>" +
-            '<div class="cart-line-mods">' + escapeHtml(modsText(line) || "Standard preparation") + "</div></div>" +
+            '<div class="cart-line-mods">' + escapeHtml(mods) + "</div></div>" +
             '<button class="cart-line-remove" type="button" data-cart-remove="' + escapeHtml(line.key) + '" aria-label="Remove ' + escapeHtml(line.name) + '">' +
               icon("trash") +
             "</button>" +
@@ -359,7 +464,7 @@
     if (els.cartSummaryWrap) els.cartSummaryWrap.hidden = cart.length === 0;
 
     if (els.cartSheetSub) els.cartSheetSub.textContent = qty + (qty === 1 ? " item" : " items") + " · ready when you are";
-    if (els.cartCheckoutBtn) els.cartCheckoutBtn.disabled = cart.length === 0;
+    if (els.cartCheckoutBtn) els.cartCheckoutBtn.disabled = cart.length === 0 || storeState !== "open";
     if (els.cartCount) {
       els.cartCount.textContent = String(qty);
       els.cartCount.dataset.empty = qty === 0 ? "true" : "false";
@@ -391,7 +496,7 @@
           ? "Place cash order"
           : "Pay with " + (selectedPayment === "card" ? "card" : paymentLabels[selectedPayment]);
     }
-    if (els.placeOrderBtn) els.placeOrderBtn.disabled = cart.length === 0;
+    renderCheckoutGuards();
   }
 
   /* ---------------------------------------------------------------------
@@ -412,11 +517,14 @@
 
     els.grid.innerHTML = filtered
       .map(function (dish) {
+        const available = isDishAvailable(dish);
         return (
-          '<article class="dish-card">' +
+          '<article class="dish-card' + (available ? "" : " is-sold-out") + '">' +
             '<div class="dish-card-media" data-dish="' + dish.id + '">' +
               '<img src="' + dish.img + '" alt="' + escapeHtml(dish.name) + '" width="640" height="400" loading="lazy">' +
-              (dish.badge ? '<span class="badge">' + escapeHtml(dish.badge) + "</span>" : "") +
+              (available
+                ? (dish.badge ? '<span class="badge">' + escapeHtml(dish.badge) + "</span>" : "")
+                : '<span class="badge badge-danger">Sold out</span>') +
               '<span class="dish-rating">' + icon("star") + dish.rating.toFixed(1) + "</span>" +
             "</div>" +
             '<div class="dish-card-body">' +
@@ -425,7 +533,9 @@
               '<div class="dish-meta"><span>' + icon("clock") + dish.prep + " min</span><span>" + icon("users") + escapeHtml(dish.serves) + "</span></div>" +
               '<div class="dish-card-foot">' +
                 '<span class="dish-price">' + money(dish.price) + "</span>" +
-                '<button class="add-btn" type="button" data-add="' + dish.id + '" aria-label="Add ' + escapeHtml(dish.name) + ' to basket">' + icon("plus") + "</button>" +
+                (available
+                  ? '<button class="add-btn" type="button" data-add="' + dish.id + '" aria-label="Add ' + escapeHtml(dish.name) + ' to basket">' + icon("plus") + "</button>"
+                  : '<button class="add-btn" type="button" disabled aria-label="' + escapeHtml(dish.name) + ' is sold out">' + icon("x-circle") + "</button>") +
               "</div>" +
             "</div>" +
           "</article>"
@@ -457,6 +567,11 @@
   function openDish(id) {
     const dish = menu.find(function (item) { return item.id === id; });
     if (!dish) return;
+    if (!isDishAvailable(dish)) {
+      toast(dish.name + " is sold out today. Please choose another dish.", "error");
+      haptic([20, 40, 20]);
+      return;
+    }
     currentDish = dish;
     currentDishState = {
       qty: 1,
@@ -563,6 +678,11 @@
 
   function addDishToCart() {
     if (!currentDish || !currentDishState) return;
+    if (!isDishAvailable(currentDish)) {
+      toast(currentDish.name + " just sold out. Remove it from the basket and choose another dish.", "error");
+      haptic([30, 60, 30]);
+      return;
+    }
     const addons = Array.from(currentDishState.addons).map(function (id) {
       return addOnOptions.find(function (item) { return item.id === id; });
     }).filter(Boolean);
@@ -589,6 +709,11 @@
   function quickAdd(id) {
     const dish = menu.find(function (item) { return item.id === id; });
     if (!dish) return;
+    if (!isDishAvailable(dish)) {
+      toast(dish.name + " is sold out today. Please choose another dish.", "error");
+      haptic([20, 40, 20]);
+      return;
+    }
     const existing = cart.find(function (line) {
       return line.id === id && (!line.addons || line.addons.length === 0) && (!line.omissions || line.omissions.length === 0) && line.cooking === "Medium";
     });
@@ -622,6 +747,13 @@
   }
 
   document.addEventListener("click", function (event) {
+    const storeButton = event.target.closest("[data-store-state]");
+    if (storeButton) {
+      event.preventDefault();
+      setStoreState(storeButton.dataset.storeState);
+      return;
+    }
+
     const addButton = event.target.closest("[data-add]");
     if (addButton) {
       event.preventDefault();
@@ -772,6 +904,20 @@
     renderCart();
   }
 
+  function setStoreState(next) {
+    if (!storeStates[next]) return;
+    storeState = next;
+    renderStoreState();
+    renderCart();
+    if (storeState !== "open" && currentView === "checkout") showView("browse");
+    toast(
+      storeState === "open"
+        ? "Store open. Checkout is available."
+        : storeStates[storeState].title + ". Checkout is disabled.",
+      storeState === "open" ? "success" : "error"
+    );
+  }
+
   document.querySelectorAll("input[name='area']").forEach(function (input) {
     input.addEventListener("change", function () { setArea(input.value); });
   });
@@ -779,6 +925,11 @@
   document.querySelectorAll("input[name='payment']").forEach(function (input) {
     input.addEventListener("change", function () { setPayment(input.value); });
   });
+
+  const cashChangeSelect = document.getElementById("cashChange");
+  if (cashChangeSelect) {
+    cashChangeSelect.addEventListener("change", renderCart);
+  }
 
   function clearFieldError(input, errorId) {
     if (!input) return;
@@ -829,6 +980,33 @@
       }
     }
 
+    if (storeState !== "open") {
+      errors.push(storeStates[storeState].title + ". " + storeStates[storeState].text);
+    }
+
+    const soldOut = cartSoldOutLines();
+    if (soldOut.length) {
+      errors.push(
+        soldOut.map(function (line) { return line.name; }).join(", ") +
+        " is sold out. Remove it from the basket before checking out."
+      );
+    }
+
+    const shortfall = movShortfall();
+    if (shortfall > 0) {
+      errors.push(
+        "Add " + money(shortfall) + " more to reach the " + money(MOV_DELIVERY) +
+        " delivery minimum. Dine-in has no minimum."
+      );
+    }
+
+    if (cashChangeInvalid()) {
+      errors.push(
+        "Change for " + money(cashChangeTendered()) + " does not cover the " + money(totals().total) +
+        " total. Choose exact cash or a higher amount."
+      );
+    }
+
     if (errors.length) {
       if (els.checkoutErrorsText) els.checkoutErrorsText.textContent = errors.join(" ");
       if (els.checkoutErrors) {
@@ -849,6 +1027,10 @@
     if (!cart.length) {
       toast("Your basket is empty. Add a dish first.", "error");
       showView("browse");
+      return;
+    }
+    if (storeState !== "open") {
+      toast(storeStates[storeState].title + ". Checkout is disabled.", "error");
       return;
     }
     if (!validateCheckout()) return;
@@ -962,7 +1144,7 @@
       cashChange: selectedPayment === "cod" && document.getElementById("cashChange") ? document.getElementById("cashChange").value : null,
       placedAt: new Date()
     };
-    orderStatus = selectedArea === "table4" ? 2 : 2;
+    orderStatus = 2;
     storageSet("mm_order_v1", order);
     renderTracking();
   }
@@ -1155,7 +1337,7 @@
   const callRider = document.getElementById("callRider");
   if (callRider) {
     callRider.addEventListener("click", function () {
-      toast("Calling Rider Juma on +256 772 000 111…");
+      toast("Calling Rider Juma on " + RIDER_PHONE + "…");
       haptic([10]);
     });
   }
@@ -1247,6 +1429,10 @@
       toast("Your basket is empty. Add a dish first.", "error");
       name = "browse";
     }
+    if (name === "checkout" && storeState !== "open") {
+      toast(storeStates[storeState].title + ". Checkout is disabled.", "error");
+      name = "browse";
+    }
 
     Object.keys(views).forEach(function (key) {
       views[key].classList.toggle("is-active", key === name);
@@ -1280,6 +1466,7 @@
   /* ---------------------------------------------------------------------
      Init
      --------------------------------------------------------------------- */
+  renderStoreState();
   renderMenu();
   renderCart();
   setArea(selectedArea);

@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Approved baseline |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Version** | 1.3.0 |
+| **Date** | 2026-11-12 |
 | **Rule** | If any document, test, screenshot, or fixture disagrees with this file, this file wins. |
 
 This file exists because the v1.0 documents used conflicting totals for the same order and a road distance that did not match the real OSRM route. The verified values below replace them.
@@ -29,6 +29,7 @@ This file exists because the v1.0 documents used conflicting totals for the same
 | Staff login PIN | 6 digits | Supabase Auth password |
 | Handover PIN attempts | 3 | `app_settings.pin_max_attempts` |
 | Handover PIN lock | 15 minutes | `app_settings.pin_lock_minutes` |
+| Max distinct cart lines | 30 | `app_settings.max_cart_lines` |
 | Staff session | 12 hours | `app_settings.staff_session_hours` |
 | Business day | `Africa/Kampala` | `app_settings.timezone` |
 
@@ -208,5 +209,6 @@ For unit tests of the fee function, use fixed metres (not network calls):
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.3.0 | 2026-11-12 | Added `max_cart_lines` and confirmed the canonical ledger fixture (Juma 38,000 + 27,500 = 65,500). |
 | 1.2.0 | 2026-11-09 | Aligned COD radius with the canonical Ntinda fixture; removed optional legacy mocks and the alternate ledger total. |
 | 1.1.0 | 2026-10-29 | Created; retired the v1.0 distance, fee, total, and ledger contradictions. |

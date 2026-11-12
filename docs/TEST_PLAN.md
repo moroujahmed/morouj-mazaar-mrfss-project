@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative; executable test authority |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.4.0 |
+| **Date** | 2026-11-12 |
 | **Canonical data** | `CANONICAL_EXAMPLES.md` |
 | **Test runner** | Vitest (unit/integration), Playwright (E2E), axe-core (a11y), k6 (load, optional) |
 
@@ -77,7 +77,7 @@ Also test:
 - Delivery packaging = 1,000; dine-in packaging = 0.
 - MOV uses items + modifiers only; packaging and delivery do not count.
 - Dine-in bypasses MOV.
-- Cart above `max_cart_value` or line quantity above `max_item_quantity` is rejected.
+- Cart above `max_cart_value`, line quantity above `max_item_quantity`, or distinct lines above `max_cart_lines` is rejected.
 
 ### 2.3 Phone normalization
 
@@ -93,9 +93,10 @@ Also test:
 
 - Allowed transitions pass.
 - Every other transition raises `ORDER_STATE_INVALID`.
-- `DELIVERED`, `DELIVERY_FAILED`, and `CANCELLED` are terminal.
+- `DELIVERED` and `CANCELLED` are terminal; `DELIVERY_FAILED` is terminal for riders but may be cancelled or returned to `READY_FOR_PICKUP` by an audited admin action.
 - Dine-in `PREPARING → DELIVERED` is allowed.
-- A status update writes one `order_status_history` row with the correct actor.
+- `READY_FOR_PICKUP → DELIVERED` (admin completion), `OUT_FOR_DELIVERY → CLAIMED` (reassign), `DELIVERY_FAILED → CANCELLED`, and `DELIVERY_FAILED → READY_FOR_PICKUP` are allowed.
+- A status update writes one `order_status_history` row with the correct actor, role, and reason.
 
 ### 2.5 PIN and lockout
 
@@ -103,17 +104,17 @@ Also test:
 - Wrong PIN increments `failed_pin_attempts` and inserts an attempt row.
 - 3rd wrong PIN sets `pin_locked_until` and returns `PIN_LOCKED`.
 - Correct PIN after lock expiry succeeds and resets counters.
-- A rider cannot verify another rider's order.
+- A rider cannot verify another rider's order; the RPC raises `AUTH_UNAUTHORIZED`, not `ORDER_STATE_INVALID`.
 - Geofence > 300 m returns `TOO_FAR_FROM_DESTINATION` without consuming a PIN attempt.
 - Admin reset generates a new PIN and clears the lock.
 
 ### 2.6 Settlement
 
 - Expected cash = sum of COD `PAID` + `DELIVERED` + unsettled orders for the business date.
-- Counted cash < expected → `PARTIAL` and negative variance.
+- Counted cash < expected → `PARTIAL` and negative variance; the shortfall remains in `get_rider_cash_summary().outstandingCash`.
 - Counted cash = expected → `SETTLED` and zero variance.
 - A second reconciliation for the same rider/date updates the same settlement; it does not duplicate.
-- Orders link to exactly one settlement.
+- Orders link to exactly one settlement; the ledger returns linked order IDs and amounts.
 
 ### 2.7 Idempotency
 
@@ -156,7 +157,10 @@ Run as SQL against a migrated local database. The test must assert both **privil
 - `verify_delivery_pin` raises `AUTH_UNAUTHORIZED` for another rider.
 - `get_kitchen_orders` raises `AUTH_UNAUTHORIZED` for a rider.
 - `admin_*` RPCs raise `AUTH_UNAUTHORIZED` for non-admin.
-- `expire_pending_orders` is executable only by `service_role`.
+- `expire_pending_orders` and `close_open_rider_shifts` are executable only by `service_role`.
+- `admin_list_orders` and `admin_get_audit_feed` return paginated payloads and reject non-admins.
+- `set_menu_item_availability` raises `ITEM_NOT_FOUND` for an unknown item.
+- Deactivating or demoting the last active admin raises `LAST_ADMIN_PROTECTED`.
 
 ### 3.3 Race test
 
@@ -178,6 +182,8 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 - A settlement cannot link orders from another rider.
 - `payment_transactions` duplicate `(provider, provider_transaction_id)` is rejected.
 - `webhook_events` duplicate `(provider, provider_event_id)` is rejected.
+- `blacklisted_phones.phone` is normalized to E.164 on write and rejects invalid input.
+- `app_settings.max_cart_lines` defaults to 30 and is exposed by `get_public_settings`.
 
 ---
 
@@ -239,7 +245,7 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 1. Seed two COD delivered orders for Juma: 38,000 and 27,500.
 2. Ledger shows expected **65,500**.
 3. Reconcile 65,500; status `SETTLED`, variance 0.
-4. Reconcile a second time with 60,000; status `PARTIAL`, variance **-5,500**.
+4. Reconcile a second time with 60,000; status `PARTIAL`, variance **-5,500**, and the shortfall remains in the rider's outstanding cash.
 5. Orders remain linked to the same settlement; no duplicate settlement row.
 
 ### Scenario H — Payment failure and retry
@@ -248,7 +254,7 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 2. The order remains `PENDING_PAYMENT`; the tracker shows the retry action and payment status, never a false “confirmed” state.
 3. Retrying with the same idempotency key and unchanged payload returns the same order; changing the payload returns `IDEMPOTENCY_CONFLICT`.
 4. A successful retry moves the order to `PREPARING` through the verified webhook path.
-5. When the retry window expires, `expire_pending_orders` cancels the order and marks the payment failed/expired.
+5. When the retry window expires, `expire_pending_orders` cancels the order, sets `payment_status = FAILED`, and fails open payment transactions.
 
 ### Scenario I — Store closed and kitchen paused
 
@@ -257,6 +263,18 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 3. Staff can still sign in, review history, and reconcile cash.
 4. If the kitchen pauses intake, new orders are blocked with `KITCHEN_PAUSED`; existing orders continue through the FSM.
 5. Resuming intake restores checkout without a redeploy.
+
+### Scenario J — Admin reassignment and audit
+1. A rider is assigned to a delivery and starts it.
+2. Admin reassigns the order to another active rider with a reason; `dispatched_at` clears and status returns to `CLAIMED`.
+3. The old rider's active order disappears; the new rider sees it.
+4. Admin list/search finds the order, and the audit feed contains the reassignment reason and actor.
+5. Reassigning to a rider who already has an active order returns `RIDER_HAS_ACTIVE_ORDER`.
+
+### Scenario K — Cart limits and COD change
+1. Add 30 distinct lines; the cart accepts them. Adding a 31st is blocked.
+2. Set a COD change request below the server total; checkout blocks until it covers the total.
+3. Set a valid change amount; the kitchen ticket and tracker show the change due.
 
 ---
 
@@ -430,7 +448,7 @@ A PR cannot merge if any gate fails. `test:db` and `test:e2e` require a migrated
 
 ## 10. Exit criteria for Phase 12
 
-- Scenarios A–I pass on desktop Chrome and a Pixel 7 viewport.
+- Scenarios A–K pass on desktop Chrome and a Pixel 7 viewport.
 - RLS matrix passes.
 - No critical/serious axe violations.
 - No retired numbers in fixtures or UI copy.
@@ -444,6 +462,7 @@ A PR cannot merge if any gate fails. `test:db` and `test:e2e` require a migrated
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.4.0 | 2026-11-12 | Added cart-line, COD-change, admin reassignment/audit, blacklist, last-admin, and partial-settlement shortfall tests; aligned FSM terminal states and wrong-rider error. |
 | 1.3.0 | 2026-11-10 | Added missing Scenarios H (payment retry) and I (store closed/kitchen paused); aligned exit criteria to A–I. |
 | 1.2.0 | 2026-11-09 | Rewritten with corrected fixtures, A–G scenarios, RLS matrix, and runnable Playwright blueprint. |
 | 1.1.0 | 2026-10-29 | Created; replaces wrong fixtures and the unrunnable Playwright blueprint. |

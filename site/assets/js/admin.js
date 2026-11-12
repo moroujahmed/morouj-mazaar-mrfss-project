@@ -22,7 +22,7 @@
       status: "On the way",
       payment: "MTN MoMo",
       paid: true,
-      rider: "David Ochieng",
+      rider: "Juma Mukasa",
       time: "12:45",
       items: [
         { name: "Whole Tilapia Flame Combo", qty: 1, price: 32000, mods: "No onions · Extra Garlic Pepper Dip" },
@@ -38,9 +38,9 @@
       area: "Ntinda",
       address: "Plot 8 Ntinda Road, Ntinda",
       notes: "Cash on delivery · Change for USh 50,000",
-      status: "On the way",
+      status: "Delivered",
       payment: "Cash on delivery",
-      paid: false,
+      paid: true,
       rider: "Juma Mukasa",
       time: "12:52",
       items: [
@@ -68,22 +68,22 @@
     },
     {
       id: "1045",
-      customer: "Grace Achieng",
-      phone: "+256 705 888 112",
-      area: "Kololo",
-      address: "Plot 22 Acacia Avenue, Kololo",
-      notes: "Leave at reception if I do not answer",
+      customer: "Brian Okello",
+      phone: "+256 701 234 567",
+      area: "Ntinda",
+      address: "Plot 8 Ntinda Road, Ntinda",
+      notes: "Cash on delivery · Change for USh 50,000",
       status: "Ready",
-      payment: "MTN MoMo",
-      paid: true,
+      payment: "Cash on delivery",
+      paid: false,
       rider: "",
       time: "13:08",
       items: [
-        { name: "Quarter Charcoal Grilled Chicken", qty: 1, price: 18000, mods: "" },
-        { name: "Golden Chips", qty: 1, price: 6000, mods: "" }
+        { name: "Smoked Beef Luwombo", qty: 1, price: 26000, mods: "" },
+        { name: "Cold-Pressed Passion Juice", qty: 1, price: 5000, mods: "" }
       ],
       packaging: 1000,
-      delivery: 0
+      delivery: 6000
     },
     {
       id: "1046",
@@ -111,10 +111,10 @@
       area: "Bugolobi",
       address: "Plot 5 Spring Road, Bugolobi",
       notes: "Extra chilli on the side",
-      status: "Ready",
+      status: "Delivered",
       payment: "Cash on delivery",
-      paid: false,
-      rider: "",
+      paid: true,
+      rider: "Juma Mukasa",
       time: "13:12",
       items: [
         { name: "Chicken Luwombo", qty: 1, price: 24000, mods: "Extra chilli on the side" },
@@ -141,11 +141,11 @@
   ];
 
   let riders = [
-    { name: "Juma Mukasa", plate: "UFD 342B", status: "On delivery", order: "#1042", cash: 65500, deliveries: 7, phone: "+256 772 100 201" },
+    { name: "Juma Mukasa", plate: "UFD 342B", status: "On delivery", order: "#1042", cash: 65500, cashOrders: "#1043 · #1047", deliveries: 7, phone: "+256 772 100 201" },
     { name: "David Ochieng", plate: "UEX 119A", status: "Available", order: "", cash: 0, deliveries: 5, phone: "+256 701 300 118" },
-    { name: "Brian Kato", plate: "UEE 902C", status: "Available", order: "", cash: 112000, deliveries: 8, phone: "+256 782 900 332" },
+    { name: "Brian Kato", plate: "UEE 902C", status: "Available", order: "", cash: 0, deliveries: 8, phone: "+256 782 900 332" },
     { name: "Samuel Ssebo", plate: "UFA 450P", status: "Available", order: "", cash: 0, deliveries: 6, phone: "+256 705 440 900" },
-    { name: "Alex Wandera", plate: "UFD 881M", status: "Offline", order: "", cash: 28000, deliveries: 4, phone: "+256 774 881 004" }
+    { name: "Alex Wandera", plate: "UFD 881M", status: "Offline", order: "", cash: 0, deliveries: 4, phone: "+256 774 881 004" }
   ];
 
   let menuItems = [

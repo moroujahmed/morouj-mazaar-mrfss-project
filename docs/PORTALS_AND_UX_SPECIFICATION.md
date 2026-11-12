@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.4.0 |
+| **Date** | 2026-11-12 |
 | **Supersedes** | v1.0 custom auth, terracotta palette, six-portal count, 4-digit staff PIN, background GPS, and stale fixtures |
 | **Design authority** | [`DESIGN_SYSTEM_V2.md`](DESIGN_SYSTEM_V2.md) and [`ACCESSIBILITY.md`](ACCESSIBILITY.md) |
 | **Behaviour authority** | [`STATE_MACHINES_AND_BUSINESS_RULES.md`](STATE_MACHINES_AND_BUSINESS_RULES.md), [`API_CONTRACTS.md`](API_CONTRACTS.md) |
@@ -95,7 +95,9 @@ States that must exist:
 - **Outside zone:** `DISTANCE_OUT_OF_BOUNDS`, checkout disabled.
 - **Routing down:** `DISTANCE_UNAVAILABLE`, retry action.
 - **Item sold out:** `ITEM_OUT_OF_STOCK`, item named, cart editable.
-- **Below MOV:** progress copy with the exact remaining amount.
+- **Cart too large:** more than `max_cart_lines` distinct lines or `max_item_quantity` per line; explain the limit before submit.
+- **Below MOV:** progress copy with the exact remaining amount; MOV comes from `app_settings`, never a hardcoded value.
+- **COD change invalid:** requested change must cover the server total; show the minimum accepted amount.
 - **COD unavailable:** outside radius, blacklisted phone, or SMS down.
 - **OTP required/invalid/expired.**
 - **Payment pending:** “Waiting for payment confirmation…” with no false success.
@@ -107,7 +109,7 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
 ### 2.4 Tracker `/orders/[token]`
 
 - Token is the bearer capability. An invalid, unknown, or expired token shows a not-found state with support; it never reveals whether an order exists.
-- Shows order number, status, ETA, items, modifiers, fees, total, payment method/status, and the 4-digit handover PIN.
+- Shows order number, status, ETA, items, modifiers, fees, total, payment method/status, and the 4-digit handover PIN only while a delivery order is active. The PIN is hidden for dine-in and terminal orders.
 - Map appears only during `OUT_FOR_DELIVERY`; if telemetry is stale, show “Last seen N minutes ago.”
 - The safety-seal instruction appears before the PIN.
 - Status changes are announced to screen readers.
@@ -144,8 +146,8 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
   - **Bump** for `PREPARING`: delivery → `READY_FOR_PICKUP`; dine-in → `DELIVERED`.
   - **Served to table** is the dine-in bump label.
   - **86** toggles item availability through `set_menu_item_availability`.
-  - **Busy mode** sets `is_kitchen_busy` and a 0-60 minute buffer through `set_kitchen_busy`.
-  - **Pause intake** sets `is_kitchen_paused` through `set_kitchen_paused`; new orders receive `KITCHEN_PAUSED` while queued orders continue.
+  - **Busy mode** sets `is_kitchen_busy` and a 0-60 minute buffer through `set_kitchen_busy`; each change is audited with a reason.
+  - **Pause intake** sets `is_kitchen_paused` through `set_kitchen_paused`; new orders receive `KITCHEN_PAUSED` while queued orders continue; each change is audited with a reason.
   - **Print docket** uses browser print; a reprint is audited.
 - Audio repeats every 15 seconds until `acknowledged_at` is set; stop on accept, cancel, or when the ticket leaves the new queue. Multiple tablets may chime; the shared state stops repeats.
 - Offline banner: the KDS requires connectivity; do not imply tickets are syncing.
@@ -215,11 +217,11 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
 - Order drawer: customer contact, items/modifiers, fees, payment, rider, status history.
 - Actions with confirmation and reason:
   - Edit contact/notes/coordinates; a coordinate change recomputes distance and fee and audits the change.
-  - Reassign rider.
+  - Reassign rider; target must be an active rider without another active order, and a reason is required.
   - Cancel order; paid orders create a refund request.
   - Force complete with PIN override; audited and security-flagged.
-  - Reset handover PIN; audited with reason.
-  - Request/retry refund.
+  - Reset handover PIN; audited with reason; not available for terminal orders.
+  - Approve or reject a refund with notes; approval stamps `approved_by`/`approved_at`.
 - Destructive actions require typing a reason and a second confirmation; the confirm button is never the default focus.
 
 ### 5.3 `/admin/menu`
@@ -257,7 +259,7 @@ Dine-in checkout removes delivery fields and sets delivery/packaging to `USh 0`;
 
 ### 5.8 `/admin/staff` and `/admin/tables`
 
-- Staff: role, active flag, plate, last login; cannot demote or deactivate the last admin.
+- Staff: role, active flag, plate, last login; cannot demote or deactivate the last admin (`LAST_ADMIN_PROTECTED`).
 - Tables: table number, label, QR token, active flag; regenerate token invalidates the old QR.
 
 ---
@@ -284,12 +286,13 @@ Every API error code has one approved human message. Components render the copy 
 | `AUTH_UNAUTHORIZED` | Staff portals | “Your session has ended. Sign in again.” |
 | `AUTH_LOCKED` | Staff login | “Too many attempts. Try again in 15 minutes.” |
 | `VALIDATION_ERROR` | All forms | “Check the highlighted fields and try again.” |
-| `MOV_NOT_MET` | Checkout | “Add USh {amount} more to reach the USh 20,000 minimum order.” |
-| `DISTANCE_OUT_OF_BOUNDS` | Checkout | “This address is outside our 15 km delivery area. Choose another pin or dine in.” |
+| `MOV_NOT_MET` | Checkout | “Add USh {amount} more to reach the USh {minimum} minimum order.” |
+| `DISTANCE_OUT_OF_BOUNDS` | Checkout | “This address is outside our {maxRadius} km delivery area. Choose another pin or dine in.” |
 | `DISTANCE_UNAVAILABLE` | Checkout | “We cannot calculate the route right now. Retry in a moment.” |
 | `STORE_CLOSED` | Storefront / checkout | "We are closed. Orders open at {opening time} EAT." |
 | `KITCHEN_PAUSED` | Storefront / checkout | "The kitchen has paused new orders. Please try again in a few minutes." |
 | `ITEM_OUT_OF_STOCK` | Menu / cart | “{Item} just ran out. Remove it to continue.” |
+| `ITEM_NOT_FOUND` | Kitchen/admin menu | “That item no longer exists. Refresh the menu.” |
 | `PAYMENT_METHOD_UNAVAILABLE` | Checkout | “That payment method is unavailable. Choose another.” |
 | `COD_NOT_AVAILABLE` | Checkout | “Cash on delivery is not available for this address. Pay online or choose another pin.” |
 | `OTP_REQUIRED` | Checkout | “Enter the 6-digit code we sent to {phone}.” |
@@ -297,12 +300,13 @@ Every API error code has one approved human message. Components render the copy 
 | `ORDER_ALREADY_CLAIMED` | Rider pool | “Another rider took this order. Pick another.” |
 | `RIDER_HAS_ACTIVE_ORDER` | Rider pool | “Finish your active delivery before claiming another.” |
 | `INVALID_HANDOVER_PIN` | Rider PIN sheet | “That PIN does not match. {n} attempts left.” |
-| `PIN_LOCKED` | Rider PIN sheet | “Handover locked. Ask the customer to refresh the PIN or contact the admin.” |
+| `PIN_LOCKED` | Rider PIN sheet | “Handover locked. Ask the admin to reset the PIN.” |
 | `TOO_FAR_FROM_DESTINATION` | Rider PIN sheet | “Move closer to the delivery pin and try again.” |
 | `ORDER_NOT_FOUND` | Tracker / orders | “We cannot find that order. Check the link or contact support.” |
 | `ORDER_STATE_INVALID` | All portals | “This order has already moved on. Refresh to see its current state.” |
 | `IDEMPOTENCY_CONFLICT` | Checkout | “We already received this order. Refresh your orders before trying again.” |
 | `RATE_LIMITED` | All surfaces | “Too many attempts. Wait a minute and try again.” |
+| `LAST_ADMIN_PROTECTED` | Admin staff | “Add another active admin before changing the last one.” |
 | `INTERNAL_ERROR` | All surfaces | “Something went wrong. Try again or contact support on WhatsApp.” |
 
 Admin and kitchen may append an operator reference (order number, correlation ID) but must not replace the approved message with raw provider or database text.
@@ -312,6 +316,8 @@ Admin and kitchen may append an operator reference (order number, correlation ID
 ## 7. Static Prototype
 
 The dependency-free prototype in `site/` is a design reference, not the production app. It must cover the four portals and the states above. Its fixtures are governed by `CANONICAL_EXAMPLES.md`.
+
+The customer prototype demonstrates store-closed and kitchen-paused states with `?store=closed` or `?store=paused`, or with the in-page demo controls. `chicken-luwombo` and `matoke` are marked sold out; the delivery minimum (`USh 20,000`) and COD-change guard use the canonical values.
 
 | Page | Purpose |
 | :--- | :--- |
@@ -330,6 +336,7 @@ The canonical screen reference is `docs/stitch-design/screens/`. The original ex
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.4.0 | 2026-11-12 | Added cart-line/COD-change states, settings-driven MOV/radius copy, PIN hiding for terminal orders, audit reasons, refund approval, `ITEM_NOT_FOUND`, and `LAST_ADMIN_PROTECTED`. |
 | 1.3.0 | 2026-11-10 | Aligned route groups with the stack manifest, clarified Stitch status, added kitchen-pause and `KITCHEN_PAUSED`, and unified touch targets. |
 | 1.2.0 | 2026-11-09 | Rewritten for four portals, Supabase Auth gates, schema-authoritative actions, canonical fixtures, v2 palette, and missing error/empty/destructive states. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |

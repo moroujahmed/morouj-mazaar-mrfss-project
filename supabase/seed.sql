@@ -13,7 +13,7 @@ INSERT INTO public.app_settings (
   free_delivery_radius_km, rate_per_excess_km, max_delivery_radius_km, cod_max_radius_km,
   minimum_order_value, minimum_order_value_dine_in,
   packaging_fee_default, packaging_fee_dine_in,
-  max_cart_value, max_item_quantity,
+  max_cart_value, max_item_quantity, max_cart_lines,
   is_store_open, opening_time, closing_time,
   is_kitchen_busy, busy_buffer_minutes, is_kitchen_paused,
   pin_max_attempts, pin_lock_minutes, pin_geofence_m, staff_session_hours
@@ -23,7 +23,7 @@ INSERT INTO public.app_settings (
   5.00, 1500, 15.00, 8.10,
   20000, 0,
   1000, 0,
-  200000, 20,
+  200000, 20, 30,
   true, '10:00:00', '22:00:00',
   false, 20, false,
   3, 15, 300, 12
@@ -45,6 +45,7 @@ ON CONFLICT (id) DO UPDATE SET
   packaging_fee_dine_in = EXCLUDED.packaging_fee_dine_in,
   max_cart_value = EXCLUDED.max_cart_value,
   max_item_quantity = EXCLUDED.max_item_quantity,
+  max_cart_lines = EXCLUDED.max_cart_lines,
   is_store_open = EXCLUDED.is_store_open,
   opening_time = EXCLUDED.opening_time,
   closing_time = EXCLUDED.closing_time,

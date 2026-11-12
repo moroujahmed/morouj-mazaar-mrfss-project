@@ -4,7 +4,7 @@
  *
  * Usage:
  *   node scripts/seed-staff.mjs
- *   STAFF_SEED_FILE=scripts/staff.local.json node scripts/seed-staff.mjs
+ *   STAFF_SEED_FILE=scripts/staff.test.json node scripts/seed-staff.mjs
  *
  * Required environment:
  *   NEXT_PUBLIC_SUPABASE_URL (or SUPABASE_URL)
@@ -18,6 +18,7 @@
  *   - The service-role key is never written to disk or logged.
  *   - Staff PINs are sent only to Supabase Auth as passwords.
  *   - Never commit a real staff file. Use scripts/staff.example.json as a template.
+ *   - The default file is scripts/staff.local.json, which is gitignored.
  */
 
 import { readFile } from "node:fs/promises";
@@ -30,7 +31,7 @@ const SUPABASE_URL = (
 ).replace(/\/+$/, "");
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const EMAIL_DOMAIN = process.env.STAFF_EMAIL_DOMAIN || "staff.bazaareats.com";
-const SEED_FILE = resolve(process.env.STAFF_SEED_FILE || "scripts/staff.example.json");
+const SEED_FILE = resolve(process.env.STAFF_SEED_FILE || "scripts/staff.local.json");
 const RESET_PASSWORDS = process.env.STAFF_RESET_PASSWORDS === "true";
 
 if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {

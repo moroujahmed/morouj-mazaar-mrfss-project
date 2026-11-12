@@ -525,6 +525,17 @@
 .add-btn:active { transform: scale(0.96); }
 .add-btn .icon { width: 21px; height: 21px; stroke-width: 2.2; }
 
+.dish-card.is-sold-out .dish-card-media img { filter: grayscale(0.75); opacity: 0.62; }
+.dish-card.is-sold-out .dish-card-media .badge { background: var(--red-50); border-color: var(--red-50); color: var(--red-600); }
+.dish-card.is-sold-out .add-btn {
+  border-color: var(--gray-200);
+  background: var(--gray-100);
+  color: var(--gray-500);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.dish-card.is-sold-out .add-btn:hover { transform: none; background: var(--gray-100); }
+
 .menu-empty {
   padding: 44px 24px;
   border: 1.5px dashed var(--border-strong);
@@ -662,6 +673,9 @@
 }
 
 .cart-line:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.cart-line.is-sold-out .cart-line-img { filter: grayscale(0.75); opacity: 0.62; }
+.cart-line.is-sold-out .cart-line-mods { color: var(--red-600); font-weight: 700; }
 
 .cart-line-img {
   width: 74px;

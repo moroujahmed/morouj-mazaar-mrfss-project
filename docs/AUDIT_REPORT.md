@@ -2,12 +2,12 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Audit date** | 2026-10-29 (v1.0); 2026-11-09 (v1.2 reconciliation); 2026-11-10 (v1.3 build-readiness reconciliation) |
+| **Audit date** | 2026-10-29 (v1.0); 2026-11-09 (v1.2 reconciliation); 2026-11-10 (v1.3 build-readiness reconciliation); 2026-11-12 (v1.4 remediation) |
 | **Repository** | `morouj-mazaar-mrfss-project` |
-| **Scope** | v1.0 audit of the original 10 documents, v1.1 specification remediation, v1.2 reconciliation, and v1.3 end-to-end document/schema/API/test/design consistency pass |
+| **Scope** | v1.0 audit of the original 10 documents, v1.1 specification remediation, v1.2 reconciliation, v1.3 end-to-end document/schema/API/test/design consistency pass, and v1.4 schema/API/prototype remediation |
 | **Auditor** | Big Pickle (OpenCode coding agent) |
-| **Document status** | v1.3 — all P0/P1/P2 findings closed at specification level; launch gated by founder inputs in §12 |
-| **Code present** | No application code. Schema, migrations, seed, config, scripts, docs, and the static `site/` prototype are present. |
+| **Document status** | v1.4 — all fixable P0/P1/P2 findings closed; launch gated by founder inputs in §12 |
+| **Code present** | No application code. Schema, migrations, seed, config, scripts, docs, PWA assets, and the static `site/` prototype are present. |
 
 > **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1; the authoritative founder action register is §12; every file created or changed in v1.2 is in §13, and the v1.3 reconciliation is recorded in §13.8. Where historical text quotes retired numbers, it is evidence, not a current contract. The normative numbers live in `CANONICAL_EXAMPLES.md`; the normative visual language lives in `DESIGN_SYSTEM_V2.md` and `ACCESSIBILITY.md`.
 
@@ -42,7 +42,9 @@ The v1.2 baseline now:
 
 **v1.3 correction:** `docs/stitch-design/screens/` is the canonical screen-by-screen visual reference. Only `docs/stitch-design/_archive/` and `site/ui-kit.html` are non-normative. The v1.3 pass also reconciled `ready_at`, kitchen-pause state, generated totals, scenario coverage A–I, browser minimums, telemetry queue bounds, and the browser-print contract across the schema and normative docs.
 
-No application code, dependency installation, or production build was performed. Validation included static checks (`node --check`), repository scans, link verification, and a fresh PostgreSQL 18 application of the migration and seed plus targeted smoke tests for the v1.3 schema changes.
+**v1.4 correction:** the remediation migrations close the remaining schema/API gaps found in the v1.4 pass: `RETURNED` outcome, cart-line limit, refund approval fields, audit reasons, blacklist E.164, last-admin protection, FSM recovery transitions, deterministic timestamps, extended rider/customer/kitchen/admin/ledger payloads, admin list/audit/close-shift RPCs, and explicit grants. The static prototype, PWA shell, staff test seed, and all affected normative docs were aligned to the canonical fixtures.
+
+No application code, dependency installation, or production build was performed. Validation included static checks (`node --check`), repository scans, link verification, and a fresh PostgreSQL 18 application of the full migration chain and seed plus targeted smoke tests for the v1.4 schema changes.
 
 **Build-readiness score: 9.5/10 — conditional.**
 
@@ -1446,6 +1448,7 @@ Historical audit/spec text may quote these as findings. That is not normative. `
 | 1.0.0 | 2026-10-29 | Original audit report (P0/P1/P2 findings). |
 | 1.1.0 | 2026-10-29 | Remediation verdict, 9/10 conditional scorecard, founder register, change log, amendment banners. |
 | 1.2.0 | 2026-11-09 | Full reconciliation: 11 P0 and 50 P1 closure matrices, P2 disposition, v2 green/orange authority, four portals + kitchen prototype, canonical fixture cleanup, new analytics/browser/changelog/glossary/sequence/security docs, and static validation evidence. |
+| 1.4.0 | 2026-11-12 | Remediation pass: additive migrations for FSM/refund/audit/blacklist/last-admin/cart-line/admin RPC gaps; canonical prototype, PWA shell, staff test seed, and normative doc alignment; 26 SQL smoke assertions. |
 | 1.3.0 | 2026-11-10 | Build-readiness reconciliation: canonical Stitch `screens/`, complete A–I test coverage, `ready_at` + kitchen-pause schema/API alignment, generated-total and blacklist corrections, browser/telemetry/print consistency, and updated manifest. |
 
 ---
@@ -1479,6 +1482,38 @@ Historical audit/spec text may quote these as findings. That is not normative. `
 | Retired-value scan | No stale distances/fees/totals in current normative files. |
 | Enum scan | Analytics uses `CASH_ON_DELIVERY`, not `COD`. |
 | Scenario scan | All normative references are A–I. |
+
+---
+
+### 13.10 v1.4 remediation evidence
+
+> This section records the 2026-11-12 pass. All edits remain uncommitted in the working tree; no application code, dependency install, production build, commit, or push was performed.
+
+| Area | Change | Evidence |
+| :--- | :--- | :--- |
+| Schema | Added `RETURNED`; `max_cart_lines`; webhook error; refund approval fields; audit reason; blacklist E.164 normalization/constraint; last-admin guard. | `20261112000000_remediation_enum.sql`; `20261112000001_remediation.sql` |
+| FSM | Added `READY_FOR_PICKUP → DELIVERED`, `OUT_FOR_DELIVERY → CLAIMED`, `DELIVERY_FAILED → READY_FOR_PICKUP/CANCELLED`; guaranteed `acknowledged_at`; history reasons. | `20261112000001_remediation.sql`; `STATE_MACHINES_AND_BUSINESS_RULES.md` |
+| Rider | Pool `readyAt`/`itemCount`; wrong-rider `AUTH_UNAUTHORIZED`; partial-settlement shortfall; `close_open_rider_shifts`. | `20261112000001_remediation.sql`; `API_CONTRACTS.md` |
+| Customer/kitchen | Token PIN hiding + refund/failure details; kitchen `paymentStatus`/`codChangeDue`. | `20261112000001_remediation.sql`; `PORTALS_AND_UX_SPECIFICATION.md` |
+| Admin | Extended `admin_get_order`; 3-arg reassign; `admin_list_orders`; `admin_get_audit_feed`; ledger linked orders; terminal PIN-reset guard. | `20261112000001_remediation.sql`; `API_CONTRACTS.md` |
+| Seed/docs | `max_cart_lines` seed; API/state/portal/test/security/schema/canonical/amendment/changelog docs aligned. | `supabase/seed.sql`; `docs/*.md` |
+| Prototype | Canonical Sarah/Brian/Alex/Juma fixtures; Juma cash 65,500; linked order IDs; availability/MOV/store/kitchen/COD-change states; rider status/phone. | `site/assets/js/*.js`; `site/*.html` |
+| Provisioning | Added `scripts/staff.test.json`; `seed-staff.mjs` defaults to `scripts/staff.local.json`. | `scripts/seed-staff.mjs`; `scripts/staff.test.json` |
+| PWA | Added manifest, minimal app-shell service worker, favicon, and 192/512 icons. Icons are local placeholder flame marks; replace with founder brand assets (F-12/F-54). | `public/` |
+| Validation | Full migration chain + seed applied to fresh PostgreSQL 18 with stubs; 26 smoke assertions passed; JS syntax and link/retired-value scans passed. | §13.11 |
+
+---
+
+### 13.11 v1.4 validation evidence
+
+| Check | Result |
+| :--- | :--- |
+| Full migration chain | `initial_schema` → `storage` → `remediation_enum` → `remediation` → `seed.sql` applied with `ON_ERROR_STOP=1` on PostgreSQL 18.4; no SQL errors. |
+| Schema smoke tests | 26 assertions passed: settings `maxCartLines`, pool `itemCount`/`readyAt`, claim/start, wrong-rider auth, PIN success/change, token PIN hiding, timestamps, FSM additions, reassign/complete, admin list/audit/payload, partial settlement 65,500 → 60,000 = 5,500 shortfall, ledger linked orders, timeout payment failure, shift close, blacklist E.164, last-admin guard, `ITEM_NOT_FOUND`, terminal PIN-reset guard, history reason. |
+| JS syntax | `node --check` passes for `site/assets/js/*.js` and `scripts/seed-staff.mjs`. |
+| Links | Local markdown/HTML links resolve; archived Stitch export links remain out of scope. |
+| Retired values | No current normative file contains the retired 229,000 ledger, 3.8/7.4 km fixtures, or 4,500 fee. |
+| Grants | New/replaced functions have explicit `REVOKE`/`GRANT`; `close_open_rider_shifts` is service-role only. |
 
 ---
 

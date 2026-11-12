@@ -4,7 +4,7 @@ Direct-to-consumer ordering, kitchen display, rider dispatch, and cash reconcili
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.3 + canonical Stitch design package + static interface prototype |
+| **Status** | Specification baseline v1.4 + canonical Stitch design package + static interface prototype |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | `USh`, whole integers with thousands separators |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
@@ -23,16 +23,18 @@ The repository currently contains the **specification, database baseline, seed d
 
 ```
 .
-├── docs/                       # normative v1.3 specs, ADRs, audit, test and ops artifacts
+├── docs/                       # normative v1.4 specs, ADRs, audit, test and ops artifacts
 │   └── stitch-design/          # 54 canonical HTML screens, 20 PNG previews, compiled CSS, audit resolution
 ├── site/                       # static customer, kitchen, admin, rider and design-system prototype
+├── public/                     # PWA manifest, service worker, favicon and placeholder icons
 ├── supabase/
 │   ├── migrations/             # schema + storage migrations
 │   ├── seed.sql                # menu, settings, tables
 │   └── config.toml             # local Supabase configuration
 ├── scripts/
 │   ├── seed-staff.mjs          # provisions Supabase Auth staff users
-│   └── staff.example.json      # template roster (replace PINs)
+│   ├── staff.example.json      # template roster (replace PINs)
+│   └── staff.test.json         # test-only roster for CI/E2E
 ├── .env.example
 ├── .gitignore
 ├── SECURITY.md
@@ -83,6 +85,8 @@ python -m http.server 8000
 
 The prototype reuses the canonical totals, distances and ledger from [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md), including Juma's **USh 65,500** settlement (`#1043` 38,000 + `#1047` 27,500). It is a design reference, not the production app; see [`docs/DESIGN_SYSTEM_V2.md`](docs/DESIGN_SYSTEM_V2.md) for scope and limitations. The older [`site/ui-kit.html`](site/ui-kit.html) is archived and non-normative.
 
+The PWA shell in [`public/`](public/) ships a manifest, a minimal service worker, a favicon, and 192/512 icons. The icons are local placeholder flame marks; replace them with the founder-supplied brand assets (F-12/F-54) before launch.
+
 ### Canonical Stitch design package
 
 [`docs/stitch-design/`](docs/stitch-design/) is the reviewed mockup set for handoff. It contains 54 HTML screens across customer, kitchen, rider, admin and shared flows, plus locally compiled Tailwind CSS and shared components. Twenty screens also include exported PNG previews; the HTML is the source of truth. Open [`docs/stitch-design/screens/customer-storefront.html`](docs/stitch-design/screens/customer-storefront.html) directly to start.
@@ -105,11 +109,17 @@ node scripts/seed-staff.mjs    # requires SUPABASE_SERVICE_ROLE_KEY
 
 ### Staff provisioning
 
-`scripts/seed-staff.mjs` reads `scripts/staff.example.json` by default. Copy it to a local file and replace the example PINs before provisioning real staff:
+`scripts/seed-staff.mjs` reads `scripts/staff.local.json` by default. Create it from the template and replace the example PINs before provisioning real staff:
 
 ```bash
 cp scripts/staff.example.json scripts/staff.local.json
-STAFF_SEED_FILE=scripts/staff.local.json node scripts/seed-staff.mjs
+node scripts/seed-staff.mjs
+```
+
+CI and E2E use `scripts/staff.test.json` with test-only PINs and `must_change_pin: false`:
+
+```bash
+STAFF_SEED_FILE=scripts/staff.test.json node scripts/seed-staff.mjs
 ```
 
 The script maps each phone number to a synthetic email (`{digits}@staff.bazaareats.com`) and creates a Supabase Auth user whose password is the 6-digit staff PIN. PINs are never stored in `profiles`.

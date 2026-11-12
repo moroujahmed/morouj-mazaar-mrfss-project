@@ -6,6 +6,34 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## [1.4.0] — 2026-11-12
+
+### Added
+
+- `20261112000000_remediation_enum.sql` adds `RETURNED` to `delivery_outcome`.
+- `20261112000001_remediation.sql` adds `max_cart_lines`, webhook error text, refund approval fields, audit reasons, blacklist E.164 normalization, last-admin protection, FSM recovery transitions, deterministic timestamps, extended RPC payloads, admin list/audit/close-shift RPCs, and explicit grants.
+- `scripts/staff.test.json` for repeatable test-only staff provisioning.
+- `public/manifest.webmanifest`, `public/sw.js`, favicon, and 192/512 PWA icons.
+
+### Changed
+
+- Failed digital payments remain retryable until `expire_pending_orders` cancels them; the timeout sets `payment_status = FAILED` and fails open transactions.
+- `verify_delivery_pin` returns `AUTH_UNAUTHORIZED` for another rider; terminal orders hide the PIN.
+- Partial settlements carry their shortfall forward in rider cash summaries.
+- Admin reassignment requires a reason and a three-argument RPC.
+- Prototype fixtures aligned to the canonical Sarah/Brian/Alex/Juma set and Juma's USh 65,500 ledger.
+
+### Fixed
+
+- Removed the retired USh 229,000 ledger claim, missing `max_cart_lines` seed value, hardcoded MOV/radius copy, and `local SMS gateway` wording.
+- Documented admin list/audit/refund/close-shift contracts, `ITEM_NOT_FOUND`, `LAST_ADMIN_PROTECTED`, and cart-line/COD-change states.
+
+### Removed
+
+- No files deleted.
+
+---
+
 ## [1.3.0] — 2026-11-10
 
 ### Added
@@ -66,7 +94,7 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 - Retired terracotta palette, AAA claim, six-portal count, `h-13`, stale fixture totals, and invalid UUID examples removed from normative text.
 - Prepaid orders correctly arrive in `PREPARING`; only `CONFIRMED_UNPAID` COD orders show Accept.
-- Admin ledger, dispatch copy, and rider cash fixtures aligned with canonical values; the ledger footer now sums the five visible rider rows (USh 229,000) and is labelled as an end-of-day example.
+- Admin ledger, dispatch copy, and rider cash fixtures aligned with canonical values; the ledger footer now sums Juma's two visible orders (#1043 USh 38,000 + #1047 USh 27,500 = USh 65,500) and is labelled as an end-of-day example.
 - Documentation references no longer use numeric filename prefixes that did not exist.
 - Operations runbook and compliance checklist aligned to 8.1 km COD and Supabase Auth sessions.
 - Repaired escaped arbitrary colour selectors in the generated design-package CSS and restored the missing `#A65A0F` text and `#1D4F42` hover rules.

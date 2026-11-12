@@ -49,7 +49,7 @@
     },
     {
       id: "1043",
-      customer: "Brian Kato",
+      customer: "Daniel Ssekandi",
       type: "delivery",
       status: "cooking",
       placed: "12:52",
@@ -58,6 +58,7 @@
       cod: true,
       paid: false,
       total: 38000,
+      changeDue: 12000,
       items: [
         { name: "Smoked Beef Luwombo", qty: 1, mods: "" },
         { name: "Cold-Pressed Passion Juice", qty: 1, mods: "No ice" }
@@ -66,20 +67,21 @@
     },
     {
       id: "1045",
-      customer: "Grace Achieng",
+      customer: "Brian Okello",
       type: "delivery",
       status: "ready",
       placed: "13:08",
       age: 6,
-      payment: "MTN MoMo",
-      cod: false,
-      paid: true,
-      total: 25000,
+      payment: "Cash on delivery",
+      cod: true,
+      paid: false,
+      total: 38000,
+      changeDue: 12000,
       items: [
-        { name: "Quarter Charcoal Grilled Chicken", qty: 1, mods: "No onions" },
-        { name: "Golden Chips", qty: 1, mods: "" }
+        { name: "Smoked Beef Luwombo", qty: 1, mods: "" },
+        { name: "Cold-Pressed Passion Juice", qty: 1, mods: "" }
       ],
-      note: "Leave at reception if I do not answer."
+      note: "Cash on delivery · change for USh 50,000."
     }
   ];
 

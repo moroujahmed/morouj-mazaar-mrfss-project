@@ -94,7 +94,7 @@
     delivery: null,
     deliveriesDone: 0,
     cashHeld: 65500,
-    status: "Ready for pickup"
+    status: "On the way"
   };
 
   if (["online", "weak", "offline"].indexOf(state.connection) === -1) state.connection = "online";

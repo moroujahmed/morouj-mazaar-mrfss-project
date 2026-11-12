@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative build contract |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.4.0 |
+| **Date** | 2026-11-12 |
 | **Rule** | Every public mutation must appear here before implementation. |
 
 ---
@@ -32,6 +32,7 @@ export type ApiResponse<T> =
 | `STORE_CLOSED` | 409 | Store is outside opening hours. |
 | `KITCHEN_PAUSED` | 409 | Kitchen has paused new orders. |
 | `ITEM_OUT_OF_STOCK` | 409 | Item was 86'd during checkout. |
+| `ITEM_NOT_FOUND` | 404 | Unknown menu item in a staff availability mutation. |
 | `PAYMENT_METHOD_UNAVAILABLE` | 409 | Provider or COD is disabled. |
 | `COD_NOT_AVAILABLE` | 409 | COD outside radius or phone blacklisted. |
 | `OTP_REQUIRED` | 428 | COD phone verification required. |
@@ -45,6 +46,7 @@ export type ApiResponse<T> =
 | `ORDER_STATE_INVALID` | 409 | Transition not allowed from current state. |
 | `IDEMPOTENCY_CONFLICT` | 409 | Same key, different payload. |
 | `RATE_LIMITED` | 429 | Too many requests. |
+| `LAST_ADMIN_PROTECTED` | 409 | Cannot deactivate or demote the final active admin. |
 | `INTERNAL_ERROR` | 500 | Unexpected failure. |
 
 ### 1.3 Auth matrix
@@ -104,7 +106,7 @@ export type ApiResponse<T> =
 4. Check kitchen intake (`app_settings.is_kitchen_paused`); return `KITCHEN_PAUSED` if paused.
 5. Check idempotency key; return existing order if same payload.
 6. Fetch authoritative menu prices, active/available flags, modifier groups.
-7. Reject any item that is 86'd or inactive.
+7. Reject any item that is 86'd or inactive; reject carts with more than `max_cart_lines` distinct lines.
 8. Compute `items_subtotal` and `modifiers_total`.
 9. Enforce MOV (delivery) or bypass (dine-in).
 10. Resolve table token for dine-in; reject invalid/inactive table.
@@ -208,13 +210,14 @@ export type ApiResponse<T> =
 | `updateOrderContactAction` | ADMIN | `{ orderId, phone?, notes?, coordinates? }` | Recomputes fee if coordinates change; audit. |
 | `cancelOrderAction` | ADMIN | `{ orderId, reason }` | Sets `CANCELLED`; refund if paid; audit. |
 | `adminCompleteOrderAction` | ADMIN | `{ orderId, reason }` | Overrides PIN; audit + security flag. |
-| `reconcileCashAction` | ADMIN | `{ riderId, countedCash, notes }` | Calls `reconcile_rider_cash`; returns settlement. |
+| `approveRefundAction` | ADMIN | `{ refundId, decision: "APPROVE" \| "REJECT", notes? }` | Sets `refunds.approved_by`, `approved_at`, `approval_notes`; approving moves `REQUESTED` → `PROCESSING`; audit. |
+| `reconcileCashAction` | ADMIN | `{ riderId, countedCash, notes }` | Calls `reconcile_rider_cash`; a shortfall produces `PARTIAL` and remains outstanding. |
 | `updateSettingsAction` | ADMIN | `{ freeRadiusKm, ratePerKm, mov, maxRadius, codMaxRadius, packagingFee, isStoreOpen, openingTime, closingTime }` | Validates bounds; audit. |
 | `upsertMenuItemAction` | ADMIN | menu item fields | Image path must exist in storage; slug unique. |
 | `upsertModifierGroupAction` | ADMIN | group + options | Validates min/max. |
 | `upsertComboAction` | ADMIN | combo + steps | Validates steps/options. |
 | `upsertTableAction` | ADMIN | `{ tableNumber, label, isActive }` | Generates QR token. |
-| `updateStaffAction` | ADMIN | `{ profileId, role, active, motorcyclePlate }` | Cannot demote last admin. |
+| `updateStaffAction` | ADMIN | `{ profileId, role, active, motorcyclePlate }` | Cannot demote/deactivate last admin (`LAST_ADMIN_PROTECTED`). |
 
 ---
 
@@ -242,8 +245,8 @@ export type ApiResponse<T> =
 6. Verify transaction with Flutterwave `/v3/transactions/{id}/verify`.
 7. Check amount and currency.
 8. If order is `CANCELLED`/`DELIVERED`, record and return 200 without state change.
-9. If successful: `payment_status = PAID`, `order_status = PREPARING`, store transaction.
-10. If failed: `payment_status = FAILED`, `order_status = CANCELLED`, reason `PAYMENT_FAILED`.
+9. If successful: `payment_status = PAID`, `order_status = PREPARING`, set `acknowledged_at` when not already set, store transaction.
+10. If failed: mark the `payment_transactions` row `FAILED`, record the provider error, and leave the order in `PENDING_PAYMENT` so the customer can retry. A definitive timeout is handled only by `expire_pending_orders()`.
 11. Return 200 quickly; no long work.
 
 **Idempotency:** unique event ID + order status guard.
@@ -257,13 +260,13 @@ export type ApiResponse<T> =
 ### 3.4 `POST /api/cron/expire-orders`
 
 **Auth:** `CRON_SECRET`
-**Behavior:** `PENDING_PAYMENT` older than 10 minutes → `CANCELLED`, reason `PAYMENT_TIMEOUT`.
+**Behavior:** calls `expire_pending_orders()`: `PENDING_PAYMENT` older than 10 minutes → `CANCELLED` + `payment_status = FAILED`, reason `PAYMENT_TIMEOUT`; linked `INITIATED`/`PENDING` payment transactions become `FAILED`.
 **Schedule:** every minute.
 
 ### 3.5 `POST /api/cron/close-shifts`
 
 **Auth:** `CRON_SECRET`
-**Behavior:** at 22:30 EAT, mark open rider shifts as pending settlement; notify admin.
+**Behavior:** at 22:30 EAT, calls `close_open_rider_shifts()` to close every open shift, snapshot expected cash, and notify admin for settlement.
 
 ### 3.6 `GET /api/health`
 
@@ -285,29 +288,32 @@ All RPCs are `SECURITY DEFINER` with `SET search_path = public, pg_temp`.
 
 | RPC | Auth | Purpose |
 | :--- | :--- | :--- |
-| `get_order_by_token(p_token uuid)` | anon | Safe customer tracker payload; includes handover PIN only for that token. |
-| `get_rider_pool()` | RIDER | Safe pool summaries; no PII/PIN. |
+| `get_order_by_token(p_token uuid)` | anon | Safe customer tracker payload; handover PIN returned only for an active delivery order, never for dine-in/terminal orders. Includes latest refund and delivery-failure summaries. |
+| `get_rider_pool()` | RIDER | Safe pool summaries with `readyAt` and `itemCount`; no PII/PIN. |
 | `get_rider_active_order()` | RIDER | Active order details; no PIN. |
 | `claim_order_atomic(p_order_id uuid)` | RIDER | Atomic claim; one active order. |
 | `start_delivery(p_order_id uuid)` | RIDER | `CLAIMED` → `OUT_FOR_DELIVERY`. |
 | `release_order(p_order_id uuid, p_reason text)` | RIDER/ADMIN | Return to pool. |
-| `verify_delivery_pin(p_order_id uuid, p_pin text, p_lat numeric, p_lng numeric, p_ip_hash text, p_user_agent text)` | RIDER | Atomic PIN check, attempts, geofence, completion. |
+| `verify_delivery_pin(p_order_id uuid, p_pin text, p_lat numeric, p_lng numeric, p_ip_hash text, p_user_agent text)` | RIDER | Atomic PIN check, attempts, geofence, completion. A rider probing another rider's order receives `AUTH_UNAUTHORIZED`, not an order-state error. |
 | `report_delivery_failed(p_order_id uuid, p_outcome public.delivery_outcome, p_reason text, p_lat numeric, p_lng numeric)` | RIDER | Terminal failure. |
-| `admin_complete_order(p_order_id uuid, p_reason text)` | ADMIN | PIN override with audit. |
+| `admin_complete_order(p_order_id uuid, p_reason text)` | ADMIN | PIN override with audit; accepts `CLAIMED`, `OUT_FOR_DELIVERY`, or `READY_FOR_PICKUP`. |
 | `admin_cancel_order(p_order_id uuid, p_reason text)` | ADMIN | Cancel + refund request if paid. |
-| `admin_reassign_order(p_order_id uuid, p_rider_id uuid, p_reason text)` | ADMIN | Reassign with audit. |
-| `admin_reset_handover_pin(p_order_id uuid, p_reason text)` | ADMIN | New PIN, clear lock, audit. |
-| `set_kitchen_busy(p_busy boolean, p_buffer_minutes int)` | KITCHEN/ADMIN | Busy mode. |
-| `set_kitchen_paused(p_paused boolean)` | KITCHEN/ADMIN | Pause/resume new-order intake; audited. |
-| `set_menu_item_availability(p_item_id uuid, p_available boolean)` | KITCHEN/ADMIN | 86 toggle. |
-| `reconcile_rider_cash(p_rider_id uuid, p_counted_cash int, p_notes text, p_business_date date)` | ADMIN | Settlement + order linkage. |
-| `get_rider_cash_summary(p_rider_id uuid)` | RIDER self/ADMIN | Expected vs. settled. |
-| `get_admin_ledger(p_business_date date)` | ADMIN | Ledger rows. |
+| `admin_reassign_order(p_order_id uuid, p_rider_id uuid, p_reason text)` | ADMIN | Reassign with audit; target must be an active rider with no other active order. |
+| `admin_reset_handover_pin(p_order_id uuid, p_reason text)` | ADMIN | New PIN, clear lock, audit; rejected for terminal orders. |
+| `set_kitchen_busy(p_busy boolean, p_buffer_minutes int)` | KITCHEN/ADMIN | Busy mode; audited with reason. |
+| `set_kitchen_paused(p_paused boolean)` | KITCHEN/ADMIN | Pause/resume new-order intake; audited with reason. |
+| `set_menu_item_availability(p_item_id uuid, p_available boolean)` | KITCHEN/ADMIN | 86 toggle; `ITEM_NOT_FOUND` for unknown IDs; audited. |
+| `reconcile_rider_cash(p_rider_id uuid, p_counted_cash int, p_notes text, p_business_date date)` | ADMIN | Settlement + order linkage; shortfall leaves `PARTIAL` status and carried-forward outstanding cash. |
+| `get_rider_cash_summary(p_rider_id uuid)` | RIDER self/ADMIN | Expected vs. settled, including `settlementShortfall`. |
+| `get_admin_ledger(p_business_date date)` | ADMIN | Ledger rows with linked order IDs/numbers. |
 | `get_admin_analytics(p_from date, p_to date)` | ADMIN | KPIs. |
 | `validate_table_token(p_token uuid)` | anon | Table lookup for dine-in. |
 | `update_rider_telemetry(p_order_id uuid, p_lat numeric, p_lng numeric, p_accuracy numeric, p_heading numeric, p_speed numeric)` | RIDER | Scoped telemetry. |
-| `expire_pending_orders()` | service role | Payment timeout. |
-| `admin_get_order(p_order_id uuid)` | ADMIN | Full order incl. PIN/attempts/audit. |
+| `expire_pending_orders()` | service role | Payment timeout; sets order `CANCELLED` + `payment_status = FAILED` and fails open transactions. |
+| `close_open_rider_shifts()` | service role | Close open shifts and snapshot expected cash for settlement. |
+| `admin_get_order(p_order_id uuid)` | ADMIN | Full order incl. PIN/attempts/status history/delivery attempts/payments/refunds. |
+| `admin_list_orders(p_status text, p_search text, p_limit int, p_offset int)` | ADMIN | Paginated order list with rider name and timestamps. |
+| `admin_get_audit_feed(p_limit int, p_offset int, p_entity_type text)` | ADMIN | Paginated audit feed with actor names and reasons. |
 
 ---
 
@@ -377,6 +383,7 @@ All variables are validated at startup by `src/lib/env.ts` with Zod.
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.4.0 | 2026-11-12 | Added `max_cart_lines`, `ITEM_NOT_FOUND`, `LAST_ADMIN_PROTECTED`; aligned failed-payment retry semantics, timeout transaction failure, rider pool `readyAt`/`itemCount`, token PIN hiding, ledger linked orders, extended admin payloads, and list/audit/close-shift/refund-approval contracts. |
 | 1.3.0 | 2026-11-10 | Added `KITCHEN_PAUSED`, `setKitchenPausedAction`/`set_kitchen_paused`, and aligned the print route with browser-print HTML. |
 | 1.2.0 | 2026-11-09 | Canonical Flutterwave route, 8.1 km COD ceiling, corrected accept/verify/RPC signatures, admin reset/reassign/refund/analytics entries. |
 | 1.1.0 | 2026-10-29 | Created; replaces the ambiguous v1.0 route/action descriptions. |

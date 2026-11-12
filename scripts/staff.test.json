@@ -1,0 +1,38 @@
+[
+  {
+    "full_name": "Test Admin",
+    "phone": "+256700900001",
+    "pin": "111111",
+    "role": "ADMIN",
+    "motorcycle_plate": null,
+    "is_active": true,
+    "must_change_pin": false
+  },
+  {
+    "full_name": "Test Kitchen",
+    "phone": "+256700900002",
+    "pin": "222222",
+    "role": "KITCHEN",
+    "motorcycle_plate": null,
+    "is_active": true,
+    "must_change_pin": false
+  },
+  {
+    "full_name": "Test Rider Juma",
+    "phone": "+256772100201",
+    "pin": "333333",
+    "role": "RIDER",
+    "motorcycle_plate": "UG 1234A",
+    "is_active": true,
+    "must_change_pin": false
+  },
+  {
+    "full_name": "Test Rider David",
+    "phone": "+256772100202",
+    "pin": "444444",
+    "role": "RIDER",
+    "motorcycle_plate": "UG 5678B",
+    "is_active": true,
+    "must_change_pin": false
+  }
+]
