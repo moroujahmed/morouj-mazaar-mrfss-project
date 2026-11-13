@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Approved baseline |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-12 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Rule** | If any document, test, screenshot, or fixture disagrees with this file, this file wins. |
 
 This file exists because the v1.0 documents used conflicting totals for the same order and a road distance that did not match the real OSRM route. The verified values below replace them.
@@ -86,6 +86,8 @@ The retired v1.0 distances and fee must not appear in tests or UI copy. Test moc
 
 Use **USh 35,000** everywhere for this order. All v1.0 variants are retired.
 
+**Payment reference:** this prepaid fixture (`#1042`) uses per-attempt Flutterwave references. The first checkout attempt is `#1042-1`; a retry is `#1042-2`, and so on. The bare `#1042` token is a customer capability, never the provider `tx_ref`. See `STATE_MACHINES_AND_BUSINESS_RULES.md` §1.3 and ADR-002.
+
 ---
 
 ## 5. Canonical Order B — Brian, COD Delivery
@@ -115,7 +117,7 @@ All v1.0 variants of this total are retired.
 
 ## 6. Canonical Order C — Alex, Dine-In
 
-**Scenario:** Table 4, Airtel Money, single Rolex.
+**Scenario:** Table T4, Airtel Money, single Rolex.
 
 | Line | Unit | Qty | Amount |
 | :--- | ---: | ---: | ---: |
@@ -209,6 +211,7 @@ For unit tests of the fee function, use fixed metres (not network calls):
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Canonicalized the dine-in table as `T4`; documented per-attempt payment references (`#1042-1`, `#1042-2`, …) and the `staff.moroujmazaar.com` staff domain. No numeric fixtures changed. |
 | 1.3.0 | 2026-11-12 | Added `max_cart_lines` and confirmed the canonical ledger fixture (Juma 38,000 + 27,500 = 65,500). |
 | 1.2.0 | 2026-11-09 | Aligned COD radius with the canonical Ntinda fixture; removed optional legacy mocks and the alternate ledger total. |
 | 1.1.0 | 2026-10-29 | Created; retired the v1.0 distance, fee, total, and ledger contradictions. |

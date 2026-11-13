@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.4.0 |
-| **Date** | 2026-11-12 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Supersedes** | v1.0 custom auth, terracotta palette, six-portal count, 4-digit staff PIN, background GPS, and stale fixtures |
 | **Design authority** | [`DESIGN_SYSTEM_V2.md`](DESIGN_SYSTEM_V2.md) and [`ACCESSIBILITY.md`](ACCESSIBILITY.md) |
 | **Behaviour authority** | [`STATE_MACHINES_AND_BUSINESS_RULES.md`](STATE_MACHINES_AND_BUSINESS_RULES.md), [`API_CONTRACTS.md`](API_CONTRACTS.md) |
@@ -336,6 +336,7 @@ The canonical screen reference is `docs/stitch-design/screens/`. The original ex
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added admin redelivery/audit states, per-attempt payment retry copy, and the `staff.moroujmazaar.com` login identity; no portal structure changed. |
 | 1.4.0 | 2026-11-12 | Added cart-line/COD-change states, settings-driven MOV/radius copy, PIN hiding for terminal orders, audit reasons, refund approval, `ITEM_NOT_FOUND`, and `LAST_ADMIN_PROTECTED`. |
 | 1.3.0 | 2026-11-10 | Aligned route groups with the stack manifest, clarified Stitch status, added kitchen-pause and `KITCHEN_PAUSED`, and unified touch targets. |
 | 1.2.0 | 2026-11-09 | Rewritten for four portals, Supabase Auth gates, schema-authoritative actions, canonical fixtures, v2 palette, and missing error/empty/destructive states. |

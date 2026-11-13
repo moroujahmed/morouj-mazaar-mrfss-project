@@ -3,10 +3,10 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Supersedes** | v1.0 version drift, `postgres_changes`, OSM production tiles, Haversine fallback, `ADMIN_DEFAULT_PIN`, and the incomplete file manifest |
-| **Authority** | [`DECISIONS.md`](DECISIONS.md) ADR-001–017, [`API_CONTRACTS.md`](API_CONTRACTS.md), [`../.env.example`](../.env.example) |
+| **Authority** | [`DECISIONS.md`](DECISIONS.md) ADR-001–019, [`API_CONTRACTS.md`](API_CONTRACTS.md), [`../.env.example`](../.env.example) |
 
 The repository is a single Next.js application. Substitutions or additional runtime dependencies require an ADR.
 
@@ -22,7 +22,7 @@ The repository is a single Next.js application. Substitutions or additional runt
 | Styling | Tailwind CSS | 3.4.x; do not install Tailwind 4 |
 | Class merging | `clsx` + `tailwind-merge` | Pinned; one `cn()` helper |
 | Icons | `lucide-react` | Named imports only |
-| Database/Auth/Storage | Supabase | Postgres 15+, Auth, Storage, RLS |
+| Database/Auth/Storage | Supabase | Postgres 15+, Auth, Storage, RLS; migrations validated on PostgreSQL 18.4 |
 | Supabase clients | `@supabase/supabase-js`, `@supabase/ssr` | Exact versions pinned at Phase 1 |
 | Realtime | Supabase Broadcast + polling | No raw `postgres_changes` on orders/telemetry/payments/profiles |
 | Maps | Leaflet | 1.9.x; CSS imported in a client wrapper |
@@ -137,17 +137,20 @@ project-root/
 │   ├── actions/                    # checkout, payments, otp, auth, kitchen, rider, admin
 │   └── middleware.ts               # deny-by-default route guards
 ├── supabase/
-│   ├── migrations/
+│   ├── migrations/                # initial_schema → storage → remediation_enum → remediation → v1_5_remediation
 │   ├── seed.sql
 │   └── config.toml
 ├── scripts/
 │   ├── seed-staff.mjs
-│   └── staff.example.json
+│   ├── staff.example.json
+│   ├── staff.test.json            # test-only PINs, must_change_pin: false
+│   └── staff.local.json           # gitignored local/production provisioning file
 ├── tests/
 │   ├── e2e/
 │   ├── db/
 │   └── unit/
-└── site/                           # static design prototype (non-production)
+├── docs/                          # normative specification, runbooks, audit, and this manifest
+└── site/                          # static design prototype (non-production)
 ```
 
 ---
@@ -248,7 +251,7 @@ NEXT_PUBLIC_SUPPORT_WHATSAPP=
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-STAFF_EMAIL_DOMAIN=staff.bazaareats.com
+STAFF_EMAIL_DOMAIN=staff.moroujmazaar.com
 
 # Flutterwave
 FLW_PUBLIC_KEY=
@@ -272,7 +275,12 @@ OSRM_BASE_URL=
 
 # Cron
 CRON_SECRET=
+
+# Error tracking (optional; no PII)
+SENTRY_DSN=
 ```
+
+Staff provisioning uses an explicit `STAFF_SEED_FILE` (for example `scripts/staff.test.json` in CI or `scripts/staff.local.json` locally). It is a server-only script input and must never be exposed with a `NEXT_PUBLIC_` prefix.
 
 Rules:
 
@@ -299,6 +307,7 @@ Configure at Phase 1 (see `SPEC_AMENDMENTS.md` §4.2):
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added `scripts/staff.test.json`/`staff.local.json`, the `docs/` and `supabase/migrations/` manifest detail, `SENTRY_DSN`/`STAFF_SEED_FILE`, the `staff.moroujmazaar.com` domain, and ADR-019 authority. |
 | 1.3.0 | 2026-11-10 | Added `src/lib/schemas/order.ts` and the browser-print receipt route to the manifest. |
 | 1.2.0 | 2026-11-09 | Rewritten: pinned stack, no `postgres_changes`, MapTiler/OSRM production rules, complete manifest, IndexedDB telemetry queue, canonical env names, no default PIN, CI/dependency gates, storefront discovery deferral. |
 | 1.1.0 | 2026-10-29 | Amendment banner. |

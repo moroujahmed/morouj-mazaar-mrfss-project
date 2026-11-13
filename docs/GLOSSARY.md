@@ -2,10 +2,10 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.3 |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
-| **Related** | All v1.3 specifications |
+| **Status** | Normative v1.5 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
+| **Related** | All v1.5 specifications |
 
 Shared vocabulary for the team, testers, and new contributors. If a document uses a term differently, the definition here wins and the document should be corrected.
 
@@ -15,7 +15,8 @@ Shared vocabulary for the team, testers, and new contributors. If a document use
 
 | Term | Meaning |
 | :--- | :--- |
-| **Bazaar Flame & Grill** | The single restaurant/brand operated in this project. |
+| **Morouj Mazaar** | The product and brand umbrella for this project. |
+| **Bazaar Flame & Grill** | The single restaurant operated under Morouj Mazaar. |
 | **COD** | Cash on delivery. The customer pays the rider at handover; the order is `CONFIRMED_UNPAID` until accepted and `PAID` after PIN-verified handover. |
 | **Dine-in** | A customer mode where the order is tied to a table QR token; no rider, delivery fee, packaging fee, or handover PIN. |
 | **EAT** | East Africa Time, `Africa/Kampala`, UTC+3. All business dates and reports use EAT. |
@@ -25,7 +26,8 @@ Shared vocabulary for the team, testers, and new contributors. If a document use
 | **Kitchen pause** | `app_settings.is_kitchen_paused`; blocks new checkout with `KITCHEN_PAUSED` while existing orders continue. |
 | **Busy mode** | `app_settings.is_kitchen_busy` plus a 0–60 minute buffer; adds ETA buffer without blocking checkout. |
 | **MOV** | Minimum order value for delivery. Dine-in has MOV 0. |
-| **MRO / MRFSS** | Morouj Mazaar restaurant food service system; the repository/project shorthand. |
+| **MRFSS** | Morouj Restaurant & Food Service System; the software system in this repository. |
+| **MRO** | Morouj Mazaar restaurant operations; the business context MRFSS serves. |
 | **86 (eighty-six)** | An item is unavailable. Toggled by kitchen/admin through the availability RPC; the storefront hides it. |
 | **Settlement** | The end-of-day reconciliation of a rider’s expected COD cash against the physical count, linked to orders through `orders.settlement_id`. |
 | **Shift** | A rider’s working window, with start/end, float, and settlement boundary. |
@@ -56,6 +58,7 @@ Shared vocabulary for the team, testers, and new contributors. If a document use
 | **OSRM** | Open Source Routing Machine. Production uses a self-hosted instance for road distance and duration. |
 | **OTP** | One-time password sent by SMS for first-time COD verification. Six digits, hashed at rest. |
 | **PIN (handover)** | Four-digit per-order secret the customer gives the rider after checking the safety seal. Stored in `orders.handover_pin`; never exposed to kitchen/rider pool. |
+| **Payment attempt** | One hosted-checkout try stored in `payment_transactions`. Each attempt has `attempt_number` and an immutable `tx_ref = '<order_token>-<attempt_number>'`; retries never reuse a reference. |
 | **PIN (staff)** | Six-digit Supabase Auth password for staff login. Never stored in `profiles`. |
 | **RLS** | Row Level Security in PostgreSQL/Supabase. |
 | **RPC** | Remote procedure call; a PostgreSQL function exposed to a specific role through Supabase. |
@@ -81,5 +84,6 @@ Shared vocabulary for the team, testers, and new contributors. If a document use
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added the Morouj Mazaar/Bazaar Flame & Grill/MRFSS hierarchy and the payment-attempt term. |
 | 1.3.0 | 2026-11-10 | Added kitchen pause and busy mode terms. |
 | 1.2.0 | 2026-11-09 | Created; closes the P2 “no glossary” finding. |

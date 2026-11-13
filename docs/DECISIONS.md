@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Approved baseline for build |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Supersedes** | Implicit/ambiguous decisions in the v1.0 specification set |
 
 This document is the **single source of truth for architectural forks**. If another document conflicts with a decision here, this document wins until the conflict is corrected.
@@ -20,7 +20,7 @@ This document is the **single source of truth for architectural forks**. If anot
 - All staff (ADMIN, KITCHEN, RIDER) authenticate through **Supabase Auth**.
 - The visible credential is **phone number + 6-digit staff PIN**.
 - Under the hood, the server maps the phone to a synthetic email:
-  `{digits}@staff.bazaareats.com` and calls `signInWithPassword`.
+  `{digits}@staff.moroujmazaar.com` and calls `signInWithPassword`.
 - This produces a real Supabase JWT, so `auth.uid()` works in RLS, RPCs, and Realtime.
 - The customer remains anonymous and uses an unguessable order token; customers do not need accounts.
 - Staff PINs are never stored in `profiles`; Supabase Auth stores the password hash.
@@ -47,9 +47,11 @@ The v1.0 custom session cookie could not populate `auth.uid()`, making every RLS
 **Decision**
 
 - Use **Flutterwave** for MTN MoMo, Airtel Money, and Visa/Mastercard.
-- Payment initiation uses Flutterwave hosted checkout (`POST /v3/payments`) with `tx_ref = orders.order_token`.
+- Payment initiation uses Flutterwave hosted checkout (`POST /v3/payments`).
+- Every attempt gets its own reference: `tx_ref = '<orders.order_token>-<attempt_number>'`. The order token alone is never the provider reference. The token remains the customer capability; `start_payment_attempt()` allocates the attempt under a row lock.
+- A retry creates a new `attempt_number` and `tx_ref`; prior open attempts are marked `ABANDONED`, and a late webhook for an old attempt never marks the current attempt paid.
 - Webhook authenticity uses Flutterwave's `verif-hash` header (plain shared-secret comparison, timing-safe).
-- Every successful webhook is independently verified with `GET /v3/transactions/{id}/verify` before the order is marked paid.
+- Every successful webhook is independently verified with `GET /v3/transactions/{id}/verify` before the order is marked paid. The webhook resolves the attempt with `resolve_payment_tx_ref(tx_ref)`.
 - Store the gateway transaction ID in `payment_transactions`.
 - Refunds use Flutterwave's refund API.
 - Direct MTN/Airtel integrations are a future adapter, not v1.
@@ -342,6 +344,30 @@ The previous 8.0 km ceiling made the canonical 8.093 km COD example ineligible �
 
 ---
 
+## ADR-019 — Admin mutations are audited database RPCs
+
+**Status:** Accepted
+
+**Decision**
+
+- High-risk admin mutations execute through `SECURITY DEFINER` RPCs, not direct table writes from the browser: `admin_update_settings`, `admin_update_order_contact`, `admin_upsert_category`, `admin_upsert_menu_item`, `admin_upsert_modifier_group`, `admin_upsert_combo`, `admin_upsert_table`, `admin_update_staff`, `admin_approve_refund`, `admin_redeliver_order`.
+- Every call requires `ADMIN` (`is_admin()`), a non-empty reason where the mutation is destructive or financial, and writes an `admin_audit_log` row with actor, before/after state, and reason.
+- Settings changes also write `settings_history`; status changes also write `order_status_history`.
+- The last active admin cannot be demoted or deactivated (`LAST_ADMIN_PROTECTED`).
+- Refund approval is a database decision only; the actual gateway refund call is a separate Phase 6 server job and is idempotent by refund ID.
+
+**Rationale**
+
+The v1.4 audit found that several admin screens implied direct table updates with no enforceable audit path. Moving the mutation boundary into the database makes the audit row atomic with the change and keeps the service-role key out of the browser.
+
+**Consequences**
+
+- Admin UI server actions are thin wrappers around these RPCs.
+- A new admin mutation that bypasses an RPC is a review failure.
+- Audit tables remain append-only and readable only through `admin_get_audit_feed` or `admin_get_order`.
+
+---
+
 ## Open founder decisions
 
 These are recorded here so they are not lost. **The authoritative, complete register — including F-16 onward, status, and blocking phase — is `AUDIT_REPORT.md` §12.** This table is the first tranche of that register.
@@ -361,7 +387,7 @@ These are recorded here so they are not lost. **The authoritative, complete regi
 | F-11 | Confirm VAT/EFRIS position | Phase 6 |
 | F-12 | Provide brand/dish assets | Phase 3 |
 | F-13 | Confirm domain/hosting accounts | Phase 12 |
-| F-14 | Confirm final commercial COD max radius and change policy (8.1 km is the v1.2 test ceiling) | Phase 2 |
+| F-14 | Confirm final commercial COD max radius and change policy (8.1 km is the current test/seed ceiling) | Phase 2 |
 | F-15 | Confirm notification templates/sender ID | Phase 9 |
 
 ---
@@ -370,6 +396,7 @@ These are recorded here so they are not lost. **The authoritative, complete regi
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added ADR-019 (audited admin RPCs); moved the synthetic staff email domain to `staff.moroujmazaar.com`; revised ADR-002 to per-attempt `tx_ref`. |
 | 1.3.0 | 2026-11-10 | Clarified ADR-017: `docs/stitch-design/screens/` is canonical; `_archive/` and `site/ui-kit.html` are non-normative. |
 | 1.2.0 | 2026-11-09 | Added ADR-017 (v2 green/orange design system) and ADR-018 (8.1 km COD test ceiling); clarified F-02/F-14 and ADR-008 status. |
 | 1.1.0 | 2026-10-29 | Added ADRs 001–016 from the audit remediation. |

@@ -3,9 +3,9 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative data model |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
-| **Source of truth** | `supabase/migrations/20261029000000_initial_schema.sql` |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
+| **Source of truth** | `20261029000000_initial_schema.sql` → `20261112000001_remediation.sql` → `20261113000000_v1_5_remediation.sql` |
 
 ---
 
@@ -90,7 +90,7 @@ erDiagram
 
 | Table | Purpose |
 | :--- | :--- |
-| `payment_transactions` | Gateway truth. |
+| `payment_transactions` | Gateway truth per payment attempt. |
 | `webhook_events` | Idempotency and replay audit. |
 | `refunds` | Refund lifecycle. |
 | `checkout_idempotency` | Duplicate checkout prevention. |
@@ -167,7 +167,7 @@ Singleton row (`id = 1`). Includes:
 - `is_store_open`, `opening_time`, `closing_time`, `timezone`.
 - `is_kitchen_busy`, `busy_buffer_minutes`, `is_kitchen_paused`.
 - `pin_max_attempts`, `pin_lock_minutes`, `pin_geofence_m`.
-- `staff_session_hours`, `max_cart_value`, `max_item_quantity`.
+- `staff_session_hours`, `max_cart_value`, `max_item_quantity`, `max_cart_lines`.
 - `updated_by`, `updated_at`.
 
 ### 3.3 `profiles`
@@ -182,6 +182,25 @@ Singleton row (`id = 1`). Includes:
 | `failed_login_attempts`, `locked_until`, `last_login_at` | Login lockout. |
 
 No plaintext PIN column exists.
+
+### 3.4 `payment_transactions`
+
+Every initiation attempt is its own row; a retry never reuses the previous provider reference.
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | UUID PK | `gen_random_uuid()`. |
+| `order_id` | UUID | FK `orders(id)`. |
+| `attempt_number` | INTEGER | Monotonic per order, `> 0`, default 1. |
+| `tx_ref` | TEXT | `<order_token>-<attempt_number>`; UNIQUE. |
+| `provider` | TEXT | `flutterwave` in v1. |
+| `provider_transaction_id` | TEXT | Set by verified webhook/verification. |
+| `amount` / `currency` | INTEGER / CHAR(3) | Snapshot of the order total at initiation. |
+| `method` | `payment_method` | MoMo, Airtel, card. |
+| `status` | `payment_tx_status` | `INITIATED`, `PENDING`, `SUCCESSFUL`, `FAILED`, `ABANDONED`. |
+| `raw_payload` / `verified_at` | JSONB / TIMESTAMPTZ | Provider evidence. |
+
+Unique `(order_id, attempt_number)` prevents two attempts claiming the same number; unique `tx_ref` makes a webhook lookup unambiguous. `start_payment_attempt()` abandons any open attempt before allocating the next number, so a late webhook for an abandoned attempt can still be reconciled without matching the current attempt.
 
 ---
 
@@ -201,12 +220,22 @@ stateDiagram-v2
     READY_FOR_PICKUP --> CLAIMED: rider claim
     CLAIMED --> READY_FOR_PICKUP: release
     CLAIMED --> OUT_FOR_DELIVERY: start trip
+    CLAIMED --> CLAIMED: admin reassign
+    OUT_FOR_DELIVERY --> CLAIMED: admin reassign
     OUT_FOR_DELIVERY --> DELIVERED: valid PIN
+    READY_FOR_PICKUP --> DELIVERED: admin complete
+    CLAIMED --> DELIVERED: admin complete
+    OUT_FOR_DELIVERY --> DELIVERED: admin complete
     OUT_FOR_DELIVERY --> DELIVERY_FAILED: failure report
+    DELIVERY_FAILED --> READY_FOR_PICKUP: admin redelivery
+    DELIVERY_FAILED --> CLAIMED: admin redelivery with rider
+    DELIVERY_FAILED --> CANCELLED: admin resolution
     DELIVERED --> [*]
     DELIVERY_FAILED --> [*]
     CANCELLED --> [*]
 ```
+
+Any non-terminal state may move to `CANCELLED` through `admin_cancel_order`. The transition trigger rejects every edge not listed here, including direct `UPDATE` writes.
 
 ---
 
@@ -225,6 +254,8 @@ stateDiagram-v2
 - `rider_telemetry(order_id)`.
 - `notifications(status, created_at)`.
 - `payment_transactions(order_id)`.
+- `payment_transactions(order_id, attempt_number)` UNIQUE.
+- `payment_transactions(tx_ref)` UNIQUE.
 - `webhook_events(provider, provider_event_id)` UNIQUE.
 
 ---
@@ -245,6 +276,8 @@ stateDiagram-v2
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added the per-attempt `payment_transactions` dictionary, `max_cart_lines`, the complete FSM (admin completion/reassignment/redelivery/cancel), the `rider_telemetry(order_id)` partial index, and payment-attempt unique indexes. |
+| 1.4.0 | 2026-11-12 | Aligned the ERD with the v1.4 remediation (FSM recovery edges, cart limits, refund approval fields, audit reasons; the document was not separately version-bumped at the time). |
 | 1.3.0 | 2026-11-10 | Added `orders.ready_at` and `app_settings.is_kitchen_paused`; corrected `total_amount` to a generated column. |
 | 1.2.0 | 2026-11-09 | Aligned COD radius, order-number type, and version metadata with the migration. |
 | 1.1.0 | 2026-10-29 | Created as the v1.1 ERD/data dictionary. |

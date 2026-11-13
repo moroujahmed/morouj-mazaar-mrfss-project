@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.2 operations baseline |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Status** | Normative v1.5 operations baseline |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Owner** | Founders + on-call engineer |
 | **Scope** | Supabase, Vercel/Next.js, Flutterwave, Africa's Talking, MapTiler, OSRM, Upstash |
 
@@ -259,7 +259,17 @@ All cron endpoints require `Authorization: Bearer ${CRON_SECRET}` and are idempo
 - Check the payment dashboard for unverified/paid orders.
 - Export the day's orders and settlements.
 
-### 7.4 Background GPS
+### 7.4 Failed delivery and redelivery
+
+1. The rider marks the order `DELIVERY_FAILED` with a reason; do not mark it delivered if cash was not collected.
+2. The rider returns any uncollected food to the kitchen and reports the reason to the shift lead.
+3. Support contacts the customer and records the agreed outcome: redelivery, refund, or cancellation.
+4. If redelivery is agreed, an admin calls `admin_redeliver_order(order_id, reason, actor)`. The order returns to `READY_FOR_PICKUP`, the rider assignment is cleared, and the reason/actor are written to the audit feed.
+5. The order must be re-packed and re-sealed before it re-enters the pool. A returned order is never re-delivered without a fresh seal check.
+6. If the customer declines redelivery, the admin cancels the order (`DELIVERY_FAILED → CANCELLED`). Refunds follow §8 and the payment provider's timeline; a refund is never implied to be instant.
+7. Reconcile the failed COD order as uncollected cash; it must not appear in the rider's expected cash.
+
+### 7.5 Background GPS
 
 Mobile browsers suspend location when backgrounded or locked. The rider app must:
 
@@ -352,7 +362,7 @@ After any rotation: redeploy, run `/api/health`, create a staging test order, an
 - [ ] Backup restore drill completed.
 - [ ] Rollback tested.
 - [ ] Accessibility gate passes.
-- [ ] Scenarios A–I pass on staging.
+- [ ] Scenarios A–K pass on staging.
 - [ ] Load test at 50 concurrent checkouts passes.
 - [ ] On-call rota and escalation contacts published.
 
@@ -401,6 +411,7 @@ These are deliberate. Do not add them mid-build without an ADR and a test plan u
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added the failed-delivery/redelivery SOP (`admin_redeliver_order`), moved go-live acceptance to Scenarios A–K, and aligned the operations baseline to v1.5. |
 | 1.3.0 | 2026-11-10 | Aligned prep-time KPI with `ready_at`; added kitchen intake pause to the SOP. |
 | 1.2.0 | 2026-11-09 | Aligned to v1.2: COD test ceiling 8.1 km and scenarios A–I. |
 | 1.1.0 | 2026-10-29 | Created; deploy, backup, incident, SOP, KPI, and go-live baseline. |

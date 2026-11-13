@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.2 |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Status** | Normative v1.5 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Owner** | Founders + engineer |
 | **Related** | `API_CONTRACTS.md` §2.9, `CANONICAL_EXAMPLES.md`, `OPERATIONS_RUNBOOK.md` §9, migration `get_admin_analytics` |
 
@@ -109,5 +109,6 @@ The `admin_audit_log`, `order_status_history`, `settings_history`, and `cash_set
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Aligned the analytics baseline to v1.5; payment attempts remain derivable from `payment_transactions` and no KPI definition changed. |
 | 1.3.0 | 2026-11-10 | Corrected COD enum value and defined `ready_at` for prep/delivery KPIs. |
 | 1.2.0 | 2026-11-09 | Created; closes P1-30 and the P2 analytics/KPI gap. |

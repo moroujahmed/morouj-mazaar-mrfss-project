@@ -3,9 +3,10 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
-| **System code** | `PROJECT-BAZAAR-D2C` / MRFSS |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
+| **System code** | `MRFSS` — Morouj Restaurant & Food Service System |
+| **Brand hierarchy** | **Morouj Mazaar** (product umbrella) → **Bazaar Flame & Grill** (restaurant) → **MRFSS** (system) |
 | **Environment** | Mobile-first responsive web application (installable PWA) |
 | **Locale** | Kampala, Uganda — `Africa/Kampala` (EAT, UTC+3) |
 | **Currency** | UGX (`USh`), whole integers |
@@ -14,7 +15,7 @@ This document describes the product, the commercial rules, the four portals, and
 
 - Numbers and fixtures: [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md)
 - States and business rules: [`STATE_MACHINES_AND_BUSINESS_RULES.md`](STATE_MACHINES_AND_BUSINESS_RULES.md)
-- Schema: [`../supabase/migrations/20261029000000_initial_schema.sql`](../supabase/migrations/20261029000000_initial_schema.sql)
+- Schema: [`../supabase/migrations/`](../supabase/migrations/) — apply every additive migration in timestamp order; [`ERD.md`](ERD.md) is the data dictionary.
 - API events: [`API_CONTRACTS.md`](API_CONTRACTS.md)
 - Security: [`SECURITY_AND_VERIFICATION_PROTOCOLS.md`](SECURITY_AND_VERIFICATION_PROTOCOLS.md)
 - UX: [`PORTALS_AND_UX_SPECIFICATION.md`](PORTALS_AND_UX_SPECIFICATION.md)
@@ -23,7 +24,7 @@ This document describes the product, the commercial rules, the four portals, and
 
 ## 1. Product
 
-Bazaar Flame & Grill is a restaurant inside a Kampala bazaar. MRFSS is its own ordering and delivery system: customers order from a web storefront, the kitchen works from a kitchen display, riders claim deliveries from a shared pool, and the owner reconciles cash and settings from an admin hub.
+**Morouj Mazaar** is the product and brand umbrella. **Bazaar Flame & Grill** is the restaurant inside a Kampala bazaar. **MRFSS** is the ordering and delivery system that serves it: customers order from a web storefront, the kitchen works from a kitchen display, riders claim deliveries from a shared pool, and the owner reconciles cash and settings from an admin hub.
 
 ### 1.1 Problem
 
@@ -215,6 +216,7 @@ Detailed journeys and acceptance scenarios are in [`TESTING_PERSONAS_AND_E2E_SCE
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Made the brand hierarchy explicit, moved the schema reference to the full migration chain, and aligned the overview to v1.5 (per-attempt payments, redelivery, audited admin actions). |
 | 1.3.0 | 2026-11-10 | Added the kitchen-pause checkout state. |
 | 1.2.0 | 2026-11-09 | Rewritten: four-portal model, integer-metre fee, 8.1 km COD alignment, no Haversine fallback, accurate cost statement, token-scoped RPC/Broadcast architecture, explicit v1 scope. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |

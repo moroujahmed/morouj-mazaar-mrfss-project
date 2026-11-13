@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Standard** | WCAG 2.2 Level AA for all text and controls; body copy targets AAA where the palette permits |
 | **Design authority** | [`DESIGN_SYSTEM_V2.md`](DESIGN_SYSTEM_V2.md) |
 | **Verification** | axe-core, Playwright, manual keyboard/screen-reader/high-glare checks |
@@ -149,6 +149,7 @@ Measured against the v2 tokens:
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Aligned the accessibility baseline to v1.5 (payment-retry and redelivery copy); no WCAG requirement changed. |
 | 1.3.0 | 2026-11-10 | Unified touch targets and 3 px focus ring; clarified AA release gate with AAA only where the palette permits. |
 | 1.2.0 | 2026-11-09 | Replaced terracotta palette with v2 green/orange tokens; corrected contrast evidence; added KDS/rider/dialog/chart rules and a manual script. |
 | 1.1.0 | 2026-10-29 | Initial AA correction. |

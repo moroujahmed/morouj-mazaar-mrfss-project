@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Execution model** | Phased, test-driven, contract-verified |
 | **Start condition** | Founder gates in [`AUDIT_REPORT.md`](AUDIT_REPORT.md) §12 that block the phase must be acknowledged before that phase starts |
 
@@ -51,16 +51,17 @@ Agents complete phases in order and run every gate before moving on. This plan d
 
 **Objective:** apply the schema, provision staff, and prove the security boundary.
 
-**Files:** `supabase/migrations/20261029000000_initial_schema.sql`, `supabase/seed.sql`, `scripts/seed-staff.mjs`, `src/lib/supabase/{client,server,admin}.ts`, `src/types/database.types.ts`, `src/middleware.ts`, `src/lib/auth/*`.
+**Files:** `supabase/migrations/20261029000000_initial_schema.sql`, `20261029000001_storage.sql`, `20261112000000_remediation_enum.sql`, `20261112000001_remediation.sql`, `20261113000000_v1_5_remediation.sql`, `supabase/seed.sql`, `scripts/seed-staff.mjs`, `src/lib/supabase/{client,server,admin}.ts`, `src/types/database.types.ts`, `src/middleware.ts`, `src/lib/auth/*`.
 
 **Directives:**
 
-1. Apply the migration; do not re-type DDL from prose. The migration is the schema authority.
+1. Apply every migration in timestamp order; do not re-type DDL from prose. The migration chain is the schema authority. Do not edit already-applied migrations; add a new additive migration instead.
 2. Run `supabase/seed.sql` (idempotent).
-3. Provision staff with `scripts/seed-staff.mjs`; staff are Auth users with 6-digit PINs as passwords.
-4. Generate `database.types.ts`.
+3. Provision staff with `scripts/seed-staff.mjs`; staff are Auth users with synthetic `@staff.moroujmazaar.com` emails and 6-digit PINs as passwords. Set `STAFF_SEED_FILE` explicitly.
+4. Generate `database.types.ts` after the full chain (`initial → storage → remediation_enum → remediation → v1_5_remediation`).
 5. Implement `server-only` admin client and role guards.
-6. Add RLS/database tests from `TEST_PLAN.md` §3.
+6. Add RLS/database tests from `TEST_PLAN.md` §3, including per-attempt payment references and the audited admin RPCs.
+7. Verify the v1.5 functions exist with the expected grants: `start_payment_attempt`, `resolve_payment_tx_ref`, `admin_redeliver_order`, and the audited `admin_*` mutations.
 
 **Gate:**
 
@@ -138,12 +139,13 @@ Agents complete phases in order and run every gate before moving on. This plan d
 1. Zod discriminated union for delivery/dine-in; normalize phone.
 2. Enforce `STORE_CLOSED` and `KITCHEN_PAUSED` server-side before order creation.
 3. Idempotency key required; recompute all totals; insert order/items/modifiers in one transaction.
-4. Digital: create `payment_transactions`, call Flutterwave hosted checkout; webhook validates `verif-hash`, verifies transaction, checks amount/currency, stores event, moves `PENDING_PAYMENT → PREPARING`.
-5. COD: enforce radius, OTP when required, store change due, create `CONFIRMED_UNPAID`.
-6. Duplicate/late events never resurrect a terminal order.
-7. Expire unpaid digital orders after 10 minutes.
+4. Digital: call `start_payment_attempt(order_token, method, 'flutterwave')` to allocate the next attempt (`tx_ref = '<order_token>-<attempt_number>'`), then call Flutterwave hosted checkout with that reference; mark prior open attempts `ABANDONED` under the row lock.
+5. Webhook validates `verif-hash`, resolves the attempt with `resolve_payment_tx_ref(tx_ref)`, verifies the transaction with the provider, checks amount/currency, stores the event, and only then moves `PENDING_PAYMENT → PREPARING`. A late event for an abandoned attempt never marks the current attempt paid.
+6. COD: enforce radius, OTP when required, store change due, create `CONFIRMED_UNPAID`.
+7. Duplicate/late events never resurrect a terminal order.
+8. Expire unpaid digital orders after 10 minutes and fail open attempts.
 
-**Gate:** webhook signature/replay/amount tests; idempotency tests; store/kitchen gates; canonical totals 35,000 / 38,000 / 8,000; no client-supplied price accepted.
+**Gate:** webhook signature/replay/amount tests; per-attempt `tx_ref` uniqueness and late-webhook isolation; idempotency tests; store/kitchen gates; canonical totals 35,000 / 38,000 / 8,000; no client-supplied price accepted.
 
 ---
 
@@ -217,7 +219,7 @@ Agents complete phases in order and run every gate before moving on. This plan d
 **Directives:**
 
 1. Auth gate; ADMIN only.
-2. Live monitor and order drawer with edit/cancel/complete/reassign/reset PIN/refund, each with reason + audit.
+2. Live monitor and order drawer with edit/cancel/complete/reassign/redeliver/reset PIN/refund, each with reason + audit. Reassign and redeliver call the audited RPCs; redelivery returns a `DELIVERY_FAILED` order to `READY_FOR_PICKUP` and clears the rider.
 3. Menu CRUD with soft archive and image upload validation.
 4. Settings with bounds and `settings_history`.
 5. Ledger with EAT business date and linked orders; reconcile.
@@ -256,7 +258,7 @@ Agents complete phases in order and run every gate before moving on. This plan d
 
 **Directives:**
 
-1. Implement scenarios A–I from `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` / `TEST_PLAN.md`.
+1. Implement scenarios A–K from `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` / `TEST_PLAN.md`.
 2. Mock OSRM and payments; fixed test OTP; no live keys.
 3. Accessibility suite on all portals.
 4. Performance budgets and bundle check.
@@ -280,6 +282,7 @@ Agents complete phases in order and run every gate before moving on. This plan d
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added the full additive migration chain and v1.5 RPC/grants to Phase 2, per-attempt payment references to Phase 6, redelivery to Phase 10, and Scenarios A–K to Phase 12. |
 | 1.3.0 | 2026-11-10 | Added store/kitchen-pause gates to Phase 6, intake pause and browser-print route to Phase 8. |
 | 1.2.0 | 2026-11-09 | Rewritten for pinned Next 15, Supabase Auth, integer-metre OSRM, canonical fixtures, v2 palette, kitchen portal, payment/refund/audit, scenarios A–I, CI and dependency/secret scanning. |
 | 1.1.0 | 2026-10-29 | Amendment banner. |

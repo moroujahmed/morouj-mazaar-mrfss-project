@@ -3,10 +3,10 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.4.0 |
-| **Date** | 2026-11-12 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Supersedes** | v1.0 transition matrix, Haversine fallback, coarse distance, claim signature, settlement prose |
-| **Authority** | Migration, `ERD.md`, `CANONICAL_EXAMPLES.md`, `DECISIONS.md` ADR-005/010/011/012/013/015 |
+| **Authority** | Migration chain through `20261113000000_v1_5_remediation.sql`, `ERD.md`, `CANONICAL_EXAMPLES.md`, `DECISIONS.md` ADR-005/010/011/012/013/015/019 |
 
 All rules in this document are server-enforced. The UI may preview prices but never authorizes a financial value or a status transition.
 
@@ -65,13 +65,27 @@ All rules in this document are server-enforced. The UI may preview prices but ne
 | `CLAIMED` | `OUT_FOR_DELIVERY` | Assigned rider | `start_delivery(p_order_id)` | `dispatched_at`; telemetry may start |
 | `OUT_FOR_DELIVERY` | `DELIVERED` | Assigned rider | `verify_delivery_pin(...)` | Valid PIN, geofence, COD paid, attempts cleared |
 | `OUT_FOR_DELIVERY` | `DELIVERY_FAILED` | Assigned rider | `report_delivery_failed(...)` | `delivery_attempts` row and security flag |
-| `DELIVERY_FAILED` | `READY_FOR_PICKUP` | Admin | Admin redelivery resolution | Clears failure flag, returns to pool; audited |
+| `DELIVERY_FAILED` | `READY_FOR_PICKUP` | Admin | `admin_redeliver_order(order_id, reason, NULL)` | Clears failure flag and rider, returns to pool; audited |
+| `DELIVERY_FAILED` | `CLAIMED` | Admin | `admin_redeliver_order(order_id, reason, rider_id)` | Clears failure flag, assigns an active rider with no other active order; audited |
 | `DELIVERY_FAILED` | `CANCELLED` | Admin | `admin_cancel_order(order_id, reason)` | Cancel fields, audit, refund request if paid |
 | any non-terminal | `CANCELLED` | Admin | `admin_cancel_order(order_id, reason)` | Cancel fields, audit, refund request if paid |
 | `CLAIMED`/`OUT_FOR_DELIVERY`/`READY_FOR_PICKUP` | `DELIVERED` | Admin | `admin_complete_order(order_id, reason)` | PIN override, audit, COD paid |
 | `CLAIMED`/`OUT_FOR_DELIVERY` | `CLAIMED` | Admin | `admin_reassign_order(order_id, rider_id, reason)` | New rider, `dispatched_at` cleared, audit |
 
 Illegal transitions are rejected by the `enforce_order_transition` trigger even if a caller bypasses the RPC. Every transition into `PREPARING` sets `acknowledged_at`, and the first transition into `READY_FOR_PICKUP` (or `PREPARING → DELIVERED` for dine-in) sets `ready_at`. Each status change writes `order_status_history` with actor, role, and the caller-supplied reason where applicable.
+
+`admin_redeliver_order` is the only path out of `DELIVERY_FAILED` back into the delivery flow. It requires a reason, clears the failure/security state, and either returns the order to the pool or assigns a specific active rider atomically. Assigning a rider who already holds a `CLAIMED`/`OUT_FOR_DELIVERY` order raises `RIDER_HAS_ACTIVE_ORDER`.
+
+### 1.3 Payment attempts
+
+A digital order is not tied to one provider reference. Each `initiatePaymentAction` call invokes `start_payment_attempt(order_token, method, provider)`, which:
+
+- locks the order and requires `PENDING_PAYMENT` + `payment_status = PENDING`;
+- marks any previous `INITIATED`/`PENDING` transaction `ABANDONED`;
+- allocates `attempt_number = max(attempt_number) + 1`;
+- stores `tx_ref = '<order_token>-<attempt_number>'`.
+
+`tx_ref` is unique and `(order_id, attempt_number)` is unique, so a webhook resolves to exactly one attempt through `resolve_payment_tx_ref(tx_ref)`. A late webhook for an abandoned attempt is recorded against that attempt and never marks the current attempt's order paid unless its own amount/currency verification matches. Reusing `order_token` as `tx_ref` is retired.
 
 ### 1.2 Status Copy
 
@@ -184,13 +198,14 @@ The PIN is 4 digits, per order, generated with `pgcrypto`, and verified only by 
 
 ### 7.1 Liability
 
-A rider's expected cash is the sum of `total_amount` for orders that are:
+A rider's expected cash for a business date is the sum of `total_amount` for orders that are:
 
 - `payment_method = CASH_ON_DELIVERY`;
 - `payment_status = PAID`;
 - `order_status = DELIVERED`;
-- delivered on the selected `Africa/Kampala` business date;
-- not already linked to a closed settlement.
+- delivered on the selected `Africa/Kampala` business date.
+
+This matches `reconcile_rider_cash`, which recomputes the same set on every call and is the authoritative formula. A settlement's `expected_cash` is therefore the day's full COD liability even when a previous settlement already linked some of those orders; only the `orders.settlement_id` linkage skips already-linked rows. Re-running reconciliation for the same rider/date updates the same settlement row and does not double-count orders.
 
 ### 7.2 Reconciliation
 
@@ -270,6 +285,7 @@ eta_at = acknowledged_at
 | :--- | :--- | :--- |
 | 1.0.0 | 2026-10-29 | Original FSM and pricing draft. |
 | 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.5.0 | 2026-11-13 | Added per-attempt payment references, the audited `admin_redeliver_order` edges, and corrected §7.1 to match `reconcile_rider_cash`. |
 | 1.4.0 | 2026-11-12 | Added `DELIVERY_FAILED` recovery transitions, `RETURNED` outcome, 3-arg reassign, timeout payment failure, deterministic timestamps/history, and carried partial-settlement shortfall. |
 | 1.3.0 | 2026-11-10 | Added `ready_at` side effects and kitchen-pause intake rules; corrected `total_amount` generated-column wording. |
 | 1.2.0 | 2026-11-09 | Rewrote transitions, integer-metre pricing, OSRM blocking, claim RPC, settlement linkage, ETA, and store-closed rules. |

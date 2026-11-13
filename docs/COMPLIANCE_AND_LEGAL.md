@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | v1.2 working baseline — **not legal advice** |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Status** | v1.5 working baseline — **not legal advice** |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Owner** | Founders |
 | **Required review** | Qualified Ugandan legal counsel and tax adviser before launch |
 | **Related** | `AUDIT_REPORT.md` §12, `DECISIONS.md`, `OPERATIONS_RUNBOOK.md`, `ACCESSIBILITY.md` |
@@ -626,5 +626,6 @@ MVP should have no non-essential cookies. If analytics is added, update this tab
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Aligned to v1.5: `staff.moroujmazaar.com` identity, per-attempt payment records, and redelivery/refund audit. Legal copy still requires founder review. |
 | 1.2.0 | 2026-11-09 | Aligned to v1.2: COD radius 8.1 km, Supabase Auth session cookie, four-portal scope. |
 | 1.1.0 | 2026-10-29 | Created; Uganda compliance checklist, data inventory, policy skeletons, and legal action register. |

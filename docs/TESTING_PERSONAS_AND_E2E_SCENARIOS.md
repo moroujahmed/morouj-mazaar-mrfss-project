@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Supersedes** | v1.0 seed SQL, 4-digit staff PINs, retired distances/totals, and the unrunnable Playwright blueprint |
 | **Canonical data** | [`CANONICAL_EXAMPLES.md`](CANONICAL_EXAMPLES.md) |
 | **Runnable tests** | [`TEST_PLAN.md`](TEST_PLAN.md) — unit, database, RLS, E2E, accessibility |
@@ -324,8 +324,9 @@ These scenarios are the acceptance narrative. The executable versions, selectors
 1. Sarah starts checkout but the Flutterwave payment fails or is abandoned.
 2. The order remains `PENDING_PAYMENT`; the customer sees a retry action and the payment status, not a false “confirmed” state.
 3. Retrying with the same idempotency key and unchanged payload returns the same order; changing the payload returns `IDEMPOTENCY_CONFLICT`.
-4. A successful retry moves the order to `PREPARING` through the verified webhook path.
-5. If the retry window expires, `expire_pending_orders` cancels the order and marks the payment failed/expired.
+4. Each checkout call allocates a fresh attempt: `start_payment_attempt` stores `tx_ref = '<order_token>-<attempt_number>'`, abandons the previous open attempt, and never reuses a reference. The first Sarah fixture attempt is `#1042-1`, then `#1042-2`.
+5. A successful retry moves the order to `PREPARING` through the verified webhook path; `resolve_payment_tx_ref` binds the webhook to exactly one attempt. A late webhook for an abandoned attempt does not mark the current attempt paid.
+6. If the retry window expires, `expire_pending_orders` cancels the order and marks the payment failed/expired.
 
 ---
 
@@ -337,6 +338,40 @@ These scenarios are the acceptance narrative. The executable versions, selectors
 2. Checkout is disabled and the server rejects order creation with `STORE_CLOSED` even if the client is bypassed.
 3. Staff can still sign in, review history, and reconcile cash.
 4. If the kitchen pauses intake, new orders are blocked with `KITCHEN_PAUSED`; existing orders continue through the FSM.
+
+---
+
+### Scenario J — admin reassignment, redelivery, and audit
+
+**Covers:** live dispatch correction, one-active-order protection, failed-delivery return, audited admin mutations.
+
+1. Juma has claimed and started a delivery. Mr. Kasule reassigns it to David with a reason through `admin_reassign_order`.
+2. Assertions:
+   - the order returns to `CLAIMED` and `dispatched_at` is cleared;
+   - Juma's active order disappears and David sees it;
+   - an audit row records the actor, old/new rider, and reason.
+3. Reassigning to a rider who already has an active order returns `RIDER_HAS_ACTIVE_ORDER`.
+4. David reports `DELIVERY_FAILED`. Kasule calls `admin_redeliver_order(order_id, reason, actor)`.
+5. Assertions:
+   - the order returns to `READY_FOR_PICKUP`, `rider_id` is cleared, and it re-enters `get_rider_pool`;
+   - the order can be claimed again;
+   - the redelivery reason and actor appear in the audit feed.
+6. `admin_list_orders` search finds the order, and no admin mutation bypasses `order_status_history`.
+
+**Negative branches:** non-admin caller → `AUTH_UNAUTHORIZED`; redelivery from a state other than `DELIVERY_FAILED` → `ORDER_STATE_INVALID`; missing reason → `VALIDATION_ERROR`.
+
+---
+
+### Scenario K — cart limits and COD change
+
+**Covers:** `max_cart_lines`, COD change validation, kitchen/tracker change copy.
+
+1. Sarah adds 30 distinct lines; the cart accepts them. A 31st line is blocked with a validation error naming `max_cart_lines`.
+2. Brian requests COD change below the server-computed total; checkout blocks until the change amount covers `total_amount`.
+3. With a valid change amount, the kitchen ticket and customer tracker both show the change due.
+4. The server recomputes the total on submit; a stale client total is rejected rather than trusted.
+
+**Negative branches:** line quantity above `max_item_quantity` → rejected; cart above `max_cart_value` → rejected; change amount below total → `VALIDATION_ERROR`.
 
 ---
 
@@ -353,6 +388,8 @@ These scenarios are the acceptance narrative. The executable versions, selectors
 | G | Kasule / Juma | 65,500 expected, linked orders, `SETTLED`, `PARTIAL`, variance | `TEST_PLAN.md` §2.6, §4 Scenario G |
 | H | Sarah | failed payment, idempotent retry, expiry | `TEST_PLAN.md` §2.7 |
 | I | Sarah / Kasule | `STORE_CLOSED`, `KITCHEN_PAUSED`, no order creation | `TEST_PLAN.md` §2.8, §4 Scenario I |
+| J | Kasule / Juma / David | reassignment, `RIDER_HAS_ACTIVE_ORDER`, redelivery to pool, audit reason | `TEST_PLAN.md` §4 Scenario J |
+| K | Sarah / Brian | `max_cart_lines`, COD change validation, server-recomputed total | `TEST_PLAN.md` §4 Scenario K, §2.2 |
 
 ### 4.1 Required data-testids
 
@@ -373,6 +410,7 @@ Use the IDs defined in `TEST_PLAN.md` §6.4. Do not introduce selector names tha
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added Scenarios J (admin reassignment/redelivery/audit) and K (cart limits/COD change) with traceability rows; added per-attempt payment references to Scenario H. |
 | 1.3.0 | 2026-11-10 | Aligned Scenarios H/I traceability with `TEST_PLAN.md` §2.7–§2.8 and §4. |
 | 1.2.0 | 2026-11-09 | Rewritten to canonical fixtures, Supabase Auth staff identities, schema-authoritative RPCs, and references to `TEST_PLAN.md`; added payment-retry and store-closed scenarios; removed duplicate seed SQL and unrunnable Playwright code. |
 | 1.0.0 | 2026-10-27 | Initial personas and E2E narrative. |

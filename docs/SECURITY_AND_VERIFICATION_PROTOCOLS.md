@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.4.0 |
-| **Date** | 2026-11-12 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Supersedes** | v1.0 custom sessions, plaintext PINs, in-memory lockout, and OTP prose |
 | **Authority** | `supabase/migrations/20261029000000_initial_schema.sql`, `API_CONTRACTS.md`, `DECISIONS.md` ADR-001/002/003/013 |
 
@@ -24,6 +24,7 @@ This document defines the security controls that the production implementation m
 | PIN or PII leakage | Column privileges revoked, safe RPC payloads, no raw `postgres_changes` on orders/telemetry |
 | Webhook forgery | Flutterwave `verif-hash` shared-secret comparison plus independent transaction verification |
 | Replay / duplicate webhook | `webhook_events(provider, provider_event_id)` unique constraint and processed-at state |
+| Stale payment webhook | Per-attempt immutable `tx_ref` + `resolve_payment_tx_ref`; a late event for an abandoned attempt cannot mark the current attempt paid |
 | Brute force | Upstash distributed limits, Supabase Auth lockout, database PIN attempts/lockout |
 | OSRM scraping | Authenticated distance proxy, coordinate quantisation, 24 h cache, per-IP rate limit |
 | Search-path hijack | Every `SECURITY DEFINER` function sets `search_path = public, pg_temp` |
@@ -38,7 +39,7 @@ All staff (`ADMIN`, `KITCHEN`, `RIDER`) authenticate with **Supabase Auth**.
 
 1. The login screen accepts a Ugandan phone number and a **6-digit staff PIN**.
 2. The server normalizes the phone to E.164 and maps it to the synthetic email
-   `{digits}@staff.bazaareats.com`.
+   `{digits}@staff.moroujmazaar.com`.
 3. The server calls `signInWithPassword`. Supabase stores only the password hash.
 4. The resulting JWT populates `auth.uid()` for RLS, RPCs, and Broadcast.
 5. Sessions last 12 hours. Logout revokes the refresh token.
@@ -236,8 +237,9 @@ No production limiter may rely on process memory. CAPTCHA or a proof-of-work cha
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
-| 1.0.0 | 2026-10-29 | Original custom-session draft. |
-| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.5.0 | 2026-11-13 | Added per-attempt payment-reference isolation, the `staff.moroujmazaar.com` synthetic domain, and audited admin mutation coverage. |
 | 1.4.0 | 2026-11-12 | Aligned SMS provider, one-feedback-per-order limit, and blacklist E.164 normalization/constraint. |
 | 1.3.0 | 2026-11-10 | Corrected blacklist DDL/columns and `total_amount` protection; added the kitchen-pause checkout gate. |
 | 1.2.0 | 2026-11-09 | Replaced with Supabase Auth, durable PIN RPC, RLS boundary, OTP, rate limits, and verification checklist. |
+| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.0.0 | 2026-10-29 | Original custom-session draft. |

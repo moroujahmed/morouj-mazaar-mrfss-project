@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative build contract |
-| **Version** | 1.4.0 |
-| **Date** | 2026-11-12 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Rule** | Every public mutation must appear here before implementation. |
 
 ---
@@ -135,8 +135,8 @@ export type ApiResponse<T> =
 **File:** `src/actions/payments.ts`
 **Auth:** anon + order token
 **Input:** `{ orderToken: string; method: "MTN_MOMO" | "AIRTEL_MONEY" | "BANK_CARD" }`
-**Output:** `{ redirectUrl: string }`
-**Behavior:** creates a `payment_transactions` row (`INITIATED`), calls Flutterwave `/v3/payments`, returns hosted checkout link. Rejects if order not `PENDING_PAYMENT` or amount mismatch.
+**Output:** `{ redirectUrl: string; transactionId: string; txRef: string; attemptNumber: number }`
+**Behavior:** calls `start_payment_attempt(order_token, method, 'flutterwave')`, which locks the order, abandons any open attempt, allocates the next `attempt_number`, stores an `INITIATED` row with `tx_ref = '<order_token>-<attempt_number>'`, then calls Flutterwave `/v3/payments` with that `tx_ref` and returns the hosted checkout link. Rejects cash orders with `PAYMENT_METHOD_UNAVAILABLE`, a method mismatch with `VALIDATION_ERROR`, and any state other than `PENDING_PAYMENT` + `PENDING` with `ORDER_STATE_INVALID`. Retries never reuse a `tx_ref`; the rate limit is 5 attempts/hour/order.
 
 ---
 
@@ -210,14 +210,15 @@ export type ApiResponse<T> =
 | `updateOrderContactAction` | ADMIN | `{ orderId, phone?, notes?, coordinates? }` | Recomputes fee if coordinates change; audit. |
 | `cancelOrderAction` | ADMIN | `{ orderId, reason }` | Sets `CANCELLED`; refund if paid; audit. |
 | `adminCompleteOrderAction` | ADMIN | `{ orderId, reason }` | Overrides PIN; audit + security flag. |
-| `approveRefundAction` | ADMIN | `{ refundId, decision: "APPROVE" \| "REJECT", notes? }` | Sets `refunds.approved_by`, `approved_at`, `approval_notes`; approving moves `REQUESTED` → `PROCESSING`; audit. |
+| `adminRedeliverOrderAction` | ADMIN | `{ orderId, reason, riderId? }` | Calls `admin_redeliver_order`; `DELIVERY_FAILED` only; audited. |
+| `approveRefundAction` | ADMIN | `{ refundId, decision: "APPROVE" \| "REJECT", notes? }` | Calls `admin_approve_refund`; approving moves `REQUESTED` → `PROCESSING`; audit. Gateway refund execution remains a Phase 6 server job. |
 | `reconcileCashAction` | ADMIN | `{ riderId, countedCash, notes }` | Calls `reconcile_rider_cash`; a shortfall produces `PARTIAL` and remains outstanding. |
-| `updateSettingsAction` | ADMIN | `{ freeRadiusKm, ratePerKm, mov, maxRadius, codMaxRadius, packagingFee, isStoreOpen, openingTime, closingTime }` | Validates bounds; audit. |
-| `upsertMenuItemAction` | ADMIN | menu item fields | Image path must exist in storage; slug unique. |
-| `upsertModifierGroupAction` | ADMIN | group + options | Validates min/max. |
-| `upsertComboAction` | ADMIN | combo + steps | Validates steps/options. |
-| `upsertTableAction` | ADMIN | `{ tableNumber, label, isActive }` | Generates QR token. |
-| `updateStaffAction` | ADMIN | `{ profileId, role, active, motorcyclePlate }` | Cannot demote/deactivate last admin (`LAST_ADMIN_PROTECTED`). |
+| `updateSettingsAction` | ADMIN | `{ ...allow-listed settings, reason }` | Calls `admin_update_settings`; validates bounds and writes history + audit. |
+| `upsertMenuItemAction` | ADMIN | `{ ...item fields, reason }` | Calls `admin_upsert_menu_item`; image path must exist in storage; slug unique; audited. |
+| `upsertModifierGroupAction` | ADMIN | `{ ...group + options, reason }` | Calls `admin_upsert_modifier_group`; validates min/max; audited. |
+| `upsertComboAction` | ADMIN | `{ ...combo + steps, reason }` | Calls `admin_upsert_combo`; validates steps/options; audited. |
+| `upsertTableAction` | ADMIN | `{ tableNumber, label, isActive, reason }` | Calls `admin_upsert_table`; generates QR token; audited. |
+| `updateStaffAction` | ADMIN | `{ profileId, role, active, motorcyclePlate, reason }` | Calls `admin_update_staff`; cannot demote/deactivate last admin (`LAST_ADMIN_PROTECTED`); audited. |
 
 ---
 
@@ -241,12 +242,12 @@ export type ApiResponse<T> =
 2. Compare `verif-hash` to `FLW_WEBHOOK_HASH` with `crypto.timingSafeEqual`.
 3. Parse with Zod.
 4. Insert `webhook_events` with `UNIQUE(provider, provider_event_id)`; if duplicate, return 200.
-5. Find order by `tx_ref = order_token`.
+5. Resolve the attempt with `resolve_payment_tx_ref(tx_ref)`. A `tx_ref` maps to exactly one `(order, attempt_number)`. If it does not resolve, record the event and return 200 without a state change.
 6. Verify transaction with Flutterwave `/v3/transactions/{id}/verify`.
-7. Check amount and currency.
+7. Check amount and currency against the resolved attempt.
 8. If order is `CANCELLED`/`DELIVERED`, record and return 200 without state change.
-9. If successful: `payment_status = PAID`, `order_status = PREPARING`, set `acknowledged_at` when not already set, store transaction.
-10. If failed: mark the `payment_transactions` row `FAILED`, record the provider error, and leave the order in `PENDING_PAYMENT` so the customer can retry. A definitive timeout is handled only by `expire_pending_orders()`.
+9. If successful: mark that attempt `SUCCESSFUL`; set `payment_status = PAID`, `order_status = PREPARING`, set `acknowledged_at` when not already set. A later attempt cannot overwrite a paid order.
+10. If failed: mark that attempt `FAILED`, record the provider error, and leave the order in `PENDING_PAYMENT` so the customer can retry. A definitive timeout is handled only by `expire_pending_orders()`. An abandoned attempt's late success never marks the order paid; it is recorded for manual review/refund.
 11. Return 200 quickly; no long work.
 
 **Idempotency:** unique event ID + order status guard.
@@ -289,6 +290,8 @@ All RPCs are `SECURITY DEFINER` with `SET search_path = public, pg_temp`.
 | RPC | Auth | Purpose |
 | :--- | :--- | :--- |
 | `get_order_by_token(p_token uuid)` | anon | Safe customer tracker payload; handover PIN returned only for an active delivery order, never for dine-in/terminal orders. Includes latest refund and delivery-failure summaries. |
+| `start_payment_attempt(p_order_token uuid, p_method public.payment_method, p_provider text)` | anon | Locks the order, abandons any open attempt, allocates the next attempt number, and returns `{ transactionId, txRef, attemptNumber, amount, currency }`. Token is the capability. |
+| `resolve_payment_tx_ref(p_tx_ref text)` | service role | Read-only webhook lookup returning the single transaction/order/attempt bound to a `tx_ref`. |
 | `get_rider_pool()` | RIDER | Safe pool summaries with `readyAt` and `itemCount`; no PII/PIN. |
 | `get_rider_active_order()` | RIDER | Active order details; no PIN. |
 | `claim_order_atomic(p_order_id uuid)` | RIDER | Atomic claim; one active order. |
@@ -299,7 +302,17 @@ All RPCs are `SECURITY DEFINER` with `SET search_path = public, pg_temp`.
 | `admin_complete_order(p_order_id uuid, p_reason text)` | ADMIN | PIN override with audit; accepts `CLAIMED`, `OUT_FOR_DELIVERY`, or `READY_FOR_PICKUP`. |
 | `admin_cancel_order(p_order_id uuid, p_reason text)` | ADMIN | Cancel + refund request if paid. |
 | `admin_reassign_order(p_order_id uuid, p_rider_id uuid, p_reason text)` | ADMIN | Reassign with audit; target must be an active rider with no other active order. |
+| `admin_redeliver_order(p_order_id uuid, p_reason text, p_rider_id uuid)` | ADMIN | `DELIVERY_FAILED` only; clears failure state, returns to `READY_FOR_PICKUP`, or assigns a rider and moves to `CLAIMED` atomically; audited. |
 | `admin_reset_handover_pin(p_order_id uuid, p_reason text)` | ADMIN | New PIN, clear lock, audit; rejected for terminal orders. |
+| `admin_update_settings(p_payload jsonb, p_reason text)` | ADMIN | Allow-listed, bounded settings update; writes `settings_history` and an `ADMIN_UPDATE_SETTINGS` audit row. |
+| `admin_update_order_contact(p_order_id uuid, ...contact/address/fee fields, p_reason text)` | ADMIN | Pre-dispatch contact/address correction; recomputes the generated total from new fee components; audited. |
+| `admin_upsert_category(p_payload jsonb, p_reason text)` | ADMIN | Create/update category; audited. |
+| `admin_upsert_menu_item(p_payload jsonb, p_reason text)` | ADMIN | Create/update item and modifier-group links; audited. |
+| `admin_upsert_modifier_group(p_payload jsonb, p_reason text)` | ADMIN | Create/update group and options; rejects options owned by another group; audited. |
+| `admin_upsert_combo(p_payload jsonb, p_reason text)` | ADMIN | Create/update combo steps/options; audited. |
+| `admin_upsert_table(p_payload jsonb, p_reason text)` | ADMIN | Create/update table and QR token; audited. |
+| `admin_update_staff(p_profile_id uuid, p_role public.user_role, p_is_active boolean, p_motorcycle_plate text, p_reason text)` | ADMIN | Role/active/plate update; last-admin guard; audited. |
+| `admin_approve_refund(p_refund_id uuid, p_decision text, p_notes text)` | ADMIN | `APPROVE` moves `REQUESTED → PROCESSING`; `REJECT` moves `REQUESTED → FAILED`; audited; no gateway call. |
 | `set_kitchen_busy(p_busy boolean, p_buffer_minutes int)` | KITCHEN/ADMIN | Busy mode; audited with reason. |
 | `set_kitchen_paused(p_paused boolean)` | KITCHEN/ADMIN | Pause/resume new-order intake; audited with reason. |
 | `set_menu_item_availability(p_item_id uuid, p_available boolean)` | KITCHEN/ADMIN | 86 toggle; `ITEM_NOT_FOUND` for unknown IDs; audited. |
@@ -358,7 +371,8 @@ NEXT_PUBLIC_APP_URL=
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-STAFF_EMAIL_DOMAIN=staff.bazaareats.com
+STAFF_EMAIL_DOMAIN=staff.moroujmazaar.com
+STAFF_SEED_FILE=scripts/staff.example.json
 FLW_PUBLIC_KEY=
 FLW_SECRET_KEY=
 FLW_WEBHOOK_HASH=
@@ -373,6 +387,7 @@ NEXT_PUBLIC_MAPTILER_KEY=
 OSRM_BASE_URL=
 CRON_SECRET=
 NEXT_PUBLIC_SUPPORT_WHATSAPP=
+SENTRY_DSN=
 ```
 
 All variables are validated at startup by `src/lib/env.ts` with Zod.
@@ -383,6 +398,7 @@ All variables are validated at startup by `src/lib/env.ts` with Zod.
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Replaced `tx_ref = order_token` with per-attempt references, added `start_payment_attempt`/`resolve_payment_tx_ref`/`admin_redeliver_order`, documented the audited admin mutation RPCs, and added `STAFF_SEED_FILE`/`SENTRY_DSN`. |
 | 1.4.0 | 2026-11-12 | Added `max_cart_lines`, `ITEM_NOT_FOUND`, `LAST_ADMIN_PROTECTED`; aligned failed-payment retry semantics, timeout transaction failure, rider pool `readyAt`/`itemCount`, token PIN hiding, ledger linked orders, extended admin payloads, and list/audit/close-shift/refund-approval contracts. |
 | 1.3.0 | 2026-11-10 | Added `KITCHEN_PAUSED`, `setKitchenPausedAction`/`set_kitchen_paused`, and aligned the print route with browser-print HTML. |
 | 1.2.0 | 2026-11-09 | Canonical Flutterwave route, 8.1 km COD ceiling, corrected accept/verify/RPC signatures, admin reset/reassign/refund/analytics entries. |

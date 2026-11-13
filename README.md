@@ -1,10 +1,10 @@
-# MRFSS / PROJECT-BAZAAR-D2C
+# Morouj Mazaar — Bazaar Flame & Grill
 
-Direct-to-consumer ordering, kitchen display, rider dispatch, and cash reconciliation for **Bazaar Flame & Grill** in Kampala, Uganda.
+**Morouj Mazaar** is the product and brand umbrella. **Bazaar Flame & Grill** is the restaurant. **MRFSS** (Morouj Restaurant & Food Service System) is the ordering, kitchen display, rider dispatch, and cash-reconciliation system in this repository.
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.4 + canonical Stitch design package + static interface prototype |
+| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | `USh`, whole integers with thousands separators |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
@@ -23,18 +23,19 @@ The repository currently contains the **specification, database baseline, seed d
 
 ```
 .
-├── docs/                       # normative v1.4 specs, ADRs, audit, test and ops artifacts
+├── docs/                       # normative v1.5 specs, ADRs, audit, test and ops artifacts
 │   └── stitch-design/          # 54 canonical HTML screens, 20 PNG previews, compiled CSS, audit resolution
 ├── site/                       # static customer, kitchen, admin, rider and design-system prototype
 ├── public/                     # PWA manifest, service worker, favicon and placeholder icons
 ├── supabase/
-│   ├── migrations/             # schema + storage migrations
+│   ├── migrations/             # initial → storage → v1.4 remediation → v1.5 remediation (additive only)
 │   ├── seed.sql                # menu, settings, tables
 │   └── config.toml             # local Supabase configuration
 ├── scripts/
 │   ├── seed-staff.mjs          # provisions Supabase Auth staff users
 │   ├── staff.example.json      # template roster (replace PINs)
 │   └── staff.test.json         # test-only roster for CI/E2E
+├── tests/                      # unit, database/RLS, and Playwright E2E suites
 ├── .env.example
 ├── .gitignore
 ├── SECURITY.md
@@ -122,7 +123,7 @@ CI and E2E use `scripts/staff.test.json` with test-only PINs and `must_change_pi
 STAFF_SEED_FILE=scripts/staff.test.json node scripts/seed-staff.mjs
 ```
 
-The script maps each phone number to a synthetic email (`{digits}@staff.bazaareats.com`) and creates a Supabase Auth user whose password is the 6-digit staff PIN. PINs are never stored in `profiles`.
+The script maps each phone number to a synthetic email (`{digits}@staff.moroujmazaar.com`) and creates a Supabase Auth user whose password is the 6-digit staff PIN. PINs are never stored in `profiles`.
 
 ---
 
@@ -145,7 +146,7 @@ The test plan is in [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md). Canonical fixtures
 | :--- | ---: | ---: | ---: |
 | Sarah / Nakasero / prepaid | 1.562 km | 0 | **USh 35,000** |
 | Brian / Ntinda / COD | 8.093 km | 6,000 | **USh 38,000** |
-| Alex / Table 4 / dine-in | 0 | 0 | **USh 8,000** |
+| Alex / Table T4 / dine-in | 0 | 0 | **USh 8,000** |
 
 Do not use retired distances, fees or totals in tests or UI copy. The canonical values above and in [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) are the only approved fixtures.
 

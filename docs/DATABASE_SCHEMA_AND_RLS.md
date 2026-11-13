@@ -3,9 +3,9 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative pointer |
-| **Version** | 1.4.0 |
-| **Date** | 2026-11-12 |
-| **Schema authority** | [`supabase/migrations/20261029000000_initial_schema.sql`](../supabase/migrations/20261029000000_initial_schema.sql) |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
+| **Schema authority** | [`supabase/migrations/`](../supabase/migrations/) — full additive chain, ending at `20261113000000_v1_5_remediation.sql` |
 | **Seed authority** | [`supabase/seed.sql`](../supabase/seed.sql) |
 | **Model reference** | [`ERD.md`](ERD.md) |
 | **RPC/API reference** | [`API_CONTRACTS.md`](API_CONTRACTS.md) |
@@ -24,6 +24,7 @@ The v1.0 SQL with `WITH CHECK (true)`, plaintext PINs, invalid UUID literals, an
 | `20261029000001_storage.sql` | `menu-images` storage bucket and public-read policy |
 | `20261112000000_remediation_enum.sql` | Adds `RETURNED` to `delivery_outcome` |
 | `20261112000001_remediation.sql` | v1.4 schema/RPC/audit remediation (cart-line limit, refund approval, blacklist E.164, last-admin guard, FSM additions, extended payloads, admin list/audit, shift close) |
+| `20261113000000_v1_5_remediation.sql` | v1.5 additive remediation (per-attempt payment `tx_ref`, `start_payment_attempt`, `resolve_payment_tx_ref`, `admin_redeliver_order`, audited admin mutation RPCs, telemetry index) |
 
 Rules:
 
@@ -61,7 +62,7 @@ Rules:
 
 ### 2.4 Payments and refunds
 
-- `payment_transactions`: provider, provider reference, amount, status, raw payload, verification time.
+- `payment_transactions`: order, `attempt_number`, immutable `tx_ref = '<order_token>-<attempt_number>'`, provider, provider reference, amount, status, raw payload, verification time. Unique `(order_id, attempt_number)` and unique `tx_ref`.
 - `webhook_events`: `(provider, provider_event_id)` unique, payload hash, processed time, error text.
 - `refunds`: order, transaction, amount, reason, status, provider reference, initiator, approver fields (`approved_by`, `approved_at`, `approval_notes`), timestamps.
 
@@ -113,6 +114,10 @@ Use the enum values in code generation; do not duplicate string unions in the ap
 - A rider can have at most one open shift (partial unique index).
 - `cash_settlements (rider_id, business_date)` is unique.
 - `webhook_events (provider, provider_event_id)` is unique.
+- `payment_transactions (order_id, attempt_number)` is unique; `payment_transactions.tx_ref` is unique and immutable.
+- `start_payment_attempt` allocates the next attempt under a row lock, marks any open attempt `ABANDONED`, and uses `tx_ref = '<order_token>-<attempt_number>'`; the bare order token is never a provider reference.
+- `resolve_payment_tx_ref(tx_ref)` maps a webhook to exactly one `(order, attempt)` row.
+- `admin_redeliver_order` is allowed only from `DELIVERY_FAILED`, returns the order to `READY_FOR_PICKUP`, clears the rider, and writes an audit row.
 - `checkout_idempotency.key` is unique.
 - Latitude/longitude/heading/accuracy and settings radii have check constraints.
 - Status transitions are guarded by `enforce_order_transition`; order items are immutable after creation.
@@ -146,7 +151,8 @@ See `SECURITY_AND_VERIFICATION_PROTOCOLS.md` §4 for the full boundary.
 | Public/customer | `get_public_settings`, `get_order_by_token`, `get_order_telemetry`, `validate_table_token`, `submit_feedback` |
 | Rider | `get_rider_pool`, `get_rider_active_order`, `claim_order_atomic`, `start_delivery`, `release_order`, `verify_delivery_pin`, `report_delivery_failed`, `update_rider_telemetry`, `start_rider_shift`, `end_rider_shift`, `get_rider_cash_summary` |
 | Kitchen | `get_kitchen_orders`, `accept_order`, `bump_order`, `set_kitchen_busy`, `set_kitchen_paused`, `set_menu_item_availability` |
-| Admin | `admin_get_order`, `admin_list_orders`, `admin_get_audit_feed`, `admin_complete_order`, `admin_cancel_order`, `admin_reassign_order`, `admin_reset_handover_pin`, `reconcile_rider_cash`, `get_admin_ledger`, `get_admin_analytics` |
+| Payment | `start_payment_attempt` (server action/service role), `resolve_payment_tx_ref` (webhook/service role) |
+| Admin | `admin_get_order`, `admin_list_orders`, `admin_get_audit_feed`, `admin_complete_order`, `admin_cancel_order`, `admin_reassign_order`, `admin_redeliver_order`, `admin_reset_handover_pin`, `admin_update_settings`, `admin_update_order_contact`, `admin_upsert_category`, `admin_upsert_menu_item`, `admin_upsert_modifier_group`, `admin_upsert_combo`, `admin_upsert_table`, `admin_update_staff`, `admin_approve_refund`, `reconcile_rider_cash`, `get_admin_ledger`, `get_admin_analytics` |
 | System | `expire_pending_orders`, `close_open_rider_shifts` (cron/service role) |
 
 Exact parameters and payloads are in `API_CONTRACTS.md`.
@@ -170,7 +176,7 @@ Menu images live in the storage bucket `menu-images`; missing images use the loc
 
 ## 8. Local Validation
 
-The full migration chain (`initial_schema`, `storage`, `remediation_enum`, `remediation`) and seed were applied to a fresh PostgreSQL 18 cluster with `ON_ERROR_STOP=1` using minimal Supabase stubs for `auth`/`storage`:
+The full migration chain (`initial_schema`, `storage`, `remediation_enum`, `remediation`, `v1_5_remediation`) and seed were applied to a fresh PostgreSQL 18.4 cluster with `ON_ERROR_STOP=1` using minimal Supabase stubs for `auth`/`storage`:
 
 - all enums, tables, indexes, triggers, RPCs, views, grants, and policies created cleanly;
 - canonical total `35,000` was generated from its components, and a direct write to `total_amount` was rejected;
@@ -182,7 +188,8 @@ The full migration chain (`initial_schema`, `storage`, `remediation_enum`, `reme
 - partial settlement of 60,000 against 65,500 produced `PARTIAL` with a 5,500 carried shortfall; ledger linked both orders;
 - `expire_pending_orders` cancelled the timed-out order, set `payment_status = FAILED`, and failed its transaction;
 - `close_open_rider_shifts` closed the open shift;
-- blacklist normalization/E.164, last-admin protection, `ITEM_NOT_FOUND`, and terminal PIN-reset rejection passed.
+- blacklist normalization/E.164, last-admin protection, `ITEM_NOT_FOUND`, and terminal PIN-reset rejection passed;
+- v1.5 smoke tests passed: `start_payment_attempt` allocated `-1` then `-2`, abandoned the first attempt, and rejected a duplicate attempt; `resolve_payment_tx_ref` resolved one attempt and returned null for an unknown reference; `admin_redeliver_order` moved `DELIVERY_FAILED → READY_FOR_PICKUP`, cleared the rider, and wrote an audit row; the audited admin mutation RPCs rejected non-admin callers; the `rider_telemetry(order_id)` index exists.
 
 Re-run locally with the Supabase CLI:
 
@@ -200,8 +207,9 @@ Do not run a production build as part of documentation validation.
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
-| 1.0.0 | 2026-10-29 | Unsafe draft schema. |
-| 1.1.0 | 2026-10-29 | Amendment banner only; stale SQL retained. |
+| 1.5.0 | 2026-11-13 | Added the v1.5 additive migration, per-attempt payment references/`tx_ref` uniqueness, `start_payment_attempt`/`resolve_payment_tx_ref`, `admin_redeliver_order`, audited admin mutation RPCs, and PostgreSQL 18.4 validation evidence. |
 | 1.4.0 | 2026-11-12 | Added remediation migrations, cart-line limit, refund approval fields, blacklist E.164, last-admin guard, FSM additions, and admin list/audit/shift RPCs. |
 | 1.3.0 | 2026-11-10 | Documented `ready_at`, kitchen intake pause, and the `set_kitchen_paused` RPC. |
 | 1.2.0 | 2026-11-09 | Removed duplicate/unsafe SQL and invalid UUIDs; migration is the sole schema authority. |
+| 1.1.0 | 2026-10-29 | Amendment banner only; stale SQL retained. |
+| 1.0.0 | 2026-10-29 | Unsafe draft schema. |

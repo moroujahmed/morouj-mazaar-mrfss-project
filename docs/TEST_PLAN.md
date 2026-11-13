@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative; executable test authority |
-| **Version** | 1.4.0 |
-| **Date** | 2026-11-12 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Canonical data** | `CANONICAL_EXAMPLES.md` |
 | **Test runner** | Vitest (unit/integration), Playwright (E2E), axe-core (a11y), k6 (load, optional) |
 
@@ -185,6 +185,15 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 - `blacklisted_phones.phone` is normalized to E.164 on write and rejects invalid input.
 - `app_settings.max_cart_lines` defaults to 30 and is exposed by `get_public_settings`.
 
+### 3.5 Payment attempts
+
+- `start_payment_attempt(order_token, 'mtn_momo', 'flutterwave')` on a fresh prepaid order allocates `attempt_number = 1` and `tx_ref = '<order_token>-1'`.
+- A retry allocates `attempt_number = 2`, `tx_ref = '<order_token>-2'`, and marks the open attempt `ABANDONED`; no `tx_ref` is ever reused.
+- `UNIQUE (order_id, attempt_number)` rejects a duplicate attempt number; `UNIQUE (tx_ref)` rejects a duplicate provider reference.
+- `resolve_payment_tx_ref(tx_ref)` returns exactly one attempt/order pair and returns no row for an unknown reference.
+- A late verified webhook for an abandoned attempt records the event but does not mark the current attempt or order paid.
+- `start_payment_attempt` rejects a cash order with `PAYMENT_METHOD_UNAVAILABLE`, a method mismatch with `VALIDATION_ERROR`, and any state other than `PENDING_PAYMENT`/`PENDING` with `ORDER_STATE_INVALID`.
+
 ---
 
 ## 4. E2E scenarios (Playwright)
@@ -214,8 +223,8 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 1. Scan table T4 QR (`88888888-8888-4888-8888-888888888804`).
 2. Add Special Bazaar Rolex (8,000).
 3. Assert MOV bypassed, packaging **0**, delivery **0**, total **8,000**.
-4. Pay Airtel Money; kitchen accept/bump.
-5. Assert `DELIVERED`; order never appears in rider pool; no handover PIN gate.
+4. Pay Airtel Money; the verified webhook moves the order to `PREPARING` (prepaid dine-in does not need kitchen acceptance).
+5. Kitchen bumps to `DELIVERED`; assert the final state; order never appears in the rider pool; no handover PIN gate.
 
 ### Scenario D — 86'd item and busy mode
 
@@ -270,6 +279,8 @@ Exactly one returns `CLAIMED`; the other returns `ORDER_ALREADY_CLAIMED`. The `o
 3. The old rider's active order disappears; the new rider sees it.
 4. Admin list/search finds the order, and the audit feed contains the reassignment reason and actor.
 5. Reassigning to a rider who already has an active order returns `RIDER_HAS_ACTIVE_ORDER`.
+6. A second delivery is reported `DELIVERY_FAILED`; admin redelivers it with a reason, which returns it to `READY_FOR_PICKUP` and clears the rider assignment.
+7. The returned order re-enters the pool, can be claimed again, and the redelivery reason/actor appear in the audit feed.
 
 ### Scenario K — Cart limits and COD change
 1. Add 30 distinct lines; the cart accepts them. Adding a 31st is blocked.
@@ -462,6 +473,7 @@ A PR cannot merge if any gate fails. `test:db` and `test:e2e` require a migrated
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added payment-attempt tests (`start_payment_attempt`/`resolve_payment_tx_ref`, unique `(order_id, attempt_number)`/`tx_ref`, late-webhook isolation), added admin redelivery coverage to Scenario J, and corrected Scenario C so prepaid dine-in arrives `PREPARING` without kitchen acceptance. |
 | 1.4.0 | 2026-11-12 | Added cart-line, COD-change, admin reassignment/audit, blacklist, last-admin, and partial-settlement shortfall tests; aligned FSM terminal states and wrong-rider error. |
 | 1.3.0 | 2026-11-10 | Added missing Scenarios H (payment retry) and I (store closed/kitchen paused); aligned exit criteria to A–I. |
 | 1.2.0 | 2026-11-09 | Rewritten with corrected fixtures, A–G scenarios, RLS matrix, and runnable Playwright blueprint. |

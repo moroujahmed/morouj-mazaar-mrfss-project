@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.2 |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Status** | Normative v1.5 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Owner** | Engineering |
 | **Related** | `TECH_STACK_AND_CONVENTIONS.md`, `ACCESSIBILITY.md`, `OPERATIONS_RUNBOOK.md` §7 |
 
@@ -97,4 +97,5 @@ Accessibility checks (axe + keyboard + screen reader) follow [`ACCESSIBILITY.md`
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Aligned the support matrix to v1.5; no browser or device requirement changed. |
 | 1.2.0 | 2026-11-09 | Created; closes the P2 browser/device/performance-method gaps. |
