@@ -6,6 +6,25 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation — Phase 1: Project foundation (2026-11-15)
+
+### Added
+
+- Pinned application scaffold: Next.js `15.5.29`, React `19.2.0`, TypeScript `5.9.3`, Tailwind CSS `3.4.19`, Supabase clients, Zod, Zustand, Leaflet, and the approved utility libraries.
+- `next.config.mjs` security headers and CSP from `SPEC_AMENDMENTS.md` §4.2; `unsafe-eval` is development-only.
+- `src/lib/env.ts` with fail-closed Zod validation (including mock/live payment and production OSRM/Upstash/cron requirements) plus `src/lib/public-env.ts` for browser-safe values.
+- `src/lib/currency.ts` (integer UGX, canonical delivery-fee formula), `src/lib/time.ts` (`Africa/Kampala`), and `src/lib/utils.ts` (`cn`).
+- v2 green/orange Tailwind tokens and accessible base styles.
+- Vitest unit tests for environment validation, delivery fees, currency formatting, and EAT date rollover.
+- GitHub Actions CI (`npm ci`, lint, typecheck, unit, build) and weekly grouped Dependabot updates.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm run test` (15 tests), and `npm run build` pass.
+- The production client bundle contains no service-role key, provider secret, or cron secret identifiers.
+
+---
+
 ## [1.5.0] — 2026-11-13
 
 ### Added

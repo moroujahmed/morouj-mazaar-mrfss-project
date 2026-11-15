@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --green-800: #173f35;
+  --green-900: #102e27;
+  --green-700: #1d4f42;
+  --green-50: #f2f7f5;
+  --green-100: #e3eeea;
+  --orange-500: #f28c28;
+  --orange-700: #a65a0f;
+  --red-600: #c62828;
+  --success-700: #17603f;
+  --warning-700: #8a4b00;
+  --surface: #ffffff;
+  --surface-inset: #f2f4f3;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface-inset text-ink antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-[3px] ring-green-800 ring-offset-2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
