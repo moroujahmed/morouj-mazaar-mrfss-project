@@ -43,6 +43,40 @@ test.describe("accessibility", () => {
     await assertNoBlockingViolations(page, "design system");
   });
 
+  test("storefront item sheet has no critical or serious violations", async ({
+    page,
+  }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await page
+      .getByRole("button", {
+        name: "Customize Whole Tilapia Flame Combo",
+      })
+      .click();
+
+    const dialog = page.getByRole("dialog", {
+      name: "Whole Tilapia Flame Combo",
+    });
+    await expect(dialog).toBeVisible();
+    await assertNoBlockingViolations(page, "storefront item sheet");
+  });
+
+  test("storefront cart sheet has no critical or serious violations", async ({
+    page,
+  }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await page
+      .getByRole("button", { name: "Add Mineral Water (500 ml) to cart" })
+      .click();
+
+    const dock = page.getByRole("button", { name: /View cart:/ });
+    await dock.focus();
+    await page.keyboard.press("Enter");
+
+    const dialog = page.getByRole("dialog", { name: "Your cart" });
+    await expect(dialog).toBeVisible();
+    await assertNoBlockingViolations(page, "storefront cart sheet");
+  });
+
   test("open sheet is labelled and Escape closes it", async ({ page }) => {
     await page.goto("/design-system", { waitUntil: "networkidle" });
 

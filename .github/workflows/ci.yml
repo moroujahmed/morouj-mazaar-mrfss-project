@@ -51,7 +51,7 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
 
   a11y:
-    name: Accessibility (axe)
+    name: Browser tests (axe + storefront)
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -70,7 +70,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Build and run axe scans
-        run: npm run test:a11y
+      - name: Build and run browser tests
+        run: npm run test:e2e
         env:
           NEXT_TELEMETRY_DISABLED: "1"

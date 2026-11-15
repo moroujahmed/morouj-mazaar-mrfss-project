@@ -6,6 +6,29 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation — Phase 4: Storefront, menu, and cart (2026-11-15)
+
+### Added
+
+- Server-only storefront data loader (`src/lib/storefront/menu.ts`) reading `get_public_settings()` plus active categories, items, modifier links/groups/options, and combo steps/options through anon RLS; malformed settings or any query error fail closed to an unavailable screen.
+- Domain builders in `src/lib/storefront/build.ts` and Zod settings validation in `settings.ts`; database enums are mapped without trusting client input.
+- Canonical test fixture (`fixture.ts`, `STOREFRONT_FIXTURE=1` only) mirroring `supabase/seed.sql` prices, modifier deltas, combo steps, and app settings, with a pinned mid-service clock so opening-hours checks stay deterministic.
+- Zustand cart store (`src/hooks/use-cart.ts`) with `persist` + `skipHydration`, explicit client rehydration, limit-enforcing add/update/remove/clear, and reconciliation against the freshly fetched menu.
+- Cart domain rules in `src/lib/storefront/cart.ts` and `selection.ts`: stable line keys, item/modifier/combo pricing, subtotal excluding fees, selection min/max validation, `max_cart_lines`/`max_item_quantity`/`max_cart_value`, combo defaults, and repricing of base, modifier, and combo-option deltas.
+- Storefront UI in `src/components/storefront/`: restaurant header with search and store status, horizontally scrollable category pills, dish cards with sold-out badges, bottom-sheet customization with keyboard-operable radio/checkbox controls and quantity stepper, sticky cart dock, cart sheet with per-line quantity/removal, and empty, sold-out, store-closed, kitchen-paused, and menu-unavailable states.
+- Home route moved to `src/app/(storefront)/page.tsx` with `dynamic = "force-dynamic"`; the old `src/app/page.tsx` was removed.
+- Unit coverage (`tests/unit/cart.test.ts`, `tests/unit/store-status.test.ts`) for the canonical 32,000 + 2,000 = 34,000 subtotal, quantity multiplication, limits, modifier/combo validation, price/availability reconciliation, and Kampala business hours.
+- Playwright storefront coverage (`tests/e2e/storefront.spec.ts`) for canonical prices, search/category filtering, keyboard-only combo customization, Escape focus restoration, and cart persistence, plus item-sheet and cart-sheet axe scans.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm run test` (56 tests), `npm run test:tokens`, `npm run test:contrast`, and `npm run build` pass.
+- `npm run test:e2e` passes 11 Chromium tests: six axe checks (zero critical/serious violations) and five storefront flows, including the canonical USh 34,000 line and USh 68,000 doubled subtotal.
+- Storefront prices, modifier deltas, combo options, and limits come from the server-rendered menu; persisted cart lines are repriced and flagged unavailable rather than trusted.
+- No Supabase secret identifiers appear in the client bundle; the browser suite uses only the explicit fixture branch.
+
+---
+
 ## Implementation — Phase 3: Design tokens and UI kit (2026-11-15)
 
 ### Added
