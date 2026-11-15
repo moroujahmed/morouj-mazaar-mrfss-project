@@ -2,9 +2,9 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative v1.2 |
-| **Version** | 1.2.0 |
-| **Date** | 2026-11-09 |
+| **Status** | Normative v1.5 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Related** | `API_CONTRACTS.md`, `STATE_MACHINES_AND_BUSINESS_RULES.md`, migration RPCs |
 
 These diagrams close the P2 “no sequence diagrams” finding. Mermaid renders on GitHub and in most Markdown viewers. The diagrams are explanatory; the RPC signatures and state transitions in the migration/API contracts remain authoritative.
@@ -27,11 +27,13 @@ sequenceDiagram
     UI->>API: createOrder(payload, idempotencyKey)
     API->>DB: validate store hours, MOV, OSRM distance, menu
     API->>DB: insert order (PENDING_PAYMENT) + order_items
-    API->>FLW: POST /v3/payments (tx_ref = order_token)
+    API->>DB: start_payment_attempt() → attempt N, tx_ref = '<order_token>-<N>'
+    API->>FLW: POST /v3/payments (tx_ref = order_token-N)
     FLW-->>C: Hosted checkout
     C->>FLW: Pay with MoMo/card
-    FLW->>API: POST /api/webhooks/flutterwave (verif-hash)
+    FLW->>API: POST /api/webhooks/flutterwave (verif-hash, tx_ref)
     API->>API: timing-safe hash check
+    API->>DB: resolve_payment_tx_ref(tx_ref) → one order + attempt
     API->>FLW: GET /v3/transactions/{id}/verify
     FLW-->>API: verified transaction
     API->>DB: insert payment_transactions + webhook_events (idempotent)
@@ -45,6 +47,7 @@ Rules:
 - A redirect alone never marks an order paid.
 - A replayed webhook is acknowledged but does not double-apply.
 - If verification fails, the order stays `PENDING_PAYMENT`; support investigates.
+- A retry calls `start_payment_attempt` again, abandons the prior open attempt, and uses a new `tx_ref`; a late webhook for the abandoned attempt is recorded but does not mark the current attempt paid.
 - Prepaid orders enter `PREPARING` directly; the kitchen does not “accept” them.
 
 ---
@@ -262,4 +265,5 @@ Rules:
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Updated the prepaid sequence to per-attempt `tx_ref`/`resolve_payment_tx_ref` and documented abandoned-attempt isolation. |
 | 1.2.0 | 2026-11-09 | Created; closes the P2 “no sequence diagrams” finding. |

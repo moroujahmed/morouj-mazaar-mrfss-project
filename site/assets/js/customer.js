@@ -181,7 +181,7 @@
   const areas = {
     nakasero: { label: "Nakasero", distance: "1.562 km", fee: 0, packaging: 1000 },
     ntinda: { label: "Ntinda", distance: "8.093 km", fee: 6000, packaging: 1000 },
-    table4: { label: "Dine-in · Table 4", distance: "0 km", fee: 0, packaging: 0 }
+    table4: { label: "Dine-in · Table T4", distance: "0 km", fee: 0, packaging: 0 }
   };
 
   const paymentLabels = {
@@ -1124,7 +1124,7 @@
       phone: els.customerPhone ? els.customerPhone.value.trim() : "+256 772 000 111",
       area: selectedArea,
       areaLabel: t.area.label,
-      address: selectedArea === "table4" ? "Table 4, Bazaar Flame & Grill" : (els.customerAddress ? els.customerAddress.value.trim() : "Plot 14 Lumumba Avenue"),
+      address: selectedArea === "table4" ? "Table T4, Bazaar Flame & Grill" : (els.customerAddress ? els.customerAddress.value.trim() : "Plot 14 Lumumba Avenue"),
       notes,
       distance: t.area.distance,
       items: cart.map(function (line) {
@@ -1165,7 +1165,7 @@
     { label: "Confirmed", icon: "check-circle", title: "Kitchen confirmed", sub: "Your order is in the queue" },
     { label: "Cooking", icon: "flame", title: "Cooking", sub: "Chef Moses is preparing your food" },
     { label: "Ready", icon: "utensils", title: "Ready to serve", sub: "A server is bringing it to your table" },
-    { label: "Served", icon: "home", title: "Served", sub: "Enjoy your meal at Table 4" }
+    { label: "Served", icon: "home", title: "Served", sub: "Enjoy your meal at Table T4" }
   ];
 
   function getOrder() {
@@ -1202,7 +1202,7 @@
     if (els.trackTitle) els.trackTitle.textContent = "Order #" + current.id;
     if (els.trackSubtitle) {
       els.trackSubtitle.textContent =
-        (dineIn ? "Dine-in · Table 4" : "Delivery to " + current.areaLabel) +
+        (dineIn ? "Dine-in · Table T4" : "Delivery to " + current.areaLabel) +
         " · " + current.paymentLabel + (current.payment === "cod" ? " · pay on delivery" : " · paid");
     }
 
@@ -1251,7 +1251,7 @@
       else els.trackEta.textContent = dineIn ? "12–18 min" : "13:15 EAT";
     }
     if (els.etaSub) {
-      if (orderStatus >= 4) els.etaSub.textContent = dineIn ? "Enjoy your meal at Table 4" : "Handed over with PIN · Thank you";
+      if (orderStatus >= 4) els.etaSub.textContent = dineIn ? "Enjoy your meal at Table T4" : "Handed over with PIN · Thank you";
       else if (orderStatus === 3) els.etaSub.textContent = dineIn ? "A server is bringing your food" : "18 minutes remaining · 1.2 km away";
       else els.etaSub.textContent = "The kitchen is preparing your order";
     }

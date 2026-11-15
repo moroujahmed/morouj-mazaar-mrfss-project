@@ -6,6 +6,39 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## [1.5.0] — 2026-11-13
+
+### Added
+
+- `20261113000000_v1_5_remediation.sql` adds per-attempt payment references (`payment_transactions.attempt_number`, immutable `tx_ref = '<order_token>-<attempt_number>'`, unique `(order_id, attempt_number)` and unique `tx_ref`), with a legacy backfill.
+- `start_payment_attempt(uuid, payment_method, text)` allocates the next attempt under a row lock and abandons the previous open attempt; `resolve_payment_tx_ref(text)` returns exactly one order/attempt for webhook handling.
+- `admin_redeliver_order(uuid, text, uuid)` returns a `DELIVERY_FAILED` order to `READY_FOR_PICKUP`, clears the rider, and writes an audit row.
+- Audited admin mutation RPCs: `admin_update_settings`, `admin_update_order_contact`, `admin_upsert_category`, `admin_upsert_menu_item`, `admin_upsert_modifier_group`, `admin_upsert_combo`, `admin_upsert_table`, `admin_update_staff`, and `admin_approve_refund`.
+- `rider_telemetry(order_id)` partial index for tracker reads.
+- Scenarios J (admin reassignment/redelivery/audit) and K (cart limits/COD change) in the persona narratives; payment-attempt tests in `TEST_PLAN.md`.
+- `SENTRY_DSN` and an explicit `STAFF_SEED_FILE` in `.env.example`; `docs/` and `tests/` in the repository manifest.
+
+### Changed
+
+- Every retry gets a new `tx_ref`; a late webhook for an abandoned attempt can no longer mark the current attempt or order paid.
+- Staff synthetic email domain changed to `staff.moroujmazaar.com`.
+- Canonical dine-in table label is `Table T4`; seed label is `Food Court Table T4`.
+- Brand hierarchy made explicit: Morouj Mazaar (umbrella) → Bazaar Flame & Grill (restaurant) → MRFSS (system).
+- All normative documents and the audit report advanced to v1.5.0; go-live acceptance is Scenarios A–K.
+
+### Fixed
+
+- `TEST_PLAN.md` Scenario C no longer asks the kitchen to “accept” prepaid dine-in; verified payment enters `PREPARING`.
+- `SEQUENCE_DIAGRAMS.md` and `INTEGRATIONS_AND_HARDWARE_APIS.md` now use the per-attempt `tx_ref` instead of `tx_ref = order_token`.
+- `OPERATIONS_RUNBOOK.md` and `STEP_BY_STEP_IMPLEMENTATION_PLAN.md` now reference Scenarios A–K.
+- `TECH_STACK_AND_CONVENTIONS.md` no longer lists the retired `staff.bazaareats.com` domain.
+
+### Removed
+
+- No files deleted.
+
+---
+
 ## [1.4.0] — 2026-11-12
 
 ### Added

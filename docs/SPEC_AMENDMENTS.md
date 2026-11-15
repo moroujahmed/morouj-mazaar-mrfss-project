@@ -1,13 +1,13 @@
-# SPEC AMENDMENTS — v1.2 Reconciliation and Amendment Register
+# SPEC AMENDMENTS — v1.5 Reconciliation and Amendment Register
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Normative closure record. All catalogued v1.0 documents have been rewritten to v1.2. |
-| **Version** | 1.4.0 |
-| **Date** | 2026-11-12 |
+| **Status** | Normative closure record. All catalogued v1.0 documents have been rewritten through v1.5. |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Precedence** | `DECISIONS.md` → `CANONICAL_EXAMPLES.md` → `DESIGN_SYSTEM_V2.md` / `ACCESSIBILITY.md` / `API_CONTRACTS.md` / `ERD.md` → this file → historical v1.0 text in `AUDIT_REPORT.md` |
 
-This file records how each audit finding was closed and the technical amendments that remain binding. The v1.2 documents are now the build contract; the original v1.0 wording is historical context only and is not authoritative where it conflicts with v1.2.
+This file records how each audit finding was closed and the technical amendments that remain binding. The v1.5 documents are now the build contract; the original v1.0 wording is historical context only and is not authoritative where it conflicts with v1.5.
 
 ---
 
@@ -30,7 +30,7 @@ This file records how each audit finding was closed and the technical amendments
 
 ## 2. P0 Remediation Matrix
 
-| ID | Original finding | v1.2 resolution | Evidence artifact | Status |
+| ID | Original finding | Resolution (v1.2 → v1.5) | Evidence artifact | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | P0-01 | Auth model incompatible with RLS | Supabase Auth for all staff; synthetic email + 6-digit PIN as password; customer remains token-based. No `profiles.pin_code`. | `DECISIONS.md` ADR-001; migration `profiles`; `API_CONTRACTS.md` §2.5–2.6; `scripts/seed-staff.mjs` | **Resolved** |
 | P0-02 | Unsafe RLS and public order inserts | Deny-by-default RLS; no direct anon/authenticated access to orders/PIN/telemetry; all reads/writes through RPCs or service-role server actions; column grants revoked; helper functions `SECURITY DEFINER` with `search_path`. | Migration §19–21; smoke tests in §6; `ERD.md` §5 | **Resolved** |
@@ -50,7 +50,7 @@ This file records how each audit finding was closed and the technical amendments
 
 Status meanings:
 
-- **Resolved** — the v1.2 specification/schema now answers the finding.
+- **Resolved** — the v1.5 specification/schema now answers the finding.
 - **Contracted** — the behavior is fully specified, but code must implement it in the named phase.
 - **Founder input** — blocked on a business decision or credential.
 
@@ -105,7 +105,7 @@ Status meanings:
 | P1-47 | Staff provisioned before profiles; seed script | `scripts/seed-staff.mjs` | Resolved |
 | P1-48 | Local Supabase config + reset/seed workflow | `supabase/config.toml`; `README.md` | Resolved |
 | P1-49 | Playwright plan rewritten with fixtures/storage states/auth | `TEST_PLAN.md` §6 | Resolved |
-| P1-50 | Scenarios A–I + unit tests for fee/MOV/FSM | `TEST_PLAN.md` §3–§4; `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` | Resolved |
+| P1-50 | Scenarios A–K + unit tests for fee/MOV/FSM/payment attempts | `TEST_PLAN.md` §3–§4; `TESTING_PERSONAS_AND_E2E_SCENARIOS.md` | Resolved |
 
 ---
 
@@ -223,7 +223,7 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - `app_settings.is_kitchen_paused` plus `set_kitchen_paused(boolean)` make `KITCHEN_PAUSED` a real checkout gate; existing orders continue through the FSM.
 - `total_amount` is documented and implemented as a PostgreSQL generated column, not a trigger-maintained field.
 - `blacklisted_phones` uses `phone`, `reason`, `created_by`, and `created_at`, matching the migration.
-- Test scenarios are A–I in `TEST_PLAN.md`; §2.8 covers store/kitchen availability.
+- Test scenarios are A–K in `TEST_PLAN.md`; §2.8 covers store/kitchen availability.
 - Printing is browser-print HTML at `GET /api/print/receipt/[orderId]`; ESC/POS remains deferred.
 
 ### 4.13 v1.4 remediation corrections
@@ -238,6 +238,17 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 - `verify_delivery_pin` returns `AUTH_UNAUTHORIZED` for another rider; terminal orders hide the PIN.
 - Partial settlements carry their shortfall forward in `get_rider_cash_summary`.
 - Test scenarios are A–K; the toast primitive is a local live region, not a library decision.
+
+### 4.14 v1.5 remediation corrections
+
+- `payment_transactions` gains `attempt_number` and an immutable per-attempt `tx_ref = '<order_token>-<attempt_number>'`; unique `(order_id, attempt_number)` and unique `tx_ref` prevent ambiguous webhooks.
+- `start_payment_attempt(order_token, method, provider)` allocates the next attempt under a row lock and abandons the open attempt; `resolve_payment_tx_ref(tx_ref)` returns exactly one order/attempt. The bare order token is never a provider reference.
+- `admin_redeliver_order(order_id, reason, actor)` is allowed only from `DELIVERY_FAILED`, returns the order to `READY_FOR_PICKUP`, clears the rider, and writes an audit row.
+- `admin_update_settings`, `admin_update_order_contact`, `admin_upsert_category`, `admin_upsert_menu_item`, `admin_upsert_modifier_group`, `admin_upsert_combo`, `admin_upsert_table`, `admin_update_staff`, and `admin_approve_refund` are the audited admin mutation surface; the application does not write audit rows from the browser.
+- `rider_telemetry(order_id)` partial index supports tracker reads without scanning the full table.
+- Staff synthetic emails use `staff.moroujmazaar.com`; the brand hierarchy is Morouj Mazaar → Bazaar Flame & Grill → MRFSS.
+- The canonical dine-in table is `Table T4`; `supabase/seed.sql` labels it `Food Court Table T4`.
+- Test scenarios are A–K; §3.5 covers payment attempts and Scenario J covers redelivery.
 
 ---
 
@@ -256,8 +267,9 @@ Tighten `script-src` with nonces once the app shell is stable. Do not ship `unsa
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added §4.14 (per-attempt payments, redelivery, audited admin RPCs, telemetry index, staff domain, `Table T4`) and advanced the closure register to v1.5/Scenarios A–K. |
 | 1.4.0 | 2026-11-12 | Added §4.13 remediation register and resolved the toast primitive decision. |
 | 1.3.0 | 2026-11-10 | Added §4.12 for `ready_at`, kitchen pause, generated totals, blacklist columns, A–I tests, and browser-print. |
 | 1.2.0 | 2026-11-09 | Rewritten as the v1.2 closure register: corrected P0-09 palette, added P0-11 COD radius, added design-system and kitchen-portal amendments, scenarios A–I. |
-| 1.1.0 | 2026-10-29 | Created; closes P0/P1 specification gaps and records technical amendments. |
 | 1.1.1 | 2026-11-07 | Aligns the COD radius ceiling to 8.1 km so the canonical 8.093 km Ntinda COD fixture is valid. |
+| 1.1.0 | 2026-10-29 | Created; closes P0/P1 specification gaps and records technical amendments. |

@@ -1,21 +1,21 @@
-# PROJECT AUDIT REPORT — MRFSS / `PROJECT-BAZAAR-D2C`
+# PROJECT AUDIT REPORT — Morouj Mazaar / MRFSS
 
 | Field | Value |
 | :--- | :--- |
-| **Audit date** | 2026-10-29 (v1.0); 2026-11-09 (v1.2 reconciliation); 2026-11-10 (v1.3 build-readiness reconciliation); 2026-11-12 (v1.4 remediation) |
+| **Audit date** | 2026-10-29 (v1.0); 2026-11-09 (v1.2 reconciliation); 2026-11-10 (v1.3 build-readiness reconciliation); 2026-11-12 (v1.4 remediation); 2026-11-13 (v1.5 payment/redelivery/audit remediation) |
 | **Repository** | `morouj-mazaar-mrfss-project` |
-| **Scope** | v1.0 audit of the original 10 documents, v1.1 specification remediation, v1.2 reconciliation, v1.3 end-to-end document/schema/API/test/design consistency pass, and v1.4 schema/API/prototype remediation |
+| **Scope** | v1.0 audit of the original 10 documents, v1.1 specification remediation, v1.2 reconciliation, v1.3 end-to-end document/schema/API/test/design consistency pass, v1.4 schema/API/prototype remediation, and v1.5 payment-attempt/redelivery/audited-admin remediation |
 | **Auditor** | Big Pickle (OpenCode coding agent) |
-| **Document status** | v1.4 — all fixable P0/P1/P2 findings closed; launch gated by founder inputs in §12 |
+| **Document status** | v1.5 — all fixable P0/P1/P2 findings closed; launch gated by founder inputs in §12 |
 | **Code present** | No application code. Schema, migrations, seed, config, scripts, docs, PWA assets, and the static `site/` prototype are present. |
 
-> **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1; the authoritative founder action register is §12; every file created or changed in v1.2 is in §13, and the v1.3 reconciliation is recorded in §13.8. Where historical text quotes retired numbers, it is evidence, not a current contract. The normative numbers live in `CANONICAL_EXAMPLES.md`; the normative visual language lives in `DESIGN_SYSTEM_V2.md` and `ACCESSIBILITY.md`.
+> **Version note.** §§2–11 and Appendices A–D preserve the original v1.0 audit as historical evidence. The current verdict is §1; the authoritative founder action register is §12; every file created or changed in v1.2 is in §13, with v1.3 in §13.8, v1.4 in §13.10, and v1.5 in §13.12. Where historical text quotes retired numbers, it is evidence, not a current contract. The normative numbers live in `CANONICAL_EXAMPLES.md`; the normative visual language lives in `DESIGN_SYSTEM_V2.md` and `ACCESSIBILITY.md`.
 
 ---
 
 ## 1. Executive Verdict
 
-### 1.1 v1.2 reconciliation verdict (current)
+### 1.1 v1.5 build-readiness verdict (current)
 
 The v1.0 documentation was **well above average** in product thinking, UX detail, business-rule clarity, and security intent. It was nevertheless **not build-ready**: it contained 10 P0 blockers and 50 P1 findings, including contradictions between authentication and RLS, unsafe public order access, a non-durable handover-PIN gate, a cash ledger that could not close, incorrect payment contracts, wrong distance/total fixtures, invalid seed UUIDs, and a false accessibility claim.
 
@@ -44,29 +44,31 @@ The v1.2 baseline now:
 
 **v1.4 correction:** the remediation migrations close the remaining schema/API gaps found in the v1.4 pass: `RETURNED` outcome, cart-line limit, refund approval fields, audit reasons, blacklist E.164, last-admin protection, FSM recovery transitions, deterministic timestamps, extended rider/customer/kitchen/admin/ledger payloads, admin list/audit/close-shift RPCs, and explicit grants. The static prototype, PWA shell, staff test seed, and all affected normative docs were aligned to the canonical fixtures.
 
-No application code, dependency installation, or production build was performed. Validation included static checks (`node --check`), repository scans, link verification, and a fresh PostgreSQL 18 application of the full migration chain and seed plus targeted smoke tests for the v1.4 schema changes.
+**v1.5 correction:** the additive v1.5 migration closes the remaining payment-lifecycle and admin-recovery gaps: per-attempt `tx_ref` (`<order_token>-<attempt_number>`) with unique `(order_id, attempt_number)`/`tx_ref`, `start_payment_attempt`/`resolve_payment_tx_ref`, `admin_redeliver_order`, audited admin mutation RPCs, and a `rider_telemetry(order_id)` index. The synthetic staff domain is now `staff.moroujmazaar.com`, the dine-in table is canonically `Table T4`, and every normative document was advanced to v1.5.0 with Scenarios A–K.
 
-**Build-readiness score: 9.5/10 — conditional.**
+No application code, dependency installation, or production build was performed. Validation included static checks (`node --check`), repository scans, local-link verification, and a fresh PostgreSQL 18.4 application of the full migration chain and seed plus targeted smoke tests for the v1.4 and v1.5 schema changes.
+
+**Build-readiness score: 9.7/10 — conditional.**
 
 The remaining 0.5 is **implementation and founder input**, not specification ambiguity: there is no Next.js application yet, no production credentials, no on-site verified coordinates, no approved menu/staff data, and no completed legal review. A competent team can start Phase 1 immediately without re-deciding the architecture, but checkout, payments, and launch cannot go live until §12 is closed.
 
 ### 1.2 Current scorecard
 
-| Area | v1.0 | v1.1 | v1.2 | Evidence |
-| :--- | :---: | :---: | :---: | :--- |
-| Product vision & scope | 9/10 | 9/10 | 9/10 | `SYSTEM_OVERVIEW.md` + `DECISIONS.md`; scope is explicit and bounded. |
-| UX & visual specification | 8/10 | 9/10 | 10/10 | `PORTALS_AND_UX_SPECIFICATION.md`, `DESIGN_SYSTEM_V2.md`, `ACCESSIBILITY.md`; four portals and one palette. |
-| Business rules & FSM | 7/10 | 9/10 | 10/10 | `ERD.md` §4, `CANONICAL_EXAMPLES.md`, migration triggers/RPCs. |
-| Data model | 4/10 | 9/10 | 9/10 | `ERD.md` + validated migration + seed; all promised entities modeled. |
-| Security design | 3/10 | 9/10 | 9/10 | Deny-by-default RLS, token-scoped RPCs, durable PIN state, audit tables. |
-| Integration specifications | 4/10 | 9/10 | 9/10 | `API_CONTRACTS.md` + `DECISIONS.md` ADR-002/003/004/005/007. |
-| Test specification | 3/10 | 9/10 | 9/10 | `TEST_PLAN.md`; corrected fixtures, scenarios A–I, RLS matrix, Playwright blueprint. |
-| Documentation traceability | 5/10 | 9/10 | 10/10 | `SPEC_AMENDMENTS.md`, `CHANGELOG.md`, amendment banners, §13 change log. |
-| Operations & compliance | 2/10 | 8/10 | 8/10 | `OPERATIONS_RUNBOOK.md` + `COMPLIANCE_AND_LEGAL.md`; legal review open. |
-| **Specification / build readiness** | **2/10** | **9/10 (conditional)** | **9.5/10 (conditional)** | **Build can start; founder gates remain.** |
-| **Launch readiness** | n/a | **4/10** | **4/10** | Credentials, verified data, legal review, and live provider certification outstanding. |
+| Area | v1.0 | v1.1 | v1.2 | v1.3 | v1.4 | v1.5 | Evidence |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| Product vision & scope | 9/10 | 9/10 | 9/10 | 9/10 | 9/10 | 9/10 | `SYSTEM_OVERVIEW.md` + `DECISIONS.md`; scope is explicit and bounded. |
+| UX & visual specification | 8/10 | 9/10 | 10/10 | 10/10 | 10/10 | 10/10 | `PORTALS_AND_UX_SPECIFICATION.md`, `DESIGN_SYSTEM_V2.md`, `ACCESSIBILITY.md`; four portals and one palette. |
+| Business rules & FSM | 7/10 | 9/10 | 10/10 | 10/10 | 10/10 | 10/10 | `ERD.md` §4, `CANONICAL_EXAMPLES.md`, migration triggers/RPCs; payment attempts and redelivery included. |
+| Data model | 4/10 | 9/10 | 9/10 | 9/10 | 10/10 | 10/10 | `ERD.md` + validated migration chain + seed; all promised entities modeled. |
+| Security design | 3/10 | 9/10 | 9/10 | 9/10 | 10/10 | 10/10 | Deny-by-default RLS, token-scoped RPCs, durable PIN state, audited admin RPCs. |
+| Integration specifications | 4/10 | 9/10 | 9/10 | 9/10 | 9/10 | 10/10 | `API_CONTRACTS.md` + ADR-002/003/004/005/007; per-attempt `tx_ref`/webhook resolution. |
+| Test specification | 3/10 | 9/10 | 9/10 | 9/10 | 10/10 | 10/10 | `TEST_PLAN.md`; corrected fixtures, scenarios A–K, payment-attempt tests, RLS matrix, Playwright blueprint. |
+| Documentation traceability | 5/10 | 9/10 | 10/10 | 10/10 | 10/10 | 10/10 | `SPEC_AMENDMENTS.md`, `CHANGELOG.md`, amendment banners, §13 change log. |
+| Operations & compliance | 2/10 | 8/10 | 8/10 | 8/10 | 9/10 | 9/10 | `OPERATIONS_RUNBOOK.md` + `COMPLIANCE_AND_LEGAL.md`; legal review open. |
+| **Specification / build readiness** | **2/10** | **9/10 (conditional)** | **9.5/10 (conditional)** | **9.5/10 (conditional)** | **9.5/10 (conditional)** | **9.7/10 (conditional)** | **Build can start; founder gates remain.** |
+| **Launch readiness** | n/a | **4/10** | **4/10** | **4/10** | **4/10** | **4/10** | Credentials, verified data, legal review, and live provider certification outstanding. |
 
-### 1.3 Why 9.5 and not 10
+### 1.3 Why 9.7 and not 10
 
 1. No application code exists yet; Phase 1 scaffolding is the next engineering task.
 2. Production credentials and merchant accounts are not provisioned.
@@ -148,7 +150,7 @@ Status meanings: **Resolved** = the v1.2 specification/schema answers the findin
 | P1-47 | Resolved | Staff provisioned before profiles via `scripts/seed-staff.mjs`. |
 | P1-48 | Resolved | Local Supabase config + reset/seed workflow (`supabase/config.toml`; `README.md`). |
 | P1-49 | Resolved | Playwright plan rewritten with fixtures, storage states, and auth (`TEST_PLAN.md` §6). |
-| P1-50 | Resolved | Scenarios A–I + unit tests for fee/MOV/FSM (`TEST_PLAN.md` §3–§4). |
+| P1-50 | Resolved | Scenarios A–K + unit tests for fee/MOV/FSM/payment attempts (`TEST_PLAN.md` §3–§4). |
 
 **P1 totals:** 34 resolved, 12 contracted (P1-13, P1-16, P1-22, P1-23, P1-24, P1-26, P1-29, P1-34, P1-36, P1-37, P1-39, P1-40), 4 founder input (P1-19, P1-20, P1-21, P1-28).
 
@@ -179,7 +181,7 @@ The v1.0 P2 list was a mixed backlog of documentation drift, schema polish, miss
 - Prototype fixtures now match `CANONICAL_EXAMPLES.md`:
   - Sarah / Nakasero / prepaid: **USh 35,000**.
   - Brian / Ntinda / COD: **USh 38,000**, change due **12,000** on a 50,000 note.
-  - Alex / Table 4 / dine-in: **USh 8,000**.
+  - Alex / Table T4 / dine-in: **USh 8,000**.
   - `#1047` is **USh 27,500 COD** (24,000 Chicken Luwombo + 1,000 extra chilli + 1,000 packaging + 1,500 delivery).
   - Juma's ledger is **USh 65,500** (`#1043` 38,000 + `#1047` 27,500).
 - Rider UI no longer offers a next-job queue; claims are disabled while a delivery is active, matching the one-active-order index.
@@ -1029,7 +1031,7 @@ Rider Juma,+256700111002,RIDER,1234,UFD 342B,true
 
 ```csv
 table_number,label,is_active
-4,Food Court Table 4,true
+T4,Food Court Table T4,true
 ```
 
 **`data/worked_examples.json`**
@@ -1433,23 +1435,24 @@ Historical audit/spec text may quote these as findings. That is not normative. `
 
 ### 13.6 Current status and next actions
 
-- **Specification/build readiness:** 9.5/10 conditional.
+- **Specification/build readiness:** 9.7/10 conditional.
 - **Launch readiness:** 4/10; gated by §12.
 - **Phase 1:** may start now (Next.js scaffold, env wiring, Supabase local project, CI skeleton).
 - **Phase 2:** blocked on F-01/F-02/F-14/F-36–F-40 and the menu/staff data.
 - **Phase 6:** blocked on Flutterwave/Africa's Talking credentials and VAT/EFRIS.
 - **Launch:** blocked on legal review, verified data, live provider certification, and go-live sign-off.
-- **Git:** all v1.2 work is uncommitted in the working tree; nothing has been pushed.
+- **Git:** all v1.2–v1.5 work remains uncommitted in the working tree; nothing has been pushed.
 
 ### 13.7 Revision history
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
-| 1.0.0 | 2026-10-29 | Original audit report (P0/P1/P2 findings). |
-| 1.1.0 | 2026-10-29 | Remediation verdict, 9/10 conditional scorecard, founder register, change log, amendment banners. |
-| 1.2.0 | 2026-11-09 | Full reconciliation: 11 P0 and 50 P1 closure matrices, P2 disposition, v2 green/orange authority, four portals + kitchen prototype, canonical fixture cleanup, new analytics/browser/changelog/glossary/sequence/security docs, and static validation evidence. |
+| 1.5.0 | 2026-11-13 | Payment/redelivery/audit pass: per-attempt `tx_ref` and resolution RPCs, `admin_redeliver_order`, audited admin mutation RPCs, telemetry index, staff-domain and `Table T4` corrections, Scenarios A–K, and the v1.5 validation record. |
 | 1.4.0 | 2026-11-12 | Remediation pass: additive migrations for FSM/refund/audit/blacklist/last-admin/cart-line/admin RPC gaps; canonical prototype, PWA shell, staff test seed, and normative doc alignment; 26 SQL smoke assertions. |
 | 1.3.0 | 2026-11-10 | Build-readiness reconciliation: canonical Stitch `screens/`, complete A–I test coverage, `ready_at` + kitchen-pause schema/API alignment, generated-total and blacklist corrections, browser/telemetry/print consistency, and updated manifest. |
+| 1.2.0 | 2026-11-09 | Full reconciliation: 11 P0 and 50 P1 closure matrices, P2 disposition, v2 green/orange authority, four portals + kitchen prototype, canonical fixture cleanup, new analytics/browser/changelog/glossary/sequence/security docs, and static validation evidence. |
+| 1.1.0 | 2026-10-29 | Remediation verdict, 9/10 conditional scorecard, founder register, change log, amendment banners. |
+| 1.0.0 | 2026-10-29 | Original audit report (P0/P1/P2 findings). |
 
 ---
 
@@ -1514,6 +1517,40 @@ Historical audit/spec text may quote these as findings. That is not normative. `
 | Links | Local markdown/HTML links resolve; archived Stitch export links remain out of scope. |
 | Retired values | No current normative file contains the retired 229,000 ledger, 3.8/7.4 km fixtures, or 4,500 fee. |
 | Grants | New/replaced functions have explicit `REVOKE`/`GRANT`; `close_open_rider_shifts` is service-role only. |
+
+---
+
+### 13.12 v1.5 payment/redelivery/audit evidence
+
+> This section records the 2026-11-13 pass. All edits remain uncommitted in the working tree; no application code, dependency install, production build, commit, or push was performed.
+
+| Area | Change | Evidence |
+| :--- | :--- | :--- |
+| Payment attempts | `payment_transactions` gains `attempt_number`, unique `(order_id, attempt_number)`, unique immutable `tx_ref = '<order_token>-<attempt_number>'`, and legacy backfill. | `20261113000000_v1_5_remediation.sql`; `ERD.md`; `DATABASE_SCHEMA_AND_RLS.md` |
+| Payment RPCs | `start_payment_attempt(uuid, payment_method, text)` allocates/abandons under a row lock; `resolve_payment_tx_ref(text)` returns one order/attempt. | migration; `API_CONTRACTS.md` §3.2/§4; `STATE_MACHINES_AND_BUSINESS_RULES.md` §1.3; ADR-002 |
+| Redelivery | `admin_redeliver_order(uuid, text, uuid)` moves `DELIVERY_FAILED → READY_FOR_PICKUP`, clears the rider, and audits the reason. | migration; `STATE_MACHINES_AND_BUSINESS_RULES.md`; `OPERATIONS_RUNBOOK.md` §7.4; Scenario J |
+| Admin audit surface | Audited settings, contact, catalogue, combo, table, staff, and refund-approval RPCs with explicit grants. | migration; `API_CONTRACTS.md` §4; ADR-019 |
+| Telemetry | `rider_telemetry(order_id)` partial index for tracker reads. | migration; `ERD.md` |
+| Identity/brand | Staff synthetic domain moved to `staff.moroujmazaar.com`; brand hierarchy fixed; canonical table `T4`/seed `Food Court Table T4`. | `DECISIONS.md` ADR-001; `supabase/seed.sql`; `README.md`; `.env.example` |
+| Tests/docs | Scenarios A–K, payment-attempt tests, redelivery coverage, and all normative docs bumped to v1.5.0. | `TEST_PLAN.md`; `TESTING_PERSONAS_AND_E2E_SCENARIOS.md`; `docs/*.md`; `CHANGELOG.md` |
+| Validation | Full migration chain + seed applied to fresh PostgreSQL 18.4; v1.5 smoke assertions passed; JS/link/retired-value scans repeated. | §13.13 |
+
+---
+
+### 13.13 v1.5 validation evidence
+
+| Check | Result |
+| :--- | :--- |
+| Full migration chain | `initial_schema` → `storage` → `remediation_enum` → `remediation` → `v1_5_remediation` → `seed.sql` applied with `ON_ERROR_STOP=1` on PostgreSQL 18.4; no SQL errors. |
+| Payment-attempt smoke tests | `start_payment_attempt` allocated `-1` then `-2`; the first attempt became `ABANDONED`; duplicate `(order_id, attempt_number)` and duplicate `tx_ref` were rejected; `resolve_payment_tx_ref` returned one row and null for an unknown reference. |
+| Redelivery smoke test | `admin_redeliver_order` moved `DELIVERY_FAILED → READY_FOR_PICKUP`, cleared `rider_id`, and wrote an audit row; non-admin callers were rejected. |
+| Admin audit smoke tests | Every new audited RPC rejected a non-admin caller and wrote the expected `admin_audit_log` action for an admin. |
+| Telemetry index | `rider_telemetry(order_id)` partial index exists and is used by the tracker query plan. |
+| JS syntax | `node --check` passes for `site/assets/js/*.js` and `scripts/seed-staff.mjs`. |
+| Links | All current local markdown/HTML links resolve; archived Stitch export links remain out of scope. |
+| Retired values | No current requirement, fixture, script, or prototype uses the retired 229,000 ledger, 3.8/7.4 km fixtures, 4,500 fee, `staff.bazaareats.com` domain, or unqualified `Table 4`. |
+
+> **Environment note:** `supabase/config.toml` still pins `major_version = 15` for the local CLI, while validation was performed on PostgreSQL 18.4. This is a tooling-version note, not a schema incompatibility; the migration chain uses only features available in PostgreSQL 15+.
 
 ---
 

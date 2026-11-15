@@ -11,7 +11,7 @@
  *   SUPABASE_SERVICE_ROLE_KEY
  *
  * Optional:
- *   STAFF_EMAIL_DOMAIN (default: staff.bazaareats.com)
+ *   STAFF_EMAIL_DOMAIN (default: staff.moroujmazaar.com)
  *   STAFF_RESET_PASSWORDS=true (default: false; only set for deliberate rotation)
  *
  * Security:
@@ -30,7 +30,7 @@ const SUPABASE_URL = (
   ""
 ).replace(/\/+$/, "");
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-const EMAIL_DOMAIN = process.env.STAFF_EMAIL_DOMAIN || "staff.bazaareats.com";
+const EMAIL_DOMAIN = process.env.STAFF_EMAIL_DOMAIN || "staff.moroujmazaar.com";
 const SEED_FILE = resolve(process.env.STAFF_SEED_FILE || "scripts/staff.local.json");
 const RESET_PASSWORDS = process.env.STAFF_RESET_PASSWORDS === "true";
 

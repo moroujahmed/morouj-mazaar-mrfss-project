@@ -45,7 +45,7 @@
       paid: true,
       total: 8000,
       items: [{ name: "Special Bazaar Rolex", qty: 1, mods: "" }],
-      note: "Dine-in · Table 4 · serve directly."
+      note: "Dine-in · Table T4 · serve directly."
     },
     {
       id: "1043",
@@ -304,7 +304,7 @@
     if (!order || order.status !== "cooking") return;
     if (order.type === "dine-in") {
       removeOrder(id);
-      toast("Order #" + id + " served to Table 4 · dine-in complete.", "success");
+      toast("Order #" + id + " served to Table T4 · dine-in complete.", "success");
       return;
     }
     order.status = "ready";
@@ -332,7 +332,7 @@
       "<div>Bazaar Flame &amp; Grill</div>" +
       '<div class="docket-line"></div>' +
       "<div><strong>Order #" + escapeHtml(order.id) + "</strong></div>" +
-      "<div>" + (order.type === "dine-in" ? "Dine-in · Table 4" : "Delivery") + " · " + escapeHtml(order.placed) + "</div>" +
+      "<div>" + (order.type === "dine-in" ? "Dine-in · Table T4" : "Delivery") + " · " + escapeHtml(order.placed) + "</div>" +
       '<div class="docket-line"></div>' +
       "<ul>" + items + "</ul>" +
       '<div class="docket-line"></div>' +

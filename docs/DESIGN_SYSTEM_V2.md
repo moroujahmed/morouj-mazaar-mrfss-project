@@ -1,5 +1,12 @@
 # Morouj Mazaar design system v2
 
+| Field | Value |
+| :--- | :--- |
+| **Status** | Normative design reference |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
+| **Brand hierarchy** | Morouj Mazaar (umbrella) → Bazaar Flame & Grill (restaurant) → MRFSS (system) |
+
 A static, dependency-free interface prototype for the four Morouj Mazaar portals:
 
 - **Customer** — browse, customise, checkout, pay, track and give feedback; dine-in is a customer mode.
@@ -92,7 +99,7 @@ Headings use tight tracking (`-0.025em` to `-0.05em`). Use mono for anything a p
 - Checkout supports delivery and dine-in. Delivery areas use the canonical distances:
   - Nakasero `1.562 km` — free delivery
   - Ntinda `8.093 km` — `USh 6,000`
-  - Table 4 — dine-in, no packaging or delivery fee
+  - Table T4 - dine-in, no packaging or delivery fee
 - Payment is simulated locally. The tracker shows a timeline, map, rider contact and a 4-digit handover PIN.
 
 ### Kitchen
@@ -152,7 +159,7 @@ The active story is consistent across the customer, kitchen, admin and rider pag
 | :--- | :--- |
 | Customer order A | Sarah Namukasa, `#1042`, Nakasero `1.562 km`, MTN MoMo, **USh 35,000** |
 | Customer order B | Brian Kato, `#1045`, Ntinda `8.093 km`, COD, **USh 38,000**, change from `USh 50,000` = `USh 12,000` |
-| Dine-in | Alex Wandera, `#1044`, Table 4, Airtel Money, **USh 8,000** |
+| Dine-in | Alex Wandera, `#1044`, Table T4, Airtel Money, **USh 8,000** |
 | Rider active | Juma Mukasa, `#1042` Sarah Nakasero `1.562 km`, prepaid `USh 35,000`, cash to collect `USh 0` |
 | Delivery pool | `#1045` Brian Kato, Ntinda `8.093 km`, COD `USh 38,000`, locked while `#1042` is active |
 | Completed cash ledger | `#1043` `USh 38,000` + `#1047` `USh 27,500` = **USh 65,500** due to the drawer |
@@ -217,6 +224,7 @@ Manual checks:
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.5.0 | 2026-11-13 | Added explicit version/brand metadata and canonicalized the dine-in table as `T4`. |
 | 1.3.0 | 2026-11-10 | Unified touch-target wording and added kitchen intake pause. |
 | 1.2.0 | 2026-11-09 | Four portals, kitchen behaviour, no rider queue, canonical `#1047` COD, Juma 65,500 ledger. |
 

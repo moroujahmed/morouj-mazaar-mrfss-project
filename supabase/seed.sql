@@ -1,6 +1,6 @@
 -- ============================================================================
--- PROJECT-BAZAAR-D2C / MRFSS — Canonical seed data v1.1
--- Run after the initial migration. Staff auth users are created separately by
+-- Morouj Mazaar / MRFSS — Canonical seed data v1.5
+-- Run after the full additive migration chain. Staff auth users are created separately by
 -- scripts/seed-staff.mjs because they require Supabase Auth Admin API access.
 -- All UUIDs below are valid hex UUIDs.
 -- ============================================================================
@@ -224,7 +224,7 @@ INSERT INTO public.tables (id, table_number, label, qr_token, is_active) VALUES
   ('77777777-7777-4777-8777-777777777701', 'T1', 'Window 1', '88888888-8888-4888-8888-888888888801', true),
   ('77777777-7777-4777-8777-777777777702', 'T2', 'Window 2', '88888888-8888-4888-8888-888888888802', true),
   ('77777777-7777-4777-8777-777777777703', 'T3', 'Garden 1', '88888888-8888-4888-8888-888888888803', true),
-  ('77777777-7777-4777-8777-777777777704', 'T4', 'Garden 2', '88888888-8888-4888-8888-888888888804', true),
+  ('77777777-7777-4777-8777-777777777704', 'T4', 'Food Court Table T4', '88888888-8888-4888-8888-888888888804', true),
   ('77777777-7777-4777-8777-777777777705', 'T5', 'Garden 3', '88888888-8888-4888-8888-888888888805', true),
   ('77777777-7777-4777-8777-777777777706', 'T6', 'Counter 1', '88888888-8888-4888-8888-888888888806', true),
   ('77777777-7777-4777-8777-777777777707', 'T7', 'Counter 2', '88888888-8888-4888-8888-888888888807', true),

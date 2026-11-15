@@ -397,6 +397,7 @@ These are recorded here so they are not lost. **The authoritative, complete regi
 | Version | Date | Change |
 | :--- | :--- | :--- |
 | 1.5.0 | 2026-11-13 | Added ADR-019 (audited admin RPCs); moved the synthetic staff email domain to `staff.moroujmazaar.com`; revised ADR-002 to per-attempt `tx_ref`. |
+| 1.4.0 | 2026-11-12 | Recorded the v1.4 remediation baseline (FSM recovery transitions, cart limits, refund approval, audit reasons, last-admin protection); no new ADR. |
 | 1.3.0 | 2026-11-10 | Clarified ADR-017: `docs/stitch-design/screens/` is canonical; `_archive/` and `site/ui-kit.html` are non-normative. |
 | 1.2.0 | 2026-11-09 | Added ADR-017 (v2 green/orange design system) and ADR-018 (8.1 km COD test ceiling); clarified F-02/F-14 and ADR-008 status. |
 | 1.1.0 | 2026-10-29 | Added ADRs 001–016 from the audit remediation. |

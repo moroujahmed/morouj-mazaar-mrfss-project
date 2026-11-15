@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Status** | Normative |
-| **Version** | 1.3.0 |
-| **Date** | 2026-11-10 |
+| **Version** | 1.5.0 |
+| **Date** | 2026-11-13 |
 | **Supersedes** | v1.0 generic HMAC contract, OTP prose, OSM tiles, ESC/POS assumptions, background-GPS promise |
 | **Authority** | `DECISIONS.md` ADR-002/003/004/005/007/009/014/016, `API_CONTRACTS.md`, migration |
 
@@ -34,14 +34,16 @@ Secrets live in the hosting secret manager or local `.env.local`. They are never
 ### 2.1 Initiation
 
 1. Server creates the order in `PENDING_PAYMENT` with integer totals and a unique `order_token`.
-2. Server calls Flutterwave `POST https://api.flutterwave.com/v3/payments` with:
-   - `tx_ref = orders.order_token`;
+2. Server calls `start_payment_attempt(order_token, method, 'flutterwave')`, which allocates the next `attempt_number` and sets `tx_ref = '<order_token>-<attempt_number>'`.
+3. Server calls Flutterwave `POST https://api.flutterwave.com/v3/payments` with:
+   - `tx_ref = '<order_token>-<attempt_number>'` (never the bare token);
    - `amount` and `currency = "UGX"`;
    - customer name/phone/email placeholder;
    - `redirect_url` to the customer tracker return route;
    - approved payment options for MTN/Airtel/card.
-3. Server stores the provider response reference in `payment_transactions` and returns the hosted-checkout URL.
-4. The browser redirects to Flutterwave. No card data enters the app.
+4. Server stores the provider response reference in `payment_transactions` and returns the hosted-checkout URL.
+5. A retry abandons the open attempt and allocates a new reference; a late webhook for an abandoned attempt is recorded but does not mark the current attempt paid.
+6. The browser redirects to Flutterwave. No card data enters the app.
 
 ### 2.2 Webhook Authentication
 
@@ -56,9 +58,9 @@ const ok = received.length === expected.length &&
 
 - Reject a missing/mismatched hash with `401` and no state change.
 - Do not trust the webhook body's status alone.
-- On a valid event, call `GET https://api.flutterwave.com/v3/transactions/{id}/verify` with the secret key.
-- Compare the verified amount, currency, and `tx_ref` to the stored order.
-- Only then mark the payment successful.
+- On a valid event, resolve `tx_ref` with `resolve_payment_tx_ref` to exactly one order/attempt, then call `GET https://api.flutterwave.com/v3/transactions/{id}/verify` with the secret key.
+- Compare the verified amount, currency, and `tx_ref` to the stored attempt (not just the order).
+- Only then mark that attempt and the order paid; an event for an abandoned attempt must not satisfy the current attempt.
 
 ### 2.3 Idempotency and Late Events
 
@@ -240,7 +242,8 @@ KDS audio:
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
-| 1.0.0 | 2026-10-29 | Original integration draft. |
-| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.5.0 | 2026-11-13 | Moved Flutterwave initiation/webhook verification to per-attempt `tx_ref` and `resolve_payment_tx_ref`; documented abandoned-attempt isolation. |
 | 1.3.0 | 2026-11-10 | Aligned distance envelope and response, telemetry queue bounds, browser minimums, and HTML print route. |
 | 1.2.0 | 2026-11-09 | Corrected Flutterwave, OTP, OSRM, telemetry, printing, deep-link, and failure contracts. |
+| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.0.0 | 2026-10-29 | Original integration draft. |

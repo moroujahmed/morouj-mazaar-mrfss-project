@@ -278,6 +278,9 @@ CRON_SECRET=
 
 # Error tracking (optional; no PII)
 SENTRY_DSN=
+
+# Staff provisioning script only
+STAFF_SEED_FILE=scripts/staff.example.json
 ```
 
 Staff provisioning uses an explicit `STAFF_SEED_FILE` (for example `scripts/staff.test.json` in CI or `scripts/staff.local.json` locally). It is a server-only script input and must never be exposed with a `NEXT_PUBLIC_` prefix.

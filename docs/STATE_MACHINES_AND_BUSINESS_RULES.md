@@ -283,9 +283,9 @@ eta_at = acknowledged_at
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
-| 1.0.0 | 2026-10-29 | Original FSM and pricing draft. |
-| 1.1.0 | 2026-10-29 | Amendment banner only. |
 | 1.5.0 | 2026-11-13 | Added per-attempt payment references, the audited `admin_redeliver_order` edges, and corrected §7.1 to match `reconcile_rider_cash`. |
 | 1.4.0 | 2026-11-12 | Added `DELIVERY_FAILED` recovery transitions, `RETURNED` outcome, 3-arg reassign, timeout payment failure, deterministic timestamps/history, and carried partial-settlement shortfall. |
 | 1.3.0 | 2026-11-10 | Added `ready_at` side effects and kitchen-pause intake rules; corrected `total_amount` generated-column wording. |
 | 1.2.0 | 2026-11-09 | Rewrote transitions, integer-metre pricing, OSRM blocking, claim RPC, settlement linkage, ETA, and store-closed rules. |
+| 1.1.0 | 2026-10-29 | Amendment banner only. |
+| 1.0.0 | 2026-10-29 | Original FSM and pricing draft. |
