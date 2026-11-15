@@ -6,6 +6,29 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation — Phase 2: Database, Auth, RLS, Seed (2026-11-15)
+
+### Added
+
+- Verified the full migration chain (`initial_schema → storage → remediation_enum → remediation → v1_5_remediation`) plus `supabase/seed.sql` applies cleanly to a fresh database; regenerated UTF-8 `src/types/database.types.ts` from the migrated schema.
+- Supabase clients: browser (`src/lib/supabase/client.ts`), cookie-bound server (`server.ts`), and `server-only` service-role (`admin.ts`).
+- Staff identity helpers (`src/lib/auth/phone.ts`), role helpers (`roles.ts`), session lookup (`session.ts`), and page/action guards (`guards.ts`): E.164 phone → `<digits>@staff.moroujmazaar.com` synthetic email, 6-digit PIN as the Auth password.
+- `src/middleware.ts` deny-by-default portal protection for `/admin`, `/kitchen`, and `/rider`, including wrong-role redirects and inactive-account sign-out.
+- `tests/db/bootstrap.sql` (Supabase auth/storage stubs), `tests/db/rls.sql` (privilege matrix and row visibility, transactional rollback), and `tests/db/claim-race.mjs` (two concurrent riders, one winner).
+- `test:db` and `test:db:race` npm scripts; `pg` and `@types/pg` dev dependencies.
+- Supabase CLI 3.1 compatibility: `supabase/config.toml` uses `[local_smtp]`.
+
+### Verification
+
+- Fresh local reset equivalent: database dropped/recreated, bootstrap applied, all five migrations applied in order, seed applied — no errors.
+- `profiles.id` references `auth.users`; `profiles.pin_code` does not exist.
+- `anon` and `authenticated` are denied direct `orders`, `handover_pin`, and `rider_telemetry` access; `service_role` retains access; admin/kitchen/rider RPC grants match the contract.
+- `claim_order_atomic`: exactly one winner; the loser receives `ORDER_ALREADY_CLAIMED`; a rider with an active order cannot claim another.
+- `npm run lint`, `npm run typecheck`, `npm run test` (23 tests), and `npm run build` pass; no server secret identifiers appear in the client bundle.
+- Local Supabase Docker stack was unavailable in this environment; the same DDL and RLS assertions were executed against PostgreSQL 18.4 on `127.0.0.1:55433`.
+
+---
+
 ## Implementation — Phase 1: Project foundation (2026-11-15)
 
 ### Added
