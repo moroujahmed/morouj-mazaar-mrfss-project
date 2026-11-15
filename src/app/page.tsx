@@ -2,7 +2,10 @@ import { publicEnv } from "@/lib/public-env";
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-3xl flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+    <main
+      id="main-content"
+      className="mx-auto flex min-h-dvh max-w-3xl flex-col items-center justify-center gap-6 px-6 py-16 text-center"
+    >
       <p className="rounded-full bg-green-100 px-4 py-1 text-sm font-medium text-green-800">
         Bazaar Flame &amp; Grill
       </p>

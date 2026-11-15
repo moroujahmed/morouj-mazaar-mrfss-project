@@ -6,6 +6,26 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation — Phase 3: Design tokens and UI kit (2026-11-15)
+
+### Added
+
+- v2 token layer: green/orange palette, status tints, display/sans/mono families, type scale, card/sheet shadows, and 48/52/56 px target utilities.
+- Accessible primitives in `src/components/ui/`: button (six variants, four sizes, loading and disabled states), status badge, text/textarea/select fields with visible labels and `aria-invalid`/`aria-describedby` errors, native `<dialog>` sheet, toast provider with `role="alert"` errors, skeletons, data table with caption and keyboard-scrollable region, and empty state.
+- `src/components/map/dynamic-map.tsx` and `leaflet-map.tsx`: browser-only Leaflet wrapper, MapTiler tiles when configured, DOM-safe marker labels, and a visible text fallback.
+- Internal `/design-system` reference page (noindex) showing the palette, controls, statuses, table, overlays, map, and measured contrast evidence.
+- Root layout skip link, toast provider, and branded focus/reduced-motion base styles.
+- `tests/unit/contrast.test.ts`, `scripts/check-tokens.mjs`, and Playwright/axe coverage in `tests/e2e/a11y.spec.ts`; `test:contrast`, `test:tokens`, `test:e2e`, and `test:a11y` scripts.
+
+### Verification
+
+- `npm run test:contrast` passes all canonical AA/AAA pairs, keeps white-on-orange below AA, and verifies status text on tinted surfaces.
+- `npm run test:tokens` finds no forbidden white-on-orange or orange-500 body-text pairing.
+- `npm run test:a11y` passes four Chromium checks: zero critical/serious axe violations on `/` and `/design-system`, an open sheet scan, Escape focus restoration, and alert toast announcement/dismissal.
+- `npm run lint`, `npm run typecheck`, `npm run test` (30 tests), and `npm run build` pass.
+
+---
+
 ## Implementation — Phase 2: Database, Auth, RLS, Seed (2026-11-15)
 
 ### Added

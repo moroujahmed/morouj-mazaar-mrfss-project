@@ -9,28 +9,51 @@
   --green-50: #f2f7f5;
   --green-100: #e3eeea;
   --orange-500: #f28c28;
+  --orange-600: #e07d1f;
   --orange-700: #a65a0f;
   --red-600: #c62828;
   --success-700: #17603f;
   --warning-700: #8a4b00;
   --surface: #ffffff;
   --surface-inset: #f2f4f3;
+  --ink: #102e27;
+  --ink-secondary: #52635d;
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-surface-inset text-ink antialiased;
+    @apply bg-surface-inset font-sans text-ink antialiased;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight text-green-800;
+    text-wrap: balance;
   }
 
   :focus-visible {
-    @apply outline-none ring-[3px] ring-green-800 ring-offset-2;
+    @apply outline-none ring-[3px] ring-green-800 ring-offset-2 ring-offset-surface;
+  }
+
+  ::selection {
+    background-color: var(--orange-500);
+    color: var(--green-900);
   }
 
   @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
     *,
     ::before,
     ::after {
@@ -38,6 +61,26 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply sr-only;
+  }
+
+  .skip-link:focus {
+    @apply not-sr-only fixed left-4 top-4 z-50 rounded-xl bg-green-800 px-5 py-3 text-base font-semibold text-white shadow-card;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media print {
+    .no-print {
+      display: none !important;
     }
   }
 }

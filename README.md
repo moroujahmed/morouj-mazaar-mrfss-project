@@ -4,7 +4,7 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + Phase 2 database, auth, and RLS foundation |
+| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + Phase 3 accessible design system and UI kit |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | `USh`, whole integers with thousands separators |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
@@ -19,7 +19,7 @@
 
 ## What is in this repository
 
-The repository contains the **specification, database baseline, seed data, and operational contracts**, a static interface prototype in `site/`, and the Phase 2 Next.js application foundation (database migrations, staff auth, RLS, and role-guarded portals). Implementation proceeds through the phases in [`docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md`](docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md).
+The repository contains the **specification, database baseline, seed data, and operational contracts**, a static interface prototype in `site/`, and the Phase 3 Next.js application foundation (database, staff auth, RLS, v2 design tokens, and an accessible UI kit). Implementation proceeds through the phases in [`docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md`](docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md).
 
 ```
 .

@@ -39,7 +39,38 @@ jobs:
       - name: Unit tests
         run: npm run test
 
+      - name: Token check
+        run: npm run test:tokens
+
+      - name: Contrast check
+        run: npm run test:contrast
+
       - name: Build
         run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  a11y:
+    name: Accessibility (axe)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build and run axe scans
+        run: npm run test:a11y
         env:
           NEXT_TELEMETRY_DISABLED: "1"

@@ -14,9 +14,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:contrast": "vitest run tests/unit/contrast.test.ts",
+    "test:tokens": "node scripts/check-tokens.mjs",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test tests/e2e/a11y.spec.ts",
     "test:db": "node tests/db/run-db-tests.mjs",
     "test:db:race": "node tests/db/claim-race.mjs",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm run test && npm run test:tokens && npm run build"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
@@ -34,8 +38,10 @@
     "zustand": "5.1.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "9.39.5",
     "@next/eslint-plugin-next": "15.5.29",
+    "@playwright/test": "^1.65.1",
     "@types/leaflet": "1.9.22",
     "@types/node": "22.20.5",
     "@types/pg": "^8.15.6",
