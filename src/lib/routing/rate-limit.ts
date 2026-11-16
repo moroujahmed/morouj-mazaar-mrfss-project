@@ -1,11 +1,15 @@
 import "server-only";
 
 /**
- * Fixed-window rate limiting for `/api/distance`.
+ * Fixed-window rate limiting.
+ *
+ * `/api/distance` uses the default 30/minute budget. Phase 6 adds per-action
+ * budgets (checkout per IP/phone, payment attempts per order, OTP per phone),
+ * so the limiter takes an explicit maximum and window.
  *
  * Production uses Upstash so limits survive serverless instances. Failures are
- * thrown and the route fails closed. In-memory state is for local development
- * and automated tests only.
+ * thrown and callers fail closed. In-memory state is for local development and
+ * automated tests only.
  */
 
 export const RATE_LIMIT_MAX = 30;
@@ -20,14 +24,33 @@ export type RateLimitResult = {
 
 export interface RateLimiter {
   consume(key: string, now?: number): Promise<RateLimitResult>;
+  consumeWithLimit(
+    key: string,
+    max: number,
+    windowSeconds: number,
+    now?: number,
+  ): Promise<RateLimitResult>;
 }
 
-function windowResult(count: number, resetAt: number): RateLimitResult {
+function windowResult(
+  count: number,
+  max: number,
+  resetAt: number,
+): RateLimitResult {
   return {
-    allowed: count <= RATE_LIMIT_MAX,
-    remaining: Math.max(0, RATE_LIMIT_MAX - count),
+    allowed: count <= max,
+    remaining: Math.max(0, max - count),
     resetAt,
   };
+}
+
+function assertLimits(max: number, windowSeconds: number): void {
+  if (!Number.isInteger(max) || max < 1) {
+    throw new Error("rate limit maximum must be a positive integer");
+  }
+  if (!Number.isInteger(windowSeconds) || windowSeconds < 1) {
+    throw new Error("rate limit window must be a positive integer");
+  }
 }
 
 class InMemoryRateLimiter implements RateLimiter {
@@ -37,15 +60,31 @@ class InMemoryRateLimiter implements RateLimiter {
   >();
 
   async consume(key: string, now = Date.now()): Promise<RateLimitResult> {
+    return this.consumeWithLimit(
+      key,
+      RATE_LIMIT_MAX,
+      RATE_LIMIT_WINDOW_SECONDS,
+      now,
+    );
+  }
+
+  async consumeWithLimit(
+    key: string,
+    max: number,
+    windowSeconds: number,
+    now = Date.now(),
+  ): Promise<RateLimitResult> {
+    assertLimits(max, windowSeconds);
+
     const existing = this.windows.get(key);
     if (!existing || existing.resetAt <= now) {
-      const resetAt = now + RATE_LIMIT_WINDOW_MS;
+      const resetAt = now + windowSeconds * 1_000;
       this.windows.set(key, { count: 1, resetAt });
-      return windowResult(1, resetAt);
+      return windowResult(1, max, resetAt);
     }
 
     existing.count += 1;
-    return windowResult(existing.count, existing.resetAt);
+    return windowResult(existing.count, max, existing.resetAt);
   }
 }
 
@@ -78,16 +117,32 @@ class UpstashRateLimiter implements RateLimiter {
   }
 
   async consume(key: string, now = Date.now()): Promise<RateLimitResult> {
+    return this.consumeWithLimit(
+      key,
+      RATE_LIMIT_MAX,
+      RATE_LIMIT_WINDOW_SECONDS,
+      now,
+    );
+  }
+
+  async consumeWithLimit(
+    key: string,
+    max: number,
+    windowSeconds: number,
+    now = Date.now(),
+  ): Promise<RateLimitResult> {
+    assertLimits(max, windowSeconds);
+
     const count = await this.command<number>(["INCR", key]);
     if (count === 1) {
-      await this.command(["EXPIRE", key, String(RATE_LIMIT_WINDOW_SECONDS)]);
+      await this.command(["EXPIRE", key, String(windowSeconds)]);
     }
 
     const ttl = await this.command<number>(["TTL", key]);
     const resetAt =
-      now + (typeof ttl === "number" && ttl > 0 ? ttl : RATE_LIMIT_WINDOW_SECONDS) * 1_000;
+      now + (typeof ttl === "number" && ttl > 0 ? ttl : windowSeconds) * 1_000;
 
-    return windowResult(count, resetAt);
+    return windowResult(count, max, resetAt);
   }
 }
 
@@ -120,12 +175,16 @@ export function getRateLimiter(): RateLimiter {
 
 /** Client IP from the trusted proxy headers; `unknown` is rate-limited too. */
 export function clientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
+  return clientIpFromHeaders(request.headers);
+}
+
+export function clientIpFromHeaders(headers: Headers): string {
+  const forwarded = headers.get("x-forwarded-for");
   if (forwarded) {
     const first = forwarded.split(",")[0]?.trim();
     if (first) return first;
   }
-  return request.headers.get("x-real-ip")?.trim() || "unknown";
+  return headers.get("x-real-ip")?.trim() || "unknown";
 }
 
 /** Unit tests call this after changing environment variables. */

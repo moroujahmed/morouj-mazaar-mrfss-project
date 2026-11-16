@@ -52,3 +52,17 @@ export function getStoreStatus(
 export function formatStoreTime(value: string): string {
   return value.slice(0, 5);
 }
+
+export const STOREFRONT_FIXTURE_NOW = "2026-11-15T12:00:00+03:00";
+
+/**
+ * One clock for storefront pages and the checkout action.
+ *
+ * Browser tests pin a mid-service instant so opening-hours assertions never
+ * depend on when the suite runs. Production always uses the real clock.
+ */
+export function storefrontNow(): Date {
+  return process.env.STOREFRONT_FIXTURE === "1"
+    ? new Date(STOREFRONT_FIXTURE_NOW)
+    : new Date();
+}

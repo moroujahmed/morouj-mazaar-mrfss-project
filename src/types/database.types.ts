@@ -740,6 +740,9 @@ isOneToOne: false
 "close_open_rider_shifts":
 { Args: Record<PropertyKey, never>; Returns: number
                            },
+"create_order":
+{ Args: { "p_payload": Json }; Returns: Json
+                           },
 "current_actor_id":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
@@ -751,6 +754,9 @@ isOneToOne: false
                            },
 "expire_pending_orders":
 { Args: Record<PropertyKey, never>; Returns: number
+                           },
+"finalize_payment_attempt":
+{ Args: { "p_error"?: string,"p_provider_transaction_id"?: string,"p_raw_payload"?: Json,"p_success": boolean,"p_tx_ref": string }; Returns: Json
                            },
 "fips_mode":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -787,6 +793,9 @@ isOneToOne: false
                            },
 "get_rider_pool":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"has_delivered_order":
+{ Args: { "p_phone": string }; Returns: boolean
                            },
 "haversine_m":
 { Args: { "p_lat1": number,"p_lat2": number,"p_lng1": number,"p_lng2": number }; Returns: number
@@ -839,6 +848,9 @@ isOneToOne: false
 "start_rider_shift":
 { Args: { "p_opening_float"?: number }; Returns: Json
                            },
+"store_cod_otp":
+{ Args: { "p_code": string,"p_expires_at": string,"p_ip_hash"?: string,"p_max_attempts"?: number,"p_phone": string }; Returns: Json
+                           },
 "submit_feedback":
 { Args: { "p_notes"?: string,"p_rating": Database["public"]['Enums']["feedback_rating"],"p_token": string }; Returns: Json
                            },
@@ -847,6 +859,9 @@ isOneToOne: false
                            },
 "validate_table_token":
 { Args: { "p_token": string }; Returns: Json
+                           },
+"verify_cod_otp":
+{ Args: { "p_code": string,"p_phone": string }; Returns: Json
                            },
 "verify_delivery_pin":
 { Args: { "p_ip_hash"?: string,"p_lat"?: number,"p_lng"?: number,"p_order_id": string,"p_pin": string,"p_user_agent"?: string }; Returns: Json
