@@ -1,7 +1,11 @@
 "use client";
 
-import L, { type LayerGroup, type Map as LeafletMapInstance } from "leaflet";
-import { useEffect, useRef } from "react";
+import L, {
+  type LayerGroup,
+  type Map as LeafletMapInstance,
+  type Marker,
+} from "leaflet";
+import { useEffect, useId, useRef } from "react";
 
 import { publicEnv } from "@/lib/public-env";
 import { cn } from "@/lib/utils";
@@ -25,6 +29,13 @@ export type LeafletMapProps = {
   ariaLabel: string;
   /** Visible text fallback with area, distance and ETA. */
   fallback?: string;
+  /**
+   * Called when the customer taps the map or releases the destination pin.
+   * The coordinate fields below the map provide the keyboard-accessible path.
+   */
+  onPick?: (lat: number, lng: number) => void;
+  /** Draggable destination pin. Requires `onPick`. */
+  destination?: readonly [number, number] | null;
 };
 
 const markerColour: Record<MapMarkerKind, string> = {
@@ -33,10 +44,31 @@ const markerColour: Record<MapMarkerKind, string> = {
   rider: "#F28C28",
 };
 
+function destinationIcon(): L.DivIcon {
+  const dot = document.createElement("span");
+  dot.setAttribute("aria-hidden", "true");
+  dot.style.cssText = [
+    "display:block",
+    "width:24px",
+    "height:24px",
+    "border-radius:9999px",
+    "background:#A65A0F",
+    "border:3px solid #FFFFFF",
+    "box-shadow:0 1px 5px rgba(0,0,0,0.45)",
+  ].join(";");
+
+  return L.divIcon({
+    className: "mrfss-destination-pin",
+    html: dot,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+}
+
 /**
  * Leaflet is client-only. The parent wrapper loads this module with
  * `ssr: false`, and every screen also renders the text fallback below the map.
- * Tile requests fail closed to the styled well when no MapTiler key exists.
+ * MapTiler requires a restricted key; development falls back to OSM tiles.
  */
 export function LeafletMap({
   center,
@@ -45,10 +77,16 @@ export function LeafletMap({
   className,
   ariaLabel,
   fallback,
+  onPick,
+  destination,
 }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMapInstance | null>(null);
   const markerLayerRef = useRef<LayerGroup | null>(null);
+  const destinationMarkerRef = useRef<Marker | null>(null);
+  const pickRef = useRef(onPick);
+  pickRef.current = onPick;
+  const fallbackId = useId();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -58,7 +96,7 @@ export function LeafletMap({
       center: [center[0], center[1]],
       zoom,
       zoomControl: true,
-      attributionControl: Boolean(publicEnv.maptilerKey),
+      attributionControl: true,
     });
 
     if (publicEnv.maptilerKey) {
@@ -70,7 +108,19 @@ export function LeafletMap({
             '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         },
       ).addTo(map);
+    } else if (process.env.NODE_ENV !== "production") {
+      // Development and local browser tests only. Production uses MapTiler;
+      // OSM's public tile service must never carry production traffic.
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
     }
+
+    map.on("click", (event: L.LeafletMouseEvent) => {
+      pickRef.current?.(event.latlng.lat, event.latlng.lng);
+    });
 
     markerLayerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
@@ -79,6 +129,7 @@ export function LeafletMap({
       map.remove();
       mapRef.current = null;
       markerLayerRef.current = null;
+      destinationMarkerRef.current = null;
     };
     // The map is created once; centre/zoom updates are handled by the effect below.
   }, []);
@@ -88,6 +139,37 @@ export function LeafletMap({
     if (!map) return;
     map.setView([center[0], center[1]], zoom);
   }, [center, zoom]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!destination) {
+      destinationMarkerRef.current?.remove();
+      destinationMarkerRef.current = null;
+      return;
+    }
+
+    if (!destinationMarkerRef.current) {
+      const marker = L.marker([destination[0], destination[1]], {
+        icon: destinationIcon(),
+        draggable: true,
+        keyboard: false,
+        alt: "Delivery destination pin",
+        title: "Delivery destination",
+      }).addTo(map);
+
+      marker.bindTooltip("Delivery destination");
+      marker.on("dragend", () => {
+        const point = marker.getLatLng();
+        pickRef.current?.(point.lat, point.lng);
+      });
+      destinationMarkerRef.current = marker;
+      return;
+    }
+
+    destinationMarkerRef.current.setLatLng([destination[0], destination[1]]);
+  }, [destination]);
 
   useEffect(() => {
     const layer = markerLayerRef.current;
@@ -121,10 +203,13 @@ export function LeafletMap({
         ref={containerRef}
         role="region"
         aria-label={ariaLabel}
+        aria-describedby={fallback ? fallbackId : undefined}
         className="h-full min-h-56 w-full rounded-xl bg-green-100"
       />
       {fallback ? (
-        <figcaption className="text-sm text-ink-secondary">{fallback}</figcaption>
+        <figcaption id={fallbackId} className="text-sm text-ink-secondary">
+          {fallback}
+        </figcaption>
       ) : null}
     </figure>
   );

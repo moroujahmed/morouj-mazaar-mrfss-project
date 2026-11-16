@@ -32,6 +32,8 @@ export default defineConfig({
       // Browser tests run without a Supabase stack. The server-only fixture is
       // read by the storefront menu loader and is never set in production.
       STOREFRONT_FIXTURE: "1",
+      // Canonical OSRM snapshot for routing tests. Production always calls OSRM.
+      DISTANCE_FIXTURE: "1",
     },
   },
 });

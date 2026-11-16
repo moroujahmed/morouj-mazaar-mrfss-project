@@ -77,6 +77,27 @@ test.describe("accessibility", () => {
     await assertNoBlockingViolations(page, "storefront cart sheet");
   });
 
+  test("checkout with a delivery pin has no critical or serious violations", async ({
+    page,
+  }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await page
+      .getByRole("button", { name: "Add Mineral Water (500 ml) to cart" })
+      .click();
+
+    await page.goto("/checkout", { waitUntil: "networkidle" });
+    await expect(
+      page.getByRole("heading", { name: "Delivery pin" }),
+    ).toBeVisible();
+
+    await page.getByLabel("Latitude").fill("0.3245");
+    await page.getByLabel("Longitude").fill("32.5782");
+    await page.getByRole("button", { name: "Use these coordinates" }).click();
+    await expect(page.getByText(/1\.562 km/).first()).toBeVisible();
+
+    await assertNoBlockingViolations(page, "checkout");
+  });
+
   test("open sheet is labelled and Escape closes it", async ({ page }) => {
     await page.goto("/design-system", { waitUntil: "networkidle" });
 

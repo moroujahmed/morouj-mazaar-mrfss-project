@@ -9,7 +9,8 @@ import {
   UtensilsCrossed,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { TextField } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { useCart } from "@/hooks/use-cart";
+import { useCartHydration } from "@/hooks/use-cart-hydration";
 import { formatUGX } from "@/lib/currency";
 import {
   type CartAddError,
@@ -29,6 +31,7 @@ import {
   type StoreStatus,
 } from "@/lib/storefront/store-status";
 import type {
+  DineInTable,
   StorefrontItem,
   StorefrontMenu,
 } from "@/lib/storefront/types";
@@ -42,6 +45,10 @@ import { ItemSheet } from "./item-sheet";
 export type StorefrontProps = {
   menu: StorefrontMenu;
   storeStatus: StoreStatus;
+  /** Server-validated dine-in table from `?table=<qr-token>`. */
+  table?: DineInTable | null;
+  /** Raw QR token from the URL; malformed tokens never reach the server. */
+  tableToken?: string | null;
 };
 
 function statusLabel(status: StoreStatus): string {
@@ -63,12 +70,17 @@ function limitMessage(code: CartAddError, limits: CartLimits): string {
   }
 }
 
-export function Storefront({ menu, storeStatus }: StorefrontProps) {
+export function Storefront({
+  menu,
+  storeStatus,
+  table = null,
+  tableToken = null,
+}: StorefrontProps) {
   const { settings, categories, items } = menu;
   const { showToast } = useToast();
+  const router = useRouter();
 
   const lines = useCart((state) => state.lines);
-  const hydrated = useCart((state) => state.hydrated);
   const addLine = useCart((state) => state.addLine);
 
   const [query, setQuery] = useState("");
@@ -77,44 +89,37 @@ export function Storefront({ menu, storeStatus }: StorefrontProps) {
   const [itemSheetOpen, setItemSheetOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
-  const hydrationStarted = useRef(false);
-
   const limits: CartLimits = {
     maxLines: settings.maxCartLines,
     maxItemQuantity: settings.maxItemQuantity,
     maxCartValue: settings.maxCartValue,
   };
 
-  useEffect(() => {
-    if (hydrationStarted.current) return;
-    hydrationStarted.current = true;
-
-    // No cleanup guard here: React StrictMode runs the effect twice in dev,
-    // and the second run returns early. The first promise must still finish.
-    Promise.resolve(useCart.persist.rehydrate()).finally(() => {
-      useCart.getState().markHydrated();
-
-      const result = useCart.getState().reconcile(items);
-      if (result.unavailable > 0) {
-        showToast({
-          title: "Some items are sold out",
-          description:
-            "Remove them from your cart before continuing to checkout.",
-          tone: "error",
-        });
-      } else if (result.priceChanged > 0) {
-        showToast({
-          title: "Prices updated",
-          description:
-            "Your cart now reflects the current menu prices and availability.",
-          tone: "info",
-        });
-      }
-    });
-  }, [items, showToast]);
+  const hydrated = useCartHydration(items, (result) => {
+    if (result.unavailable > 0) {
+      showToast({
+        title: "Some items are sold out",
+        description:
+          "Remove them from your cart before continuing to checkout.",
+        tone: "error",
+      });
+    } else if (result.priceChanged > 0) {
+      showToast({
+        title: "Prices updated",
+        description:
+          "Your cart now reflects the current menu prices and availability.",
+        tone: "info",
+      });
+    }
+  });
 
   const orderingEnabled = storeStatus.open;
   const canAdd = orderingEnabled && hydrated;
+  const dineIn = table !== null;
+  const checkoutHref =
+    dineIn && tableToken
+      ? `/checkout?table=${encodeURIComponent(tableToken)}`
+      : "/checkout";
 
   const visibleCategories = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -205,7 +210,9 @@ export function Storefront({ menu, storeStatus }: StorefrontProps) {
               </h1>
               <p className="flex items-center gap-1.5 text-sm text-ink-secondary">
                 <MapPin aria-hidden="true" className="size-4" />
-                Kampala · Delivery, pickup, and dine-in
+                {dineIn
+                  ? `Dine-in · Table ${table.tableNumber}`
+                  : "Kampala · Delivery, pickup, and dine-in"}
               </p>
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
@@ -248,6 +255,33 @@ export function Storefront({ menu, storeStatus }: StorefrontProps) {
         id="main-content"
         className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6"
       >
+        {table ? (
+          <div
+            role="status"
+            className="flex flex-col gap-1 rounded-2xl border-2 border-green-800 bg-green-50 p-4 text-green-900"
+          >
+            <p className="flex items-center gap-2 font-extrabold">
+              <UtensilsCrossed aria-hidden="true" className="size-5" />
+              Dine-in · Table {table.tableNumber}
+            </p>
+            <p className="text-sm">
+              {table.label}. No delivery or packaging fee, and the delivery
+              minimum does not apply.
+            </p>
+          </div>
+        ) : tableToken ? (
+          <div
+            role="status"
+            className="flex flex-col gap-1 rounded-2xl border-2 border-status-warning bg-status-warningSurface p-4 text-status-warning"
+          >
+            <p className="font-extrabold">This table link is not active</p>
+            <p className="text-sm">
+              Order for delivery instead, or ask a member of staff for a new
+              table QR code.
+            </p>
+          </div>
+        ) : null}
+
         {!storeStatus.open ? (
           <div
             role="status"
@@ -422,8 +456,9 @@ export function Storefront({ menu, storeStatus }: StorefrontProps) {
             {settings.currency}
           </p>
           <p className="mt-1">
-            Delivery minimum {formatUGX(settings.minimumOrderValue)} · Dine-in
-            minimum {formatUGX(settings.minimumOrderValueDineIn)}
+            {dineIn
+              ? `Dine-in · no delivery fee · no minimum order`
+              : `Delivery minimum ${formatUGX(settings.minimumOrderValue)} · Dine-in minimum ${formatUGX(settings.minimumOrderValueDineIn)}`}
           </p>
         </footer>
       </main>
@@ -454,12 +489,7 @@ export function Storefront({ menu, storeStatus }: StorefrontProps) {
         kitchenPaused={settings.isKitchenPaused}
         onCheckout={() => {
           setCartOpen(false);
-          showToast({
-            title: "Checkout is the next step",
-            description:
-              "Delivery pricing and payment are added in the next build phase.",
-            tone: "info",
-          });
+          router.push(checkoutHref);
         }}
       />
     </div>

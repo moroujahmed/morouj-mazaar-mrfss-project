@@ -98,6 +98,13 @@ export type StorefrontMenu = {
   fetchedAt: string;
 };
 
+/** Server-validated dine-in table. A forged QR token never yields one. */
+export type DineInTable = {
+  tableId: string;
+  tableNumber: string;
+  label: string;
+};
+
 export type MenuResult =
   | { status: "ok"; menu: StorefrontMenu }
   | { status: "unavailable" };

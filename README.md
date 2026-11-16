@@ -4,7 +4,7 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + Phase 4 storefront, menu, and cart |
+| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + Phase 5 storefront, cart, distance API, and checkout quote |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | `USh`, whole integers with thousands separators |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
@@ -19,7 +19,7 @@
 
 ## What is in this repository
 
-The repository contains the **specification, database baseline, seed data, and operational contracts**, a static interface prototype in `site/`, and the Phase 4 Next.js application foundation (database, staff auth, RLS, v2 design tokens, accessible UI kit, and a server-driven storefront with a persisted, reconciled cart). Implementation proceeds through the phases in [`docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md`](docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md).
+The repository contains the **specification, database baseline, seed data, and operational contracts**, a static interface prototype in `site/`, and the Phase 5 Next.js application foundation (database, staff auth, RLS, v2 design tokens, accessible UI kit, a server-driven storefront with a persisted, reconciled cart, the OSRM-backed distance and delivery-quote API, and the checkout screen). Implementation proceeds through the phases in [`docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md`](docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md).
 
 ```
 .
@@ -149,6 +149,14 @@ The test plan is in [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md). Canonical fixtures
 | Alex / Table T4 / dine-in | 0 | 0 | **USh 8,000** |
 
 Do not use retired distances, fees or totals in tests or UI copy. The canonical values above and in [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) are the only approved fixtures.
+
+Playwright runs the production build with `STOREFRONT_FIXTURE=1` and `DISTANCE_FIXTURE=1` so it needs no Supabase stack or OSRM instance. The distance fixture serves the canonical Nakasero and Ntinda routes plus two boundary points: `9,400 m` (inside delivery, outside the 8.1 km COD radius) and `35,000 m` (outside the 15 km delivery radius). Those flags are test-only; production requires `OSRM_BASE_URL`, Upstash, and the live database.
+
+```bash
+npm run check        # lint, typecheck, unit tests, token checks, production build
+npm run test:e2e     # Playwright Chromium suite (production build on port 3100)
+npm run test:db      # RLS/privilege matrix against local Supabase Postgres
+```
 
 ---
 

@@ -4,7 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 import { buildStorefrontMenu, type MenuRows } from "./build";
 import { createFixtureMenu } from "./fixture";
-import { storeSettingsSchema } from "./settings";
+import { getPublicSettings } from "./public-settings";
 import type { MenuResult } from "./types";
 
 const ITEM_COLUMNS =
@@ -12,17 +12,18 @@ const ITEM_COLUMNS =
 
 export async function getStorefrontMenu(): Promise<MenuResult> {
   // Test-only harness: Playwright runs without a Supabase stack. Production
-  // never sets this, and the server environment validation still gate-keeps
-  // the real clients.
+  // never sets this flag.
   if (process.env.STOREFRONT_FIXTURE === "1") {
     return createFixtureMenu();
   }
 
+  const settingsResult = await getPublicSettings();
+  if (settingsResult.status !== "ok") return { status: "unavailable" };
+
   try {
     const supabase = await createServerSupabaseClient();
 
-    const [settingsResult, categoriesResult, itemsResult] = await Promise.all([
-      supabase.rpc("get_public_settings"),
+    const [categoriesResult, itemsResult] = await Promise.all([
       supabase
         .from("categories")
         .select("id, name, slug, display_order")
@@ -35,19 +36,7 @@ export async function getStorefrontMenu(): Promise<MenuResult> {
         .order("sort_order", { ascending: true }),
     ]);
 
-    if (
-      settingsResult.error ||
-      categoriesResult.error ||
-      itemsResult.error ||
-      !settingsResult.data ||
-      !categoriesResult.data ||
-      !itemsResult.data
-    ) {
-      return { status: "unavailable" };
-    }
-
-    const parsedSettings = storeSettingsSchema.safeParse(settingsResult.data);
-    if (!parsedSettings.success) {
+    if (categoriesResult.error || itemsResult.error || !categoriesResult.data || !itemsResult.data) {
       return { status: "unavailable" };
     }
 
@@ -142,7 +131,7 @@ export async function getStorefrontMenu(): Promise<MenuResult> {
     if (optionItemsResult.error) return { status: "unavailable" };
 
     return buildStorefrontMenu({
-      settings: parsedSettings.data,
+      settings: settingsResult.settings,
       categories: categoriesResult.data,
       items: [...items, ...(optionItemsResult.data ?? [])],
       links,

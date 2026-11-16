@@ -6,6 +6,38 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation - Phase 5: Distance API, delivery quote, and checkout (2026-11-16)
+
+### Added
+
+- OSRM routing layer in `src/lib/routing/`: coordinate validation and 6-decimal cache quantization, 24-hour route cache (Upstash REST in production, in-memory for local tests), fixed-window 30 requests/minute/IP limiter, OSRM driving-route client with no Haversine fallback, and the shared fee/MOV/COD/total quote builders in `quote.ts`.
+- `GET /api/distance` (`src/app/api/distance/route.ts`) returning integer metres and duration with `VALIDATION_ERROR`, `DISTANCE_OUT_OF_BOUNDS`, `DISTANCE_UNAVAILABLE`, and `RATE_LIMITED` envelopes, `Retry-After` on throttling, a Uganda routing envelope, and production fail-closed checks for missing OSRM/Upstash configuration.
+- Distance wire contract in `src/lib/routing/contract.ts`, shared by the route and the checkout client.
+- `/checkout` server route (`src/app/(storefront)/checkout/page.tsx`) and `src/components/checkout/checkout-client.tsx`: map click/drag pin with keyboard-accessible latitude/longitude fields, debounced distance fetch, free/excess fee breakdown, MOV progress, COD-radius gating, store-hours and kitchen-paused blocks, cart limit checks, contact fields with Ugandan phone normalization (`src/lib/phone.ts`), payment-method selection, order summary, and an interim place-order CTA that does not pretend to submit an order.
+- Dine-in checkout from `?table=<qr-token>`: `getTableByToken()` resolves tokens through `validate_table_token()`, `getPublicSettings()` wraps `get_public_settings()`, mobile-storefront banner, and a checkout mode that removes delivery and packaging fees and bypasses the delivery MOV. Forged, inactive, or malformed tokens fall back to delivery with a visible warning.
+- Shared `useCartHydration()` hook used by both the storefront and checkout so persisted carts rehydrate once and reconcile against the fresh server menu.
+- Settings-derived delivery radii: `calculateDeliveryFee` and `isBeyondMaxDelivery` accept optional free/max metre values defaulting to the canonical 5 km/15 km.
+- Leaflet destination pin (draggable), click-to-place support, dev OSM tiles with production MapTiler tiles, and CSP updates for OpenStreetMap images/connections.
+- Unit coverage (`tests/unit/routing.test.ts`, `tests/unit/distance-api.test.ts`) for canonical quotes and totals, MOV/COD/radius boundaries, coordinate validation and quantization, OSRM success/failure paths, 24-hour cache expiry, rate-limit windows, and the distance API contracts.
+- Playwright coverage (`tests/e2e/checkout.spec.ts`) for the canonical USh 35,000 and USh 38,000 totals, out-of-area and failed-route blocks with retry, exact MOV shortfall, COD-radius enforcement, dine-in USh 8,000, and forged-token fallback, plus a checkout axe scan.
+
+### Changed
+
+- Storefront menu loading now shares `getPublicSettings()` and reads dine-in tokens server-side; `src/lib/storefront/types.ts` exports `DineInTable`.
+- Storefront cart CTA navigates to `/checkout` (preserving the table token) instead of showing a placeholder toast.
+- `src/lib/currency.ts` fee helpers derive radii from settings rather than hard-coded constants.
+- `next.config.mjs` CSP allows OpenStreetMap tiles for development.
+- `playwright.config.ts` pins `DISTANCE_FIXTURE=1` and `vitest.config.ts` aliases `server-only` to a test stub.
+
+### Verification
+
+- `npm run check` passes: lint, typecheck, 90 unit tests across 8 files, token checks, and the production build.
+- `npm run test:e2e` passes 20 Chromium tests at 1 worker: 11 Phase 4 flows/axe checks, 8 checkout flows, and the checkout axe scan, with zero critical or serious violations.
+- Client bundle inspection finds no server secret identifiers and no `process.env` references.
+- Production distance requests require durable Upstash configuration and an OSRM base URL; missing infrastructure returns `DISTANCE_UNAVAILABLE` instead of an estimated fee.
+
+---
+
 ## Implementation — Phase 4: Storefront, menu, and cart (2026-11-15)
 
 ### Added

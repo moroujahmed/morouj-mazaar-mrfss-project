@@ -17,11 +17,14 @@ export function formatUGX(amount: number): string {
 
 /**
  * Delivery fee in whole UGX.
- * Free at or below 5,000 m; otherwise ceil((metres - 5000) / 1000) * rate.
+ * Free at or below the free radius; otherwise
+ * ceil((metres - freeMetres) / 1000) * rate. Defaults match the canonical
+ * 5 km / 15 km rules; `app_settings` may override the radii.
  */
 export function calculateDeliveryFee(
   metres: number,
   ratePerExcessKmUgx: number,
+  freeMetres: number = FREE_DELIVERY_METRES,
 ): number {
   if (!Number.isInteger(metres) || metres < 0) {
     throw new Error(`Distance must be a non-negative integer metre value`);
@@ -29,14 +32,20 @@ export function calculateDeliveryFee(
   if (!Number.isInteger(ratePerExcessKmUgx) || ratePerExcessKmUgx < 0) {
     throw new Error(`Rate must be a non-negative integer UGX value`);
   }
-  if (metres <= FREE_DELIVERY_METRES) return 0;
+  if (!Number.isInteger(freeMetres) || freeMetres < 0) {
+    throw new Error(`Free radius must be a non-negative integer metre value`);
+  }
+  if (metres <= freeMetres) return 0;
 
-  const excessKm = Math.ceil((metres - FREE_DELIVERY_METRES) / 1_000);
+  const excessKm = Math.ceil((metres - freeMetres) / 1_000);
   return excessKm * ratePerExcessKmUgx;
 }
 
-export function isBeyondMaxDelivery(metres: number): boolean {
-  return metres > MAX_DELIVERY_METRES;
+export function isBeyondMaxDelivery(
+  metres: number,
+  maxMetres: number = MAX_DELIVERY_METRES,
+): boolean {
+  return metres > maxMetres;
 }
 
 export function formatDistanceMetres(metres: number): string {

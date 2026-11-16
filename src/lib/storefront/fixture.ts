@@ -1,7 +1,7 @@
 import "server-only";
 
 import { buildStorefrontMenu, type MenuRows } from "./build";
-import type { MenuResult, StoreSettings } from "./types";
+import type { DineInTable, MenuResult, StoreSettings } from "./types";
 
 /**
  * Canonical storefront fixture for browser tests.
@@ -421,6 +421,79 @@ const stepOptions: MenuRows["stepOptions"] = [
     sort_order: 2,
   },
 ];
+
+export type FixtureTable = DineInTable;
+
+/** Canonical seed QR tokens, available only when the fixture branch is on. */
+const fixtureTables: Record<string, FixtureTable> = {
+  "88888888-8888-4888-8888-888888888801": {
+    tableId: "77777777-7777-4777-8777-777777777701",
+    tableNumber: "T1",
+    label: "Window 1",
+  },
+  "88888888-8888-4888-8888-888888888804": {
+    tableId: "77777777-7777-4777-8777-777777777704",
+    tableNumber: "T4",
+    label: "Food Court Table T4",
+  },
+};
+
+export function createFixtureTable(token: string): FixtureTable | null {
+  return fixtureTables[token.toLowerCase()] ?? null;
+}
+
+/**
+ * Canonical OSRM snapshot from `CANONICAL_EXAMPLES.md` §3 plus one far point
+ * used to exercise the out-of-bounds block. These distances are test fixtures,
+ * never production truth: a real deployment must call OSRM.
+ */
+export const FIXTURE_ROUTES = [
+  {
+    lat: 0.3245,
+    lng: 32.5782,
+    distanceM: 1_562,
+    durationSeconds: 212,
+  },
+  {
+    lat: 0.3542,
+    lng: 32.612,
+    distanceM: 8_093,
+    durationSeconds: 507,
+  },
+  {
+    lat: 0.36,
+    lng: 32.62,
+    distanceM: 9_400,
+    durationSeconds: 600,
+  },
+  {
+    lat: 0.0512,
+    lng: 32.4637,
+    distanceM: 35_000,
+    durationSeconds: 2_700,
+  },
+] as const;
+
+const FIXTURE_TOLERANCE_DEGREES = 0.0006;
+
+export function resolveFixtureRoute(
+  lat: number,
+  lng: number,
+): { distanceM: number; durationSeconds: number } | null {
+  const match = FIXTURE_ROUTES.find(
+    (route) =>
+      Math.abs(route.lat - lat) <= FIXTURE_TOLERANCE_DEGREES &&
+      Math.abs(route.lng - lng) <= FIXTURE_TOLERANCE_DEGREES,
+  );
+
+  return match
+    ? { distanceM: match.distanceM, durationSeconds: match.durationSeconds }
+    : null;
+}
+
+export function createFixtureSettings(): StoreSettings {
+  return settings;
+}
 
 export function createFixtureMenu(): MenuResult {
   return buildStorefrontMenu({
