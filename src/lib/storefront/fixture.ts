@@ -442,6 +442,15 @@ export function createFixtureTable(token: string): FixtureTable | null {
   return fixtureTables[token.toLowerCase()] ?? null;
 }
 
+/** Resolve the label for a table id, mirroring `create_order`'s snapshot. */
+export function createFixtureTableNumber(tableId: string | null): string | null {
+  if (!tableId) return null;
+  const match = Object.values(fixtureTables).find(
+    (table) => table.tableId === tableId,
+  );
+  return match?.tableNumber ?? null;
+}
+
 /**
  * Canonical OSRM snapshot from `CANONICAL_EXAMPLES.md` §3 plus one far point
  * used to exercise the out-of-bounds block. These distances are test fixtures,

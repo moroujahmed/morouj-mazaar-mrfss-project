@@ -124,6 +124,14 @@ function upstashConfig(): { url: string; token: string } | null {
 export function getRouteCache(): RouteCache {
   if (cached) return cached;
 
+  // Test-only: canonical fixture routes never touch a durable cache.
+  if (process.env.DISTANCE_FIXTURE === "1") {
+    const globalStore = globalThis as CacheGlobal;
+    globalStore.__mrfssRouteCache ??= new InMemoryRouteCache();
+    cached = globalStore.__mrfssRouteCache;
+    return cached;
+  }
+
   const config = upstashConfig();
   if (config) {
     cached = new UpstashRouteCache(config.url, config.token);

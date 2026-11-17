@@ -4,7 +4,7 @@ import { randomInt, randomUUID } from "node:crypto";
 
 import { normalizeUgPhone } from "@/lib/phone";
 import type { OrderItemInput } from "@/lib/schemas/order";
-import { createFixtureMenu } from "@/lib/storefront/fixture";
+import { createFixtureMenu, createFixtureTableNumber } from "@/lib/storefront/fixture";
 
 import { OrderFailure } from "./errors";
 import { priceOrder } from "./pricing";
@@ -92,6 +92,7 @@ type FixtureState = {
   otps: Map<string, OtpRecord>;
   deliveredPhones: Set<string>;
   webhookEvents: Set<string>;
+  processedWebhookEvents: Set<string>;
   nextOrderNumber: number;
   refunds: number;
 };
@@ -111,6 +112,7 @@ function state(): FixtureState {
     otps: new Map(),
     deliveredPhones: new Set(),
     webhookEvents: new Set(),
+    processedWebhookEvents: new Set(),
     nextOrderNumber: 1042,
     refunds: 0,
   };
@@ -130,6 +132,15 @@ export function seedDeliveredCustomerForTests(phone: string): void {
 
 export function fixtureRefundCount(): number {
   return state().refunds;
+}
+
+/** Test-only: backdate an order so the timeout cron can expire it. */
+export function ageFixtureOrderForTests(token: string, minutes: number): void {
+  const order = getFixtureOrderByToken(token);
+  if (!order) return;
+  order.createdAt = new Date(
+    Date.now() - minutes * 60 * 1_000,
+  ).toISOString();
 }
 
 export function getFixtureOrderByToken(token: string): FixtureOrder | null {
@@ -266,7 +277,7 @@ export const fixtureOrderStore: OrderStore = {
         normalizeUgPhone(input.customerPhone) ?? input.customerPhone,
       notes: input.customerNotes,
       tableId: input.tableId,
-      tableNumber: null,
+      tableNumber: createFixtureTableNumber(input.tableId),
       address: input.deliveryAddressText,
       lat: input.deliveryLatitude,
       lng: input.deliveryLongitude,
@@ -312,12 +323,19 @@ export const fixtureOrderStore: OrderStore = {
       paymentMethod: order.method,
       customerName: order.customerName,
       tableNumber: order.tableNumber,
-      deliveryArea: null,
+      deliveryArea: order.address,
       itemsSubtotal: order.itemsSubtotal,
       modifiersTotal: order.modifiersTotal,
       deliveryFee: order.deliveryFee,
       packagingFee: order.packagingFee,
       totalAmount: order.total,
+      handoverPin:
+        order.type === "DELIVERY" &&
+        order.status !== "DELIVERED" &&
+        order.status !== "DELIVERY_FAILED" &&
+        order.status !== "CANCELLED"
+          ? order.handoverPin
+          : null,
       codChangeRequestedFor: order.codChangeRequestedFor,
       codChangeDue: order.codChangeDue,
       etaAt: order.etaAt,
@@ -569,14 +587,18 @@ export const fixtureOrderStore: OrderStore = {
     const key = `${input.provider}:${input.providerEventId}`;
     const store = state();
     if (store.webhookEvents.has(key)) {
-      return { duplicate: true, eventId: null };
+      return {
+        duplicate: true,
+        processed: store.processedWebhookEvents.has(key),
+        eventId: key,
+      };
     }
     store.webhookEvents.add(key);
-    return { duplicate: false, eventId: key };
+    return { duplicate: false, processed: false, eventId: key };
   },
 
-  async completeWebhookEvent(): Promise<void> {
-    // In-memory events have no processing column.
+  async completeWebhookEvent({ providerEventId }): Promise<void> {
+    state().processedWebhookEvents.add(`flutterwave:${providerEventId}`);
   },
 
   async expirePendingOrders(): Promise<number> {

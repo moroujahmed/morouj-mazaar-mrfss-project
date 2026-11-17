@@ -30,6 +30,13 @@ function raise(error: { message: string } | null, label: string): never {
   throw new Error(error?.message || `${label} failed`);
 }
 
+/** Columns typed `Json` are `NOT NULL` in the schema. */
+type NonNullJson = Exclude<Json, null>;
+
+function toJson(value: Record<string, unknown>): NonNullJson {
+  return value as NonNullJson;
+}
+
 export const supabaseOrderStore: OrderStore = {
   async createOrder(input: CreateOrderRpcInput): Promise<CreatedOrder> {
     const supabase = createAdminClient();
@@ -123,19 +130,31 @@ export const supabaseOrderStore: OrderStore = {
         provider: input.provider,
         provider_event_id: input.providerEventId,
         event_type: input.eventType,
-        payload: input.payload as unknown as Json,
+        payload: toJson(input.payload),
       })
       .select("id")
       .maybeSingle();
 
     if (error) {
       if (error.code === "23505") {
-        return { duplicate: true, eventId: null };
+        // A retry of an event we have not finished is allowed to reprocess.
+        const existing = await supabase
+          .from("webhook_events")
+          .select("id, processed_at")
+          .eq("provider", input.provider)
+          .eq("provider_event_id", input.providerEventId)
+          .maybeSingle();
+
+        return {
+          duplicate: true,
+          processed: Boolean(existing.data?.processed_at),
+          eventId: existing.data?.id ?? null,
+        };
       }
       raise(error, "webhook_events insert");
     }
 
-    return { duplicate: false, eventId: data?.id ?? null };
+    return { duplicate: false, processed: false, eventId: data?.id ?? null };
   },
 
   async completeWebhookEvent({
@@ -225,10 +244,10 @@ export const supabaseOrderStore: OrderStore = {
   }): Promise<void> {
     const supabase = createAdminClient();
     const update: {
-      raw_payload: Json;
+      raw_payload: NonNullJson;
       provider_transaction_id?: string;
     } = {
-      raw_payload: rawPayload as unknown as Json,
+      raw_payload: toJson(rawPayload),
     };
     if (providerReference) {
       update.provider_transaction_id = providerReference;

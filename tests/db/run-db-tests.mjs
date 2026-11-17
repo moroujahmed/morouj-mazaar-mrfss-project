@@ -38,14 +38,18 @@ if (!psql) {
   process.exit(1);
 }
 
-const result = spawnSync(
-  psql,
-  [databaseUrl, "-v", "ON_ERROR_STOP=1", "-f", join("tests", "db", "rls.sql")],
-  { stdio: "inherit", env: process.env },
-);
+const suites = [join("tests", "db", "rls.sql"), join("tests", "db", "orders.sql")];
 
-if (result.status !== 0) {
-  process.exit(result.status ?? 1);
+for (const suite of suites) {
+  const result = spawnSync(
+    psql,
+    [databaseUrl, "-v", "ON_ERROR_STOP=1", "-f", suite],
+    { stdio: "inherit", env: process.env },
+  );
+
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
 }
 
 console.log("Database and RLS tests passed.");

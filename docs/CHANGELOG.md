@@ -6,6 +6,38 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation - Phase 6: Order pipeline and payments (2026-11-17)
+
+### Added
+
+- Additive migration `supabase/migrations/20261116000000_order_pipeline.sql`: `create_order(jsonb)` inserts the order before its lines, rebuilds every price and fee from the catalogue/settings, snapshots items and modifiers, records the opening status history, and returns the authoritative totals; `finalize_payment_attempt()` re-checks amount/currency, isolates abandoned attempts, refuses to revive terminal orders, opens refund tasks, and is replay-safe; `store_cod_otp`/`verify_cod_otp` hash codes with bcrypt inside the database; `has_delivered_order` backs the returning-customer rule. All functions are granted to `service_role` only.
+- Authoritative server pricing in `src/lib/orders/pricing.ts` and the order store boundary (`store-types.ts`, `supabase-store.ts`, fixture `fixture-store.ts`, selector `store.ts`).
+- `src/actions/checkout.ts`: Zod-validated delivery/dine-in submission, Ugandan phone normalization, store/kitchen gates, fresh menu pricing, table-token resolution, server-side road route, MOV/COD/OTP gates, canonical idempotency hash, IP and phone rate limits, and an authoritative create-order call.
+- `src/actions/payments.ts`: per-attempt hosted checkout through `start_payment_attempt`, a fresh `tx_ref` on retry, provider failure cleanup, and the test-only mock completion action. `src/actions/otp.ts`: rate-limited cash-order codes with returning-customer skip and a fail-closed SMS adapter (`src/lib/notifications/sms.ts`).
+- Flutterwave adapter (`src/lib/payments/flutterwave.ts`) for hosted checkout and server-to-server transaction verification; production is gated on `PAYMENTS_MODE=live` credentials, while `PAYMENTS_FIXTURE=1`/`ORDERS_FIXTURE=1`/`OTP_FIXTURE=1` provide deterministic, network-free browser tests.
+- `POST /api/webhooks/flutterwave`: timing-safe `verif-hash` check, single event storage with reprocessing of unfinished retries, provider verification as the only payment authority, amount/currency/tx_ref matching, late-abandoned isolation, and duplicate-safe responses.
+- `GET/POST /api/cron/expire-orders`: `CRON_SECRET` bearer/header authentication, fail-closed configuration, and cancellation of digital orders pending past ten minutes with their open attempts failed.
+- Customer order tracker at `/orders/[token]` backed only by `get_order_by_token`, with status/payment badges, totals, change due, conditional handover PIN, payment retry, and refresh. Test-only `/checkout/mock-payment` simulates hosted checkout approval/decline. Checkout now submits real orders, handles OTP/change, and routes to payment or the tracker.
+- Unit coverage (`tests/unit/orders.test.ts`, `tests/unit/webhook.test.ts`) for canonical totals, combo snapshots, idempotent replay/conflict, store/kitchen gates, MOV/radius/COD limits, rate limiting, OTP required/invalid/returning-skip, per-attempt `tx_ref` isolation, declined payments, mock-payment success, webhook signatures/duplicates/mismatch/abandoned/unknown events, and cron auth/expiry.
+- Database coverage (`tests/db/orders.sql`, run by `npm run test:db`) for the canonical 35,000/38,000/8,000 totals, idempotency, server-side gate rejections, abandoned-attempt refunds, amount mismatch, terminal protection, hashed/single-use/locked/expired OTPs, and timeout expiry.
+- Playwright coverage (`tests/e2e/orders.spec.ts`) for prepaid mock checkout to a paid tracker, COD with OTP and change due, dine-in without delivery/packaging, declined payment, unknown-token 404, and axe scans of the mock-payment page and trackers.
+
+### Changed
+
+- Checkout no longer shows a placeholder CTA; `checkout-client.tsx` now submits orders, requests/validates codes, shows change options, maps server error codes, and clears the cart only after success.
+- `playwright.config.ts` runs the production build with `ORDERS_FIXTURE`, `PAYMENTS_FIXTURE`, `OTP_FIXTURE`, and `RATE_LIMIT_FIXTURE` set, plus production-valid dummy credentials so environment validation exercises the real schema.
+- The fixture order store mirrors database behaviour for table numbers, handover PIN exposure, and processed webhook events.
+- `src/lib/schemas/order.ts`, `src/types/database.types.ts`, and `src/lib/orders/errors.ts` cover the new RPC payloads and error codes.
+
+### Verification
+
+- `npm run check` passes: lint, typecheck, 126 unit tests across 10 files, token checks, and the production build.
+- `npm run test:e2e` passes 25 Chromium tests at 1 worker, including all Phase 4/5 regressions and the new order flows, with zero critical or serious axe violations.
+- `npm run test:db` passes both the RLS/privilege suite and the new order-pipeline suite against local PostgreSQL.
+- Client bundle inspection finds no secret identifiers; webhook, cron, and payment code is server-only.
+
+---
+
 ## Implementation - Phase 5: Distance API, delivery quote, and checkout (2026-11-16)
 
 ### Added

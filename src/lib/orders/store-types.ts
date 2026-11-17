@@ -143,6 +143,8 @@ export type WebhookEventInput = {
 
 export type WebhookEventRecord = {
   duplicate: boolean;
+  /** True only when the stored event already has `processed_at`. */
+  processed: boolean;
   eventId: string | null;
 };
 
@@ -191,11 +193,11 @@ export interface OrderStore {
   }): Promise<void>;
 }
 
-export function parseStoreResult<T>(
-  schema: z.ZodType<T>,
+export function parseStoreResult<S extends z.ZodTypeAny>(
+  schema: S,
   value: unknown,
   label: string,
-): T {
+): z.output<S> {
   const parsed = schema.safeParse(value);
   if (!parsed.success) {
     throw new OrderFailure(
@@ -203,5 +205,5 @@ export function parseStoreResult<T>(
       `The order service returned an invalid ${label} response.`,
     );
   }
-  return parsed.data;
+  return parsed.data as z.output<S>;
 }

@@ -9,7 +9,9 @@ export type OrderErrorCode =
   | "COD_NOT_AVAILABLE"
   | "OTP_REQUIRED"
   | "OTP_INVALID"
+  | "OTP_EXPIRED"
   | "OTP_LOCKED"
+  | "OTP_UNAVAILABLE"
   | "PAYMENT_METHOD_UNAVAILABLE"
   | "PAYMENT_UNAVAILABLE"
   | "IDEMPOTENCY_CONFLICT"
@@ -41,7 +43,10 @@ const MESSAGES: Record<OrderErrorCode, string> = {
     "Cash on delivery is not available for this order. Choose another payment method.",
   OTP_REQUIRED: "Enter the 6-digit code we sent to your phone.",
   OTP_INVALID: "That code is not valid. Check it and try again.",
+  OTP_EXPIRED: "That code expired. Request a new one.",
   OTP_LOCKED: "Too many incorrect codes. Request a new code.",
+  OTP_UNAVAILABLE:
+    "We cannot text a verification code right now. Pay online or try again shortly.",
   PAYMENT_METHOD_UNAVAILABLE:
     "That payment method is not available right now. Choose another method.",
   PAYMENT_UNAVAILABLE:
@@ -97,7 +102,9 @@ const KNOWN_CODES = new Set<string>([
   "COD_NOT_AVAILABLE",
   "OTP_REQUIRED",
   "OTP_INVALID",
+  "OTP_EXPIRED",
   "OTP_LOCKED",
+  "OTP_UNAVAILABLE",
   "PAYMENT_METHOD_UNAVAILABLE",
   "PAYMENT_UNAVAILABLE",
   "IDEMPOTENCY_CONFLICT",

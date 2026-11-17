@@ -25,7 +25,11 @@ export const DIGITAL_PAYMENT_METHODS = [
 export const paymentMethodSchema = z.enum(PAYMENT_METHODS);
 export const digitalPaymentMethodSchema = z.enum(DIGITAL_PAYMENT_METHODS);
 
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>;
+export type DigitalPaymentMethod = z.infer<typeof digitalPaymentMethodSchema>;
+
 export const orderTypeSchema = z.enum(["DELIVERY", "DINE_IN"]);
+export type OrderType = z.infer<typeof orderTypeSchema>;
 
 export const orderStatusSchema = z.enum([
   "PENDING_PAYMENT",
@@ -149,6 +153,8 @@ export const orderConfirmationSchema = z
     customerName: z.string(),
     tableNumber: z.string().nullable().optional(),
     deliveryArea: z.string().nullable().optional(),
+    handoverPin: z.string().nullable().optional(),
+    cancellationReason: z.string().nullable().optional(),
     itemsSubtotal: z.coerce.number().int(),
     modifiersTotal: z.coerce.number().int(),
     deliveryFee: z.coerce.number().int(),

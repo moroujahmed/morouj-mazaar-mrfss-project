@@ -161,6 +161,14 @@ function upstashConfig(): { url: string; token: string } | null {
 export function getRateLimiter(): RateLimiter {
   if (cached) return cached;
 
+  // Test-only: Playwright sets this so the suite never needs a live Upstash.
+  if (process.env.RATE_LIMIT_FIXTURE === "1") {
+    const globalStore = globalThis as LimiterGlobal;
+    globalStore.__mrfssDistanceLimiter ??= new InMemoryRateLimiter();
+    cached = globalStore.__mrfssDistanceLimiter;
+    return cached;
+  }
+
   const config = upstashConfig();
   if (config) {
     cached = new UpstashRateLimiter(config.url, config.token);

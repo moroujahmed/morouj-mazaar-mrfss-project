@@ -4,8 +4,11 @@ import {
   isBeyondMaxDelivery,
 } from "@/lib/currency";
 import type { OrderItemInput } from "@/lib/schemas/order";
-import type { SelectionMap } from "@/lib/storefront/cart";
-import { selectionRules, validateSelections } from "@/lib/storefront/selection";
+import {
+  validateSelections,
+  type SelectionMap,
+} from "@/lib/storefront/cart";
+import { selectionRules } from "@/lib/storefront/selection";
 import type {
   ModifierOptionType,
   StorefrontItem,

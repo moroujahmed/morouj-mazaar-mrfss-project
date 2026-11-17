@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -21,6 +22,9 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import { createOrderAction } from "@/actions/checkout";
+import { sendCodOtpAction } from "@/actions/otp";
+import { initiatePaymentAction } from "@/actions/payments";
 import { DynamicMap } from "@/components/map/dynamic-map";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
@@ -104,6 +108,23 @@ function roundCoordinate(value: number): number {
   return Number(value.toFixed(6));
 }
 
+const DB_PAYMENT_METHOD = {
+  MTN: "MTN_MOMO",
+  AIRTEL: "AIRTEL_MONEY",
+  CARD: "BANK_CARD",
+  COD: "CASH_ON_DELIVERY",
+} as const;
+
+const CHANGE_DENOMINATIONS = [20_000, 50_000, 100_000, 200_000, 500_000];
+
+type OtpStatus = "idle" | "sending" | "sent" | "skip" | "error";
+
+function newIdempotencyKey(): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `key-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 export function CheckoutClient({
   menu,
   storeStatus,
@@ -112,11 +133,13 @@ export function CheckoutClient({
 }: CheckoutClientProps) {
   const { settings, items } = menu;
   const { showToast } = useToast();
+  const router = useRouter();
   const dineIn = table !== null;
   const mode: FulfilmentMode = dineIn ? "dine-in" : "delivery";
 
   const lines = useCart((state) => state.lines);
   const removeLine = useCart((state) => state.removeLine);
+  const clearCart = useCart((state) => state.clear);
 
   const hydrated = useCartHydration(items, (result) => {
     if (result.unavailable > 0) {
@@ -154,6 +177,35 @@ export function CheckoutClient({
     address: false,
   });
 
+  const [otpCode, setOtpCode] = useState("");
+  const [otpStatus, setOtpStatus] = useState<OtpStatus>("idle");
+  const [otpMessage, setOtpMessage] = useState<string | null>(null);
+  const [changeAmount, setChangeAmount] = useState<number | null>(null);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<{
+    code: string;
+    message: string;
+  } | null>(null);
+
+  const cartSignature = useMemo(
+    () =>
+      JSON.stringify(
+        lines
+          .map((line) => ({ key: line.key, quantity: line.quantity }))
+          .sort((a, b) => a.key.localeCompare(b.key)),
+      ),
+    [lines],
+  );
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    // A new key per cart contents: retries of the same submission reuse it,
+    // while any cart change becomes a distinct order request.
+    setIdempotencyKey(newIdempotencyKey());
+    setSubmitError(null);
+  }, [cartSignature]);
+
   const subtotal = cartSubtotal(lines);
   const itemCount = cartItemCount(lines);
   const unavailableLines = lines.filter((line) => line.unavailable);
@@ -169,6 +221,11 @@ export function CheckoutClient({
   const remaining = movRemaining(subtotal, settings, mode);
   const minimum = minimumOrderValue(settings, mode);
   const totalReady = dineIn || quote !== null;
+
+  const changeOptions = useMemo(
+    () => CHANGE_DENOMINATIONS.filter((value) => value >= totals.total),
+    [totals.total],
+  );
 
   const normalizedPhone = normalizeUgPhone(phone);
   const nameError =
@@ -271,6 +328,12 @@ export function CheckoutClient({
     }
   }, [method, quote]);
 
+  useEffect(() => {
+    if (changeAmount !== null && changeAmount < totals.total) {
+      setChangeAmount(null);
+    }
+  }, [changeAmount, totals.total]);
+
   function pickPin(nextLat: number, nextLng: number) {
     const roundedLat = roundCoordinate(nextLat);
     const roundedLng = roundCoordinate(nextLng);
@@ -329,6 +392,131 @@ export function CheckoutClient({
       },
       { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 },
     );
+  }
+
+  async function requestOtp() {
+    if (!normalizedPhone) {
+      setTouched((state) => ({ ...state, phone: true }));
+      setOtpStatus("error");
+      setOtpMessage("Enter your phone number first.");
+      return;
+    }
+
+    setOtpStatus("sending");
+    setOtpMessage(null);
+
+    const result = await sendCodOtpAction({ phone });
+    if (!result.ok) {
+      setOtpStatus("error");
+      setOtpMessage(result.error.message);
+      return;
+    }
+
+    if (result.data.skip) {
+      setOtpStatus("skip");
+      setOtpMessage("You are a returning customer. No code is needed.");
+      return;
+    }
+
+    setOtpStatus("sent");
+    setOtpMessage("Code sent. It expires in 10 minutes.");
+  }
+
+  async function placeOrder() {
+    if (!idempotencyKey || normalizedPhone === null || blockedReason) return;
+    if (!dineIn && !destination) return;
+    if (dineIn && !tableToken) return;
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const dbMethod = DB_PAYMENT_METHOD[method];
+    const orderItems = lines.map((line) => ({
+      menuItemId: line.itemId,
+      quantity: line.quantity,
+      modifierIds: line.modifiers.map((modifier) => modifier.id),
+      comboSelections: line.comboSelections.map((selection) => ({
+        stepId: selection.stepId,
+        optionId: selection.optionId,
+      })),
+    }));
+
+    const payload = dineIn
+      ? {
+          idempotencyKey,
+          customerName: name.trim(),
+          customerPhone: phone,
+          customerNotes: notes.trim() || undefined,
+          items: orderItems,
+          paymentMethod: dbMethod,
+          orderType: "DINE_IN" as const,
+          tableToken: tableToken ?? "",
+        }
+      : {
+          idempotencyKey,
+          customerName: name.trim(),
+          customerPhone: phone,
+          customerNotes: notes.trim() || undefined,
+          items: orderItems,
+          paymentMethod: dbMethod,
+          orderType: "DELIVERY" as const,
+          deliveryCoordinates: destination ?? { lat: 0, lng: 0 },
+          deliveryAddressText: addressDetails.trim(),
+          otpCode:
+            method === "COD" && otpCode.length === 6 ? otpCode : undefined,
+          codChangeRequestedFor:
+            method === "COD" ? (changeAmount ?? undefined) : undefined,
+        };
+
+    const result = await createOrderAction(payload);
+
+    if (!result.ok) {
+      setSubmitError({ code: result.error.code, message: result.error.message });
+      if (
+        result.error.code === "OTP_REQUIRED" ||
+        result.error.code === "OTP_INVALID" ||
+        result.error.code === "OTP_LOCKED"
+      ) {
+        setOtpStatus("error");
+        setOtpMessage(result.error.message);
+      }
+      showToast({
+        title: "We could not place the order",
+        description: result.error.message,
+        tone: "error",
+      });
+      setSubmitting(false);
+      return;
+    }
+
+    const order = result.data;
+
+    // Cash orders (and any order that is already confirmed) go straight to the
+    // tracker. Digital orders continue to hosted checkout.
+    if (
+      order.paymentMethod === "CASH_ON_DELIVERY" ||
+      order.orderStatus !== "PENDING_PAYMENT" ||
+      order.paymentStatus !== "PENDING"
+    ) {
+      clearCart();
+      router.push(`/orders/${order.orderToken}`);
+      return;
+    }
+
+    const payment = await initiatePaymentAction({
+      orderToken: order.orderToken,
+      method: dbMethod,
+    });
+
+    if (!payment.ok) {
+      // The order exists and stays pending; the tracker can retry payment.
+      clearCart();
+      router.push(`/orders/${order.orderToken}`);
+      return;
+    }
+
+    clearCart();
+    window.location.assign(payment.data.redirectUrl);
   }
 
   const blockers: string[] = [];
@@ -392,6 +580,16 @@ export function CheckoutClient({
         ? "Add your name and phone number to continue."
         : "Add your name, phone number, and delivery details to continue.",
     );
+  }
+
+  if (
+    blockers.length === 0 &&
+    method === "COD" &&
+    !dineIn &&
+    otpStatus === "sent" &&
+    otpCode.length !== 6
+  ) {
+    blockers.push("Enter the 6-digit code we texted you, or request a new one.");
   }
 
   const blockedReason = blockers[0] ?? null;
@@ -736,12 +934,92 @@ export function CheckoutClient({
               })}
             </fieldset>
 
-            {method === "COD" && quote ? (
-              <p className="flex items-start gap-2 rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-900">
-                <Banknote aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-                Have {formatUGX(totals.total)} ready. The rider may send a
-                6-digit code to confirm the handover.
-              </p>
+            {method === "COD" ? (
+              <div className="flex flex-col gap-3 rounded-xl bg-green-50 p-3">
+                <p className="flex items-start gap-2 text-sm font-semibold text-green-900">
+                  <Banknote
+                    aria-hidden="true"
+                    className="mt-0.5 size-4 shrink-0"
+                  />
+                  Have {formatUGX(totals.total)} ready. The rider may ask for the
+                  handover PIN when your food arrives.
+                </p>
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="cod-change"
+                    className="text-sm font-semibold text-green-900"
+                  >
+                    Cash amount
+                  </label>
+                  <select
+                    id="cod-change"
+                    value={changeAmount ?? ""}
+                    onChange={(event) =>
+                      setChangeAmount(
+                        event.target.value ? Number(event.target.value) : null,
+                      )
+                    }
+                    className="min-h-touch rounded-xl border-2 border-green-800 bg-surface px-3 text-base font-semibold text-green-900"
+                  >
+                    <option value="">Exact amount</option>
+                    {changeOptions.map((value) => (
+                      <option key={value} value={value}>
+                        {formatUGX(value)} · change{" "}
+                        {formatUGX(value - totals.total)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {!dineIn ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap items-end gap-2">
+                      <div className="min-w-40 flex-1">
+                        <TextField
+                          label="Verification code"
+                          value={otpCode}
+                          onChange={(event) =>
+                            setOtpCode(
+                              event.target.value.replace(/\D/g, "").slice(0, 6),
+                            )
+                          }
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          hint="6 digits"
+                        />
+                      </div>
+                      <Button
+                        variant="secondary"
+                        onClick={requestOtp}
+                        isLoading={otpStatus === "sending"}
+                        disabled={otpStatus === "sending" || otpStatus === "skip"}
+                      >
+                        {otpStatus === "sent" ? "Resend code" : "Send code"}
+                      </Button>
+                    </div>
+                    {otpMessage ? (
+                      <p
+                        role="status"
+                        aria-live="polite"
+                        className={cn(
+                          "text-sm font-semibold",
+                          otpStatus === "error"
+                            ? "text-status-danger"
+                            : "text-green-900",
+                        )}
+                      >
+                        {otpMessage}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-ink-secondary">
+                        First cash order? We text a 6-digit code to confirm your
+                        number.
+                      </p>
+                    )}
+                  </div>
+                ) : null}
+              </div>
             ) : null}
           </section>
         </div>
@@ -879,19 +1157,37 @@ export function CheckoutClient({
               </span>
             </div>
 
+            {submitError ? (
+              <div
+                role="alert"
+                className="flex items-start gap-2 rounded-xl bg-status-dangerSurface p-3 text-sm font-semibold text-status-danger"
+              >
+                <AlertTriangle
+                  aria-hidden="true"
+                  className="mt-0.5 size-4 shrink-0"
+                />
+                <span>
+                  {submitError.message}
+                  {submitError.code === "IDEMPOTENCY_CONFLICT" ? (
+                    <button
+                      type="button"
+                      onClick={() => setIdempotencyKey(newIdempotencyKey())}
+                      className="ml-1 underline underline-offset-4"
+                    >
+                      Start a new checkout
+                    </button>
+                  ) : null}
+                </span>
+              </div>
+            ) : null}
+
             <Button
               size="xl"
               fullWidth
               disabled={Boolean(blockedReason)}
+              isLoading={submitting}
               aria-describedby="checkout-status"
-              onClick={() =>
-                showToast({
-                  title: "Order submission is coming next",
-                  description:
-                    "Your cart and delivery quote are saved on this device. Payment and order confirmation are enabled in the next build step.",
-                  tone: "info",
-                })
-              }
+              onClick={() => void placeOrder()}
               leadingIcon={<ShieldCheck aria-hidden="true" className="size-5" />}
             >
               {totalReady

@@ -150,12 +150,12 @@ The test plan is in [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md). Canonical fixtures
 
 Do not use retired distances, fees or totals in tests or UI copy. The canonical values above and in [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) are the only approved fixtures.
 
-Playwright runs the production build with `STOREFRONT_FIXTURE=1` and `DISTANCE_FIXTURE=1` so it needs no Supabase stack or OSRM instance. The distance fixture serves the canonical Nakasero and Ntinda routes plus two boundary points: `9,400 m` (inside delivery, outside the 8.1 km COD radius) and `35,000 m` (outside the 15 km delivery radius). Those flags are test-only; production requires `OSRM_BASE_URL`, Upstash, and the live database.
+Playwright runs the production build with `STOREFRONT_FIXTURE=1`, `DISTANCE_FIXTURE=1`, `ORDERS_FIXTURE=1`, `PAYMENTS_FIXTURE=1`, `OTP_FIXTURE=1`, and `RATE_LIMIT_FIXTURE=1` so it needs no Supabase stack, OSRM instance, Upstash, Flutterwave account, or SMS provider. The distance fixture serves the canonical Nakasero and Ntinda routes plus two boundary points: `9,400 m` (inside delivery, outside the 8.1 km COD radius) and `35,000 m` (outside the 15 km delivery radius). The order fixtures use the deterministic cash code `123456` and an internal mock checkout page. Those flags are test-only; production requires `OSRM_BASE_URL`, Upstash, live Flutterwave and Africa's Talking credentials, and the live database.
 
 ```bash
 npm run check        # lint, typecheck, unit tests, token checks, production build
 npm run test:e2e     # Playwright Chromium suite (production build on port 3100)
-npm run test:db      # RLS/privilege matrix against local Supabase Postgres
+npm run test:db      # RLS/privilege matrix and order pipeline against local Supabase Postgres
 ```
 
 ---
