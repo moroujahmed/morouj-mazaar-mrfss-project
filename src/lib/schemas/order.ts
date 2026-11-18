@@ -50,6 +50,9 @@ export const paymentStatusSchema = z.enum([
   "REFUNDED",
 ]);
 
+export const feedbackRatingSchema = z.enum(["GREAT", "OKAY", "BAD"]);
+export type FeedbackRating = z.infer<typeof feedbackRatingSchema>;
+
 const phoneSchema = z
   .string()
   .min(9)
@@ -120,6 +123,12 @@ export const mockPaymentSchema = z.object({
   outcome: z.enum(["success", "failure"]),
 });
 
+export const submitFeedbackSchema = z.object({
+  orderToken: z.string().uuid(),
+  rating: feedbackRatingSchema,
+  notes: z.string().trim().max(1000).optional(),
+});
+
 export const flutterwaveWebhookSchema = z
   .object({
     event: z.string().min(1).max(120),
@@ -167,6 +176,56 @@ export const orderConfirmationSchema = z
     roadDistanceM: z.coerce.number().int().nullable().optional(),
     estimatedTravelMinutes: z.coerce.number().int().nullable().optional(),
     createdAt: z.string().optional(),
+    readyAt: z.string().nullable().optional(),
+    deliveredAt: z.string().nullable().optional(),
+    cancelledAt: z.string().nullable().optional(),
+    destinationLatitude: z.coerce.number().nullable().optional(),
+    destinationLongitude: z.coerce.number().nullable().optional(),
+    canRate: z.boolean().optional(),
+    feedback: z
+      .object({
+        rating: feedbackRatingSchema,
+        notes: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+    timeline: z
+      .array(
+        z.object({
+          status: orderStatusSchema,
+          at: z.string(),
+          reason: z.string().nullable().optional(),
+        }),
+      )
+      .default([]),
+    refund: z
+      .object({
+        status: z.string(),
+        amount: z.coerce.number().int(),
+        reason: z.string().nullable().optional(),
+        requestedAt: z.string().nullable().optional(),
+        completedAt: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+    deliveryFailure: z
+      .object({
+        outcome: z.string(),
+        reason: z.string().nullable().optional(),
+        createdAt: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+    rider: z
+      .object({
+        name: z.string().nullable().optional(),
+        phone: z.string().nullable().optional(),
+        latitude: z.coerce.number().nullable().optional(),
+        longitude: z.coerce.number().nullable().optional(),
+        updatedAt: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
     items: z
       .array(
         z.object({

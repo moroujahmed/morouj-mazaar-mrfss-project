@@ -26,7 +26,7 @@ export default defineConfig({
     command: `npm run build && npm run start -- -p ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    timeout: 300_000,
     env: {
       NEXT_TELEMETRY_DISABLED: "1",
       // Browser tests run without a Supabase stack. The server-only fixture is
@@ -40,6 +40,8 @@ export default defineConfig({
       OTP_FIXTURE: "1",
       // Per-instance limiters/cache instead of dummy Upstash calls.
       RATE_LIMIT_FIXTURE: "1",
+      // No Realtime websocket in the browser suite; polling is the fallback.
+      NEXT_PUBLIC_REALTIME_DISABLED: "1",
       // Production-mode validation requires live payments, durable limits,
       // OSRM, and a cron secret. These are dummy values for the test server.
       PAYMENTS_MODE: "live",

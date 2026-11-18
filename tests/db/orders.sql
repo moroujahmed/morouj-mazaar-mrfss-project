@@ -730,6 +730,157 @@ BEGIN
   END IF;
 END $$;
 
+-- ---------------------------------------------------------------------------
+-- Phase 7: tracker payload and one-time feedback.
+-- The token RPC must expose the status timeline, hide destination coordinates
+-- until the rider is en route, drop the PIN at terminal states, and never
+-- return customer phone, notes, or payment references.
+-- ---------------------------------------------------------------------------
+DO $$
+DECLARE
+  r jsonb;
+  g jsonb;
+  v_token UUID;
+  v_dine UUID;
+BEGIN
+  r := public.create_order(jsonb_build_object(
+    'idempotencyKey', '00000000-0000-4000-8000-0000000000f3',
+    'requestHash', 'hash-tracker',
+    'customerName', 'DB Tracker',
+    'customerPhone', '0772900013',
+    'orderType', 'DELIVERY',
+    'deliveryAddressText', 'Nakasero Plot 12',
+    'deliveryLatitude', 0.3245,
+    'deliveryLongitude', 32.5782,
+    'roadDistanceM', 1562,
+    'estimatedTravelMinutes', 4,
+    'paymentMethod', 'MTN_MOMO',
+    'items', jsonb_build_array(
+      jsonb_build_object(
+        'menuItemId', '22222222-2222-4222-8222-222222222203',
+        'quantity', 1
+      )
+    )
+  ));
+  v_token := (r->>'orderToken')::uuid;
+
+  g := public.get_order_by_token(v_token);
+  IF g IS NULL THEN
+    RAISE EXCEPTION 'FAIL: tracker payload is null';
+  END IF;
+  IF jsonb_array_length(g->'timeline') <> 1
+     OR (g->'timeline'->0->>'status') <> 'PENDING_PAYMENT' THEN
+    RAISE EXCEPTION 'FAIL: initial timeline %', g->'timeline';
+  END IF;
+  IF (g->>'destinationLatitude') IS NOT NULL
+     OR (g->>'destinationLongitude') IS NOT NULL THEN
+    RAISE EXCEPTION 'FAIL: destination coordinates exposed before dispatch';
+  END IF;
+  IF (g->>'handoverPin') IS NULL OR (g->>'handoverPin') !~ '^[0-9]{4}$' THEN
+    RAISE EXCEPTION 'FAIL: active delivery PIN missing from token payload';
+  END IF;
+  IF (g->>'customerPhone') IS NOT NULL
+     OR (g->>'customerNotes') IS NOT NULL
+     OR (g->>'paymentReference') IS NOT NULL THEN
+    RAISE EXCEPTION 'FAIL: token payload leaked private fields';
+  END IF;
+  IF (g->>'canRate')::boolean
+     OR coalesce(g->'feedback', 'null'::jsonb) <> 'null'::jsonb THEN
+    RAISE EXCEPTION 'FAIL: feedback exposed before delivery';
+  END IF;
+
+  -- Out for delivery: destination coordinates appear, timeline records the hop.
+  UPDATE public.orders SET order_status = 'PREPARING' WHERE order_token = v_token;
+  UPDATE public.orders SET order_status = 'READY_FOR_PICKUP' WHERE order_token = v_token;
+  UPDATE public.orders SET order_status = 'CLAIMED' WHERE order_token = v_token;
+  UPDATE public.orders SET order_status = 'OUT_FOR_DELIVERY' WHERE order_token = v_token;
+
+  g := public.get_order_by_token(v_token);
+  IF abs((g->>'destinationLatitude')::numeric - 0.3245) > 0.000001
+     OR abs((g->>'destinationLongitude')::numeric - 32.5782) > 0.000001 THEN
+    RAISE EXCEPTION 'FAIL: destination coordinates wrong while dispatched: %, %',
+      g->>'destinationLatitude', g->>'destinationLongitude';
+  END IF;
+  IF (g->'timeline'->(jsonb_array_length(g->'timeline') - 1)->>'status') <> 'OUT_FOR_DELIVERY' THEN
+    RAISE EXCEPTION 'FAIL: dispatch missing from timeline %', g->'timeline';
+  END IF;
+  IF (g->>'handoverPin') IS NULL THEN
+    RAISE EXCEPTION 'FAIL: PIN disappeared while the order is active';
+  END IF;
+
+  -- Feedback is rejected before delivery.
+  BEGIN
+    PERFORM public.submit_feedback(v_token, 'GREAT', 'too early');
+    RAISE EXCEPTION 'FAIL: feedback accepted before delivery';
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM NOT LIKE 'ORDER_NOT_FOUND_OR_ALREADY_RATED%' THEN RAISE; END IF;
+  END;
+
+  -- Delivered: destination and PIN disappear, rating becomes available.
+  UPDATE public.orders
+  SET order_status = 'DELIVERED',
+      delivered_at = timezone('utc', now())
+  WHERE order_token = v_token;
+
+  g := public.get_order_by_token(v_token);
+  IF (g->>'destinationLatitude') IS NOT NULL
+     OR (g->>'destinationLongitude') IS NOT NULL THEN
+    RAISE EXCEPTION 'FAIL: destination coordinates retained after delivery';
+  END IF;
+  IF (g->>'handoverPin') IS NOT NULL THEN
+    RAISE EXCEPTION 'FAIL: PIN retained on a delivered order';
+  END IF;
+  IF NOT (g->>'canRate')::boolean THEN
+    RAISE EXCEPTION 'FAIL: delivered order is not rateable';
+  END IF;
+  IF (g->'timeline'->(jsonb_array_length(g->'timeline') - 1)->>'status') <> 'DELIVERED' THEN
+    RAISE EXCEPTION 'FAIL: delivery missing from timeline %', g->'timeline';
+  END IF;
+
+  IF (public.submit_feedback(v_token, 'GREAT', 'Still warm'))->>'success' <> 'true' THEN
+    RAISE EXCEPTION 'FAIL: feedback was not stored';
+  END IF;
+
+  g := public.get_order_by_token(v_token);
+  IF (g->'feedback'->>'rating') <> 'GREAT'
+     OR (g->'feedback'->>'notes') <> 'Still warm' THEN
+    RAISE EXCEPTION 'FAIL: feedback payload wrong %', g->'feedback';
+  END IF;
+  IF (g->>'canRate')::boolean THEN
+    RAISE EXCEPTION 'FAIL: rated order still reports canRate';
+  END IF;
+
+  BEGIN
+    PERFORM public.submit_feedback(v_token, 'BAD', NULL);
+    RAISE EXCEPTION 'FAIL: second feedback accepted';
+  EXCEPTION WHEN OTHERS THEN
+    IF SQLERRM NOT LIKE 'ORDER_NOT_FOUND_OR_ALREADY_RATED%' THEN RAISE; END IF;
+  END;
+
+  -- Dine-in orders never carry a handover PIN.
+  r := public.create_order(jsonb_build_object(
+    'idempotencyKey', '00000000-0000-4000-8000-0000000000f2',
+    'requestHash', 'hash-tracker-dine',
+    'customerName', 'DB Tracker Dine',
+    'customerPhone', '0772900014',
+    'orderType', 'DINE_IN',
+    'tableId', '77777777-7777-4777-8777-777777777704',
+    'paymentMethod', 'CASH_ON_DELIVERY',
+    'items', jsonb_build_array(
+      jsonb_build_object(
+        'menuItemId', '22222222-2222-4222-8222-222222222205',
+        'quantity', 1
+      )
+    )
+  ));
+  v_dine := (r->>'orderToken')::uuid;
+
+  g := public.get_order_by_token(v_dine);
+  IF (g->>'handoverPin') IS NOT NULL THEN
+    RAISE EXCEPTION 'FAIL: dine-in order exposed a handover PIN';
+  END IF;
+END $$;
+
 ROLLBACK;
 
 SELECT 'Order pipeline tests passed.' AS result;

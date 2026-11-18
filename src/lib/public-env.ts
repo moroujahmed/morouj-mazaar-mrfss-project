@@ -10,6 +10,9 @@ export const publicEnv = {
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
   maptilerKey: process.env.NEXT_PUBLIC_MAPTILER_KEY ?? "",
+  // The browser suite disables the Realtime websocket so a dummy Supabase URL
+  // never causes connection retries. Polling remains the fallback everywhere.
+  realtimeEnabled: process.env.NEXT_PUBLIC_REALTIME_DISABLED !== "1",
 } as const;
 
 export function isSupabaseConfigured(): boolean {

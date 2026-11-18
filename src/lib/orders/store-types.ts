@@ -163,6 +163,11 @@ export type StoreCodOtpInput = {
 export interface OrderStore {
   createOrder(input: CreateOrderRpcInput): Promise<CreatedOrder>;
   getOrderByToken(token: string): Promise<unknown | null>;
+  submitFeedback(input: {
+    orderToken: string;
+    rating: "GREAT" | "OKAY" | "BAD";
+    notes?: string;
+  }): Promise<void>;
   getPaymentContext(token: string): Promise<PaymentContext | null>;
   startPaymentAttempt(input: {
     orderToken: string;

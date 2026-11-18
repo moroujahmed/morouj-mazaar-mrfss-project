@@ -1,8 +1,7 @@
 "use client";
 
-import { RefreshCw, CreditCard } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { initiatePaymentAction } from "@/actions/payments";
@@ -10,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import type { DigitalPaymentMethod } from "@/lib/schemas/order";
 
 /**
- * Tracker actions. A digital order still awaiting payment can restart hosted
- * checkout; a retry allocates a fresh attempt reference.
+ * A digital order still awaiting payment can restart hosted checkout. Every
+ * retry allocates a fresh `tx_ref`; a late success on an abandoned attempt is
+ * isolated by the webhook and never marks the order paid.
  */
 export function PaymentRetryPanel({
   orderToken,
@@ -59,22 +59,5 @@ export function PaymentRetryPanel({
         Back to your order
       </Link>
     </div>
-  );
-}
-
-export function RefreshOrderButton() {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
-
-  return (
-    <Button
-      variant="secondary"
-      size="sm"
-      isLoading={pending}
-      leadingIcon={<RefreshCw aria-hidden="true" className="size-4" />}
-      onClick={() => startTransition(() => router.refresh())}
-    >
-      Refresh status
-    </Button>
   );
 }

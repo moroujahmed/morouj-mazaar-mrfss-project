@@ -56,6 +56,29 @@ export const supabaseOrderStore: OrderStore = {
     return data ?? null;
   },
 
+  async submitFeedback({
+    orderToken,
+    rating,
+    notes,
+  }): Promise<void> {
+    const supabase = createAdminClient();
+    const { error } = await supabase.rpc("submit_feedback", {
+      p_token: orderToken,
+      p_rating: rating,
+      p_notes: notes ?? undefined,
+    });
+
+    if (error) {
+      if (error.message.includes("ORDER_NOT_FOUND_OR_ALREADY_RATED")) {
+        throw new OrderFailure(
+          "ORDER_STATE_INVALID",
+          "Feedback was already sent, or this order is not ready for feedback.",
+        );
+      }
+      raise(error, "submit_feedback");
+    }
+  },
+
   async getPaymentContext(token: string): Promise<PaymentContext | null> {
     const supabase = createAdminClient();
     const { data, error } = await supabase

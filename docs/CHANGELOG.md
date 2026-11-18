@@ -6,6 +6,35 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation - Phase 7: Customer order tracker (2026-11-18)
+
+### Added
+
+- Additive migration `supabase/migrations/20261118000000_tracker_payload.sql`: `get_order_by_token` now returns the ordered status timeline from `order_status_history`, destination coordinates only while `OUT_FOR_DELIVERY`, the latest rider position only in that same window, and the existing refund/delivery-failure context. `handover_pin` remains limited to active delivery orders, and customer phone, notes, and payment references are never returned.
+- Tracker domain layer in `src/lib/orders/tracker.ts` (`TrackerSnapshot`, `toTrackerSnapshot`, `isTerminalStatus`, `parseTimestamp`) that narrows the token payload before it reaches the browser.
+- `GET /api/orders/[token]/tracking`: token-scoped polling with UUID validation, per-IP rate limiting, `no-store` responses, a terminal marker, and no PIN/phone/notes/payment fields. `src/actions/orders.ts` adds one-time customer feedback through `submit_feedback` with per-token and per-IP limits.
+- Tracker UI under `src/components/tracker/`: `TrackerLive` polling (10 s while visible), optional Supabase Broadcast subscription with polling fallback, polite status announcements, terminal-state PIN withdrawal, safety-seal instruction before the PIN, status/payment badges, progress timeline, OUT_FOR_DELIVERY map with rider/destination markers and stale-telemetry copy, one-tap feedback, docket totals/change due, payment retry, and cancelled/delivery-failed explanations with support links.
+- `/orders/[token]` is rebuilt on the tracker components, reads the PIN only from the initial server RPC render, returns 404 for malformed/unknown tokens, and renders a recoverable alert when the store is unavailable. The old `src/components/orders/order-actions.tsx` is removed.
+- Test-only fixture driver `POST /api/test/fixture/orders/[token]` (`ORDERS_FIXTURE=1` only) so the browser suite can advance fixture orders and telemetry until the Phase 8/9 portals exist.
+- Unit coverage (`tests/unit/tracker.test.ts`) for the narrowed polling payload, destination/rider scoping, unknown-token 404s, PIN removal, feedback rejection before delivery, one-time acceptance, and invalid ratings.
+- Database coverage (`tests/db/orders.sql`) for the timeline, PIN/destination transitions, private-field absence, rateability, one-time feedback, and dine-in PIN omission.
+- Playwright coverage (`tests/e2e/tracker.spec.ts`) for safety-seal ordering, polling without a reload, live/stale rider telemetry, delivered feedback once, cancelled state, and axe scans.
+
+### Changed
+
+- `orderConfirmationSchema` accepts the tracker fields and exports `feedbackRatingSchema`/`submitFeedbackSchema`; both order stores implement `submitFeedback`, and the fixture store records timeline entries, terminal timestamps, rider name, telemetry, and feedback.
+- `publicEnv.realtimeEnabled` is false when `NEXT_PUBLIC_REALTIME_DISABLED=1`; Playwright sets it so the dummy Supabase URL never opens a websocket. Polling remains the fallback everywhere.
+- Playwright tracker cases set a distinct forwarded IP per test, matching proxy behaviour, so the 5/minute checkout limiter does not couple unrelated cases.
+- `playwright.config.ts` allows 300 s for the production build/start web server on cold runs.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm test` (133 unit tests across 11 files), `npm run test:tokens`, and `npm run build` pass.
+- `npm run test:e2e` passes the full Chromium suite, including the five new tracker flows, with zero critical or serious axe violations.
+- `npm run test:db` passes the RLS suite and the extended order-pipeline suite against local PostgreSQL.
+
+---
+
 ## Implementation - Phase 6: Order pipeline and payments (2026-11-17)
 
 ### Added

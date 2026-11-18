@@ -72,6 +72,18 @@ type FixtureOrder = {
   handoverPin: string;
   createdAt: string;
   acknowledgedAt: string | null;
+  readyAt: string | null;
+  deliveredAt: string | null;
+  cancelledAt: string | null;
+  cancellationReason: string | null;
+  riderName: string | null;
+  telemetry: { latitude: number; longitude: number; updatedAt: string } | null;
+  timeline: Array<{
+    status: CreatedOrder["orderStatus"];
+    at: string;
+    reason?: string | null;
+  }>;
+  feedback: { rating: "GREAT" | "OKAY" | "BAD"; notes: string | null } | null;
   items: PricedLine[];
 };
 
@@ -141,6 +153,93 @@ export function ageFixtureOrderForTests(token: string, minutes: number): void {
   order.createdAt = new Date(
     Date.now() - minutes * 60 * 1_000,
   ).toISOString();
+}
+
+function recordStatus(
+  order: FixtureOrder,
+  status: FixtureOrder["status"],
+  reason: string,
+  at = new Date().toISOString(),
+): void {
+  order.timeline.push({ status, at, reason });
+}
+
+/**
+ * Test-only status driver for Playwright. Phase 8/9 own the real kitchen and
+ * rider transitions; until those portals exist the browser suite needs a way
+ * to move a fixture order to READY/OUT_FOR_DELIVERY/DELIVERED and set the rider
+ * position. This helper is never reachable unless `ORDERS_FIXTURE=1`.
+ */
+export function setFixtureOrderStatusForTests(
+  token: string,
+  status: FixtureOrder["status"],
+  options: {
+    telemetry?: {
+      latitude: number;
+      longitude: number;
+      updatedAt?: string;
+    } | null;
+    reason?: string;
+    at?: string;
+  } = {},
+): boolean {
+  const order = getFixtureOrderByToken(token);
+  if (!order) return false;
+
+  const at = options.at ?? new Date().toISOString();
+  order.status = status;
+  order.timeline.push({
+    status,
+    at,
+    reason: options.reason ?? `FIXTURE_${status}`,
+  });
+
+  if (status === "PREPARING") {
+    order.acknowledgedAt ??= at;
+  }
+  if (status === "READY_FOR_PICKUP") {
+    order.readyAt ??= at;
+  }
+  if (status === "CLAIMED" || status === "OUT_FOR_DELIVERY") {
+    order.riderName ??= "Juma Okello";
+  }
+  if (status === "OUT_FOR_DELIVERY") {
+    order.telemetry =
+      options.telemetry === null
+        ? null
+        : {
+            latitude: options.telemetry?.latitude ?? order.lat ?? 0.3245,
+            longitude: options.telemetry?.longitude ?? order.lng ?? 32.5782,
+            updatedAt: options.telemetry?.updatedAt ?? at,
+          };
+  }
+  if (status === "DELIVERED") {
+    order.deliveredAt = at;
+    if (order.method === "CASH_ON_DELIVERY") {
+      order.paymentStatus = "PAID";
+    }
+  }
+  if (status === "CANCELLED") {
+    order.cancelledAt = at;
+    order.cancellationReason = options.reason ?? "CANCELLED_BY_STAFF";
+  }
+
+  return true;
+}
+
+/** Test-only: move the rider marker without changing the order status. */
+export function setFixtureTelemetryForTests(
+  token: string,
+  point: { latitude: number; longitude: number; updatedAt?: string },
+): boolean {
+  const order = getFixtureOrderByToken(token);
+  if (!order || order.status !== "OUT_FOR_DELIVERY") return false;
+  order.telemetry = {
+    latitude: point.latitude,
+    longitude: point.longitude,
+    updatedAt: point.updatedAt ?? new Date().toISOString(),
+  };
+  return true;
 }
 
 export function getFixtureOrderByToken(token: string): FixtureOrder | null {
@@ -259,16 +358,19 @@ export const fixtureOrderStore: OrderStore = {
       }
     }
 
+    const createdAt = new Date().toISOString();
+    const initialStatus: FixtureOrder["status"] =
+      input.paymentMethod === "CASH_ON_DELIVERY"
+        ? "CONFIRMED_UNPAID"
+        : "PENDING_PAYMENT";
+
     const order: FixtureOrder = {
       id: randomUUID(),
       token: randomUUID(),
       number: store.nextOrderNumber,
       type: input.orderType,
       source: input.orderType === "DINE_IN" ? "TABLE_QR" : "WEB",
-      status:
-        input.paymentMethod === "CASH_ON_DELIVERY"
-          ? "CONFIRMED_UNPAID"
-          : "PENDING_PAYMENT",
+      status: initialStatus,
       paymentStatus: "PENDING",
       method: input.paymentMethod,
       customerName: input.customerName,
@@ -293,10 +395,19 @@ export const fixtureOrderStore: OrderStore = {
       codChangeDue:
         changeRequested !== null ? changeRequested - priced.total : null,
       handoverPin: String(randomInt(1000, 10_000)),
-      createdAt: new Date().toISOString(),
+      createdAt,
       acknowledgedAt: null,
+      readyAt: null,
+      deliveredAt: null,
+      cancelledAt: null,
+      cancellationReason: null,
+      riderName: null,
+      telemetry: null,
+      timeline: [],
+      feedback: null,
       items: priced.lines,
     };
+    recordStatus(order, initialStatus, "ORDER_CREATED", createdAt);
 
     store.nextOrderNumber += 1;
     store.orders.set(order.id, order);
@@ -343,6 +454,43 @@ export const fixtureOrderStore: OrderStore = {
       roadDistanceM: order.distanceM,
       estimatedTravelMinutes: order.travelMinutes,
       createdAt: order.createdAt,
+      readyAt: order.readyAt,
+      deliveredAt: order.deliveredAt,
+      cancelledAt: order.cancelledAt,
+      cancellationReason: order.cancellationReason,
+      destinationLatitude:
+        order.status === "OUT_FOR_DELIVERY" ? order.lat : null,
+      destinationLongitude:
+        order.status === "OUT_FOR_DELIVERY" ? order.lng : null,
+      canRate: order.status === "DELIVERED" && order.feedback === null,
+      feedback: order.feedback,
+      timeline: order.timeline,
+      refund: null,
+      deliveryFailure:
+        order.status === "DELIVERY_FAILED"
+          ? {
+              outcome: "FAILED",
+              reason: order.cancellationReason ?? "DELIVERY_FAILED",
+              createdAt: order.cancelledAt,
+            }
+          : null,
+      rider: order.riderName
+        ? {
+            name: order.riderName,
+            latitude:
+              order.status === "OUT_FOR_DELIVERY"
+                ? (order.telemetry?.latitude ?? null)
+                : null,
+            longitude:
+              order.status === "OUT_FOR_DELIVERY"
+                ? (order.telemetry?.longitude ?? null)
+                : null,
+            updatedAt:
+              order.status === "OUT_FOR_DELIVERY"
+                ? (order.telemetry?.updatedAt ?? null)
+                : null,
+          }
+        : null,
       items: order.items.map((line) => ({
         name: line.name,
         quantity: line.quantity,
@@ -354,6 +502,18 @@ export const fixtureOrderStore: OrderStore = {
         })),
       })),
     };
+  },
+
+  async submitFeedback({ orderToken, rating, notes }): Promise<void> {
+    const order = findOrderByToken(orderToken);
+    if (!order || order.status !== "DELIVERED" || order.feedback !== null) {
+      throw new OrderFailure(
+        "ORDER_STATE_INVALID",
+        "Feedback was already sent, or this order is not ready for feedback.",
+      );
+    }
+
+    order.feedback = { rating, notes: notes ?? null };
   },
 
   async getPaymentContext(token: string): Promise<PaymentContext | null> {
@@ -530,6 +690,7 @@ export const fixtureOrderStore: OrderStore = {
       order.paymentStatus = "PAID";
       order.status = "PREPARING";
       order.acknowledgedAt ??= new Date().toISOString();
+      recordStatus(order, "PREPARING", "PAYMENT_VERIFIED", order.acknowledgedAt);
 
       return {
         applied: true,
@@ -613,6 +774,14 @@ export const fixtureOrderStore: OrderStore = {
       ) {
         order.status = "CANCELLED";
         order.paymentStatus = "FAILED";
+        order.cancelledAt = new Date().toISOString();
+        order.cancellationReason = "PAYMENT_TIMEOUT";
+        recordStatus(
+          order,
+          "CANCELLED",
+          "PAYMENT_TIMEOUT",
+          order.cancelledAt,
+        );
         expired += 1;
 
         const refs = state().attemptsByOrder.get(order.id) ?? [];
