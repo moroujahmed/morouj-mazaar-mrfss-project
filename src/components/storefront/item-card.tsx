@@ -71,7 +71,9 @@ export function ItemCard({
               type="button"
               onClick={() => onCustomize(item)}
               disabled={disabled}
-              aria-label={`Customize ${item.name}`}
+              aria-label={
+                soldOut ? `Sold out: ${item.name}` : `Customize ${item.name}`
+              }
               className={buttonClasses({
                 variant: soldOut ? "secondary" : "primary",
                 fullWidth: true,
@@ -85,7 +87,9 @@ export function ItemCard({
               type="button"
               onClick={() => onQuickAdd(item)}
               disabled={disabled}
-              aria-label={`Add ${item.name} to cart`}
+              aria-label={
+                soldOut ? `Sold out: ${item.name}` : `Add ${item.name} to cart`
+              }
               className={buttonClasses({
                 variant: soldOut ? "secondary" : "primary",
                 fullWidth: true,

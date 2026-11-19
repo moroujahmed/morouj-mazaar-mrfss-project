@@ -1,3 +1,10 @@
+import { cookies } from "next/headers";
+
+import {
+  FIXTURE_STAFF_COOKIE,
+  staffFixtureEnabled,
+  verifyFixtureSessionToken,
+} from "@/lib/auth/fixture-token";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 
@@ -27,6 +34,28 @@ const PROFILE_COLUMNS =
 
 /** Read the authenticated staff member and their profile, or null. */
 export async function getStaffSession(): Promise<StaffSession | null> {
+  // Test-only portal session; production always uses Supabase Auth.
+  if (staffFixtureEnabled()) {
+    const store = await cookies();
+    const session = await verifyFixtureSessionToken(
+      store.get(FIXTURE_STAFF_COOKIE)?.value,
+    );
+    if (!session) return null;
+
+    return {
+      userId: session.userId,
+      profile: {
+        id: session.userId,
+        full_name: session.fullName,
+        phone_number: session.phone,
+        role: session.role,
+        is_active: true,
+        must_change_pin: session.mustChangePin,
+        motorcycle_plate: null,
+      },
+    };
+  }
+
   const supabase = await createServerSupabaseClient();
   const {
     data: { user },

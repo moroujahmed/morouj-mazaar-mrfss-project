@@ -5,6 +5,7 @@ import { randomInt, randomUUID } from "node:crypto";
 import { normalizeUgPhone } from "@/lib/phone";
 import type { OrderItemInput } from "@/lib/schemas/order";
 import { createFixtureMenu, createFixtureTableNumber } from "@/lib/storefront/fixture";
+import type { KitchenTicket } from "@/lib/kitchen/types";
 
 import { OrderFailure } from "./errors";
 import { priceOrder } from "./pricing";
@@ -107,6 +108,7 @@ type FixtureState = {
   processedWebhookEvents: Set<string>;
   nextOrderNumber: number;
   refunds: number;
+  reprints: Map<string, number>;
 };
 
 type FixtureGlobal = typeof globalThis & {
@@ -127,6 +129,7 @@ function state(): FixtureState {
     processedWebhookEvents: new Set(),
     nextOrderNumber: 1042,
     refunds: 0,
+    reprints: new Map(),
   };
   return globalStore.__mrfssOrders;
 }
@@ -245,6 +248,100 @@ export function setFixtureTelemetryForTests(
 export function getFixtureOrderByToken(token: string): FixtureOrder | null {
   const id = state().tokenIndex.get(token);
   return id ? (state().orders.get(id) ?? null) : null;
+}
+
+function toKitchenTicket(order: FixtureOrder): KitchenTicket {
+  return {
+    orderId: order.id,
+    orderNumber: order.number,
+    status: order.status as KitchenTicket["status"],
+    orderType: order.type,
+    tableNumber: order.tableNumber,
+    customerName: order.customerName,
+    customerNotes: order.notes,
+    paymentMethod: order.method,
+    paymentStatus: order.paymentStatus,
+    totalAmount: order.total,
+    codChangeRequestedFor: order.codChangeRequestedFor,
+    codChangeDue: order.codChangeDue,
+    createdAt: order.createdAt,
+    acknowledgedAt: order.acknowledgedAt,
+    readyAt: order.readyAt,
+    kitchenBusyBufferApplied: null,
+    items: order.items.map((line) => ({
+      name: line.name,
+      quantity: line.quantity,
+      modifiers: line.modifiers.map((modifier) => ({
+        name: modifier.name,
+        priceDelta: modifier.priceDelta,
+      })),
+    })),
+  };
+}
+
+const ACTIVE_KITCHEN_STATUSES = new Set<FixtureOrder["status"]>([
+  "CONFIRMED_UNPAID",
+  "PREPARING",
+  "READY_FOR_PICKUP",
+]);
+
+/** Kitchen board read path for the fixture store (mirrors get_kitchen_orders). */
+export function listFixtureKitchenTickets(): KitchenTicket[] {
+  return [...state().orders.values()]
+    .filter((order) => ACTIVE_KITCHEN_STATUSES.has(order.status))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    .map(toKitchenTicket);
+}
+
+export function getFixtureKitchenTicket(orderId: string): KitchenTicket | null {
+  const order = state().orders.get(orderId);
+  return order && ACTIVE_KITCHEN_STATUSES.has(order.status)
+    ? toKitchenTicket(order)
+    : null;
+}
+
+export function acceptFixtureOrder(orderId: string): void {
+  const order = state().orders.get(orderId);
+  if (!order) throw new OrderFailure("ORDER_NOT_FOUND");
+  if (order.status !== "CONFIRMED_UNPAID") {
+    throw new OrderFailure("ORDER_STATE_INVALID");
+  }
+
+  const at = new Date().toISOString();
+  order.status = "PREPARING";
+  order.acknowledgedAt ??= at;
+  recordStatus(order, "PREPARING", "KITCHEN_ACCEPTED", at);
+}
+
+export function bumpFixtureOrder(
+  orderId: string,
+): "READY_FOR_PICKUP" | "DELIVERED" {
+  const order = state().orders.get(orderId);
+  if (!order) throw new OrderFailure("ORDER_NOT_FOUND");
+  if (order.status !== "PREPARING") {
+    throw new OrderFailure("ORDER_STATE_INVALID");
+  }
+
+  const at = new Date().toISOString();
+  const next: "READY_FOR_PICKUP" | "DELIVERED" =
+    order.type === "DINE_IN" ? "DELIVERED" : "READY_FOR_PICKUP";
+
+  order.status = next;
+  order.acknowledgedAt ??= at;
+  if (next === "READY_FOR_PICKUP") order.readyAt ??= at;
+  if (next === "DELIVERED") order.deliveredAt ??= at;
+  recordStatus(order, next, "KITCHEN_BUMPED", at);
+  return next;
+}
+
+export function recordFixtureReprint(orderId: string): void {
+  const order = state().orders.get(orderId);
+  if (!order) throw new OrderFailure("ORDER_NOT_FOUND");
+  state().reprints.set(orderId, (state().reprints.get(orderId) ?? 0) + 1);
+}
+
+export function fixtureReprintCount(orderId: string): number {
+  return state().reprints.get(orderId) ?? 0;
 }
 
 function pricingItems(menu: NonNullable<ReturnType<typeof fixtureMenu>>, input: CreateOrderRpcInput): OrderItemInput[] {

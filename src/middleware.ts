@@ -2,6 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
+import {
+  FIXTURE_STAFF_COOKIE,
+  staffFixtureEnabled,
+  verifyFixtureSessionToken,
+} from "@/lib/auth/fixture-token";
 import type { Database } from "@/types/database.types";
 
 type StaffRole = Exclude<
@@ -69,6 +74,27 @@ export async function middleware(request: NextRequest) {
   );
 
   if (!portal) return NextResponse.next();
+
+  // Playwright has no Supabase Auth. A signed fixture cookie (STAFF_FIXTURE=1)
+  // is verified here so portal routing matches production behaviour.
+  if (staffFixtureEnabled()) {
+    const session = await verifyFixtureSessionToken(
+      request.cookies.get(FIXTURE_STAFF_COOKIE)?.value,
+    );
+
+    if (pathname === portal.login) {
+      if (session && portal.roles.includes(session.role)) {
+        return NextResponse.redirect(new URL(portal.base, request.url));
+      }
+      return NextResponse.next();
+    }
+
+    if (!session) return loginRedirect(request, portal, pathname);
+    if (!portal.roles.includes(session.role)) {
+      return NextResponse.redirect(new URL(homeForRole(session.role), request.url));
+    }
+    return NextResponse.next();
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

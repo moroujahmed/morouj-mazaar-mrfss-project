@@ -680,6 +680,9 @@ isOneToOne: false
             "accept_order":
 { Args: { "p_order_id": string }; Returns: Json
                            },
+"audit_kitchen_reprint":
+{ Args: { "p_order_id": string }; Returns: Json
+                           },
 "admin_approve_refund":
 { Args: { "p_decision": string,"p_notes"?: string,"p_refund_id": string }; Returns: Json
                            },

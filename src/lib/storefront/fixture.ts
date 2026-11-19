@@ -501,14 +501,85 @@ export function resolveFixtureRoute(
 }
 
 export function createFixtureSettings(): StoreSettings {
-  return settings;
+  const state = kitchenFixtureState();
+  return {
+    ...settings,
+    isKitchenBusy: state.isKitchenBusy,
+    busyBufferMinutes: state.busyBufferMinutes,
+    isKitchenPaused: state.isKitchenPaused,
+  };
+}
+
+type KitchenFixtureState = {
+  isKitchenBusy: boolean;
+  busyBufferMinutes: number;
+  isKitchenPaused: boolean;
+  overrides: Map<string, boolean>;
+};
+
+type FixtureGlobal = typeof globalThis & {
+  __mrfssKitchen?: KitchenFixtureState;
+};
+
+/**
+ * Per-process kitchen overrides for Playwright. Production uses the database;
+ * the fixture store never exists outside `STOREFRONT_FIXTURE=1`.
+ *
+ * State lives on `globalThis` because Next.js can evaluate this module in more
+ * than one server bundle (page render, server actions, route handlers). A
+ * module-local object would let the kitchen toggle write to a different copy
+ * than the storefront and kitchen board read from.
+ */
+function kitchenFixtureState(): KitchenFixtureState {
+  const globalStore = globalThis as FixtureGlobal;
+  globalStore.__mrfssKitchen ??= {
+    isKitchenBusy: false,
+    busyBufferMinutes: settings.busyBufferMinutes,
+    isKitchenPaused: false,
+    overrides: new Map(),
+  };
+  return globalStore.__mrfssKitchen;
+}
+
+export function setFixtureItemAvailability(
+  itemId: string,
+  available: boolean,
+): boolean {
+  if (!items.some((item) => item.id === itemId)) return false;
+  kitchenFixtureState().overrides.set(itemId, available);
+  return true;
+}
+
+export function setFixtureKitchenBusy(
+  busy: boolean,
+  bufferMinutes?: number,
+): void {
+  const state = kitchenFixtureState();
+  state.isKitchenBusy = busy;
+  if (bufferMinutes !== undefined) state.busyBufferMinutes = bufferMinutes;
+}
+
+export function setFixtureKitchenPaused(paused: boolean): void {
+  kitchenFixtureState().isKitchenPaused = paused;
+}
+
+export function resetFixtureKitchenStateForTests(): void {
+  const state = kitchenFixtureState();
+  state.isKitchenBusy = false;
+  state.busyBufferMinutes = settings.busyBufferMinutes;
+  state.isKitchenPaused = false;
+  state.overrides.clear();
 }
 
 export function createFixtureMenu(): MenuResult {
+  const state = kitchenFixtureState();
   return buildStorefrontMenu({
-    settings,
+    settings: createFixtureSettings(),
     categories,
-    items,
+    items: items.map((item) => ({
+      ...item,
+      is_available: state.overrides.get(item.id) ?? item.is_available,
+    })),
     links,
     groups,
     modifiers,

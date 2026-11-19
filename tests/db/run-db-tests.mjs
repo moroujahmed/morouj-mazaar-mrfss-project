@@ -38,7 +38,11 @@ if (!psql) {
   process.exit(1);
 }
 
-const suites = [join("tests", "db", "rls.sql"), join("tests", "db", "orders.sql")];
+const suites = [
+  join("tests", "db", "rls.sql"),
+  join("tests", "db", "orders.sql"),
+  join("tests", "db", "kitchen.sql"),
+];
 
 for (const suite of suites) {
   const result = spawnSync(

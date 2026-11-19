@@ -42,6 +42,9 @@ export default defineConfig({
       RATE_LIMIT_FIXTURE: "1",
       // No Realtime websocket in the browser suite; polling is the fallback.
       NEXT_PUBLIC_REALTIME_DISABLED: "1",
+      // Signed fixture staff session for /kitchen, /rider, and /admin. The
+      // default test secret is documented in src/lib/auth/fixture-token.ts.
+      STAFF_FIXTURE: "1",
       // Production-mode validation requires live payments, durable limits,
       // OSRM, and a cron secret. These are dummy values for the test server.
       PAYMENTS_MODE: "live",

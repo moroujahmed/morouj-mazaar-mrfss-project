@@ -4,7 +4,7 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + Phase 7 storefront, checkout, order pipeline, and customer tracker |
+| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + Phase 8 storefront, checkout, order pipeline, customer tracker, and kitchen board |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | `USh`, whole integers with thousands separators |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |
@@ -19,7 +19,7 @@
 
 ## What is in this repository
 
-The repository contains the **specification, database baseline, seed data, and operational contracts**, a static interface prototype in `site/`, and the Phase 7 Next.js application foundation (database, staff auth, RLS, v2 design tokens, accessible UI kit, a server-driven storefront with a persisted, reconciled cart, the OSRM-backed distance and delivery-quote API, the checkout screen, the authoritative order/payment pipeline, and the customer order tracker with polling, rider telemetry, handover PIN, and one-time feedback). Implementation proceeds through the phases in [`docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md`](docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md).
+The repository contains the **specification, database baseline, seed data, and operational contracts**, a static interface prototype in `site/`, and the Phase 8 Next.js application foundation (database, staff auth, RLS, v2 design tokens, accessible UI kit, a server-driven storefront with a persisted, reconciled cart, the OSRM-backed distance and delivery-quote API, the checkout screen, the authoritative order/payment pipeline, the customer order tracker with polling, rider telemetry, handover PIN, and one-time feedback, and the kitchen board with accept/bump, 86 toggles, busy mode, intake pause, new-order chime, and audited print dockets). Implementation proceeds through the phases in [`docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md`](docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md).
 
 ```
 .
@@ -133,6 +133,7 @@ The script maps each phone number to a synthetic email (`{digits}@staff.moroujma
 - `anon` and `authenticated` have **no direct table access** to orders, PINs, telemetry, payments, settlements, or audit tables. Use the RPCs in the migration.
 - `orders.handover_pin` is returned only by `get_order_by_token(token)` (customer capability) or `admin_get_order(id)` (admin).
 - Rider pool payloads contain no phone, exact address, notes, or PIN.
+- Kitchen board payloads and printed dockets contain no customer phone, handover PIN, or payment reference; every docket is audited before it is released.
 - Every payment webhook is verified with Flutterwave `/v3/transactions/{id}/verify` before an order is marked paid.
 - Cash settlements link to orders through `orders.settlement_id`; a settlement total must equal the sum of its linked orders.
 
@@ -150,7 +151,7 @@ The test plan is in [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md). Canonical fixtures
 
 Do not use retired distances, fees or totals in tests or UI copy. The canonical values above and in [`docs/CANONICAL_EXAMPLES.md`](docs/CANONICAL_EXAMPLES.md) are the only approved fixtures.
 
-Playwright runs the production build with `STOREFRONT_FIXTURE=1`, `DISTANCE_FIXTURE=1`, `ORDERS_FIXTURE=1`, `PAYMENTS_FIXTURE=1`, `OTP_FIXTURE=1`, and `RATE_LIMIT_FIXTURE=1` so it needs no Supabase stack, OSRM instance, Upstash, Flutterwave account, or SMS provider. `NEXT_PUBLIC_REALTIME_DISABLED=1` keeps the dummy Supabase URL from opening a websocket; the tracker polls every 10 seconds in every environment, with Broadcast as an optional accelerator. The distance fixture serves the canonical Nakasero and Ntinda routes plus two boundary points: `9,400 m` (inside delivery, outside the 8.1 km COD radius) and `35,000 m` (outside the 15 km delivery radius). The order fixtures use the deterministic cash code `123456`, an internal mock checkout page, and a fixture-only status/telemetry driver for tracker tests. Those flags are test-only; production requires `OSRM_BASE_URL`, Upstash, live Flutterwave and Africa's Talking credentials, and the live database.
+Playwright runs the production build with `STOREFRONT_FIXTURE=1`, `DISTANCE_FIXTURE=1`, `ORDERS_FIXTURE=1`, `PAYMENTS_FIXTURE=1`, `OTP_FIXTURE=1`, `RATE_LIMIT_FIXTURE=1`, and `STAFF_FIXTURE=1` so it needs no Supabase stack, OSRM instance, Upstash, Flutterwave account, or SMS provider. `NEXT_PUBLIC_REALTIME_DISABLED=1` keeps the dummy Supabase URL from opening a websocket; the tracker and kitchen board poll every 10 seconds in every environment, with Broadcast as an optional accelerator. The distance fixture serves the canonical Nakasero and Ntinda routes plus two boundary points: `9,400 m` (inside delivery, outside the 8.1 km COD radius) and `35,000 m` (outside the 15 km delivery radius). The order fixtures use the deterministic cash code `123456`, an internal mock checkout page, and a fixture-only status/telemetry driver for tracker tests. Staff fixture credentials are documented in `src/lib/auth/fixture-staff.ts`; kitchen cases sign the fixture session cookie directly so the five-attempt sign-in limit is not shared across the suite. Those flags are test-only; production requires `OSRM_BASE_URL`, Upstash, live Flutterwave and Africa's Talking credentials, and the live database.
 
 ```bash
 npm run check        # lint, typecheck, unit tests, token checks, production build

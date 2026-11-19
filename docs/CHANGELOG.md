@@ -6,6 +6,36 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation - Phase 8: Kitchen board and service controls (2026-11-19)
+
+### Added
+
+- Additive migration `supabase/migrations/20261119000000_kitchen_reprint.sql`: `audit_kitchen_reprint(uuid)` records every released kitchen docket as `KITCHEN_REPRINT_DOCKET`, returns `ORDER_NOT_FOUND` for unknown orders, and is executable only by `authenticated` (PUBLIC and `anon` are revoked).
+- Staff authentication in `src/actions/auth.ts`, `src/lib/auth/action-result.ts`, and `src/lib/auth/fixture-token.ts`/`fixture-staff.ts`: phone + 6-digit PIN sign-in, five failed attempts per phone per fifteen minutes, role routing (`ADMIN` → `/admin`, `KITCHEN` → `/kitchen`, `RIDER` → `/rider`), sign-out, and a signed, expiring fixture session for browser tests. `src/middleware.ts` now protects `/admin`, `/kitchen`, and `/rider` while leaving the login screens reachable.
+- Kitchen domain layer in `src/lib/kitchen/` (`types`, `errors`, `schemas`, `store`, `fixture-store`, `supabase-store`, `board`) plus `src/actions/kitchen.ts`: typed board envelope, accept/bump, 86 toggles, busy mode, intake pause, and reprint auditing, backed by the existing RPCs in production and a deterministic fixture store for Playwright.
+- `GET /api/kitchen/board`: authenticated, `no-store`, oldest-first active tickets, item snapshots, settings, and stock, with no phone, handover PIN, or payment reference in the payload.
+- Kitchen UI under `src/app/(operations)/kitchen/` and `src/components/kitchen/`: staff sign-in, chef shell with sign-out, oldest-first ticket cards, 10-second visible-only polling, shift-gated repeating new-order chime, polite announcements, offline/busy/paused banners, delivery/dine-in filters, queue statistics, accept and bump actions with optimistic updates, busy buffer selection, intake pause, 86 sheet, toast feedback, and browser-print dockets.
+- Docket route `GET /api/print/receipt/[orderId]`: KITCHEN/ADMIN only, 80 mm browser-print HTML, no handover PIN or customer phone, audited before the copy is released, and `noindex`/`no-store`.
+- Phase 8 unit coverage (`tests/unit/kitchen.test.ts`): the ticket contract and PII exclusion, accept/bump state machine, delivery vs dine-in bumping, error mapping, reprint auditing, 86 propagation, unknown items, busy immutability, intake pause rejection at checkout, chime unlock/repetition/stop, and fixture session signing/expiry.
+- Database coverage (`tests/db/kitchen.sql`, run by `npm run test:db`): privilege matrix, COD/prepaid/dine-in tickets, board filtering without private fields, accept/bump transitions, 86 propagation and sold-out rejection, busy buffer on new orders, busy/pause immutability of existing tickets, reprint audit, admin access, rider denial, and audit-trail counts.
+- Playwright coverage (`tests/e2e/kitchen.spec.ts`): unauthenticated redirects and API 401s, wrong-PIN error then successful sign-in, COD ticket accept → ready, audited docket without PIN/phone, busy/pause propagation to the storefront with server persistence, 86 hide/restore, and axe scans of the board, 86 sheet, and sold-out storefront.
+
+### Changed
+
+- `src/lib/storefront/fixture.ts` keeps busy/pause/stock state on `globalThis` so page renders, server actions, and route handlers share one fixture kitchen; module-local state made 86 and busy mode invisible across Next bundles.
+- Kitchen ticket contact sheets no longer read as "Customize <item>" when sold out: the accessible name now includes the visible "Sold out" text, clearing the axe `label-content-name-mismatch` violation.
+- The staff sign-in form reads `?next=` inside the submit handler instead of with `useSearchParams`, so the login pages remain statically prerenderable and need no Suspense boundary.
+- `playwright.config.ts` runs the browser suite with `STAFF_FIXTURE=1`; kitchen cases sign the documented fixture cookie for most flows so the five-attempt login limiter is not shared across the suite, while one case still drives the form.
+- `tests/db/run-db-tests.mjs` now runs `tests/db/rls.sql`, `tests/db/orders.sql`, and `tests/db/kitchen.sql`.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npx vitest run` (146 unit tests across 12 files), and `npm run build` pass.
+- `npm run test:db` passes the RLS/privilege, order-pipeline, and kitchen suites against local PostgreSQL 18.
+- `npm run test:e2e` passes 34 Chromium tests, including the four new kitchen flows, with zero critical or serious axe violations.
+
+---
+
 ## Implementation - Phase 7: Customer order tracker (2026-11-18)
 
 ### Added
