@@ -2,6 +2,13 @@ import "server-only";
 
 import { randomInt, randomUUID } from "node:crypto";
 
+import type {
+  AdminOrderDetail,
+  AdminOrderStatus,
+  AdminOrderSummary,
+  RefundRequest,
+} from "@/lib/admin/types";
+import type { UpdateOrderContactInput } from "@/lib/admin/schemas";
 import { normalizeUgPhone } from "@/lib/phone";
 import type { OrderItemInput } from "@/lib/schemas/order";
 import { createFixtureMenu, createFixtureTableNumber } from "@/lib/storefront/fixture";
@@ -64,6 +71,7 @@ type FixtureOrder = {
   notes: string | null;
   tableId: string | null;
   tableNumber: string | null;
+  deliveryArea: string | null;
   address: string | null;
   lat: number | null;
   lng: number | null;
@@ -86,7 +94,9 @@ type FixtureOrder = {
   cancellationReason: string | null;
   riderId: string | null;
   riderName: string | null;
+  claimedAt: string | null;
   dispatchedAt: string | null;
+  adminEditedAt: string | null;
   failedPinAttempts: number;
   pinLockedUntil: string | null;
   deliveryFailure: { outcome: string; reason: string; at: string } | null;
@@ -108,6 +118,16 @@ type OtpRecord = {
   consumed: boolean;
 };
 
+type FixtureRefund = {
+  refundId: string;
+  orderId: string;
+  amount: number;
+  status: string;
+  reason: string | null;
+  notes: string | null;
+  requestedAt: string;
+};
+
 type FixtureState = {
   orders: Map<string, FixtureOrder>;
   tokenIndex: Map<string, string>;
@@ -120,6 +140,7 @@ type FixtureState = {
   processedWebhookEvents: Set<string>;
   nextOrderNumber: number;
   refunds: number;
+  refundRequests: Map<string, FixtureRefund>;
   reprints: Map<string, number>;
 };
 
@@ -141,6 +162,7 @@ function state(): FixtureState {
     processedWebhookEvents: new Set(),
     nextOrderNumber: 1042,
     refunds: 0,
+    refundRequests: new Map(),
     reprints: new Map(),
   };
   return globalStore.__mrfssOrders;
@@ -495,6 +517,7 @@ export function claimFixtureRiderOrder(
   order.riderId = riderId;
   order.riderName = riderName;
   order.status = "CLAIMED";
+  order.claimedAt = at;
   recordStatus(order, "CLAIMED", "RIDER_CLAIMED", at);
   return toRiderActiveOrder(order);
 }
@@ -695,6 +718,302 @@ export function clearFixtureRiderAssignment(orderId: string): void {
   order.dispatchedAt = null;
 }
 
+// ---------------------------------------------------------------------------
+// Admin bridge. The admin fixture store owns settings/menu/staff/audit state;
+// orders and refunds remain in this single source of truth so the operations,
+// storefront, kitchen, and rider fixtures all observe the same mutations.
+// ---------------------------------------------------------------------------
+
+function toAdminSummary(order: FixtureOrder): AdminOrderSummary {
+  return {
+    orderId: order.id,
+    orderNumber: order.number,
+    customerName: order.customerName,
+    customerPhone: order.customerPhoneNormalized,
+    status: order.status,
+    paymentStatus: order.paymentStatus,
+    paymentMethod: order.method,
+    orderType: order.type,
+    deliveryArea: order.deliveryArea,
+    tableNumber: order.tableNumber,
+    riderId: order.riderId,
+    riderName: order.riderName,
+    totalAmount: order.total,
+    createdAt: order.createdAt,
+    acknowledgedAt: order.acknowledgedAt,
+    readyAt: order.readyAt,
+    etaAt: order.etaAt,
+  };
+}
+
+function toAdminDetail(order: FixtureOrder): AdminOrderDetail {
+  const payments = [...(state().attempts.values() ?? [])]
+    .filter((tx) => tx.orderId === order.id)
+    .map((tx) => ({
+      txRef: tx.txRef,
+      method: String(
+        (tx.rawPayload as { provider?: unknown } | undefined)?.provider ?? "UNKNOWN",
+      ),
+      status: tx.status,
+      amount: tx.amount,
+      createdAt: null,
+    }));
+
+  const refund = [...state().refundRequests.values()].find(
+    (entry) => entry.orderId === order.id,
+  );
+
+  return {
+    ...toAdminSummary(order),
+    handoverPin: order.handoverPin,
+    failedPinAttempts: order.failedPinAttempts,
+    pinLockedUntil: order.pinLockedUntil,
+    address: order.address,
+    notes: order.notes,
+    deliveryLatitude: order.lat,
+    deliveryLongitude: order.lng,
+    roadDistanceM: order.distanceM,
+    codChangeDue: order.codChangeDue,
+    cancellationReason: order.cancellationReason,
+    securityFlag: order.deliveryFailure
+      ? `DELIVERY_FAILED:${order.deliveryFailure.outcome}`
+      : null,
+    adminEditedAt: order.adminEditedAt,
+    timeline: order.timeline,
+    items: order.items.map((line) => ({
+      name: line.name,
+      quantity: line.quantity,
+      unitPrice: line.unitPrice,
+      lineTotal:
+        (line.unitPrice +
+          line.modifiers.reduce((sum, modifier) => sum + modifier.priceDelta * modifier.quantity, 0)) *
+        line.quantity,
+    })),
+    payments,
+    refund: refund
+      ? {
+          id: refund.refundId,
+          status: refund.status,
+          amount: refund.amount,
+          reason: refund.reason,
+          requestedAt: refund.requestedAt,
+        }
+      : null,
+  };
+}
+
+export function listFixtureAdminOrders(): AdminOrderSummary[] {
+  return [...state().orders.values()]
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+    .map(toAdminSummary);
+}
+
+export function getFixtureAdminOrderDetail(orderId: string): AdminOrderDetail | null {
+  const order = state().orders.get(orderId);
+  return order ? toAdminDetail(order) : null;
+}
+
+export function adminFixtureUpdateContact(
+  input: UpdateOrderContactInput,
+): AdminOrderDetail {
+  const order = state().orders.get(input.orderId);
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  if (["OUT_FOR_DELIVERY", "DELIVERED", "DELIVERY_FAILED", "CANCELLED"].includes(order.status)) {
+    throw new Error("ORDER_STATE_INVALID");
+  }
+
+  if (input.customerName !== undefined) order.customerName = input.customerName;
+  if (input.customerPhone !== undefined) {
+    order.customerPhone = input.customerPhone;
+    order.customerPhoneNormalized = normalizeUgPhone(input.customerPhone) ?? input.customerPhone;
+  }
+  if (input.customerNotes !== undefined) order.notes = input.customerNotes;
+  if (input.deliveryAddressText !== undefined) order.address = input.deliveryAddressText;
+  if (input.deliveryArea !== undefined) order.deliveryArea = input.deliveryArea;
+  if (input.deliveryLatitude !== undefined) order.lat = input.deliveryLatitude;
+  if (input.deliveryLongitude !== undefined) order.lng = input.deliveryLongitude;
+  if (input.roadDistanceM !== undefined) order.distanceM = input.roadDistanceM;
+  if (input.deliveryFee !== undefined) {
+    order.deliveryFee = input.deliveryFee;
+    order.total =
+      order.itemsSubtotal + order.modifiersTotal + order.deliveryFee + order.packagingFee;
+  }
+  order.adminEditedAt = new Date().toISOString();
+  recordStatus(order, order.status, input.reason);
+  return toAdminDetail(order);
+}
+
+export function adminFixtureCancelOrder(orderId: string, reason: string): void {
+  const order = state().orders.get(orderId);
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  if (["DELIVERED", "CANCELLED"].includes(order.status)) {
+    throw new Error("ORDER_STATE_INVALID");
+  }
+
+  const at = new Date().toISOString();
+  order.status = "CANCELLED";
+  order.cancelledAt = at;
+  order.cancellationReason = reason;
+  recordStatus(order, "CANCELLED", reason, at);
+
+  if (order.paymentStatus === "PAID") {
+    createFixtureRefundRequest(order.id, reason, order.total);
+  }
+}
+
+export function adminFixtureCompleteOrder(orderId: string, reason: string): void {
+  const order = state().orders.get(orderId);
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  if (!["CLAIMED", "OUT_FOR_DELIVERY", "READY_FOR_PICKUP"].includes(order.status)) {
+    throw new Error("ORDER_STATE_INVALID");
+  }
+
+  const at = new Date().toISOString();
+  order.status = "DELIVERED";
+  order.deliveredAt = at;
+  if (order.method === "CASH_ON_DELIVERY") order.paymentStatus = "PAID";
+  recordStatus(order, "DELIVERED", reason, at);
+}
+
+export function adminFixtureReassignOrder(
+  orderId: string,
+  riderId: string,
+  riderName: string,
+  reason: string,
+): void {
+  const order = state().orders.get(orderId);
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  if (!["CLAIMED", "OUT_FOR_DELIVERY", "READY_FOR_PICKUP"].includes(order.status)) {
+    throw new Error("ORDER_STATE_INVALID");
+  }
+  if (
+    [...state().orders.values()].some(
+      (candidate) =>
+        candidate.id !== orderId &&
+        candidate.riderId === riderId &&
+        (candidate.status === "CLAIMED" || candidate.status === "OUT_FOR_DELIVERY"),
+    )
+  ) {
+    throw new Error("RIDER_HAS_ACTIVE_ORDER");
+  }
+
+  order.riderId = riderId;
+  order.riderName = riderName;
+  order.status = "CLAIMED";
+  order.claimedAt = new Date().toISOString();
+  order.dispatchedAt = null;
+  order.telemetry = null;
+  recordStatus(order, "CLAIMED", reason);
+}
+
+export function adminFixtureRedeliverOrder(
+  orderId: string,
+  reason: string,
+  riderId?: string | null,
+  riderName?: string | null,
+): AdminOrderStatus {
+  const order = state().orders.get(orderId);
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  if (order.status !== "DELIVERY_FAILED") throw new Error("ORDER_STATE_INVALID");
+
+  if (riderId) {
+    if (
+      [...state().orders.values()].some(
+        (candidate) =>
+          candidate.id !== orderId &&
+          candidate.riderId === riderId &&
+          (candidate.status === "CLAIMED" || candidate.status === "OUT_FOR_DELIVERY"),
+      )
+    ) {
+      throw new Error("RIDER_HAS_ACTIVE_ORDER");
+    }
+  }
+
+  const at = new Date().toISOString();
+  order.status = "READY_FOR_PICKUP";
+  order.riderId = null;
+  order.riderName = null;
+  order.claimedAt = null;
+  order.dispatchedAt = null;
+  order.deliveredAt = null;
+  order.deliveryFailure = null;
+  order.failedPinAttempts = 0;
+  order.pinLockedUntil = null;
+  order.readyAt = order.readyAt ?? at;
+  recordStatus(order, "READY_FOR_PICKUP", reason, at);
+
+  if (riderId) {
+    order.status = "CLAIMED";
+    order.riderId = riderId;
+    order.riderName = riderName ?? "Rider";
+    order.claimedAt = at;
+    recordStatus(order, "CLAIMED", reason, at);
+    return "CLAIMED";
+  }
+  return "READY_FOR_PICKUP";
+}
+
+export function adminFixtureResetPin(orderId: string, reason: string): void {
+  const order = state().orders.get(orderId);
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  if (["DELIVERED", "CANCELLED"].includes(order.status)) {
+    throw new Error("ORDER_STATE_INVALID");
+  }
+  order.handoverPin = String(randomInt(100_000, 1_000_000));
+  order.failedPinAttempts = 0;
+  order.pinLockedUntil = null;
+  recordStatus(order, order.status, reason);
+}
+
+export function createFixtureRefundRequest(
+  orderId: string,
+  reason: string,
+  amount?: number,
+): string {
+  const order = state().orders.get(orderId);
+  if (!order) throw new Error("ORDER_NOT_FOUND");
+  const refundId = randomUUID();
+  state().refundRequests.set(refundId, {
+    refundId,
+    orderId,
+    amount: amount ?? order.total,
+    status: "REQUESTED",
+    reason,
+    notes: null,
+    requestedAt: new Date().toISOString(),
+  });
+  state().refunds += 1;
+  return refundId;
+}
+
+export function listFixtureRefundRequests(): RefundRequest[] {
+  return [...state().refundRequests.values()]
+    .sort((left, right) => right.requestedAt.localeCompare(left.requestedAt))
+    .map((refund) => ({
+      refundId: refund.refundId,
+      orderId: refund.orderId,
+      orderNumber: state().orders.get(refund.orderId)?.number,
+      amount: refund.amount,
+      status: refund.status,
+      reason: refund.reason,
+      notes: refund.notes,
+      requestedAt: refund.requestedAt,
+    }));
+}
+
+export function approveFixtureRefundRequest(
+  refundId: string,
+  decision: "APPROVE" | "REJECT",
+  notes?: string,
+): { refundId: string; status: string } {
+  const refund = state().refundRequests.get(refundId);
+  if (!refund) throw new Error("REFUND_NOT_FOUND");
+  if (refund.status !== "REQUESTED") throw new Error("ORDER_STATE_INVALID");
+  refund.status = decision === "APPROVE" ? "PROCESSING" : "FAILED";
+  refund.notes = notes ?? null;
+  return { refundId, status: refund.status };
+}
+
 function pricingItems(menu: NonNullable<ReturnType<typeof fixtureMenu>>, input: CreateOrderRpcInput): OrderItemInput[] {
   return input.items.map((line) => {
     const item = menu.items.find((candidate) => candidate.id === line.menuItemId);
@@ -828,6 +1147,7 @@ export const fixtureOrderStore: OrderStore = {
       notes: input.customerNotes,
       tableId: input.tableId,
       tableNumber: createFixtureTableNumber(input.tableId),
+      deliveryArea: null,
       address: input.deliveryAddressText,
       lat: input.deliveryLatitude,
       lng: input.deliveryLongitude,
@@ -851,7 +1171,9 @@ export const fixtureOrderStore: OrderStore = {
       cancellationReason: null,
       riderId: null,
       riderName: null,
+      claimedAt: null,
       dispatchedAt: null,
+      adminEditedAt: null,
       failedPinAttempts: 0,
       pinLockedUntil: null,
       deliveryFailure: null,

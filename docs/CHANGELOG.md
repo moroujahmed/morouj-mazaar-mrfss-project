@@ -6,7 +6,37 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
-## Implementation - Phase 9: Rider portal (2026-11-20)
+## Implementation - Phase 10: Admin hub (2026-11-22)
+
+### Added
+
+- Additive admin domain in `src/lib/admin/` (`types`, `errors`, `schemas`, `store-types`, `store`, `fixture-store`, `supabase-store`): typed snapshot/orders/ledger/analytics/audit/staff/table contracts, Zod validation with typed reasons on every destructive mutation, and store selection between the audited Supabase RPCs and a deterministic fixture mirror.
+- `src/actions/admin.ts`: ADMIN-only server actions for snapshot, order list/detail/contact/cancel/complete/reassign/redeliver/PIN reset, refund approval, cash reconciliation, settings, category/menu/table upserts, menu archive, staff updates, and audit feed. Every action authorises with `getAuthorizedProfile(["ADMIN"])` before touching the store.
+- Admin UI under `src/app/(operations)/admin/` and `src/components/admin/`: ADMIN-only guarded login/dashboard, tabbed operations hub, live order monitor with audited drawer actions (edit contact, cancel, complete, reassign, redeliver, reset PIN) and required typed reasons, menu CRUD with soft archive and `menu-images/` path validation, settings with bounds/history/audit, EAT ledger with linked COD orders and reconciliation, analytics, audit feed, staff role/active/plate management with last-admin guard, and table management with QR token preservation.
+- Fixture bridge in `src/lib/orders/fixture-store.ts`: admin order/refund helpers keep orders, refunds, and admin actions in the same fixture source of truth so kitchen/rider/admin fixtures observe shared mutations; admin settings edits propagate to the storefront fixture via `applyFixtureSettingsOverrides`.
+- Unit coverage (`tests/unit/admin.test.ts`, 16 tests): schema bounds/reason validation, authz failure mapping, audited settings/category/menu/table/staff mutations, last-admin protection, paid-cancellation refund creation, unpaid-cancellation no-refund, redelivery state reset, delivery-failed reassignment, ledger totals, and settlement upsert semantics.
+- Database coverage (`tests/db/admin.sql`, registered in `tests/db/run-db-tests.mjs`): anon/authenticated privilege matrix, non-admin denial, order list/detail/contact/cancel/refund/approval/redeliver flows, settings validation/history/audit, menu/table/staff RPCs, last-admin trigger, 65,500 ledger (38,000 + 27,500 linked orders), same-row settlement upsert, analytics, and audit-feed reason coverage.
+- Playwright coverage (`tests/e2e/admin.spec.ts`, 7 tests): admin-only redirect and wrong-PIN rejection, wrong-role redirect, tab/a11y coverage across all sections, order cancellation requiring a typed reason with audit row, settings propagation to storefront with audit, menu create/archive with typed reasons and audit, table create/edit preserving QR token with audit, and last-admin UI guard plus audited staff plate change.
+
+### Changed
+
+- `src/components/ui/table.tsx`: `TableRow` now forwards native `<tr>` props (`data-testid`, `className`, etc.) so admin/kitchen/rider test selectors and row metadata render in the DOM.
+- `tests/db/run-db-tests.mjs` now includes `tests/db/admin.sql`.
+
+### Fixed
+
+- `src/actions/admin.ts`: removed a non-async `adminReason` re-export; `"use server"` files may only export async functions, and the export caused the admin dashboard build/runtime to fail.
+- Admin DB test fixtures use sequential delivery to satisfy `orders_one_active_per_rider`, compare ledger plate after the staff-update step, and prove settlement upsert by matching returned `settlementId` values instead of querying RLS-protected tables as the authenticated role.
+- Paid-cancellation unit coverage uses a prepaid PAID non-terminal order (`MTN_MOMO` → `startPaymentAttempt` → `finalizePaymentAttempt`) because `admin_cancel_order` correctly rejects terminal `DELIVERED`/`CANCELLED` orders.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm test` (179 unit tests), and `npm run build` pass.
+- `npm run test:db` and `npm run test:db:race` pass against local PostgreSQL 18, including the Phase 10 admin suite.
+- `npm run test:e2e` passes the Chromium browser suite, including the 7 new admin flows, with zero critical or serious axe violations.
+
+---
+
 
 ### Added
 

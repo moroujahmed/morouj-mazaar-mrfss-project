@@ -119,6 +119,7 @@ test.describe("order pipeline", () => {
     await expect(page.getByText("Paid", { exact: true })).toBeVisible();
     await expect(page.getByText("Handover PIN")).toBeVisible();
     await expect(page.getByText("USh 35,000").first()).toBeVisible();
+    await expect(page).toHaveTitle(/Your order/);
     await assertNoBlockingViolations(page, "order tracker");
 
     // The tracker refreshes without mutating a paid order.
@@ -154,6 +155,7 @@ test.describe("order pipeline", () => {
     ).toBeVisible();
     await expect(page.getByText("Handover PIN")).toBeVisible();
     await expect(page.getByText("Payment pending")).toBeVisible();
+    await expect(page).toHaveTitle(/Your order/);
     await assertNoBlockingViolations(page, "cash order tracker");
   });
 

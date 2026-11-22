@@ -1,4 +1,8 @@
-import type { ReactNode, TableHTMLAttributes } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  ReactNode,
+  TableHTMLAttributes,
+} from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -46,8 +50,16 @@ export function TableBody({ children }: { children: ReactNode }) {
   return <tbody className="divide-y divide-green-100">{children}</tbody>;
 }
 
-export function TableRow({ children }: { children: ReactNode }) {
-  return <tr>{children}</tr>;
+export function TableRow({
+  children,
+  className,
+  ...props
+}: ComponentPropsWithoutRef<"tr">) {
+  return (
+    <tr className={className} {...props}>
+      {children}
+    </tr>
+  );
 }
 
 export function TableHeaderCell({

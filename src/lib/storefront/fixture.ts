@@ -507,7 +507,18 @@ export function createFixtureSettings(): StoreSettings {
     isKitchenBusy: state.isKitchenBusy,
     busyBufferMinutes: state.busyBufferMinutes,
     isKitchenPaused: state.isKitchenPaused,
-  };
+    ...Object.fromEntries(state.settingsOverrides),
+  } as StoreSettings;
+}
+
+/** Admin settings edits are reflected by the storefront fixture as well. */
+export function applyFixtureSettingsOverrides(
+  patch: Record<string, unknown>,
+): void {
+  const state = kitchenFixtureState();
+  for (const [key, value] of Object.entries(patch)) {
+    if (key in settings) state.settingsOverrides.set(key, value);
+  }
 }
 
 type KitchenFixtureState = {
@@ -515,6 +526,7 @@ type KitchenFixtureState = {
   busyBufferMinutes: number;
   isKitchenPaused: boolean;
   overrides: Map<string, boolean>;
+  settingsOverrides: Map<string, unknown>;
 };
 
 type FixtureGlobal = typeof globalThis & {
@@ -537,6 +549,7 @@ function kitchenFixtureState(): KitchenFixtureState {
     busyBufferMinutes: settings.busyBufferMinutes,
     isKitchenPaused: false,
     overrides: new Map(),
+    settingsOverrides: new Map(),
   };
   return globalStore.__mrfssKitchen;
 }
@@ -569,6 +582,7 @@ export function resetFixtureKitchenStateForTests(): void {
   state.busyBufferMinutes = settings.busyBufferMinutes;
   state.isKitchenPaused = false;
   state.overrides.clear();
+  state.settingsOverrides.clear();
 }
 
 export function createFixtureMenu(): MenuResult {

@@ -43,6 +43,7 @@ const suites = [
   join("tests", "db", "orders.sql"),
   join("tests", "db", "kitchen.sql"),
   join("tests", "db", "rider.sql"),
+  join("tests", "db", "admin.sql"),
 ];
 
 for (const suite of suites) {
