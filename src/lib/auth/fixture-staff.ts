@@ -15,6 +15,7 @@ export type FixtureStaffMember = {
   pin: string;
   role: FixtureSessionRole;
   mustChangePin: boolean;
+  motorcyclePlate: string | null;
 };
 
 const STAFF: readonly FixtureStaffMember[] = [
@@ -25,6 +26,7 @@ const STAFF: readonly FixtureStaffMember[] = [
     pin: "246810",
     role: "ADMIN",
     mustChangePin: false,
+    motorcyclePlate: null,
   },
   {
     userId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb02",
@@ -33,6 +35,7 @@ const STAFF: readonly FixtureStaffMember[] = [
     pin: "135790",
     role: "KITCHEN",
     mustChangePin: false,
+    motorcyclePlate: null,
   },
   {
     userId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb03",
@@ -41,6 +44,7 @@ const STAFF: readonly FixtureStaffMember[] = [
     pin: "112233",
     role: "RIDER",
     mustChangePin: false,
+    motorcyclePlate: "UFD 342B",
   },
   {
     userId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb04",
@@ -49,11 +53,18 @@ const STAFF: readonly FixtureStaffMember[] = [
     pin: "445566",
     role: "RIDER",
     mustChangePin: false,
+    motorcyclePlate: "UEX 119A",
   },
 ];
 
 export function listFixtureStaff(): readonly FixtureStaffMember[] {
   return STAFF;
+}
+
+export function findFixtureStaffById(
+  userId: string,
+): FixtureStaffMember | null {
+  return STAFF.find((member) => member.userId === userId) ?? null;
 }
 
 export function findFixtureStaffByCredentials(

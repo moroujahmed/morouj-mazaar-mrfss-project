@@ -5,6 +5,7 @@ import {
   staffFixtureEnabled,
   verifyFixtureSessionToken,
 } from "@/lib/auth/fixture-token";
+import { findFixtureStaffById } from "@/lib/auth/fixture-staff";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database.types";
 
@@ -51,7 +52,8 @@ export async function getStaffSession(): Promise<StaffSession | null> {
         role: session.role,
         is_active: true,
         must_change_pin: session.mustChangePin,
-        motorcycle_plate: null,
+        motorcycle_plate:
+          findFixtureStaffById(session.userId)?.motorcyclePlate ?? null,
       },
     };
   }

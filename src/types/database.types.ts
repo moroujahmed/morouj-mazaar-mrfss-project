@@ -797,6 +797,9 @@ isOneToOne: false
 "get_rider_pool":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
+"get_rider_shift":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "has_delivered_order":
 { Args: { "p_phone": string }; Returns: boolean
                            },

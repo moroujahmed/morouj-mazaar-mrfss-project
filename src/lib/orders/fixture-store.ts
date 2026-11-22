@@ -6,6 +6,13 @@ import { normalizeUgPhone } from "@/lib/phone";
 import type { OrderItemInput } from "@/lib/schemas/order";
 import { createFixtureMenu, createFixtureTableNumber } from "@/lib/storefront/fixture";
 import type { KitchenTicket } from "@/lib/kitchen/types";
+import { RiderFailure } from "@/lib/rider/errors";
+import type {
+  RiderActiveOrder,
+  RiderCashSummary,
+  RiderPinResult,
+  RiderPoolItem,
+} from "@/lib/rider/types";
 
 import { OrderFailure } from "./errors";
 import { priceOrder } from "./pricing";
@@ -77,7 +84,12 @@ type FixtureOrder = {
   deliveredAt: string | null;
   cancelledAt: string | null;
   cancellationReason: string | null;
+  riderId: string | null;
   riderName: string | null;
+  dispatchedAt: string | null;
+  failedPinAttempts: number;
+  pinLockedUntil: string | null;
+  deliveryFailure: { outcome: string; reason: string; at: string } | null;
   telemetry: { latitude: number; longitude: number; updatedAt: string } | null;
   timeline: Array<{
     status: CreatedOrder["orderStatus"];
@@ -344,6 +356,345 @@ export function fixtureReprintCount(orderId: string): number {
   return state().reprints.get(orderId) ?? 0;
 }
 
+// ---------------------------------------------------------------------------
+// Rider fixtures (mirror the security-definer RPCs used in production)
+// ---------------------------------------------------------------------------
+
+const PIN_MAX_ATTEMPTS = 3;
+const PIN_LOCK_MINUTES = 15;
+const PIN_GEOFENCE_M = 300;
+const ACTIVE_DELIVERY_STATUSES = new Set<FixtureOrder["status"]>([
+  "CLAIMED",
+  "OUT_FOR_DELIVERY",
+]);
+
+function haversineM(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const radius = 6_371_000;
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+  const deltaLat = toRadians(lat2 - lat1);
+  const deltaLng = toRadians(lng2 - lng1);
+  const a =
+    Math.sin(deltaLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(deltaLng / 2) ** 2;
+  return Math.round(2 * radius * Math.asin(Math.sqrt(a)));
+}
+
+function toRiderPoolItem(order: FixtureOrder): RiderPoolItem {
+  return {
+    orderId: order.id,
+    orderNumber: order.number,
+    // The database pool only exposes `delivery_area`, never the street address.
+    // Fixture orders do not record a separate area, so the safe value is null.
+    area: null,
+    distanceKm:
+      order.distanceM === null
+        ? null
+        : Math.round((order.distanceM / 1000) * 100) / 100,
+    totalAmount: order.total,
+    paymentMethod: order.method,
+    itemCount: order.items.reduce((sum, line) => sum + line.quantity, 0),
+    readyAt: order.readyAt ?? order.createdAt,
+  };
+}
+
+function toRiderActiveOrder(order: FixtureOrder): RiderActiveOrder {
+  return {
+    orderId: order.id,
+    orderNumber: order.number,
+    status: order.status as RiderActiveOrder["status"],
+    paymentMethod: order.method,
+    paymentStatus: order.paymentStatus,
+    customerName: order.customerName,
+    customerPhone: order.customerPhoneNormalized,
+    deliveryAddressText: order.address,
+    deliveryArea: order.address,
+    deliveryLatitude: order.lat,
+    deliveryLongitude: order.lng,
+    roadDistanceM: order.distanceM,
+    estimatedTravelMinutes: order.travelMinutes,
+    etaAt: order.etaAt,
+    totalAmount: order.total,
+    codChangeDue: order.codChangeDue,
+    customerNotes: order.notes,
+    claimedAt: order.timeline.find((entry) => entry.status === "CLAIMED")?.at,
+    dispatchedAt: order.dispatchedAt,
+    items: order.items.map((line) => ({
+      name: line.name,
+      quantity: line.quantity,
+      unitPrice: line.unitPrice,
+      lineTotal: line.unitPrice * line.quantity,
+      modifiers: line.modifiers.map((modifier) => ({
+        name: modifier.name,
+        priceDelta: modifier.priceDelta,
+      })),
+    })),
+  };
+}
+
+/** Rider pool read path: summaries only, never phone/address/notes/PIN. */
+export function listFixtureRiderPool(): RiderPoolItem[] {
+  return [...state().orders.values()]
+    .filter(
+      (order) =>
+        order.type === "DELIVERY" &&
+        order.status === "READY_FOR_PICKUP" &&
+        order.riderId === null,
+    )
+    .sort((left, right) =>
+      (left.readyAt ?? left.createdAt).localeCompare(
+        right.readyAt ?? right.createdAt,
+      ),
+    )
+    .map(toRiderPoolItem);
+}
+
+export function getFixtureRiderActiveOrder(
+  riderId: string,
+): RiderActiveOrder | null {
+  const active = [...state().orders.values()]
+    .filter(
+      (order) =>
+        order.riderId === riderId &&
+        ACTIVE_DELIVERY_STATUSES.has(order.status),
+    )
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0];
+
+  return active ? toRiderActiveOrder(active) : null;
+}
+
+export function claimFixtureRiderOrder(
+  orderId: string,
+  riderId: string,
+  riderName: string,
+): RiderActiveOrder {
+  const store = state();
+  const existing = [...store.orders.values()].find(
+    (order) =>
+      order.riderId === riderId && ACTIVE_DELIVERY_STATUSES.has(order.status),
+  );
+  if (existing) throw new RiderFailure("RIDER_HAS_ACTIVE_ORDER");
+
+  const order = store.orders.get(orderId);
+  if (!order) throw new RiderFailure("ORDER_NOT_FOUND");
+  if (
+    order.type !== "DELIVERY" ||
+    order.status !== "READY_FOR_PICKUP" ||
+    order.riderId !== null
+  ) {
+    throw new RiderFailure("ORDER_ALREADY_CLAIMED");
+  }
+
+  const at = new Date().toISOString();
+  order.riderId = riderId;
+  order.riderName = riderName;
+  order.status = "CLAIMED";
+  recordStatus(order, "CLAIMED", "RIDER_CLAIMED", at);
+  return toRiderActiveOrder(order);
+}
+
+export function startFixtureRiderDelivery(
+  orderId: string,
+  riderId: string,
+): RiderActiveOrder {
+  const order = state().orders.get(orderId);
+  if (!order || order.riderId !== riderId) {
+    throw new RiderFailure("ORDER_STATE_INVALID");
+  }
+  if (order.status !== "CLAIMED") {
+    throw new RiderFailure("ORDER_STATE_INVALID");
+  }
+
+  const at = new Date().toISOString();
+  order.status = "OUT_FOR_DELIVERY";
+  order.dispatchedAt = at;
+  recordStatus(order, "OUT_FOR_DELIVERY", "RIDER_STARTED_DELIVERY", at);
+  return toRiderActiveOrder(order);
+}
+
+export function releaseFixtureRiderOrder(
+  orderId: string,
+  riderId: string,
+  reason: string,
+): void {
+  const order = state().orders.get(orderId);
+  if (!order || order.riderId !== riderId) {
+    throw new RiderFailure("ORDER_STATE_INVALID");
+  }
+  if (order.status !== "CLAIMED") {
+    throw new RiderFailure("ORDER_STATE_INVALID");
+  }
+
+  const at = new Date().toISOString();
+  order.status = "READY_FOR_PICKUP";
+  order.riderId = null;
+  order.riderName = null;
+  order.dispatchedAt = null;
+  order.failedPinAttempts = 0;
+  order.pinLockedUntil = null;
+  recordStatus(order, "READY_FOR_PICKUP", reason || "RIDER_RELEASED", at);
+}
+
+export function verifyFixtureRiderPin({
+  orderId,
+  riderId,
+  pin,
+  latitude,
+  longitude,
+  now = new Date(),
+}: {
+  orderId: string;
+  riderId: string;
+  pin: string;
+  latitude?: number;
+  longitude?: number;
+  now?: Date;
+}): RiderPinResult {
+  const order = state().orders.get(orderId);
+  if (!order || order.riderId !== riderId) {
+    throw new RiderFailure("AUTH_UNAUTHORIZED");
+  }
+  if (order.status !== "OUT_FOR_DELIVERY") {
+    throw new RiderFailure("ORDER_STATE_INVALID");
+  }
+
+  if (order.pinLockedUntil && new Date(order.pinLockedUntil) > now) {
+    return { ok: false, code: "PIN_LOCKED", lockedUntil: order.pinLockedUntil };
+  }
+
+  if (
+    latitude !== undefined &&
+    longitude !== undefined &&
+    order.lat !== null &&
+    order.lng !== null
+  ) {
+    const distance = haversineM(latitude, longitude, order.lat, order.lng);
+    if (distance > PIN_GEOFENCE_M) {
+      return {
+        ok: false,
+        code: "TOO_FAR_FROM_DESTINATION",
+        distanceM: distance,
+        allowedM: PIN_GEOFENCE_M,
+      };
+    }
+  }
+
+  if (!/^[0-9]{4}$/.test(pin) || pin !== order.handoverPin) {
+    order.failedPinAttempts += 1;
+    const locked =
+      order.failedPinAttempts >= PIN_MAX_ATTEMPTS
+        ? new Date(now.getTime() + PIN_LOCK_MINUTES * 60_000).toISOString()
+        : null;
+    order.pinLockedUntil = locked;
+
+    return {
+      ok: false,
+      code: locked ? "PIN_LOCKED" : "INVALID_HANDOVER_PIN",
+      remainingAttempts: Math.max(
+        0,
+        PIN_MAX_ATTEMPTS - order.failedPinAttempts,
+      ),
+      lockedUntil: locked,
+    };
+  }
+
+  const at = now.toISOString();
+  order.status = "DELIVERED";
+  order.deliveredAt = at;
+  order.dispatchedAt ??= at;
+  order.failedPinAttempts = 0;
+  order.pinLockedUntil = null;
+  if (order.method === "CASH_ON_DELIVERY") {
+    order.paymentStatus = "PAID";
+  }
+  recordStatus(order, "DELIVERED", "DELIVERY_PIN_VERIFIED", at);
+
+  return {
+    ok: true,
+    code: "DELIVERED",
+    changeDue: order.codChangeDue,
+    deliveredAt: at,
+  };
+}
+
+export function reportFixtureRiderFailure(
+  orderId: string,
+  riderId: string,
+  outcome: string,
+  reason: string,
+): void {
+  const order = state().orders.get(orderId);
+  if (!order || order.riderId !== riderId) {
+    throw new RiderFailure("AUTH_UNAUTHORIZED");
+  }
+  if (order.status !== "OUT_FOR_DELIVERY") {
+    throw new RiderFailure("ORDER_STATE_INVALID");
+  }
+
+  const at = new Date().toISOString();
+  order.status = "DELIVERY_FAILED";
+  order.deliveryFailure = { outcome, reason, at };
+  recordStatus(order, "DELIVERY_FAILED", reason || outcome, at);
+}
+
+export function recordFixtureRiderTelemetry({
+  orderId,
+  riderId,
+  latitude,
+  longitude,
+  recordedAt = new Date().toISOString(),
+}: {
+  orderId: string;
+  riderId: string;
+  latitude: number;
+  longitude: number;
+  recordedAt?: string;
+}): void {
+  const order = state().orders.get(orderId);
+  if (
+    !order ||
+    order.riderId !== riderId ||
+    order.status !== "OUT_FOR_DELIVERY"
+  ) {
+    throw new RiderFailure("ORDER_STATE_INVALID");
+  }
+  order.telemetry = { latitude, longitude, updatedAt: recordedAt };
+}
+
+export function fixtureRiderCashSummary(riderId: string): RiderCashSummary {
+  const delivered = [...state().orders.values()].filter(
+    (order) =>
+      order.riderId === riderId &&
+      order.status === "DELIVERED" &&
+      order.method === "CASH_ON_DELIVERY" &&
+      order.paymentStatus === "PAID",
+  );
+  const unsettled = delivered.reduce((sum, order) => sum + order.total, 0);
+
+  return {
+    riderId,
+    outstandingCash: unsettled,
+    unsettledOrderCash: unsettled,
+    settlementShortfall: 0,
+    totalSettled: 0,
+  };
+}
+
+/** Reassign helper used by the admin fixture path; clears the rider assignment. */
+export function clearFixtureRiderAssignment(orderId: string): void {
+  const order = state().orders.get(orderId);
+  if (!order) return;
+  order.riderId = null;
+  order.riderName = null;
+  order.dispatchedAt = null;
+}
+
 function pricingItems(menu: NonNullable<ReturnType<typeof fixtureMenu>>, input: CreateOrderRpcInput): OrderItemInput[] {
   return input.items.map((line) => {
     const item = menu.items.find((candidate) => candidate.id === line.menuItemId);
@@ -498,7 +849,12 @@ export const fixtureOrderStore: OrderStore = {
       deliveredAt: null,
       cancelledAt: null,
       cancellationReason: null,
+      riderId: null,
       riderName: null,
+      dispatchedAt: null,
+      failedPinAttempts: 0,
+      pinLockedUntil: null,
+      deliveryFailure: null,
       telemetry: null,
       timeline: [],
       feedback: null,
@@ -566,9 +922,9 @@ export const fixtureOrderStore: OrderStore = {
       deliveryFailure:
         order.status === "DELIVERY_FAILED"
           ? {
-              outcome: "FAILED",
-              reason: order.cancellationReason ?? "DELIVERY_FAILED",
-              createdAt: order.cancelledAt,
+              outcome: order.deliveryFailure?.outcome ?? "OTHER",
+              reason: order.deliveryFailure?.reason ?? "DELIVERY_FAILED",
+              createdAt: order.deliveryFailure?.at ?? order.cancelledAt,
             }
           : null,
       rider: order.riderName

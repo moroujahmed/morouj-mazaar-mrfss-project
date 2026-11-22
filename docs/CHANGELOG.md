@@ -6,6 +6,38 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation - Phase 9: Rider portal (2026-11-20)
+
+### Added
+
+- Additive migration `supabase/migrations/20261120000000_rider_shift.sql`: `get_rider_shift()` returns the caller's open shift only (RPC-only `rider_shifts`, no table policy), denies non-riders with `AUTH_UNAUTHORIZED`, and is executable by `authenticated`.
+- Rider domain layer in `src/lib/rider/` (`types`, `schemas`, `errors`, `store-types`, `store`, `fixture-store`, `supabase-store`, `snapshot`, `telemetry-queue`) plus `src/actions/rider.ts`: typed pool/active-order/shift/cash contracts, validated mutations, and every write routed through the audited security-definer RPCs (or the fixture mirror). The pool schema strips customer phone, name, notes, address, and PIN.
+- `GET /api/rider/snapshot`: RIDER-only, `no-store`, 15-second polling payload of the safe pool, the rider's own active order (contact and destination but never the PIN), shift state, and cash summary. `POST /api/rider/telemetry`: RIDER-only, rate-limited, order-scoped location writes that the RPC re-checks against ownership and `OUT_FOR_DELIVERY`.
+- `src/hooks/use-geolocation.ts`: foreground-only capture with an IndexedDB queue (50 points / 10 minutes, duplicate suppression, per-order isolation), Screen Wake Lock, and online-only flushing; the handover PIN is never queued.
+- Rider UI under `src/app/(operations)/rider/` and `src/components/rider/`: phone + 6-digit PIN sign-in, role-guarded shell, start/end shift with opening float, oldest-first safe pool, one-active-order claim/start/release flow, live position and navigation, offline gating, locked/attempt/error messaging, handover PIN sheet, failed-delivery reporting with a reason, and cash-summary panel.
+- Phase 9 unit coverage (`tests/unit/rider.test.ts`): pool PII exclusion, per-rider claim/start/release isolation, PIN lockout/geofence/cash accounting, failed delivery, shift summary, telemetry queue pruning/deduplication, and contracts/messages.
+- Database coverage (`tests/db/rider.sql`, run by `npm run test:db`): privilege matrix, safe pool shape, atomic claim and one-active-order enforcement, pre-start telemetry rejection, geofence and three-attempt lockout, cross-rider isolation, failed delivery, prepaid handover, admin PIN reset, shift close/cash, kitchen/admin denial, and persisted audit/telemetry/shift evidence.
+- Playwright coverage (`tests/e2e/rider.spec.ts`): unauthenticated API 401s, wrong-PIN then successful sign-in, wrong-role redirect, full COD claim → start → wrong PIN → handover → end-shift flow with safe-snapshot assertions and PIN removal from the tracker, and release/failed-delivery flows, with axe scans of the login and board.
+
+### Changed
+
+- `tests/db/run-db-tests.mjs` now runs `tests/db/rider.sql`.
+- Fixture staff gained `motorcyclePlate` so rider sessions mirror the seeded profile; `src/lib/auth/session.ts` and `src/types/database.types.ts` carry the rider shift RPC into the typed client.
+- The fixture rider store is bound per rider through `createFixtureRiderStore(riderId)` so concurrent riders never share mutable state; shifts are keyed by rider id.
+
+### Fixed
+
+- The fixture rider pool no longer falls back to the customer's street address for the safe `area` field; it returns `null` to match the SQL contract and avoid PII exposure before a claim.
+- The claim button's accessible name now contains its visible label ("Claim delivery" / "Start your shift to claim"), clearing the axe `label-content-name-mismatch` violation.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npx vitest run` (163 unit tests across 13 files), and `npm run build` pass.
+- `npm run test:db` passes the RLS/privilege, order-pipeline, kitchen, and rider suites; `npm run test:db:race` passes against local PostgreSQL 18.
+- `npm run test:e2e` passes all 37 Chromium tests (including the three new rider flows) with zero critical or serious axe violations.
+
+---
+
 ## Implementation - Phase 8: Kitchen board and service controls (2026-11-19)
 
 ### Added
