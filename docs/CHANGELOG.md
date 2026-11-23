@@ -26,11 +26,15 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 - `npm audit --omit=dev --audit-level=high` reports 0 vulnerabilities.
 - Phase 11 gate evidence: forged table token rejected (`tests/e2e/checkout.spec.ts`), dine-in never enters rider pool and KDS served completion works (`tests/e2e/kitchen.spec.ts`), dine-in pricing/QR behavior covered by existing checkout/orders tests.
 
-### Remaining operational launch gates
+### Release status
 
-- CodeQL/Semgrep/Gitleaks workflows were added in `.github/workflows/`; their GitHub Actions runs must be green on the release commit and any high/critical findings resolved. GitHub Secret Scanning/Push Protection remains a repo-admin setting.
-- Local DB backup/restore drill was exercised (see `docs/RELEASE_EVIDENCE.md`); production/staging Supabase restore drill and staging/Vercel rollback promotion still require environment access.
-- Founder go-live checklist is prepared in `docs/GO_LIVE_CHECKLIST.md`; explicit founder/owner sign-off remains a human release action.
+- **Engineering-complete (locally verifiable scope):** acknowledged by founder on 2026-11-23. This is **not** production deployment or commercial go-live approval.
+- **Outstanding external release gates:**
+  - GitHub-hosted security scan verification: CodeQL/Semgrep/Gitleaks Actions must run green on the release commit; resolve any high/critical findings.
+  - GitHub Secret Scanning / Push Protection must be enabled and verified in repository settings (admin action).
+  - Supabase production/staging backup-restore drill must be executed and recorded per `docs/OPERATIONS_RUNBOOK.md` §3.2.
+  - Vercel staging rollback promotion drill must be executed and recorded.
+  - Founder go-live checklist sign-off remains pending in `docs/GO_LIVE_CHECKLIST.md`; founder explicitly did not authorize production deployment or commercial go-live.
 
 ---
 
