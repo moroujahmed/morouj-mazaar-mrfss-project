@@ -77,13 +77,14 @@ See `docs/GO_LIVE_CHECKLIST.md`. Technical items verifiable in-repo are checked;
 - **Local restore drill:** exercised and verified locally.
 - **Security workflow coverage:** workflows added; GitHub-hosted execution/results are pending.
 - **Engineering-complete (locally verifiable scope):** acknowledged by founder on 2026-11-23.
-- **Founder go-live checklist sign-off:** **Granted** on 2026-11-23 via explicit founder confirmation ("Founder sign-off approved for v1.5.0 go-live checklist").
+- **Production deployment / commercial go-live approval:** **NOT granted**. Founder explicitly did not authorize production deployment or commercial go-live.
 
 ## 7. Outstanding external release gates (required from founder/team/admin)
 
-Founder sign-off is recorded, but the following external/environment gates remain required before production release execution:
+These remain required before any production release approval:
 
 1. **GitHub-hosted security scan verification:** Run and confirm green results for CodeQL, Semgrep, and Gitleaks workflows on the release commit; resolve any high/critical findings.
 2. **GitHub repository security settings:** Enable GitHub Secret Scanning and Push Protection in repository settings (admin action); verify provider secret-scanning coverage.
 3. **Supabase production backup-restore testing:** Execute backup restore drill against staging/restored Supabase project per `docs/OPERATIONS_RUNBOOK.md` §3.2; record timestamps, restore target, and smoke-check results.
 4. **Vercel staging rollback testing:** Execute rollback promotion drill on staging/Vercel (promote previous deployment, verify, restore current), record deployment IDs and outcome.
+5. **Founder go-live sign-off:** Explicit founder/owner sign-off in `docs/GO_LIVE_CHECKLIST.md` after business/legal/provider/operational items are complete. This is separate from engineering acknowledgement and has not been granted.

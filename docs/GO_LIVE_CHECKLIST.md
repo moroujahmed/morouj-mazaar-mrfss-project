@@ -57,8 +57,8 @@ Legend: `[x]` verified in repo/local gates, `[ ]` requires founder/team/provider
 
 Phase 12 requires an explicit founder go-live sign-off before production launch.
 
-- [x] **Founder / Owner sign-off:** I confirm the business, legal, provider, and operational items above are complete or accepted, and I approve production go-live for MRFSS v1.5.0.
+- [ ] **Founder / Owner sign-off:** I confirm the business, legal, provider, and operational items above are complete or accepted, and I approve production go-live for MRFSS v1.5.0.
 
 | Signer | Role | Date | Signature / Confirmation |
 | :--- | :--- | :--- | :--- |
-| Founder / Owner | Founder / Owner | 2026-11-23 | Explicit confirmation received in conversation: "Founder sign-off approved for v1.5.0 go-live checklist". |
+| _Pending_ | Founder / Owner | _Pending_ | **Not granted.** Founder acknowledged locally verifiable Phase 12 engineering work as complete (2026-11-23) but explicitly did **not** authorize production deployment or commercial go-live. No sign-off recorded on behalf of founder. |
