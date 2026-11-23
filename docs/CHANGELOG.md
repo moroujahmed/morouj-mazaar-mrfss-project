@@ -28,13 +28,13 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ### Release status
 
-- **Engineering-complete (locally verifiable scope):** acknowledged by founder on 2026-11-23. This is **not** production deployment or commercial go-live approval.
-- **Outstanding external release gates:**
+- **Engineering-complete (locally verifiable scope):** acknowledged by founder on 2026-11-23.
+- **Founder go-live checklist sign-off:** granted on 2026-11-23 via explicit founder confirmation (recorded in `docs/GO_LIVE_CHECKLIST.md`).
+- **Outstanding external release gates (still required before production release execution):**
   - GitHub-hosted security scan verification: CodeQL/Semgrep/Gitleaks Actions must run green on the release commit; resolve any high/critical findings.
   - GitHub Secret Scanning / Push Protection must be enabled and verified in repository settings (admin action).
   - Supabase production/staging backup-restore drill must be executed and recorded per `docs/OPERATIONS_RUNBOOK.md` §3.2.
   - Vercel staging rollback promotion drill must be executed and recorded.
-  - Founder go-live checklist sign-off remains pending in `docs/GO_LIVE_CHECKLIST.md`; founder explicitly did not authorize production deployment or commercial go-live.
 
 ---
 
