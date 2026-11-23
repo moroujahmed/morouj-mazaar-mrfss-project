@@ -140,16 +140,26 @@ const CHEF_SESSION = {
   mustChangePin: false,
 } as const;
 
+const RIDER_SESSION = {
+  userId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb03",
+  fullName: "Rider Juma",
+  phone: "+256700111002",
+  role: "RIDER",
+  mustChangePin: false,
+} as const;
+
+const T4_TOKEN = "88888888-8888-4888-8888-888888888804";
+
 /**
  * The staff login limiter allows five attempts per phone per fifteen minutes,
  * and a full run signs in more often than that. Signing the documented fixture
  * cookie gives each case a session without spending the shared budget; the
  * login form itself is still covered by its own test.
  */
-function fixtureStaffCookie(): string {
+function fixtureStaffCookie(session: { userId: string; fullName: string; phone: string; role: string; mustChangePin: boolean } = CHEF_SESSION): string {
   const payload = Buffer.from(
     JSON.stringify({
-      ...CHEF_SESSION,
+      ...session,
       exp: Math.floor(Date.now() / 1_000) + 60 * 60,
     }),
     "utf8",
@@ -471,5 +481,90 @@ test.describe("kitchen board", () => {
     await expect(
       page.getByRole("button", { name: "Customize Whole Tilapia Flame Combo" }),
     ).toBeEnabled();
+  });
+
+  test("completes a dine-in ticket as served and keeps it out of the rider pool", async ({
+    page,
+    context,
+    browser,
+  }) => {
+    const phone = `0772 555 ${String(300 + clientCounter).slice(-3)}`;
+
+    await page.goto(`/?table=${T4_TOKEN}`);
+    await expect(page.getByText("Dine-in · Table T4").first()).toBeVisible();
+    await page
+      .getByRole("button", { name: "Customize Special Bazaar Rolex" })
+      .click();
+    const rolexDialog = page.getByRole("dialog", { name: "Special Bazaar Rolex" });
+    await expect(rolexDialog).toBeVisible();
+    await rolexDialog
+      .getByRole("button", { name: /Add to cart · USh 8,000/ })
+      .click();
+    await expect(rolexDialog).toBeHidden();
+
+    await page.getByRole("button", { name: /View cart:/ }).click();
+    const cart = page.getByRole("dialog", { name: "Your cart" });
+    await cart.getByRole("button", { name: "Continue to checkout" }).click();
+    await expect(page).toHaveURL(new RegExp(`table=${T4_TOKEN}`));
+
+    await page.getByLabel("Full name").fill("Alex Dine In");
+    await page.getByLabel("Phone number").fill(phone);
+    await page.getByRole("radio", { name: /Cash on delivery/ }).check();
+    await page
+      .getByRole("button", { name: /Place order · USh 8,000/ })
+      .click();
+
+    await expect(page).toHaveURL(/\/orders\/[0-9a-f-]{36}$/);
+    await expect(page.getByText("Table T4")).toBeVisible();
+    await expect(page.getByText("Handover PIN")).toHaveCount(0);
+
+    await startKitchenShift(context, page);
+    const ticket = page
+      .locator('[data-testid^="kitchen-ticket-"]')
+      .filter({ hasText: "Table T4" })
+      .first();
+    await expect(ticket).toBeVisible();
+    await expect(ticket).toContainText("Dine-in · Table T4");
+    const heading = await ticket.getByRole("heading", { level: 2 }).textContent();
+    const orderNumber = Number(heading?.match(/#(\d+)/)?.[1]);
+    expect(orderNumber).toBeGreaterThan(0);
+
+    await ticket.getByRole("button", { name: /Accept order/ }).click();
+    await expect(
+      ticket.getByRole("button", { name: /Mark order .* served/ }),
+    ).toBeVisible();
+    await ticket.getByRole("button", { name: /Mark order .* served/ }).click();
+    await expect(
+      page.getByText(/The dine-in ticket has left the board/),
+    ).toBeVisible();
+    await expect(ticket).toHaveCount(0);
+
+    // Phase 11 gate: dine-in orders never enter the rider pool.
+    const riderContext = await browser.newContext();
+    await riderContext.addCookies([
+      {
+        name: "mrfss_staff_fixture",
+        value: fixtureStaffCookie(RIDER_SESSION),
+        domain: "127.0.0.1",
+        path: "/",
+        httpOnly: true,
+        sameSite: "Lax",
+      },
+    ]);
+    const snapshot = await riderContext.request.get("/api/rider/snapshot");
+    expect(snapshot.status()).toBe(200);
+    const body = (await snapshot.json()) as {
+      ok: boolean;
+      data?: {
+        pool: Array<{ orderId: string; orderNumber: number }>;
+        active: { orderId: string; orderNumber: number } | null;
+      };
+    };
+    expect(body.ok).toBe(true);
+    expect(
+      body.data?.pool.some((order) => order.orderNumber === orderNumber),
+    ).toBe(false);
+    expect(body.data?.active?.orderNumber === orderNumber).toBe(false);
+    await riderContext.close();
   });
 });

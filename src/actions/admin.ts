@@ -45,7 +45,7 @@ async function authorise() {
 function invalid<T>(
   parsed: {
     success: false;
-    error: { issues: Array<{ message: string; path: (string | number)[] }> };
+    error: { issues: Array<{ message: string; path: PropertyKey[] }> };
   },
 ): AdminActionResult<T> {
   const issue = parsed.error.issues[0];
@@ -54,7 +54,9 @@ function invalid<T>(
     error: {
       code: "VALIDATION_ERROR",
       message: issue?.message ?? "Check the values and try again.",
-      ...(issue?.path.length ? { field: issue.path.join(".") } : {}),
+      ...(issue?.path.length
+        ? { field: issue.path.map(String).join(".") }
+        : {}),
     },
   };
 }

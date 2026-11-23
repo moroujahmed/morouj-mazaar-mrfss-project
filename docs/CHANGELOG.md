@@ -6,6 +6,30 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation - Phase 11/12 hardening (2026-11-23)
+
+### Added
+
+- `tests/e2e/kitchen.spec.ts`: Phase 11 dine-in KDS completion coverage — COD dine-in ticket is accepted and bumped as served, leaves the board with the dine-in served toast, and is asserted absent from `/api/rider/snapshot` pool/active (dine-in never enters rider pool).
+
+### Changed
+
+- `package.json` / `package-lock.json`: upgraded `zod` to `4.6.7` and added an npm `postcss` override to `8.5.33` to resolve `npm audit --omit=dev --audit-level=high` findings; updated Zod v4 typing in `src/actions/admin.ts`, `src/actions/rider.ts`, and `src/lib/routing/coordinates.ts`.
+- `tests/e2e/orders.spec.ts`: waits for the tracker document title before axe checks to remove a client-navigation `document-title` timing flake.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm test` (179), `npm run build`, `npm run test:db`, `npm run test:db:race`, and `npm run test:e2e` (45/45 Chromium, 0 critical/serious axe violations) pass.
+- `npm audit --omit=dev --audit-level=high` reports 0 vulnerabilities.
+- Phase 11 gate evidence: forged table token rejected (`tests/e2e/checkout.spec.ts`), dine-in never enters rider pool and KDS served completion works (`tests/e2e/kitchen.spec.ts`), dine-in pricing/QR behavior covered by existing checkout/orders tests.
+
+### Remaining operational launch gates
+
+- Formal CodeQL/Semgrep and provider secret scanning are not installed in this local environment; CI/release environment should run them.
+- Rollback/restore exercise and founder go-live checklist sign-off remain operational/human release actions.
+
+---
+
 ## Implementation - Phase 10: Admin hub (2026-11-22)
 
 ### Added

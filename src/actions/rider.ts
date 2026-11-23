@@ -36,7 +36,10 @@ async function authorise() {
 }
 
 function invalid<T>(
-  parsed: { success: false; error: { issues: Array<{ message: string; path: (string | number)[] }> } },
+  parsed: {
+    success: false;
+    error: { issues: Array<{ message: string; path: PropertyKey[] }> };
+  },
 ): RiderActionResult<T> {
   const issue = parsed.error.issues[0];
   return {
@@ -44,7 +47,9 @@ function invalid<T>(
     error: {
       code: "VALIDATION_ERROR",
       message: issue?.message ?? "Check the values and try again.",
-      ...(issue?.path.length ? { field: issue.path.join(".") } : {}),
+      ...(issue?.path.length
+        ? { field: issue.path.map(String).join(".") }
+        : {}),
     },
   };
 }

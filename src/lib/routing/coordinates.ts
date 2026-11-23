@@ -14,7 +14,7 @@ export type Coordinates = {
 };
 
 export const coordinateSchema = z
-  .number({ invalid_type_error: "Coordinate must be a number" })
+  .number({ error: "Coordinate must be a number" })
   .finite("Coordinate must be finite");
 
 export const latitudeSchema = coordinateSchema
