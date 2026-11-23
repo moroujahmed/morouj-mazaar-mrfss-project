@@ -44,7 +44,7 @@ for (const file of await collect(ROOT)) {
       /\bbg-orange-(?:500|600)\b/.test(line) || /#F28C28/i.test(line);
     const orangeBodyText = /\btext-orange-500\b/.test(line);
     const lightSurface =
-      /\bbg-white\b/.test(line) ||
+      /\bbg-white\b(?!\/)/.test(line) ||
       /\bbg-surface\b/.test(line) ||
       /\bbg-green-50\b/.test(line) ||
       /\bbg-surface-inset\b/.test(line) ||
