@@ -11,6 +11,9 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 ### Added
 
 - `tests/e2e/kitchen.spec.ts`: Phase 11 dine-in KDS completion coverage — COD dine-in ticket is accepted and bumped as served, leaves the board with the dine-in served toast, and is asserted absent from `/api/rider/snapshot` pool/active (dine-in never enters rider pool).
+- `.github/workflows/codeql.yml`, `.github/workflows/semgrep.yml`, `.github/workflows/secret-scan.yml`: CI security scan workflows for CodeQL, Semgrep, and Gitleaks.
+- `docs/RELEASE_EVIDENCE.md`: Phase 12 gate evidence (automated gates, security scan status, local restore drill, rollback notes).
+- `docs/GO_LIVE_CHECKLIST.md`: founder go-live checklist with explicit sign-off block.
 
 ### Changed
 
@@ -25,8 +28,9 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ### Remaining operational launch gates
 
-- Formal CodeQL/Semgrep and provider secret scanning are not installed in this local environment; CI/release environment should run them.
-- Rollback/restore exercise and founder go-live checklist sign-off remain operational/human release actions.
+- CodeQL/Semgrep/Gitleaks workflows were added in `.github/workflows/`; their GitHub Actions runs must be green on the release commit and any high/critical findings resolved. GitHub Secret Scanning/Push Protection remains a repo-admin setting.
+- Local DB backup/restore drill was exercised (see `docs/RELEASE_EVIDENCE.md`); production/staging Supabase restore drill and staging/Vercel rollback promotion still require environment access.
+- Founder go-live checklist is prepared in `docs/GO_LIVE_CHECKLIST.md`; explicit founder/owner sign-off remains a human release action.
 
 ---
 
