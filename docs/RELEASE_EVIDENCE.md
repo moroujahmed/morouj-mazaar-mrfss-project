@@ -2,24 +2,39 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Date** | 2026-11-23 |
-| **Branch/commit** | `main` (includes `03c8186` + Phase 12 release-evidence commit) |
-| **Scope** | Phase 12 launch gates: scans, rollback/restore exercise, go-live checklist |
+| **Date** | 2026-11-24 |
+| **Branch/commit** | `main` (includes the 2026-11-24 documented-endpoint completion commit) |
+| **Scope** | Phase 12 launch gates plus completion of the documented `/api/health`, `/api/cron/close-shifts`, and `/api/notifications/dispatch` handlers |
 
 ## 1. Automated quality gates
 
-All passed on 2026-11-23:
+Re-verified on 2026-11-24 after the endpoint-completion work:
 
 | Gate | Result |
 | :--- | :--- |
 | `npm run lint` | Pass |
 | `npm run typecheck` | Pass |
-| `npm test` | Pass (179/179) |
-| `npm run test:db` | Pass |
-| `npm run test:db:race` | Pass |
+| `npm test` | Pass (204/204) |
+| `npm run test:tokens` | Pass |
 | `npm run build` | Pass |
 | `npm run test:e2e` | Pass (45/45 Chromium, 0 critical/serious axe violations) |
 | `npm audit --omit=dev --audit-level=high` | Pass (0 vulnerabilities) |
+| `npm run test:db` | Pass on 2026-11-23; **not re-run on 2026-11-24** (see caveat) |
+| `npm run test:db:race` | Pass on 2026-11-23; **not re-run on 2026-11-24** (see caveat) |
+
+**DB caveat:** the local PostgreSQL 18 cluster could not be restarted on 2026-11-24 because Windows returned `0xC0000142` / shared-memory error 487 and stale `postgres.exe` processes could not be terminated without a reboot. No migration or database-code changes were made after the 2026-11-23 pass, so the last verified DB result remains 2026-11-23. The production/staging Supabase drill in §7 is still required.
+
+### 1.1 Live endpoint probes (production build, fixture/demo mode)
+
+| Probe | Result |
+| :--- | :--- |
+| `GET /api/health` | `200 {"status":"ok","time":"…","version":"1.5.0"}` |
+| `POST /api/cron/close-shifts` with secret | `200 {"ok":true,"closed":0}` |
+| `POST /api/notifications/dispatch` with secret | `200 {"ok":true,"pending":0,"sent":0,"retried":0,"failed":0}` |
+| Cron routes without the secret | `401 {"ok":false,"error":"UNAUTHORIZED"}` |
+| `POST /api/cron/expire-orders` with secret | `200 {"ok":true,"expired":0}` |
+
+These probes exercise the deployed route handlers in the local production build. Dispatch was empty because the demo outbox has no rows; the worker's send/retry/dead-letter paths are covered by unit tests.
 
 ## 2. Security scanning
 
@@ -73,10 +88,11 @@ See `docs/GO_LIVE_CHECKLIST.md`. Technical items verifiable in-repo are checked;
 
 ## 6. Overall status
 
-- **Code/automated gates:** complete and verified locally.
-- **Local restore drill:** exercised and verified locally.
+- **Code/automated gates:** complete and verified locally on 2026-11-24 (unit, token, build, E2E, audit); DB suites last verified 2026-11-23 due to the local cluster caveat above.
+- **Documented endpoints:** `/api/health`, `/api/cron/close-shifts`, and `/api/notifications/dispatch` are implemented and probed on the production build.
+- **Local restore drill:** exercised and verified locally on 2026-11-23.
 - **Security workflow coverage:** workflows added; GitHub-hosted execution/results are pending.
-- **Engineering-complete (locally verifiable scope):** acknowledged by founder on 2026-11-23.
+- **Engineering-complete (locally verifiable scope):** verified locally on 2026-11-24. This is not production deployment or commercial go-live approval.
 - **Production deployment / commercial go-live approval:** **NOT granted**. Founder explicitly did not authorize production deployment or commercial go-live.
 
 ## 7. Outstanding external release gates (required from founder/team/admin)

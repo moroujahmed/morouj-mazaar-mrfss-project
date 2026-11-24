@@ -46,6 +46,21 @@ export function resetRiderStoreForTests(): void {
   delete globalStore.__mrfssRider;
 }
 
+/**
+ * Test-only mirror of `close_open_rider_shifts()`: closes every open shift and
+ * snapshots the rider's unsettled cash for settlement.
+ */
+export function closeAllFixtureRiderShifts(): number {
+  let closed = 0;
+  for (const [riderId, shift] of state().shifts) {
+    if (shift.endedAt !== null) continue;
+    shift.expectedCash = fixtureRiderCashSummary(riderId).outstandingCash;
+    shift.endedAt = new Date().toISOString();
+    closed += 1;
+  }
+  return closed;
+}
+
 function openShift(riderId: string): FixtureShift | null {
   const shift = state().shifts.get(riderId);
   return shift && shift.endedAt === null ? shift : null;

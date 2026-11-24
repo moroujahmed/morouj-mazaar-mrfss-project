@@ -4,7 +4,7 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + Phase 8 storefront, checkout, order pipeline, customer tracker, and kitchen board |
+| **Status** | Specification baseline v1.5 + canonical Stitch design package + static interface prototype + production Next.js app through Phase 12 (storefront, checkout, order pipeline, customer tracker, kitchen board, rider dispatch, admin hub, cron/health endpoints, and release evidence) |
 | **Stack** | Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 3.4, Supabase (Postgres + Auth + Storage), Flutterwave, Africa's Talking, MapTiler, self-hosted OSRM |
 | **Currency** | `USh`, whole integers with thousands separators |
 | **Timezone** | `Africa/Kampala` (EAT, UTC+3) |

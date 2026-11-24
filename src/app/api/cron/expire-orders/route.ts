@@ -1,6 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
-
-import { getServerEnv } from "@/lib/env";
+import { checkCronAuth } from "@/lib/cron/auth";
 import { getOrderStore } from "@/lib/orders/store";
 
 export const runtime = "nodejs";
@@ -19,35 +17,12 @@ function json(body: unknown, status: number): Response {
   });
 }
 
-function safeEqual(received: string, expected: string): boolean {
-  const a = Buffer.from(received);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
-}
-
-function authorized(request: Request, secret: string): boolean {
-  if (!secret) return false;
-
-  const header = request.headers.get("authorization") ?? "";
-  if (header.startsWith("Bearer ")) {
-    return safeEqual(header.slice(7).trim(), secret);
-  }
-
-  const direct = request.headers.get("x-cron-secret") ?? "";
-  return direct ? safeEqual(direct, secret) : false;
-}
-
 async function run(request: Request): Promise<Response> {
-  let secret: string;
-  try {
-    secret = getServerEnv().CRON_SECRET.trim();
-  } catch {
+  const auth = checkCronAuth(request);
+  if (auth === "CONFIGURATION") {
     return json({ ok: false, error: "CONFIGURATION" }, 503);
   }
-
-  if (!secret) return json({ ok: false, error: "CONFIGURATION" }, 503);
-  if (!authorized(request, secret)) {
+  if (auth === "UNAUTHORIZED") {
     return json({ ok: false, error: "UNAUTHORIZED" }, 401);
   }
 

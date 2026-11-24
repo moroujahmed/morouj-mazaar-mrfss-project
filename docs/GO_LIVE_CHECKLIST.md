@@ -3,6 +3,7 @@
 | Field | Value |
 | :--- | :--- |
 | **Date prepared** | 2026-11-23 |
+| **Date updated** | 2026-11-24 |
 | **Prepared from** | `docs/OPERATIONS_RUNBOOK.md` §11, `docs/STEP_BY_STEP_IMPLEMENTATION_PLAN.md` Phase 12 |
 | **Release evidence** | `docs/RELEASE_EVIDENCE.md` |
 
@@ -31,6 +32,7 @@ Legend: `[x]` verified in repo/local gates, `[ ]` requires founder/team/provider
 - [x] Scenarios A–K covered by executable tests/E2E per `docs/TEST_PLAN.md` and `docs/TESTING_PERSONAS_AND_E2E_SCENARIOS.md`.
 - [x] `npm audit --omit=dev --audit-level=high` has 0 vulnerabilities.
 - [x] Security scan workflows added: CodeQL, Semgrep, Gitleaks (`.github/workflows/`).
+- [x] Documented `/api/health`, `/api/cron/close-shifts`, and `/api/notifications/dispatch` handlers implemented and probed on the production build (2026-11-24).
 - [ ] GitHub Actions CodeQL/Semgrep/Secret Scan runs green on release commit; any high/critical findings resolved.
 - [ ] GitHub Secret Scanning / Push Protection enabled in repository settings (admin).
 - [ ] Payment webhook verified with real sandbox transaction and replay.

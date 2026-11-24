@@ -92,6 +92,7 @@ const ok = received.length === expected.length &&
 - First-time COD customers must verify. Returning customers with a delivered order may skip when the setting permits.
 - If the provider is down, COD checkout is disabled with a clear message; do not silently bypass.
 - Status notifications are written to the `notifications` outbox and dispatched with bounded retries and a dead-letter state. Dine-in orders do not receive delivery-status SMS.
+- The dispatcher ships provisional operational copy for the v1 status templates; exact wording and the sender ID remain founder dependencies (F-15/F-44). Approved copy can be supplied per row in `payload.message` without a code change.
 - WhatsApp is a human support link in v1, not an automated channel.
 
 Webhook/callback authentication for delivery receipts must be verified before updating a notification as `SENT`.

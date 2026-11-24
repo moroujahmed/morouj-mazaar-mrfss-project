@@ -61,6 +61,9 @@ export type ApiResponse<T> =
 | `/admin` | Supabase Auth, `ADMIN` | Middleware + server guard. |
 | `/api/webhooks/flutterwave` | provider signature | No user session. |
 | `/api/notifications/dispatch` | `CRON_SECRET` | Cron only. |
+| `/api/cron/expire-orders` | `CRON_SECRET` | Cron only. |
+| `/api/cron/close-shifts` | `CRON_SECRET` | Cron only. |
+| `/api/health` | none | Liveness only; no secrets or DB details. |
 | `/api/distance` | anon + rate limit | No PII. |
 
 ---
@@ -255,7 +258,9 @@ export type ApiResponse<T> =
 ### 3.3 `POST /api/notifications/dispatch`
 
 **Auth:** `Authorization: Bearer ${CRON_SECRET}`
-**Behavior:** select up to 50 `PENDING` notifications, send via Africa's Talking, update status/attempts, exponential backoff.
+**Behavior:** select up to 50 due `PENDING` notifications, send via Africa's Talking, update status/attempts, exponential backoff.
+**Response:** `{ ok: true, pending, sent, retried, failed }`; `503 CONFIGURATION` when the SMS provider is not configured.
+**Rules:** only `SMS` is automated in v1; other channels and unrenderable templates move to the `FAILED` dead-letter state. A row may carry approved copy in `payload.message`; otherwise `template` is resolved against the payload. Failed sends retry after 1, 2, 4, then 8 minutes and dead-letter on the fifth attempt.
 **Schedule:** every minute (Vercel Cron or Supabase cron).
 
 ### 3.4 `POST /api/cron/expire-orders`
@@ -268,12 +273,13 @@ export type ApiResponse<T> =
 
 **Auth:** `CRON_SECRET`
 **Behavior:** at 22:30 EAT, calls `close_open_rider_shifts()` to close every open shift, snapshot expected cash, and notify admin for settlement.
+**Response:** `{ ok: true, closed: number }`; idempotent when no shift is open.
 
 ### 3.6 `GET /api/health`
 
 **Auth:** none
 **Response:** `{ status: "ok", time: string, version: string }`
-**Rules:** no secrets, no DB details.
+**Rules:** no secrets, no DB details. The `version` value is the root `package.json` version (`1.5.0`).
 
 ### 3.7 `GET /api/print/receipt/[orderId]`
 

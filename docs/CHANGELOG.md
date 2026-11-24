@@ -6,6 +6,37 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation — Documented endpoint completion (2026-11-24)
+
+### Added
+
+- `GET /api/health`: unauthenticated liveness payload `{ status, time, version }` with `Cache-Control: no-store`; no secrets or database details. `version` reads the root `package.json` (`1.5.0`).
+- `POST /api/cron/close-shifts` and `GET` equivalent: constant-time `CRON_SECRET` auth, calls `close_open_rider_shifts()`, and returns `{ ok, closed }`; the fixture mirrors the same behaviour for tests.
+- `POST /api/notifications/dispatch` and `GET` equivalent: claims up to 50 due outbox rows, renders approved `payload.message` copy or a known template, sends through the Africa's Talking adapter, and records `SENT`/retry/dead-letter outcomes with 1/2/4/8-minute backoff. Unsupported channels and unrenderable templates fail permanently.
+- `src/lib/cron/auth.ts`: shared constant-time cron authentication used by all three cron endpoints.
+- `src/lib/notifications/`: outbox store boundary, service-role store, fixture store, and dispatch worker.
+- Unit coverage in `tests/unit/health.test.ts`, `tests/unit/cron.test.ts`, and `tests/unit/notifications.test.ts` (route auth, configuration fail-closed, template rendering, retry/dead-letter, idempotency, shift closure).
+
+### Changed
+
+- `package.json` / `package-lock.json`: root version aligned to the v1.5.0 release.
+- `src/app/api/cron/expire-orders/route.ts`: now uses the shared cron auth helper; response contract unchanged.
+- `docs/API_CONTRACTS.md` and `docs/OPERATIONS_RUNBOOK.md`: documented the implemented response shapes and dispatch rules.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm test` (204/204), `npm run test:tokens`, `npm run build`, and `npm run test:e2e` (45/45 Chromium, 0 critical/serious axe violations) pass.
+- `npm audit --omit=dev --audit-level=high` reports 0 vulnerabilities.
+- Live production-build probes: `/api/health` → `200 {"status":"ok",...}`, close-shifts with the secret → `200 {"ok":true,"closed":0}`, dispatch with the secret → `200 {"ok":true,"pending":0,...}`, and all cron routes without the secret → `401`.
+
+### Release status
+
+- Engineering scope is complete and locally verified, including the previously missing documented endpoints.
+- External release gates remain outstanding: GitHub-hosted CodeQL/Semgrep/Gitleaks results, GitHub Secret Scanning/Push Protection settings, Supabase production/staging restore drill, and Vercel staging rollback drill.
+- Founder go-live sign-off remains **pending / not granted**; production deployment and commercial go-live are not authorized by this entry.
+
+---
+
 ## Implementation - Phase 11/12 hardening (2026-11-23)
 
 ### Added

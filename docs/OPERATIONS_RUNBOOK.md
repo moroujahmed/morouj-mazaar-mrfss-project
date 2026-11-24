@@ -121,7 +121,7 @@ A backup that has never been restored is not a backup.
 | Daily backup check | 23:00 | Provider job | Alert founder |
 | Settlement reminder | 22:35 | Admin dashboard | Alert if any rider has outstanding cash |
 
-All cron endpoints require `Authorization: Bearer ${CRON_SECRET}` and are idempotent.
+All cron endpoints require `Authorization: Bearer ${CRON_SECRET}` and are idempotent. `GET /api/health` is unauthenticated and returns `{ status, time, version }` with no secrets or database details; point the uptime check at it. The notification worker returns `{ ok, pending, sent, retried, failed }`, and the shift worker returns `{ ok, closed }`.
 
 ---
 
