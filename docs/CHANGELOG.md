@@ -6,6 +6,31 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 ---
 
+## Implementation — Stitch storefront UI and menu images (2026-11-24)
+
+### Added
+
+- Local menu photography in `public/images/menu/` (copied from `docs/assets/`) and wired into the storefront fixture and `supabase/seed.sql` for matching menu items.
+- Stitch-inspired storefront presentation: richer hero, category navigation, card layout, and cart/item-sheet visual polish while preserving accessible labels and roles used by automated tests.
+
+### Changed
+
+- `src/components/storefront/storefront.tsx`: redesigned to align with the Stitch AI customer storefront reference, including hero imagery, category/filter presentation, and clearer menu sections.
+- `src/components/storefront/item-card.tsx`, `dish-image.tsx`, `item-sheet.tsx`, `cart-dock.tsx`, and `cart-sheet.tsx`: updated visual treatment for real dish images and a more polished Stitch-aligned shopping flow; kept test-critical aria labels/roles (`Customize <item>`, `Add <item> to cart`, `View cart:`, `Your cart`, `Continue to checkout`, search label, category `aria-pressed`).
+- `src/lib/storefront/fixture.ts` and `supabase/seed.sql`: mapped real image URLs for matching demo/seed items; items without photos continue to use the branded placeholder.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm test` (204/204), `npm run test:tokens`, `npm run build`, and `npm run test:e2e` (45/45 Chromium, 0 critical/serious axe violations) pass.
+- `npm audit --omit=dev --audit-level=high` reports 0 vulnerabilities.
+
+### Release status
+
+- Storefront UI and image presentation are locally verified. This does not change external release gates or founder sign-off status.
+- Founder go-live sign-off remains **pending / not granted**; production deployment and commercial go-live are not authorized by this entry.
+
+---
+
 ## Implementation — Documented endpoint completion (2026-11-24)
 
 ### Added

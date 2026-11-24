@@ -80,6 +80,7 @@ function item(
   prepTimeMinutes: number,
   sortOrder: number,
   isCombo = false,
+  imageUrl: string | null = null,
 ): MenuRows["items"][number] {
   return {
     id,
@@ -88,7 +89,7 @@ function item(
     slug,
     description,
     base_price: basePrice,
-    image_url: null,
+    image_url: imageUrl,
     prep_time_minutes: prepTimeMinutes,
     is_available: true,
     is_combo: isCombo,
@@ -107,6 +108,7 @@ const items: MenuRows["items"] = [
     25,
     1,
     true,
+    "/images/menu/grilled_tilapia_combo_1793348738708.jpg",
   ),
   item(
     "22222222-2222-4222-8222-222222222202",
@@ -117,6 +119,8 @@ const items: MenuRows["items"] = [
     18_000,
     20,
     1,
+    false,
+    "/images/menu/charcoal_grilled_chicken_1793348776274.jpg",
   ),
   item(
     "22222222-2222-4222-8222-222222222203",
@@ -127,6 +131,8 @@ const items: MenuRows["items"] = [
     26_000,
     30,
     1,
+    false,
+    "/images/menu/flame_burger.jpg",
   ),
   item(
     "22222222-2222-4222-8222-222222222204",
@@ -137,6 +143,8 @@ const items: MenuRows["items"] = [
     24_000,
     30,
     2,
+    false,
+    "/images/menu/grilled_chicken.jpg",
   ),
   item(
     "22222222-2222-4222-8222-222222222205",
@@ -147,6 +155,8 @@ const items: MenuRows["items"] = [
     8_000,
     10,
     1,
+    false,
+    "/images/menu/passion_juice_rolex_1793348796512.jpg",
   ),
   item(
     "22222222-2222-4222-8222-222222222206",
@@ -207,6 +217,8 @@ const items: MenuRows["items"] = [
     5_000,
     5,
     3,
+    false,
+    "/images/menu/passion_juice_rolex.jpg",
   ),
   item(
     "22222222-2222-4222-8222-222222222211",

@@ -3,12 +3,15 @@
 import {
   CheckCircle2,
   Clock,
+  Flame,
   MapPin,
   MessageCircle,
   Search,
+  Sparkles,
   UtensilsCrossed,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -45,9 +48,7 @@ import { ItemSheet } from "./item-sheet";
 export type StorefrontProps = {
   menu: StorefrontMenu;
   storeStatus: StoreStatus;
-  /** Server-validated dine-in table from `?table=<qr-token>`. */
   table?: DineInTable | null;
-  /** Raw QR token from the URL; malformed tokens never reach the server. */
   tableToken?: string | null;
 };
 
@@ -182,10 +183,7 @@ export function Storefront({
     }
     setItemSheetOpen(false);
     setSelectedItem(null);
-    showToast({
-      title: `${line.name} added`,
-      tone: "success",
-    });
+    showToast({ title: `${line.name} added`, tone: "success" });
   }
 
   const activeCategoryName =
@@ -195,25 +193,33 @@ export function Storefront({
         null);
 
   const supportHref = `https://wa.me/${settings.supportWhatsapp.replace(/\D/g, "")}`;
+  const heroImage =
+    items.find((item) => item.slug === "whole-tilapia-flame-combo")?.imageUrl ??
+    "/images/placeholder-dish.svg";
 
   return (
-    <div className="min-h-dvh bg-surface-inset pb-32">
-      <header className="border-b border-green-100 bg-surface">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-5 sm:px-6">
+    <div className="min-h-dvh bg-[#f4f7f5] pb-32 text-green-950">
+      <header className="sticky top-0 z-40 border-b border-green-100/80 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <p className="text-eyebrow uppercase text-orange-700">
-                Morouj Mazaar · Food Court
-              </p>
-              <h1 className="text-3xl font-extrabold text-green-800">
-                {settings.restaurantName}
-              </h1>
-              <p className="flex items-center gap-1.5 text-sm text-ink-secondary">
-                <MapPin aria-hidden="true" className="size-4" />
-                {dineIn
-                  ? `Dine-in · Table ${table.tableNumber}`
-                  : "Kampala · Delivery, pickup, and dine-in"}
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-green-800 text-white shadow-[0_10px_24px_rgba(23,63,53,0.28)]">
+                <Flame aria-hidden="true" className="size-6" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-orange-700">
+                  Morouj Mazaar · Food Court
+                </p>
+                <h1 className="text-2xl font-extrabold leading-none tracking-tight text-green-900 sm:text-3xl">
+                  {settings.restaurantName}
+                </h1>
+                <p className="flex items-center gap-1.5 text-sm text-ink-secondary">
+                  <MapPin aria-hidden="true" className="size-4" />
+                  {dineIn
+                    ? `Dine-in · Table ${table.tableNumber}`
+                    : "Kampala · Delivery, pickup, and dine-in"}
+                </p>
+              </div>
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
               <Badge
@@ -232,7 +238,7 @@ export function Storefront({
                 href={supportHref}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-touch items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-green-800 underline underline-offset-4 hover:bg-green-50"
+                className="inline-flex min-h-touch items-center gap-1.5 rounded-xl px-2 text-sm font-semibold text-green-800 underline underline-offset-4 hover:bg-green-50"
               >
                 <MessageCircle aria-hidden="true" className="size-4" />
                 WhatsApp support
@@ -240,25 +246,104 @@ export function Storefront({
             </div>
           </div>
 
-          <TextField
-            label="Search the menu"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search dishes, drinks, or sides"
-            autoComplete="off"
-          />
+          <div className="max-w-xl">
+            <TextField
+              label="Search the menu"
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search dishes, drinks, or sides"
+              autoComplete="off"
+            />
+          </div>
         </div>
       </header>
 
       <main
         id="main-content"
-        className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6"
+        className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
       >
+        <section className="relative overflow-hidden rounded-[2rem] border border-green-100 bg-white shadow-[0_20px_60px_-20px_rgba(16,46,39,0.18)]">
+          <div className="absolute -right-20 -top-20 size-72 rounded-full bg-orange-200/40 blur-3xl" />
+          <div className="absolute -bottom-16 left-1/3 size-64 rounded-full bg-green-200/40 blur-3xl" />
+          <div className="grid items-center gap-6 p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:p-10">
+            <div className="relative z-10 flex flex-col gap-4">
+              <div className="inline-flex w-fit items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-sm font-semibold text-green-800">
+                <Sparkles aria-hidden="true" className="size-4 text-orange-600" />
+                Chef&apos;s signature charcoal grill
+              </div>
+              <h2 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-green-950 sm:text-5xl lg:text-6xl">
+                Authentic Kampala flame &amp;{" "}
+                <span className="text-green-700">gourmet grills</span>
+              </h2>
+              <p className="max-w-2xl text-base leading-relaxed text-ink-secondary sm:text-lg">
+                Tender whole tilapia, slow-steamed luwombo, charcoal chicken, and
+                legendary Rolex made to order. Browse the full menu, customize your
+                dish, and check out in minutes.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-green-900 shadow-sm ring-1 ring-green-100">
+                  <CheckCircle2 aria-hidden="true" className="size-4 text-green-700" />
+                  Free delivery within 5 km
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-green-900 shadow-sm ring-1 ring-green-100">
+                  <Clock aria-hidden="true" className="size-4 text-orange-600" />
+                  Fresh prep, clear ETA
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-green-900 shadow-sm ring-1 ring-green-100">
+                  <UtensilsCrossed aria-hidden="true" className="size-4 text-green-700" />
+                  Dine-in or delivery
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <a
+                  href="#menu-heading"
+                  className={cn(
+                    "inline-flex min-h-touch items-center justify-center rounded-2xl bg-green-800 px-6 py-3 text-base font-bold text-white shadow-[0_12px_30px_rgba(23,63,53,0.28)] transition hover:bg-green-900",
+                  )}
+                >
+                  Explore full menu
+                </a>
+                <a
+                  href={supportHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-touch items-center justify-center rounded-2xl border border-green-200 bg-white px-6 py-3 text-base font-bold text-green-900 transition hover:bg-green-50"
+                >
+                  Chat on WhatsApp
+                </a>
+              </div>
+            </div>
+
+            <div className="relative z-10 mx-auto w-full max-w-xl">
+              <div className="relative overflow-hidden rounded-[1.75rem] border border-green-100 bg-green-50 shadow-2xl">
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src={heroImage}
+                    alt="Featured Bazaar Flame & Grill dish"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-2">
+                  <span className="rounded-full bg-green-950/80 px-4 py-2 text-sm font-semibold text-white backdrop-blur">
+                    Featured: Whole Tilapia Flame Combo
+                  </span>
+                  <span className="rounded-full bg-orange-500 px-4 py-2 text-sm font-bold text-green-950 shadow">
+                    From USh 32,000
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {table ? (
           <div
             role="status"
-            className="flex flex-col gap-1 rounded-2xl border-2 border-green-800 bg-green-50 p-4 text-green-900"
+            className="flex flex-col gap-1 rounded-2xl border border-green-200 bg-green-50 p-4 text-green-900"
           >
             <p className="flex items-center gap-2 font-extrabold">
               <UtensilsCrossed aria-hidden="true" className="size-5" />
@@ -272,12 +357,12 @@ export function Storefront({
         ) : tableToken ? (
           <div
             role="status"
-            className="flex flex-col gap-1 rounded-2xl border-2 border-status-warning bg-status-warningSurface p-4 text-status-warning"
+            className="flex flex-col gap-1 rounded-2xl border border-status-warning bg-status-warningSurface p-4 text-status-warning"
           >
             <p className="font-extrabold">This table link is not active</p>
             <p className="text-sm">
-              Order for delivery instead, or ask a member of staff for a new
-              table QR code.
+              Order for delivery instead, or ask a member of staff for a new table
+              QR code.
             </p>
           </div>
         ) : null}
@@ -285,7 +370,7 @@ export function Storefront({
         {!storeStatus.open ? (
           <div
             role="status"
-            className="flex flex-col gap-1 rounded-2xl border-2 border-status-warning bg-status-warningSurface p-4 text-status-warning"
+            className="flex flex-col gap-1 rounded-2xl border border-status-warning bg-status-warningSurface p-4 text-status-warning"
           >
             <p className="flex items-center gap-2 font-extrabold">
               <Clock aria-hidden="true" className="size-5" />
@@ -302,12 +387,12 @@ export function Storefront({
         {storeStatus.open && settings.isKitchenPaused ? (
           <div
             role="status"
-            className="flex flex-col gap-1 rounded-2xl border-2 border-status-warning bg-status-warningSurface p-4 text-status-warning"
+            className="flex flex-col gap-1 rounded-2xl border border-status-warning bg-status-warningSurface p-4 text-status-warning"
           >
             <p className="font-extrabold">The kitchen is paused</p>
             <p className="text-sm">
-              You can build a cart, but checkout stays disabled until the
-              kitchen resumes.
+              You can build a cart, but checkout stays disabled until the kitchen
+              resumes.
             </p>
           </div>
         ) : null}
@@ -324,19 +409,24 @@ export function Storefront({
           </p>
         ) : null}
 
-        <section aria-labelledby="menu-heading" className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-end justify-between gap-2">
+        <section aria-labelledby="menu-heading" className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h2 id="menu-heading" className="text-2xl font-extrabold">
-                {activeCategoryName ?? "Full menu"}
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700">
+                Bazaar culinary map
+              </p>
+              <h2
+                id="menu-heading"
+                className="text-3xl font-extrabold tracking-tight text-green-950"
+              >
+                {activeCategoryName ?? "Signature dishes"}
               </h2>
               <p
                 role="status"
                 aria-live="polite"
                 className="text-sm text-ink-secondary"
               >
-                {visibleItemCount}{" "}
-                {visibleItemCount === 1 ? "dish" : "dishes"}
+                {visibleItemCount} {visibleItemCount === 1 ? "dish" : "dishes"}
                 {query.trim() ? ` matching “${query.trim()}”` : ""}
               </p>
             </div>
@@ -355,10 +445,10 @@ export function Storefront({
                   aria-pressed={activeCategory === "all"}
                   onClick={() => setActiveCategory("all")}
                   className={cn(
-                    "min-h-touch shrink-0 rounded-full border-2 px-4 text-base font-semibold transition-colors",
+                    "min-h-touch shrink-0 rounded-full border px-5 text-sm font-bold transition-all sm:text-base",
                     activeCategory === "all"
-                      ? "border-green-800 bg-green-800 text-white"
-                      : "border-green-100 bg-surface text-green-800 hover:border-green-700",
+                      ? "border-green-800 bg-green-800 text-white shadow-[0_8px_20px_rgba(23,63,53,0.22)]"
+                      : "border-green-100 bg-white text-green-900 hover:border-green-300 hover:bg-green-50",
                   )}
                 >
                   All
@@ -370,10 +460,10 @@ export function Storefront({
                     aria-pressed={activeCategory === category.id}
                     onClick={() => setActiveCategory(category.id)}
                     className={cn(
-                      "min-h-touch shrink-0 rounded-full border-2 px-4 text-base font-semibold transition-colors",
+                      "min-h-touch shrink-0 rounded-full border px-5 text-sm font-bold transition-all sm:text-base",
                       activeCategory === category.id
-                        ? "border-green-800 bg-green-800 text-white"
-                        : "border-green-100 bg-surface text-green-800 hover:border-green-700",
+                        ? "border-green-800 bg-green-800 text-white shadow-[0_8px_20px_rgba(23,63,53,0.22)]"
+                        : "border-green-100 bg-white text-green-900 hover:border-green-300 hover:bg-green-50",
                     )}
                   >
                     {category.name}
@@ -390,7 +480,7 @@ export function Storefront({
                 setQuery("");
                 setActiveCategory("all");
               }}
-              className="inline-flex min-h-touch w-fit items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-green-800 underline underline-offset-4 hover:bg-green-50"
+              className="inline-flex min-h-touch w-fit items-center gap-1.5 rounded-xl px-2 text-sm font-semibold text-green-800 underline underline-offset-4 hover:bg-green-50"
             >
               <X aria-hidden="true" className="size-4" />
               Clear search and filters
@@ -425,15 +515,20 @@ export function Storefront({
               <section
                 key={category.id}
                 aria-labelledby={`category-${category.slug}`}
-                className="flex flex-col gap-3"
+                className="flex flex-col gap-4"
               >
-                <h3
-                  id={`category-${category.slug}`}
-                  className="text-xl font-extrabold"
-                >
-                  {category.name}
-                </h3>
-                <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="flex items-center justify-between gap-3">
+                  <h3
+                    id={`category-${category.slug}`}
+                    className="text-2xl font-extrabold tracking-tight text-green-950"
+                  >
+                    {category.name}
+                  </h3>
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-700 ring-1 ring-green-100">
+                    {category.items.length} items
+                  </span>
+                </div>
+                <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {category.items.map((item) => (
                     <li key={item.id}>
                       <ItemCard

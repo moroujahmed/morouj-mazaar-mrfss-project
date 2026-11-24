@@ -3,8 +3,8 @@
 | Field | Value |
 | :--- | :--- |
 | **Date** | 2026-11-24 |
-| **Branch/commit** | `main` at `b6dbb2d` (2026-11-24 endpoint completion; previous evidence at `98605a9`) |
-| **Scope** | Phase 12 launch gates plus completion of the documented `/api/health`, `/api/cron/close-shifts`, and `/api/notifications/dispatch` handlers |
+| **Branch/commit** | `main` at `b6dbb2d` (2026-11-24 endpoint completion; previous evidence at `98605a9`); Stitch UI/image alignment verified locally after this commit, release-commit hash recorded in git history |
+| **Scope** | Phase 12 launch gates, documented endpoint completion, and Stitch-aligned storefront UI with real menu image wiring |
 
 ## 1. Automated quality gates
 

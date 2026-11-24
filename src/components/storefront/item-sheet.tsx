@@ -23,6 +23,8 @@ import type { StorefrontItem } from "@/lib/storefront/types";
 import { formatUGX } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
+import { DishImage } from "./dish-image";
+
 export type ItemSheetProps = {
   item: StorefrontItem | null;
   open: boolean;
@@ -128,9 +130,16 @@ export function ItemSheet({
       }
     >
       <div className="flex flex-col gap-5">
-        {item.isCombo ? (
-          <Badge tone="orange">Combo · choose each step</Badge>
-        ) : null}
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-green-100 bg-green-50">
+          <DishImage src={item.imageUrl} sizes="(min-width: 640px) 560px, 100vw" priority />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {item.isCombo ? <Badge tone="orange">Combo · choose each step</Badge> : null}
+          <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-800">
+            Ready in about {item.prepTimeMinutes} min
+          </span>
+        </div>
 
         <p className="text-base font-semibold text-green-900">
           {formatUGX(item.basePrice)} base price

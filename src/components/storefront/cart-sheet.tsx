@@ -167,8 +167,8 @@ export function CartSheet({
         <ul className="flex flex-col divide-y divide-green-100">
           {lines.map((line) => (
             <li key={line.key} className="flex gap-3 py-4 first:pt-0">
-              <div className="size-16 shrink-0 overflow-hidden rounded-xl border border-green-100">
-                <DishImage src={line.imageUrl} />
+              <div className="relative size-16 shrink-0 overflow-hidden rounded-xl border border-green-100">
+                <DishImage src={line.imageUrl} sizes="64px" />
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <div className="flex items-start justify-between gap-2">

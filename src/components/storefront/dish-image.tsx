@@ -14,9 +14,13 @@ export const PLACEHOLDER_DISH_IMAGE = "/images/placeholder-dish.svg";
 export function DishImage({
   src,
   className,
+  sizes = "(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw",
+  priority = false,
 }: {
   src: string;
   className?: string;
+  sizes?: string;
+  priority?: boolean;
 }) {
   const image = src?.trim();
 
@@ -25,11 +29,11 @@ export function DishImage({
       <div
         aria-hidden="true"
         className={cn(
-          "flex h-full w-full items-center justify-center bg-green-50",
+          "flex h-full w-full items-center justify-center bg-gradient-to-br from-green-50 to-green-100",
           className,
         )}
       >
-        <Utensils className="size-9 text-green-700" />
+        <Utensils className="size-9 text-green-700/70" />
       </div>
     );
   }
@@ -38,10 +42,10 @@ export function DishImage({
     <Image
       src={image}
       alt=""
-      width={640}
-      height={400}
-      sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
-      className={cn("h-full w-full object-cover", className)}
+      fill
+      sizes={sizes}
+      priority={priority}
+      className={cn("object-cover", className)}
     />
   );
 }
