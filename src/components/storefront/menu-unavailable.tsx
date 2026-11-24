@@ -4,6 +4,7 @@ import { RefreshCw, UtensilsCrossed } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 
 import { SiteFooter } from "./site-footer";
+import { SiteHeader } from "./site-header";
 
 /**
  * Fail-closed storefront state. It is rendered when settings or menu data
@@ -12,16 +13,7 @@ import { SiteFooter } from "./site-footer";
 export function MenuUnavailable() {
   return (
     <div className="min-h-dvh bg-[#f4f7f5] text-green-950">
-      <header className="sticky top-0 z-40 border-b border-green-100/80 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700">
-            Morouj Mazaar · Food Court
-          </p>
-          <h1 className="text-2xl font-extrabold tracking-tight text-green-950 sm:text-3xl">
-            Bazaar Flame &amp; Grill
-          </h1>
-        </div>
-      </header>
+      <SiteHeader backHref="/" backLabel="Back to menu" eyebrow="Menu unavailable" />
       <main
         id="main-content"
         className="mx-auto flex w-full max-w-3xl flex-col items-center gap-5 px-4 py-16 text-center sm:px-6"

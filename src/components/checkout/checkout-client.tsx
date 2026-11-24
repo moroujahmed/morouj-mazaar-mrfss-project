@@ -27,6 +27,7 @@ import { sendCodOtpAction } from "@/actions/otp";
 import { initiatePaymentAction } from "@/actions/payments";
 import { DynamicMap } from "@/components/map/dynamic-map";
 import { SiteFooter } from "@/components/storefront/site-footer";
+import { SiteHeader } from "@/components/storefront/site-header";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -1238,20 +1239,7 @@ export function CheckoutClient({
 }
 
 function CheckoutHeader({ editHref }: { editHref: string }) {
-  return (
-    <header className="sticky top-0 z-40 border-b border-green-100/80 bg-white/90 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
-        <Link
-          href={editHref}
-          className="inline-flex min-h-touch items-center gap-2 rounded-xl px-2 text-sm font-semibold text-green-800 hover:bg-green-50"
-        >
-          <ArrowLeft aria-hidden="true" className="size-4" />
-          <span className="text-lg font-extrabold tracking-tight text-green-950">Bazaar Flame &amp; Grill</span>
-        </Link>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700">Secure checkout</p>
-      </div>
-    </header>
-  );
+  return <SiteHeader backHref={editHref} backLabel="Back to menu" eyebrow="Secure checkout" />;
 }
 
 function DineInBanner({ table }: { table: DineInTable | null }) {

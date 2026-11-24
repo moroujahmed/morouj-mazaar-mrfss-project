@@ -5,6 +5,7 @@ import { AlertTriangle, ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/storefront/site-footer";
+import { SiteHeader } from "@/components/storefront/site-header";
 import { TrackerLive } from "@/components/tracker/tracker-live";
 import { buttonClasses } from "@/components/ui/button";
 import { getOrderStore } from "@/lib/orders/store";
@@ -92,18 +93,7 @@ export default async function OrderPage({
 function OrderShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-[#f4f7f5] text-green-950">
-      <header className="sticky top-0 z-40 border-b border-green-100/80 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="inline-flex min-h-touch items-center gap-2 rounded-xl px-2 text-sm font-semibold text-green-800 hover:bg-green-50"
-          >
-            <ArrowLeft aria-hidden="true" className="size-4" />
-            <span className="text-lg font-extrabold tracking-tight text-green-950">Bazaar Flame &amp; Grill</span>
-          </Link>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700">Order tracker</p>
-        </div>
-      </header>
+      <SiteHeader backHref="/" backLabel="Back to menu" eyebrow="Order tracker" />
       <main
         id="main-content"
         className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-8 sm:px-6"
