@@ -92,9 +92,9 @@ export function SiteFooter() {
         <div className="mt-10 flex flex-col gap-3 border-t border-green-200/70 pt-6 text-sm text-ink-secondary sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 Bazaar Flame &amp; Grill Ltd. All rights reserved.</p>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
-            <span>Hygiene &amp; Safety Certified</span>
+            <Link href="/privacy" className="hover:text-green-800 hover:underline underline-offset-4">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-green-800 hover:underline underline-offset-4">Terms of Service</Link>
+            <Link href="/hygiene" className="hover:text-green-800 hover:underline underline-offset-4">Hygiene &amp; Safety</Link>
           </div>
         </div>
       </div>

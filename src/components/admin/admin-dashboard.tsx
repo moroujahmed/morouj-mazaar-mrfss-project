@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import {
   BarChart3,
@@ -30,7 +31,7 @@ import { AdminSettings } from "./admin-settings";
 import { AdminStaff } from "./admin-staff";
 import { AdminTables } from "./admin-tables";
 
-type TabId =
+export type AdminTabId =
   | "orders"
   | "menu"
   | "settings"
@@ -40,22 +41,28 @@ type TabId =
   | "staff"
   | "tables";
 
-const TABS: Array<{ id: TabId; label: string; icon: typeof ClipboardList }> = [
-  { id: "orders", label: "Orders", icon: ClipboardList },
-  { id: "menu", label: "Menu", icon: UtensilsCrossed },
-  { id: "settings", label: "Settings", icon: Settings2 },
-  { id: "ledger", label: "Ledger", icon: Receipt },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "audit", label: "Audit", icon: ScrollText },
-  { id: "staff", label: "Staff", icon: Users },
-  { id: "tables", label: "Tables", icon: Table2 },
+const TABS: Array<{ id: AdminTabId; label: string; href: string; icon: typeof ClipboardList }> = [
+  { id: "orders", label: "Orders", href: "/admin/orders", icon: ClipboardList },
+  { id: "menu", label: "Menu", href: "/admin/menu", icon: UtensilsCrossed },
+  { id: "settings", label: "Settings", href: "/admin/settings", icon: Settings2 },
+  { id: "ledger", label: "Ledger", href: "/admin/ledger", icon: Receipt },
+  { id: "analytics", label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { id: "audit", label: "Audit", href: "/admin/audit", icon: ScrollText },
+  { id: "staff", label: "Staff", href: "/admin/staff", icon: Users },
+  { id: "tables", label: "Tables", href: "/admin/tables", icon: Table2 },
 ];
 
 const POLL_MS = 15_000;
 
-export function AdminDashboard({ initial }: { initial: AdminSnapshot }) {
+export function AdminDashboard({
+  initial,
+  initialTab = "orders",
+}: {
+  initial: AdminSnapshot;
+  initialTab?: AdminTabId;
+}) {
   const [snapshot, setSnapshot] = useState(initial);
-  const [tab, setTab] = useState<TabId>("orders");
+  const tab = initialTab;
   const [refreshing, startRefresh] = useTransition();
   const { showToast } = useToast();
 
@@ -117,15 +124,14 @@ export function AdminDashboard({ initial }: { initial: AdminSnapshot }) {
         aria-label="Admin sections"
         className="flex gap-2 overflow-x-auto pb-1"
       >
-        {TABS.map(({ id, label, icon: Icon }) => {
+        {TABS.map(({ id, label, href, icon: Icon }) => {
           const active = tab === id;
           return (
-            <button
+            <Link
               key={id}
-              type="button"
+              href={href}
               data-testid={`admin-tab-${id}`}
               aria-current={active ? "page" : undefined}
-              onClick={() => setTab(id)}
               className={[
                 "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors",
                 "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-green-800 focus-visible:ring-offset-2",
@@ -136,7 +142,7 @@ export function AdminDashboard({ initial }: { initial: AdminSnapshot }) {
             >
               <Icon aria-hidden="true" className="size-4" />
               {label}
-            </button>
+            </Link>
           );
         })}
       </nav>
