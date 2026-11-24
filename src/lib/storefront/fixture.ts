@@ -167,6 +167,8 @@ const items: MenuRows["items"] = [
     6_000,
     12,
     2,
+    false,
+    "/images/menu/golden-chips.svg",
   ),
   item(
     "22222222-2222-4222-8222-222222222207",
@@ -177,6 +179,8 @@ const items: MenuRows["items"] = [
     15_000,
     20,
     3,
+    false,
+    "/images/menu/matoke-groundnut.svg",
   ),
   item(
     "22222222-2222-4222-8222-222222222212",
@@ -187,6 +191,8 @@ const items: MenuRows["items"] = [
     1_500,
     5,
     4,
+    false,
+    "/images/menu/chapati.svg",
   ),
   item(
     "22222222-2222-4222-8222-222222222208",
@@ -197,6 +203,8 @@ const items: MenuRows["items"] = [
     2_000,
     1,
     1,
+    false,
+    "/images/menu/mineral-water.svg",
   ),
   item(
     "22222222-2222-4222-8222-222222222209",
@@ -207,6 +215,8 @@ const items: MenuRows["items"] = [
     3_000,
     1,
     2,
+    false,
+    "/images/menu/soda.svg",
   ),
   item(
     "22222222-2222-4222-8222-222222222210",
@@ -229,6 +239,8 @@ const items: MenuRows["items"] = [
     4_000,
     5,
     4,
+    false,
+    "/images/menu/african-coffee.svg",
   ),
 ];
 

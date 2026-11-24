@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFF8F1"/><stop offset="100%" stop-color="#F3DFC3"/></linearGradient></defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="270" r="150" fill="#E8C98A" stroke="#C9A45C" stroke-width="8"/>
+  <circle cx="400" cy="270" r="120" fill="none" stroke="#D4B06A" stroke-width="4" opacity="0.7"/>
+  <circle cx="350" cy="230" r="8" fill="#C9A45C" opacity="0.5"/>
+  <circle cx="440" cy="250" r="7" fill="#C9A45C" opacity="0.5"/>
+  <circle cx="390" cy="310" r="9" fill="#C9A45C" opacity="0.5"/>
+  <text x="400" y="470" text-anchor="middle" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="#173F35">Chapati</text>
+  <text x="400" y="510" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" fill="#5F6F6A">Soft handmade flatbread</text>
+</svg>

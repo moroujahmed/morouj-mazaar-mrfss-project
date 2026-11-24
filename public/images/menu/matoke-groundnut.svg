@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F2F7F5"/><stop offset="100%" stop-color="#DDEBE5"/></linearGradient></defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="400" cy="265" r="165" fill="#173F35" opacity="0.08"/>
+  <ellipse cx="360" cy="250" rx="95" ry="55" fill="#C4A35A"/>
+  <ellipse cx="430" cy="290" rx="100" ry="58" fill="#B8923F"/>
+  <ellipse cx="400" cy="270" rx="130" ry="75" fill="none" stroke="#173F35" stroke-width="10" opacity="0.15"/>
+  <text x="400" y="470" text-anchor="middle" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="#173F35">Matoke &amp; Groundnut</text>
+  <text x="400" y="510" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" fill="#5F6F6A">Traditional steamed banana dish</text>
+</svg>

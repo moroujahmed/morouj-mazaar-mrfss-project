@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -244,6 +245,12 @@ export function Storefront({
                 <MessageCircle aria-hidden="true" className="size-4" />
                 WhatsApp support
               </a>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-ink-secondary">
+                <span className="text-green-900">Staff:</span>
+                <Link href="/kitchen/login" className="hover:text-green-800 hover:underline underline-offset-4">Kitchen</Link>
+                <Link href="/rider/login" className="hover:text-green-800 hover:underline underline-offset-4">Delivery</Link>
+                <Link href="/admin/login" className="hover:text-green-800 hover:underline underline-offset-4">Manager</Link>
+              </div>
             </div>
           </div>
 
@@ -339,6 +346,20 @@ export function Storefront({
               </div>
             </div>
           </div>
+        </section>
+
+        <section aria-label="How to order" className="grid gap-3 sm:grid-cols-3">
+          {[
+            { step: "1", title: "Choose your dishes", text: "Browse the menu, customize items, and add them to your cart." },
+            { step: "2", title: "Review your cart", text: "Open the cart dock, confirm quantities, and continue to checkout." },
+            { step: "3", title: "Pay securely", text: "Enter delivery details and pay by mobile money or cash on delivery." },
+          ].map((item) => (
+            <div key={item.step} className="rounded-2xl border border-green-100 bg-white p-4 shadow-sm">
+              <div className="mb-2 flex size-8 items-center justify-center rounded-full bg-green-800 text-sm font-bold text-white">{item.step}</div>
+              <p className="font-extrabold text-green-950">{item.title}</p>
+              <p className="mt-1 text-sm leading-relaxed text-ink-secondary">{item.text}</p>
+            </div>
+          ))}
         </section>
 
         {table ? (

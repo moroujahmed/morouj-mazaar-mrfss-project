@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F7F3EF"/><stop offset="100%" stop-color="#E7D8C8"/></linearGradient></defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <path d="M290 220 H470 V320 C470 360 440 390 400 390 H360 C320 390 290 360 290 320 Z" fill="#6B3F2A"/>
+  <path d="M470 245 H500 C525 245 540 260 540 282 C540 305 525 320 500 320 H470" fill="none" stroke="#6B3F2A" stroke-width="16"/>
+  <ellipse cx="380" cy="390" rx="120" ry="22" fill="#173F35" opacity="0.12"/>
+  <path d="M350 170 C340 190 360 200 350 220" stroke="#A65A0F" stroke-width="8" fill="none"/>
+  <path d="M385 160 C375 185 395 195 385 220" stroke="#A65A0F" stroke-width="8" fill="none"/>
+  <path d="M420 170 C410 190 430 200 420 220" stroke="#A65A0F" stroke-width="8" fill="none"/>
+  <text x="400" y="470" text-anchor="middle" font-family="Arial,sans-serif" font-size="44" font-weight="700" fill="#173F35">African Coffee</text>
+  <text x="400" y="510" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" fill="#5F6F6A">Freshly brewed Ugandan coffee</text>
+</svg>

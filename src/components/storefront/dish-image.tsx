@@ -38,6 +38,8 @@ export function DishImage({
     );
   }
 
+  const isSvg = image.toLowerCase().endsWith(".svg");
+
   return (
     <Image
       src={image}
@@ -45,6 +47,7 @@ export function DishImage({
       fill
       sizes={sizes}
       priority={priority}
+      unoptimized={isSvg}
       className={cn("object-cover", className)}
     />
   );

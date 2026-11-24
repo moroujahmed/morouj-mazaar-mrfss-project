@@ -1,6 +1,7 @@
 "use client";
 
 import { LogIn } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
 
@@ -127,6 +128,16 @@ export function StaffLoginForm({
         Forgotten your PIN? Ask the restaurant administrator to reset it. Five
         incorrect attempts lock sign-in for 15 minutes.
       </p>
+
+      <div className="border-t border-green-100 pt-4 text-sm text-ink-secondary">
+        <p className="mb-2 font-semibold text-green-900">Other staff portals</p>
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          {portal !== "kitchen" ? <Link href="/kitchen/login" className="font-medium text-green-800 underline underline-offset-4 hover:text-green-900">Kitchen staff</Link> : null}
+          {portal !== "rider" ? <Link href="/rider/login" className="font-medium text-green-800 underline underline-offset-4 hover:text-green-900">Delivery staff</Link> : null}
+          {portal !== "admin" ? <Link href="/admin/login" className="font-medium text-green-800 underline underline-offset-4 hover:text-green-900">Manager / Admin</Link> : null}
+          <Link href="/" className="font-medium text-green-800 underline underline-offset-4 hover:text-green-900">Back to website</Link>
+        </div>
+      </div>
     </div>
   );
 }

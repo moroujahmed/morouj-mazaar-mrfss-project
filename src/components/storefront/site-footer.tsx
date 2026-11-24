@@ -53,13 +53,18 @@ export function SiteFooter() {
             <ul className="space-y-2 text-sm text-ink-secondary">
               <li><Link href="/" className="hover:text-green-800 hover:underline underline-offset-4">Browse menu</Link></li>
               <li><Link href="/checkout" className="hover:text-green-800 hover:underline underline-offset-4">Checkout</Link></li>
-              <li><Link href="/design-system" className="hover:text-green-800 hover:underline underline-offset-4">Design system</Link></li>
               <li>
                 <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 hover:text-green-800 hover:underline underline-offset-4">
                   <MessageCircle aria-hidden="true" className="size-4" />
                   Order help on WhatsApp
                 </a>
               </li>
+            </ul>
+            <p className="mt-5 mb-2 text-xs font-bold uppercase tracking-[0.14em] text-green-900">Staff portals</p>
+            <ul className="space-y-2 text-sm text-ink-secondary">
+              <li><Link href="/kitchen/login" className="hover:text-green-800 hover:underline underline-offset-4">Kitchen staff</Link></li>
+              <li><Link href="/rider/login" className="hover:text-green-800 hover:underline underline-offset-4">Delivery staff</Link></li>
+              <li><Link href="/admin/login" className="hover:text-green-800 hover:underline underline-offset-4">Manager / Admin</Link></li>
             </ul>
           </div>
 

@@ -17,8 +17,10 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 - `src/components/storefront/storefront.tsx`: redesigned to align with the Stitch AI customer storefront reference, including hero imagery, category/filter presentation, and clearer menu sections.
 - `src/components/storefront/item-card.tsx`, `dish-image.tsx`, `item-sheet.tsx`, `cart-dock.tsx`, and `cart-sheet.tsx`: updated visual treatment for real dish images and a more polished Stitch-aligned shopping flow; kept test-critical aria labels/roles (`Customize <item>`, `Add <item> to cart`, `View cart:`, `Your cart`, `Continue to checkout`, search label, category `aria-pressed`).
-- `src/components/storefront/site-footer.tsx` and customer page shells (`checkout`, `orders/[token]`, `checkout/mock-payment`, menu unavailable, design system): added consistent Stitch-style header/footer treatment across customer-facing pages.
-- `src/lib/storefront/fixture.ts` and `supabase/seed.sql`: mapped real image URLs for matching demo/seed items; items without photos continue to use the branded placeholder.
+- `src/components/storefront/site-footer.tsx` and customer page shells (`checkout`, `orders/[token]`, `checkout/mock-payment`, menu unavailable, design system): added consistent Stitch-style header/footer treatment across customer-facing pages; footer and storefront header now expose Kitchen, Delivery, and Manager/Admin staff portal links.
+- `src/components/auth/staff-login-form.tsx` and staff login pages: added cross-links between staff portals and a back-to-website link for clearer staff access.
+- `src/components/storefront/storefront.tsx`: added a clear "How to order" section so customers can see browse → cart → checkout/payment flow.
+- `src/lib/storefront/fixture.ts`, `supabase/seed.sql`, `src/components/storefront/dish-image.tsx`, and `public/images/menu/*.svg`: every menu item now has an image (real JPGs where available, branded SVG fallbacks for remaining items); `DishImage` renders SVGs with `unoptimized`.
 
 ### Verification
 
