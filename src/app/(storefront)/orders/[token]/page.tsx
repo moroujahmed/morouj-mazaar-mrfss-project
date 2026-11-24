@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { SiteFooter } from "@/components/storefront/site-footer";
 import { TrackerLive } from "@/components/tracker/tracker-live";
 import { buttonClasses } from "@/components/ui/button";
 import { getOrderStore } from "@/lib/orders/store";
@@ -90,17 +91,17 @@ export default async function OrderPage({
 
 function OrderShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-dvh bg-surface-inset">
-      <header className="border-b border-green-100 bg-surface">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+    <div className="min-h-dvh bg-[#f4f7f5] text-green-950">
+      <header className="sticky top-0 z-40 border-b border-green-100/80 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
           <Link
             href="/"
-            className="inline-flex min-h-touch items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-green-800 underline underline-offset-4 hover:bg-green-50"
+            className="inline-flex min-h-touch items-center gap-2 rounded-xl px-2 text-sm font-semibold text-green-800 hover:bg-green-50"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
-            Bazaar Flame &amp; Grill
+            <span className="text-lg font-extrabold tracking-tight text-green-950">Bazaar Flame &amp; Grill</span>
           </Link>
-          <p className="text-eyebrow uppercase text-orange-700">Order tracker</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700">Order tracker</p>
         </div>
       </header>
       <main
@@ -109,6 +110,7 @@ function OrderShell({ children }: { children: ReactNode }) {
       >
         {children}
       </main>
+      <SiteFooter />
     </div>
   );
 }

@@ -17,6 +17,7 @@ Format follows a simple `Added / Changed / Fixed / Removed` structure. Dates are
 
 - `src/components/storefront/storefront.tsx`: redesigned to align with the Stitch AI customer storefront reference, including hero imagery, category/filter presentation, and clearer menu sections.
 - `src/components/storefront/item-card.tsx`, `dish-image.tsx`, `item-sheet.tsx`, `cart-dock.tsx`, and `cart-sheet.tsx`: updated visual treatment for real dish images and a more polished Stitch-aligned shopping flow; kept test-critical aria labels/roles (`Customize <item>`, `Add <item> to cart`, `View cart:`, `Your cart`, `Continue to checkout`, search label, category `aria-pressed`).
+- `src/components/storefront/site-footer.tsx` and customer page shells (`checkout`, `orders/[token]`, `checkout/mock-payment`, menu unavailable, design system): added consistent Stitch-style header/footer treatment across customer-facing pages.
 - `src/lib/storefront/fixture.ts` and `supabase/seed.sql`: mapped real image URLs for matching demo/seed items; items without photos continue to use the branded placeholder.
 
 ### Verification

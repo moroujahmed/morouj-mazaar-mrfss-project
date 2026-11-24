@@ -44,6 +44,7 @@ import { CartDock } from "./cart-dock";
 import { CartSheet } from "./cart-sheet";
 import { ItemCard } from "./item-card";
 import { ItemSheet } from "./item-sheet";
+import { SiteFooter } from "./site-footer";
 
 export type StorefrontProps = {
   menu: StorefrontMenu;
@@ -545,18 +546,9 @@ export function Storefront({
           )}
         </section>
 
-        <footer className="border-t border-green-100 pt-6 text-sm text-ink-secondary">
-          <p>
-            {settings.restaurantName} · Kampala, Uganda · Prices in{" "}
-            {settings.currency}
-          </p>
-          <p className="mt-1">
-            {dineIn
-              ? `Dine-in · no delivery fee · no minimum order`
-              : `Delivery minimum ${formatUGX(settings.minimumOrderValue)} · Dine-in minimum ${formatUGX(settings.minimumOrderValueDineIn)}`}
-          </p>
-        </footer>
       </main>
+
+      <SiteFooter />
 
       <CartDock
         lines={lines}

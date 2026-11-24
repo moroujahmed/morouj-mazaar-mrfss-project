@@ -26,6 +26,7 @@ import { createOrderAction } from "@/actions/checkout";
 import { sendCodOtpAction } from "@/actions/otp";
 import { initiatePaymentAction } from "@/actions/payments";
 import { DynamicMap } from "@/components/map/dynamic-map";
+import { SiteFooter } from "@/components/storefront/site-footer";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -639,12 +640,13 @@ export function CheckoutClient({
             }
           />
         </main>
+        <SiteFooter />
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-surface-inset pb-24">
+    <div className="min-h-dvh bg-[#f4f7f5] pb-24 text-green-950">
       <CheckoutHeader editHref={editHref} />
 
       <main
@@ -1230,22 +1232,23 @@ export function CheckoutClient({
           </p>
         </aside>
       </main>
+      <SiteFooter />
     </div>
   );
 }
 
 function CheckoutHeader({ editHref }: { editHref: string }) {
   return (
-    <header className="border-b border-green-100 bg-surface">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-green-100/80 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
         <Link
           href={editHref}
-          className="inline-flex min-h-touch items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-green-800 underline underline-offset-4 hover:bg-green-50"
+          className="inline-flex min-h-touch items-center gap-2 rounded-xl px-2 text-sm font-semibold text-green-800 hover:bg-green-50"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
-          Back to menu
+          <span className="text-lg font-extrabold tracking-tight text-green-950">Bazaar Flame &amp; Grill</span>
         </Link>
-        <p className="text-eyebrow uppercase text-orange-700">Secure checkout</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700">Secure checkout</p>
       </div>
     </header>
   );

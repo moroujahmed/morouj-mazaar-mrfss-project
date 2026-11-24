@@ -5,13 +5,13 @@ import {
   CheckCircle2,
   Clock,
   Inbox,
-  MapPin,
   Package,
   Utensils,
 } from "lucide-react";
 
 import { DesignSystemDemos } from "./demos";
 import { DynamicMap } from "@/components/map/dynamic-map";
+import { SiteFooter } from "@/components/storefront/site-footer";
 import {
   Badge,
   Button,
@@ -110,6 +110,7 @@ const swatches = [
 
 export default function DesignSystemPage() {
   return (
+    <>
     <main
       id="main-content"
       className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-4 py-10 sm:px-6"
@@ -386,10 +387,8 @@ export default function DesignSystemPage() {
         </Table>
       </section>
 
-      <footer className="flex items-center gap-2 border-t border-green-100 pt-6 text-sm text-ink-secondary">
-        <MapPin aria-hidden="true" className="size-4" />
-        Kampala, Uganda · Africa/Kampala (EAT)
-      </footer>
     </main>
+    <SiteFooter />
+    </>
   );
 }
