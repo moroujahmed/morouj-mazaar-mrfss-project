@@ -3,7 +3,7 @@
 | Field | Value |
 | :--- | :--- |
 | **Date** | 2026-11-24 |
-| **Branch/commit** | `main` (includes the 2026-11-24 documented-endpoint completion commit) |
+| **Branch/commit** | `main` at `b6dbb2d` (2026-11-24 endpoint completion; previous evidence at `98605a9`) |
 | **Scope** | Phase 12 launch gates plus completion of the documented `/api/health`, `/api/cron/close-shifts`, and `/api/notifications/dispatch` handlers |
 
 ## 1. Automated quality gates
